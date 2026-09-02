@@ -5,7 +5,7 @@ description: أكتر الأسئلة اللي بتتكرر بمقابلات اخ
 publishDate: 2026-08-15
 updatedDate: ''
 category: مهارات
-cover: /uploads/Screenshot 2026-04-02 111615.png
+cover: ''
 featured: false
 draft: false
 ---
