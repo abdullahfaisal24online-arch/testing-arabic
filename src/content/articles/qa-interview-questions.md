@@ -6,7 +6,7 @@ publishDate: 2026-08-15
 updatedDate: ''
 category: مهارات
 cover: ''
-featured: false
+featured: true
 draft: false
 ---
 
