@@ -85,7 +85,7 @@ collections:
         collection: tracks
         search_fields:
           - title
-        value_field: "{{filename}}"
+        value_field: slug
         display_fields:
           - title
         required: false
