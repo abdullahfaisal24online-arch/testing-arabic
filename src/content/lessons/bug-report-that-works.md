@@ -6,7 +6,7 @@ publishDate: 2026-08-01
 category: أساسيات
 level: مبتدئ
 duration: "19:30"
-track: qa-basics
+course: qa-basics
 order: 3
 draft: false
 resources:

@@ -1,0 +1,30 @@
+---
+import { formatDate } from '../lib/utils';
+
+interface Props {
+  item: {
+    id: string;
+    data: { title: string; description: string; publishDate: Date; pinned: boolean };
+  };
+}
+const { item } = Astro.props;
+---
+<a class="card news" href={`/news/${item.id}/`}>
+  <div class="card-body">
+    <span class="meta">
+      <time datetime={item.data.publishDate.toISOString()}>{formatDate(item.data.publishDate)}</time>
+      {item.data.pinned && <span class="pin">مثبّت</span>}
+    </span>
+    <span class="ttl">{item.data.title}</span>
+    {item.data.description && <p class="desc">{item.data.description}</p>}
+  </div>
+</a>
+
+<style>
+  .news { color: inherit; background: var(--navy); }
+  .news .card-body { padding: 24px; gap: 10px; }
+  .meta { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+  .pin { font-size: 11px; font-weight: 600; color: var(--orange); background: var(--orange-soft); padding: 3px 9px; border-radius: 999px; }
+  .ttl { font-size: 18px; font-weight: 700; line-height: 1.6; }
+  .desc { font-size: 15px; color: var(--ink-3); line-height: 1.85; }
+</style>

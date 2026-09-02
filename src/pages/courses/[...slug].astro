@@ -1,0 +1,149 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { getSite } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const courses = (await getCollection('courses')).filter((c) => !c.data.draft);
+  const lessons = (await getCollection('lessons')).filter((l) => !l.data.draft);
+  return courses.map((course) => ({
+    params: { slug: course.id },
+    props: {
+      course,
+      lessons: lessons
+        .filter((l) => (l.data.course ?? l.data.track) === course.id)
+        .sort((a, b) => a.data.order - b.data.order),
+    },
+  }));
+}
+
+const { course, lessons } = Astro.props;
+const { data } = course;
+const { Content } = await render(course);
+const site = await getSite();
+
+const totalSeconds = lessons.reduce((sum, l) => {
+  const p = l.data.duration.split(':').map((n) => parseInt(n, 10) || 0);
+  const s = p.length === 3 ? p[0] * 3600 + p[1] * 60 + p[2] : p.length === 2 ? p[0] * 60 + p[1] : p[0];
+  return sum + s;
+}, 0);
+const hours = Math.floor(totalSeconds / 3600);
+const mins = Math.round((totalSeconds % 3600) / 60);
+const totalLabel = hours > 0 ? `${hours} ساعة و${mins} دقيقة` : `${mins} دقيقة`;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    name: data.title,
+    description: data.description,
+    inLanguage: 'ar',
+    url: `${site.url}/courses/${course.id}/`,
+    provider: { '@type': 'Organization', name: site.name, url: site.url },
+    isAccessibleForFree: true,
+    hasCourseInstance: {
+      '@type': 'CourseInstance',
+      courseMode: 'online',
+      courseWorkload: `PT${Math.max(1, Math.round(totalSeconds / 60))}M`,
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: site.url },
+      { '@type': 'ListItem', position: 2, name: 'الدورات', item: `${site.url}/courses/` },
+      { '@type': 'ListItem', position: 3, name: data.title, item: `${site.url}/courses/${course.id}/` },
+    ],
+  },
+];
+---
+<Base title={data.title} description={data.description} jsonLd={jsonLd}>
+  <div class="wrap crumbs">
+    <a href="/">الرئيسية</a><span>›</span><a href="/courses/">الدورات</a><span>›</span>
+    <span class="now">{data.title}</span>
+  </div>
+
+  <section class="hero dots">
+    <div class="wrap hero-in">
+      <div class="txt">
+        {data.recommended && <span class="badge badge-orange">الدورة الموصى فيها للبداية</span>}
+        <h1>{data.title}</h1>
+        <p class="lead">{data.description}</p>
+        <div class="stats">
+          <div><b>{lessons.length}</b><span>عدد الدروس</span></div>
+          <i></i>
+          <div><b>{totalLabel}</b><span>مدة المشاهدة</span></div>
+          <i></i>
+          <div><b>{data.level}</b><span>المستوى</span></div>
+        </div>
+        {lessons.length > 0 && (
+          <a class="btn btn-primary" href={`/lessons/${lessons[0].id}/`}>
+            ابدأ الدورة <Icon name="arrow" size={19} />
+          </a>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap grid-wrap">
+      <div>
+        <h2 class="ttl">محتوى الدورة</h2>
+        <ol class="curr">
+          {lessons.map((l, i) => (
+            <li>
+              <a class="row-item" href={`/lessons/${l.id}/`}>
+                <span class="num mono">{String(i + 1).padStart(2, '0')}</span>
+                <span class="name">{l.data.title}</span>
+                <span class="dur mono">{l.data.duration}</span>
+                <span class="badge">مجاني</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+        {lessons.length === 0 && <p class="lead">دروس هذه الدورة قيد الإضافة.</p>}
+      </div>
+
+      <div class="notes">
+        <div class="prose"><Content /></div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .crumbs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-block: 18px; font-size: 14px; color: var(--muted); }
+  .crumbs .now { color: var(--ink); }
+  .hero { background: var(--navy); border-block: 1px solid var(--line); }
+  .hero-in { padding-block: 48px 54px; }
+  .txt { display: grid; gap: 18px; justify-items: start; max-width: 760px; }
+  .stats { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .stats div { display: grid; gap: 2px; }
+  .stats b { font-size: 22px; }
+  .stats span { font-size: 13px; color: var(--muted); }
+  .stats i { width: 1px; height: 32px; background: var(--line); }
+
+  .grid-wrap { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 44px; align-items: start; }
+  @media (max-width: 940px) { .grid-wrap { grid-template-columns: minmax(0, 1fr); } }
+  .ttl { font-size: 22px; margin-bottom: 16px; }
+  .curr { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .row-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 14px;
+    background: var(--navy);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 15px 18px;
+    color: inherit;
+    min-height: 48px;
+  }
+  .row-item:hover { border-color: var(--line-strong); }
+  .num { font-size: 13px; color: var(--cyan); }
+  .name { font-size: 16px; font-weight: 500; }
+  .dur { font-size: 13px; color: var(--muted); }
+  .notes .prose { font-size: 16px; }
+</style>

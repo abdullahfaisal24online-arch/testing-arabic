@@ -3,10 +3,11 @@ import { getCollection } from 'astro:content';
 import { excerpt } from '../lib/utils';
 
 export const GET: APIRoute = async () => {
-  const [lessons, articles, tracks, pages] = await Promise.all([
+  const [lessons, articles, courses, news, pages] = await Promise.all([
     getCollection('lessons'),
     getCollection('articles'),
-    getCollection('tracks'),
+    getCollection('courses'),
+    getCollection('news'),
     getCollection('pages'),
   ]);
 
@@ -29,14 +30,23 @@ export const GET: APIRoute = async () => {
         url: `/articles/${a.id}/`,
         text: excerpt(a.body ?? '', 1200),
       })),
-    ...tracks
-      .filter((t) => !t.data.draft)
-      .map((t) => ({
-        kind: 'مسار',
-        title: t.data.title,
-        description: t.data.description,
-        url: `/tracks/${t.id}/`,
-        text: excerpt(t.body ?? '', 600),
+    ...courses
+      .filter((c) => !c.data.draft)
+      .map((c) => ({
+        kind: 'دورة',
+        title: c.data.title,
+        description: c.data.description,
+        url: `/courses/${c.id}/`,
+        text: excerpt(c.body ?? '', 600),
+      })),
+    ...news
+      .filter((n) => !n.data.draft)
+      .map((n) => ({
+        kind: 'خبر',
+        title: n.data.title,
+        description: n.data.description,
+        url: `/news/${n.id}/`,
+        text: excerpt(n.body ?? '', 800),
       })),
     ...pages
       .filter((p) => !p.data.draft)

@@ -3,26 +3,26 @@
   "logoTop": "Testing",
   "logoBottom": "بالعربي",
   "tagline": "تعلّم اختبار البرمجيات بالعربي — من الصفر لحدّ الأتمتة",
-  "description": "منصة عربية لتعليم اختبار البرمجيات: دروس مصوّرة، مسارات مرتّبة، ومقالات عملية في الاختبار اليدوي والأتمتة وأدوات الـ QA.",
+  "description": "منصة عربية لتعليم اختبار البرمجيات: دورات مرتّبة، دروس مصوّرة، ومقالات عملية في الاختبار اليدوي والأتمتة وأدوات الـ QA.",
   "url": "https://testing-arabic.com",
-  "author": "Abdullah Faisal",
-  "youtube": "https://www.youtube.com/@testingbilarabic",
-  "linkedin": "https://www.linkedin.com/in/abdullah94faisal/",
-  "email": "abdullahqafaisal@gmail.com",
+  "author": "عبدالله",
+  "youtube": "https://www.youtube.com/@testingbilarabi",
+  "linkedin": "",
+  "email": "testingarabic94@gmail.com",
   "newsletterAction": "",
   "bunnyLibraryId": "",
   "bunnyCdnHostname": "",
   "headerCtaLabel": "ابدأ من هنا",
-  "headerCtaHref": "/tracks/",
-  "footerNote": "الموقع قيد التطوير والصيانة ، ربنا يسهّل 🔻",
+  "headerCtaHref": "/courses/",
+  "footerNote": "كل المحتوى بالعربي، ومستضاف على دومين مستقل.",
   "nav": [
     {
       "label": "الرئيسية",
       "href": "/"
     },
     {
-      "label": "المسارات",
-      "href": "/tracks/"
+      "label": "الدورات",
+      "href": "/courses/"
     },
     {
       "label": "الدروس",
@@ -31,6 +31,10 @@
     {
       "label": "المقالات",
       "href": "/articles/"
+    },
+    {
+      "label": "آخر الأخبار",
+      "href": "/news/"
     },
     {
       "label": "عن المنصة",

@@ -1,0 +1,47 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import NewsCard from '../../components/NewsCard.astro';
+import { getSite } from '../../lib/site';
+
+const site = await getSite();
+
+const news = (await getCollection('news'))
+  .filter((n) => !n.data.draft)
+  .sort((a, b) => {
+    if (a.data.pinned !== b.data.pinned) return a.data.pinned ? -1 : 1;
+    return b.data.publishDate.valueOf() - a.data.publishDate.valueOf();
+  });
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'آخر الأخبار',
+  url: `${site.url}/news/`,
+  inLanguage: 'ar',
+};
+---
+<Base
+  title="آخر الأخبار"
+  description="آخر أخبار وتحديثات منصة Testing بالعربي: دورات جديدة، إضافات على المنصة، وإعلانات."
+  jsonLd={jsonLd}
+>
+  <section class="page-head dots">
+    <div class="wrap">
+      <h1>آخر الأخبار</h1>
+      <p class="lead">كل جديد بالمنصة والقناة — دورات جديدة، تحديثات، وإعلانات.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="grid grid-2">{news.map((n) => <NewsCard item={n} />)}</div>
+      {news.length === 0 && <p class="lead">ما في أخبار منشورة بعد.</p>}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-head { background: var(--navy); border-bottom: 1px solid var(--line); padding-block: 52px 44px; }
+  .page-head h1 { margin-bottom: 12px; }
+</style>

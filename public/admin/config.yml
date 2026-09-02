@@ -8,6 +8,64 @@ media_folder: public/uploads
 public_folder: /uploads
 
 collections:
+  - name: courses
+    label: "الدورات"
+    label_singular: "دورة"
+    folder: src/content/courses
+    create: true
+    slug: "{{fields.slug}}"
+    extension: md
+    format: frontmatter
+    summary: "{{title}}"
+    fields:
+      - name: title
+        label: "اسم الدورة"
+        widget: string
+      - name: slug
+        label: "الرابط بالإنجليزي بدون مسافات"
+        widget: string
+        hint: "مثال: qa-basics — بيصير رابط الدورة /courses/qa-basics/"
+      - name: description
+        label: "الوصف"
+        widget: text
+      - name: level
+        label: "المستوى"
+        widget: select
+        default: "مبتدئ"
+        options:
+          - "مبتدئ"
+          - "متوسط"
+          - "متقدّم"
+      - name: order
+        label: "ترتيب الدورة بالصفحة"
+        widget: number
+        default: 1
+        value_type: int
+        min: 0
+      - name: accent
+        label: "اللون المميّز"
+        widget: select
+        default: cyan
+        options:
+          - cyan
+          - orange
+      - name: recommended
+        label: "موصى فيها للبداية"
+        widget: boolean
+        default: false
+      - name: cover
+        label: "صورة الدورة"
+        widget: image
+        required: false
+      - name: draft
+        label: "مسودّة لا تُنشر"
+        widget: boolean
+        default: false
+      - name: body
+        label: "نص إضافي بصفحة الدورة"
+        widget: markdown
+        required: false
+
   - name: lessons
     label: "الدروس"
     label_singular: "درس"
@@ -79,18 +137,19 @@ collections:
         label: "صورة مصغّرة مخصّصة"
         widget: image
         required: false
-      - name: track
-        label: "المسار التعليمي"
+      - name: course
+        label: "الدورة"
         widget: relation
-        collection: tracks
+        collection: courses
         search_fields:
           - title
         value_field: slug
         display_fields:
           - title
         required: false
+        hint: "اتركه فاضي إذا الدرس فيديو متفرّق مش ضمن دورة"
       - name: order
-        label: "ترتيب الدرس داخل المسار"
+        label: "ترتيب الدرس داخل الدورة"
         widget: number
         default: 1
         value_type: int
@@ -180,10 +239,10 @@ collections:
         label: "نص المقال"
         widget: markdown
 
-  - name: tracks
-    label: "المسارات"
-    label_singular: "مسار"
-    folder: src/content/tracks
+  - name: news
+    label: "آخر الأخبار"
+    label_singular: "خبر"
+    folder: src/content/news
     create: true
     slug: "{{fields.slug}}"
     extension: md
@@ -191,37 +250,29 @@ collections:
     summary: "{{title}}"
     fields:
       - name: title
-        label: "اسم المسار"
+        label: "عنوان الخبر"
         widget: string
       - name: slug
         label: "الرابط بالإنجليزي بدون مسافات"
         widget: string
+        hint: "مثال: new-course-maestro"
       - name: description
-        label: "الوصف"
+        label: "الوصف المختصر"
         widget: text
-      - name: level
-        label: "المستوى"
-        widget: select
-        default: "مبتدئ"
-        options:
-          - "مبتدئ"
-          - "متوسط"
-          - "متقدّم"
-      - name: order
-        label: "ترتيب المسار بالصفحة"
-        widget: number
-        default: 1
-        value_type: int
-        min: 0
-      - name: accent
-        label: "اللون المميّز"
-        widget: select
-        default: cyan
-        options:
-          - cyan
-          - orange
-      - name: recommended
-        label: "موصى فيه للبداية"
+        required: false
+      - name: publishDate
+        label: "تاريخ النشر"
+        widget: datetime
+        format: "YYYY-MM-DD"
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        picker_utc: true
+      - name: cover
+        label: "صورة الخبر"
+        widget: image
+        required: false
+      - name: pinned
+        label: "تثبيت بأعلى الأخبار"
         widget: boolean
         default: false
       - name: draft
@@ -229,9 +280,8 @@ collections:
         widget: boolean
         default: false
       - name: body
-        label: "نص إضافي بصفحة المسار"
+        label: "نص الخبر"
         widget: markdown
-        required: false
 
   - name: pages
     label: "الصفحات"
@@ -348,7 +398,7 @@ collections:
               - name: href
                 label: "الرابط"
                 widget: string
-                hint: "مثال: /tracks/ أو /about/"
+                hint: "مثال: /courses/ أو /news/ أو /about/"
 
       - name: home
         label: "الصفحة الرئيسية"
@@ -365,7 +415,7 @@ collections:
             label: "الكلمة المميّزة باللون السماوي"
             widget: string
             required: false
-            hint: "لازم تكون كلمة موجودة داخل العنوان الرئيسي"
+            hint: "لازم تكون كلمة موجودة حرفياً داخل العنوان الرئيسي"
           - name: heroSubtitle
             label: "النص تحت العنوان"
             widget: text
@@ -394,8 +444,8 @@ collections:
             label: "وصف رقم الدروس"
             widget: string
             required: false
-          - name: statTracksLabel
-            label: "وصف رقم المسارات"
+          - name: statCoursesLabel
+            label: "وصف رقم الدورات"
             widget: string
             required: false
           - name: statArticlesLabel
@@ -414,20 +464,20 @@ collections:
             label: "نص رابط البطاقة المميّزة"
             widget: string
             required: false
-          - name: showTracks
-            label: "إظهار قسم المسارات"
+          - name: showCourses
+            label: "إظهار قسم الدورات"
             widget: boolean
             default: true
-          - name: tracksEyebrow
-            label: "قسم المسارات — الشارة"
+          - name: coursesEyebrow
+            label: "قسم الدورات — الشارة"
             widget: string
             required: false
-          - name: tracksTitle
-            label: "قسم المسارات — العنوان"
+          - name: coursesTitle
+            label: "قسم الدورات — العنوان"
             widget: string
             required: false
-          - name: tracksSubtitle
-            label: "قسم المسارات — النص"
+          - name: coursesSubtitle
+            label: "قسم الدورات — النص"
             widget: text
             required: false
           - name: showLessons
@@ -444,6 +494,14 @@ collections:
             default: true
           - name: articlesTitle
             label: "قسم المقالات — العنوان"
+            widget: string
+            required: false
+          - name: showNews
+            label: "إظهار قسم آخر الأخبار"
+            widget: boolean
+            default: true
+          - name: newsTitle
+            label: "قسم الأخبار — العنوان"
             widget: string
             required: false
           - name: newsletterTitle

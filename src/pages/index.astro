@@ -4,7 +4,8 @@ import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import LessonCard from '../components/LessonCard.astro';
 import ArticleCard from '../components/ArticleCard.astro';
-import TrackCard from '../components/TrackCard.astro';
+import CourseCard from '../components/CourseCard.astro';
+import NewsCard from '../components/NewsCard.astro';
 import Newsletter from '../components/Newsletter.astro';
 import { getSite, getHome, splitHighlight } from '../lib/site';
 import { bunnyThumb } from '../lib/utils';
@@ -19,9 +20,16 @@ const lessons = (await getCollection('lessons'))
   .filter(live)
   .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
 
-const tracks = (await getCollection('tracks'))
+const courses = (await getCollection('courses'))
   .filter(live)
   .sort((a, b) => a.data.order - b.data.order);
+
+const news = (await getCollection('news'))
+  .filter(live)
+  .sort((a, b) => {
+    if (a.data.pinned !== b.data.pinned) return a.data.pinned ? -1 : 1;
+    return b.data.publishDate.valueOf() - a.data.publishDate.valueOf();
+  });
 
 const articles = (await getCollection('articles'))
   .filter(live)
@@ -33,7 +41,8 @@ const featuredThumb = featured
   : null;
 const latest = lessons.filter((l) => l.id !== featured?.id).slice(0, 4);
 
-const countFor = (trackId: string) => lessons.filter((l) => l.data.track === trackId).length;
+const countFor = (courseId: string) =>
+  lessons.filter((l) => (l.data.course ?? l.data.track) === courseId).length;
 
 const jsonLd = [
   {
@@ -86,7 +95,7 @@ const jsonLd = [
           <div class="stats">
             <div><b>{lessons.length}</b><span>{home.statLessonsLabel}</span></div>
             <i></i>
-            <div><b>{tracks.length}</b><span>{home.statTracksLabel}</span></div>
+            <div><b>{courses.length}</b><span>{home.statCoursesLabel}</span></div>
             <i></i>
             <div><b>{articles.length}</b><span>{home.statArticlesLabel}</span></div>
           </div>
@@ -115,21 +124,21 @@ const jsonLd = [
     </div>
   </section>
 
-  <!-- ===== المسارات ===== -->
-  {home.showTracks && tracks.length > 0 && (
+  <!-- ===== الدورات ===== -->
+  {home.showCourses && courses.length > 0 && (
     <section class="section">
       <div class="wrap">
         <div class="section-head">
           <div>
-            {home.tracksEyebrow && <span class="eyebrow">{home.tracksEyebrow}</span>}
-            <h2>{home.tracksTitle}</h2>
-            {home.tracksSubtitle && <p class="lead">{home.tracksSubtitle}</p>}
+            {home.coursesEyebrow && <span class="eyebrow">{home.coursesEyebrow}</span>}
+            <h2>{home.coursesTitle}</h2>
+            {home.coursesSubtitle && <p class="lead">{home.coursesSubtitle}</p>}
           </div>
           <span class="grow"></span>
-          <a href="/tracks/" class="more">كل المسارات ←</a>
+          <a href="/courses/" class="more">كل الدورات ←</a>
         </div>
         <div class="grid grid-3">
-          {tracks.slice(0, 3).map((t) => <TrackCard track={t} count={countFor(t.id)} />)}
+          {courses.slice(0, 3).map((c) => <CourseCard course={c} count={countFor(c.id)} />)}
         </div>
       </div>
     </section>
@@ -162,6 +171,22 @@ const jsonLd = [
         </div>
         <div class="grid grid-3">
           {articles.slice(0, 3).map((a) => <ArticleCard article={a} />)}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- ===== آخر الأخبار ===== -->
+  {home.showNews && news.length > 0 && (
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>{home.newsTitle}</h2>
+          <span class="grow"></span>
+          <a href="/news/" class="more">كل الأخبار ←</a>
+        </div>
+        <div class="grid grid-2">
+          {news.slice(0, 2).map((n) => <NewsCard item={n} />)}
         </div>
       </div>
     </section>

@@ -31,6 +31,8 @@ const lessons = defineCollection({
     videoId: optString,
     youtubeUrl: optString,
     thumbnail: optString,
+    // الدورة التي ينتمي لها الدرس (track = الاسم القديم، مدعوم للتوافق)
+    course: optString,
     track: optString,
     order: num(0),
     resources: z.preprocess(
@@ -57,9 +59,9 @@ const articles = defineCollection({
   }),
 });
 
-/* ===== المسارات ===== */
-const tracks = defineCollection({
-  loader: glob({ base: './src/content/tracks', pattern: '**/*.{md,mdx}' }),
+/* ===== الدورات ===== */
+const courses = defineCollection({
+  loader: glob({ base: './src/content/courses', pattern: '**/*.{md,mdx}' }),
   schema: z.object({
     title: z.string(),
     description: str(''),
@@ -67,11 +69,25 @@ const tracks = defineCollection({
     order: num(0),
     accent: z.preprocess(fallback('cyan'), z.enum(['cyan', 'orange'])),
     recommended: bool(false),
+    cover: optString,
     draft: bool(false),
   }),
 });
 
-/* ===== صفحات حرّة (عن المنصة، الخصوصية، تواصل…) ===== */
+/* ===== آخر الأخبار ===== */
+const news = defineCollection({
+  loader: glob({ base: './src/content/news', pattern: '**/*.{md,mdx}' }),
+  schema: z.object({
+    title: z.string(),
+    description: str(''),
+    publishDate: z.coerce.date(),
+    cover: optString,
+    pinned: bool(false),
+    draft: bool(false),
+  }),
+});
+
+/* ===== صفحات حرّة ===== */
 const pages = defineCollection({
   loader: glob({ base: './src/content/pages', pattern: '**/*.{md,mdx}' }),
   schema: z.object({
@@ -123,19 +139,21 @@ const home = defineCollection({
     secondaryCtaHref: optString,
     showStats: bool(true),
     statLessonsLabel: optString,
-    statTracksLabel: optString,
+    statCoursesLabel: optString,
     statArticlesLabel: optString,
     showFeatured: bool(true),
     featuredBadge: optString,
     featuredCta: optString,
-    showTracks: bool(true),
-    tracksEyebrow: optString,
-    tracksTitle: optString,
-    tracksSubtitle: optString,
+    showCourses: bool(true),
+    coursesEyebrow: optString,
+    coursesTitle: optString,
+    coursesSubtitle: optString,
     showLessons: bool(true),
     lessonsTitle: optString,
     showArticles: bool(true),
     articlesTitle: optString,
+    showNews: bool(true),
+    newsTitle: optString,
     newsletterTitle: optString,
     newsletterText: optString,
     newsletterButton: optString,
@@ -143,4 +161,4 @@ const home = defineCollection({
   }),
 });
 
-export const collections = { lessons, articles, tracks, pages, site, home };
+export const collections = { lessons, articles, courses, news, pages, site, home };

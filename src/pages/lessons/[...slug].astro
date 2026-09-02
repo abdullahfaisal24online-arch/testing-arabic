@@ -8,11 +8,12 @@ import { formatDate, durationToISO, bunnyEmbed, bunnyThumb } from '../../lib/uti
 
 export async function getStaticPaths() {
   const lessons = (await getCollection('lessons')).filter((l) => !l.data.draft);
-  const tracks = await getCollection('tracks');
+  const courses = await getCollection('courses');
   return lessons.map((lesson) => {
-    const track = tracks.find((t) => t.id === lesson.data.track);
+    const courseId = lesson.data.course ?? lesson.data.track;
+    const course = courses.find((c) => c.id === courseId);
     const siblings = lessons
-      .filter((l) => l.data.track && l.data.track === lesson.data.track)
+      .filter((l) => courseId && (l.data.course ?? l.data.track) === courseId)
       .sort((a, b) => a.data.order - b.data.order);
     const idx = siblings.findIndex((l) => l.id === lesson.id);
     const related = lessons
@@ -22,7 +23,7 @@ export async function getStaticPaths() {
       params: { slug: lesson.id },
       props: {
         lesson,
-        track,
+        course,
         siblings,
         prev: idx > 0 ? siblings[idx - 1] : undefined,
         next: idx >= 0 && idx < siblings.length - 1 ? siblings[idx + 1] : undefined,
@@ -32,7 +33,7 @@ export async function getStaticPaths() {
   });
 }
 
-const { lesson, track, siblings, prev, next, related } = Astro.props;
+const { lesson, course, siblings, prev, next, related } = Astro.props;
 const { data } = lesson;
 const { Content } = await render(lesson);
 const site = await getSite();
@@ -75,7 +76,7 @@ const jsonLd = [
 >
   <div class="wrap crumbs">
     <a href="/">الرئيسية</a><span>›</span>
-    {track ? <><a href={`/tracks/${track.id}/`}>{track.data.title}</a><span>›</span></> : <><a href="/lessons/">الدروس</a><span>›</span></>}
+    {course ? <><a href={`/courses/${course.id}/`}>{course.data.title}</a><span>›</span></> : <><a href="/lessons/">الدروس</a><span>›</span></>}
     <span class="now">{data.title}</span>
   </div>
 
@@ -116,7 +117,7 @@ const jsonLd = [
 
       <div class="prose"><Content /></div>
 
-      <nav class="pager" aria-label="التنقّل بين دروس المسار">
+      <nav class="pager" aria-label="التنقّل بين دروس الدورة">
         {prev ? (
           <a class="pg" href={`/lessons/${prev.id}/`}>
             <span class="pg-lbl">الدرس السابق</span>
@@ -146,10 +147,10 @@ const jsonLd = [
         </section>
       )}
 
-      {track && siblings.length > 0 && (
+      {course && siblings.length > 0 && (
         <section class="box">
-          <span class="eyebrow">محتوى المسار</span>
-          <h2 class="box-ttl">{track.data.title}</h2>
+          <span class="eyebrow">محتوى الدورة</span>
+          <h2 class="box-ttl">{course.data.title}</h2>
           <ol class="pl">
             {siblings.map((s, i) => (
               <li>
@@ -162,7 +163,7 @@ const jsonLd = [
               </li>
             ))}
           </ol>
-          <a class="btn btn-ghost btn-sm full" href={`/tracks/${track.id}/`}>صفحة المسار</a>
+          <a class="btn btn-ghost btn-sm full" href={`/courses/${course.id}/`}>صفحة الدورة</a>
         </section>
       )}
     </aside>

@@ -5,9 +5,10 @@ import { getSite } from '../lib/site';
 
 export async function GET(context: APIContext) {
   const site = await getSite();
-  const [lessons, articles] = await Promise.all([
+  const [lessons, articles, news] = await Promise.all([
     getCollection('lessons'),
     getCollection('articles'),
+    getCollection('news'),
   ]);
 
   const items = [
@@ -22,6 +23,12 @@ export async function GET(context: APIContext) {
       description: a.data.description,
       pubDate: a.data.publishDate,
       link: `/articles/${a.id}/`,
+    })),
+    ...news.filter((n) => !n.data.draft).map((n) => ({
+      title: n.data.title,
+      description: n.data.description,
+      pubDate: n.data.publishDate,
+      link: `/news/${n.id}/`,
     })),
   ].sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
 
