@@ -1,6 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /search
-
-Sitemap: https://testing-arabic.com/sitemap-index.xml
