@@ -1,0 +1,50 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import TrackCard from '../../components/TrackCard.astro';
+import { SITE } from '../../consts';
+
+const tracks = (await getCollection('tracks'))
+  .filter((t) => !t.data.draft)
+  .sort((a, b) => a.data.order - b.data.order);
+const lessons = (await getCollection('lessons')).filter((l) => !l.data.draft);
+const countFor = (id: string) => lessons.filter((l) => l.data.track === id).length;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'المسارات التعليمية',
+  itemListElement: tracks.map((t, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: t.data.title,
+    url: `${SITE.url}/tracks/${t.id}`,
+  })),
+};
+---
+<Base
+  title="المسارات التعليمية"
+  description="مسارات مرتّبة لتعلّم اختبار البرمجيات بالعربي: الأساسيات، أدوات إدارة الاختبار، وأتمتة الاختبار خطوة بخطوة."
+  jsonLd={jsonLd}
+>
+  <section class="page-head dots">
+    <div class="wrap">
+      <h1>المسارات التعليمية</h1>
+      <p class="lead">اختر وين حابب توصل، والمسار بيرتّبلك الدروس بالترتيب الصح. تقدر تبدأ من أي نقطة.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="grid grid-3">
+        {tracks.map((t) => <TrackCard track={t} count={countFor(t.id)} />)}
+      </div>
+      {tracks.length === 0 && <p class="lead">ما في مسارات منشورة بعد.</p>}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-head { background: var(--navy); border-bottom: 1px solid var(--line); padding-block: 52px 44px; }
+  .page-head h1 { margin-bottom: 12px; }
+</style>

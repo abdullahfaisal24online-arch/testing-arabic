@@ -1,19 +1,21 @@
 ---
-import { NEWSLETTER_ACTION } from '../consts';
+import { getSite, getHome } from '../lib/site';
+const site = await getSite();
+const home = await getHome();
 ---
-{NEWSLETTER_ACTION && (
+{site.newsletterAction && (
   <section class="section">
     <div class="wrap">
       <div class="nl dots">
         <div class="txt">
-          <h2>خلّي طريقك لعندي مضمون</h2>
-          <p class="lead">اشترك بالنشرة، وبيوصلك كل درس ومقال جديد على بريدك مباشرة — بدون ما تعتمد على خوارزمية أو منصة واحدة.</p>
+          <h2>{home.newsletterTitle}</h2>
+          <p class="lead">{home.newsletterText}</p>
         </div>
-        <form class="form" action={NEWSLETTER_ACTION} method="post" target="_blank">
+        <form class="form" action={site.newsletterAction} method="post" target="_blank">
           <label class="sr-only" for="nl-email">بريدك الإلكتروني</label>
           <input id="nl-email" name="email" type="email" required placeholder="بريدك الإلكتروني" />
-          <button class="btn btn-primary" type="submit">اشترك</button>
-          <span class="note">بدون سبام. إلغاء الاشتراك بضغطة واحدة.</span>
+          <button class="btn btn-primary" type="submit">{home.newsletterButton}</button>
+          {home.newsletterNote && <span class="note">{home.newsletterNote}</span>}
         </form>
       </div>
     </div>

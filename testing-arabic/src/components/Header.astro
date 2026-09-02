@@ -1,0 +1,104 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { NAV } from '../consts';
+
+const path = Astro.url.pathname;
+const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+<header class="site-head">
+  <div class="wrap inner">
+    <a href="/" class="brand" aria-label="الصفحة الرئيسية"><Logo /></a>
+
+    <nav class="nav" aria-label="القائمة الرئيسية">
+      {NAV.map((item) => (
+        <a href={item.href} class:list={['nav-link', { on: isActive(item.href) }]}
+           aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a>
+      ))}
+    </nav>
+
+    <div class="grow"></div>
+
+    <a href="/search/" class="icon-btn" aria-label="بحث"><Icon name="search" size={19} /></a>
+    <a href="/tracks/" class="btn btn-primary btn-sm start">ابدأ من هنا</a>
+
+    <button class="icon-btn menu-btn" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="القائمة">
+      <Icon name="list" size={20} />
+    </button>
+  </div>
+
+  <nav class="mobile-nav" id="mobile-nav" hidden aria-label="القائمة">
+    {NAV.map((item) => <a href={item.href} class:list={['m-link', { on: isActive(item.href) }]}>{item.label}</a>)}
+    <a href="/search/" class="m-link">بحث</a>
+  </nav>
+</header>
+
+<style>
+  .site-head {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(13, 27, 51, 0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .inner { display: flex; align-items: center; gap: 26px; padding-block: 12px; }
+  .brand { color: inherit; }
+  .nav { display: flex; align-items: center; gap: 22px; }
+  .nav-link {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink-2);
+    padding-block-end: 3px;
+    border-bottom: 2px solid transparent;
+  }
+  .nav-link:hover { color: var(--ink); }
+  .nav-link.on { color: #fff; border-bottom-color: var(--orange); }
+  .icon-btn {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: var(--r-sm);
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .icon-btn:hover { color: var(--ink); border-color: var(--line-strong); }
+  .menu-btn { display: none; }
+  .mobile-nav { display: none; }
+
+  @media (max-width: 900px) {
+    .nav, .start { display: none; }
+    .menu-btn { display: grid; }
+    .mobile-nav[hidden] { display: none; }
+    .mobile-nav {
+      display: grid;
+      gap: 2px;
+      padding: 10px 24px 18px;
+      border-top: 1px solid var(--line);
+    }
+    .m-link {
+      color: var(--ink-2);
+      font-size: 16px;
+      font-weight: 500;
+      padding: 12px 4px;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+    }
+    .m-link.on { color: var(--orange); }
+  }
+</style>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('.menu-btn');
+  const nav = document.getElementById('mobile-nav');
+  btn?.addEventListener('click', () => {
+    const open = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!open));
+    if (nav) nav.hidden = open;
+  });
+</script>

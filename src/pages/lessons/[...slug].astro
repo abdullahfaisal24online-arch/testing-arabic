@@ -3,7 +3,7 @@ import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import LessonCard from '../../components/LessonCard.astro';
-import { SITE } from '../../consts';
+import { getSite } from '../../lib/site';
 import { formatDate, durationToISO, bunnyEmbed, bunnyThumb } from '../../lib/utils';
 
 export async function getStaticPaths() {
@@ -35,9 +35,10 @@ export async function getStaticPaths() {
 const { lesson, track, siblings, prev, next, related } = Astro.props;
 const { data } = lesson;
 const { Content } = await render(lesson);
+const site = await getSite();
 
-const embed = data.videoId ? bunnyEmbed(data.videoId) : '';
-const thumb = bunnyThumb(data.videoId, data.thumbnail);
+const embed = data.videoId ? bunnyEmbed(data.videoId, site.bunnyLibraryId) : '';
+const thumb = bunnyThumb(data.videoId, data.thumbnail, site.bunnyCdnHostname);
 
 const jsonLd = [
   {
@@ -50,15 +51,15 @@ const jsonLd = [
     thumbnailUrl: thumb ? [thumb] : undefined,
     embedUrl: embed || undefined,
     inLanguage: 'ar',
-    publisher: { '@type': 'Organization', name: SITE.name, url: SITE.url },
+    publisher: { '@type': 'Organization', name: site.name, url: site.url },
   },
   {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: SITE.url },
-      { '@type': 'ListItem', position: 2, name: 'الدروس', item: `${SITE.url}/lessons` },
-      { '@type': 'ListItem', position: 3, name: data.title, item: `${SITE.url}/lessons/${lesson.id}` },
+      { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: site.url },
+      { '@type': 'ListItem', position: 2, name: 'الدروس', item: `${site.url}/lessons/` },
+      { '@type': 'ListItem', position: 3, name: data.title, item: `${site.url}/lessons/${lesson.id}/` },
     ],
   },
 ];
@@ -92,7 +93,7 @@ const jsonLd = [
         ) : (
           <div class="player-empty">
             <span class="play"><Icon name="play" size={26} /></span>
-            <p>الفيديو لسا ما انربط. أضف <code>videoId</code> للدرس ورقم المكتبة في <code>src/consts.ts</code>.</p>
+            <p>الفيديو لسا ما انربط. أضف معرّف الفيديو للدرس ورقم مكتبة Bunny من إعدادات لوحة التحكم.</p>
           </div>
         )}
       </div>

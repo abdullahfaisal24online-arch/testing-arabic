@@ -1,0 +1,124 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { SITE } from '../../consts';
+import { formatDate, readingTime, minutesLabel } from '../../lib/utils';
+
+export async function getStaticPaths() {
+  const articles = (await getCollection('articles')).filter((a) => !a.data.draft);
+  return articles.map((article) => ({
+    params: { slug: article.id },
+    props: {
+      article,
+      related: articles.filter((a) => a.id !== article.id).slice(0, 3),
+    },
+  }));
+}
+
+const { article, related } = Astro.props;
+const { data } = article;
+const { Content, headings } = await render(article);
+const mins = readingTime(article.body);
+const toc = headings.filter((h) => h.depth === 2);
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: data.title,
+    description: data.description,
+    inLanguage: 'ar',
+    datePublished: data.publishDate.toISOString(),
+    dateModified: (data.updatedDate ?? data.publishDate).toISOString(),
+    author: { '@type': 'Person', name: SITE.author },
+    publisher: { '@type': 'Organization', name: SITE.name, url: SITE.url },
+    mainEntityOfPage: `${SITE.url}/articles/${article.id}`,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: SITE.url },
+      { '@type': 'ListItem', position: 2, name: 'المقالات', item: `${SITE.url}/articles` },
+      { '@type': 'ListItem', position: 3, name: data.title, item: `${SITE.url}/articles/${article.id}` },
+    ],
+  },
+];
+---
+<Base
+  title={data.title}
+  description={data.description}
+  type="article"
+  publishDate={data.publishDate}
+  updatedDate={data.updatedDate}
+  image={data.cover}
+  jsonLd={jsonLd}
+>
+  <div class="wrap crumbs">
+    <a href="/">الرئيسية</a><span>›</span><a href="/articles/">المقالات</a><span>›</span>
+    <span class="now">{data.category}</span>
+  </div>
+
+  <div class="wrap layout">
+    <article class="main">
+      <header class="head">
+        <h1>{data.title}</h1>
+        <p class="standfirst">{data.description}</p>
+        <div class="byline">
+          <span class="who">{SITE.author}</span>
+          <span>·</span>
+          <time datetime={data.publishDate.toISOString()}>{formatDate(data.publishDate)}</time>
+          <span>·</span>
+          <span>{minutesLabel(mins)} قراءة</span>
+        </div>
+      </header>
+
+      {data.cover && <img class="cover" src={data.cover} alt="" width="1200" height="630" />}
+
+      <div class="prose"><Content /></div>
+    </article>
+
+    <aside class="side">
+      {toc.length > 1 && (
+        <nav class="box" aria-label="محتويات المقال">
+          <span class="eyebrow">بهذا المقال</span>
+          <ul>
+            {toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}
+          </ul>
+        </nav>
+      )}
+    </aside>
+  </div>
+
+  {related.length > 0 && (
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head"><h2>اقرأ كمان</h2></div>
+        <div class="grid grid-3">{related.map((a) => <ArticleCard article={a} />)}</div>
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .crumbs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-block: 18px; font-size: 14px; color: var(--muted); }
+  .crumbs .now { color: var(--orange); font-weight: 600; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 48px; align-items: start; padding-bottom: 24px; }
+  @media (max-width: 1000px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+  .head { display: grid; gap: 16px; margin-bottom: 28px; }
+  .standfirst { font-size: 20px; line-height: 1.85; color: var(--ink-3); max-width: var(--read); }
+  .byline {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    font-size: 14px; color: var(--muted);
+    padding-block: 16px; border-block: 1px solid var(--line);
+  }
+  .byline .who { color: var(--ink); font-weight: 600; }
+  .cover { border-radius: var(--r-lg); border: 1px solid var(--line); margin-bottom: 30px; }
+  .side { position: sticky; top: 84px; }
+  @media (max-width: 1000px) { .side { position: static; } }
+  .box { display: grid; gap: 12px; }
+  .box ul { list-style: none; margin: 0; padding: 0 14px 0 0; border-inline-start: 1px solid var(--line); display: grid; gap: 10px; }
+  .box a { font-size: 15px; color: var(--muted); }
+  .box a:hover { color: var(--cyan); }
+</style>

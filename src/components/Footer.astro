@@ -1,33 +1,39 @@
 ---
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
-import { SITE, NAV } from '../consts';
+import { getSite } from '../lib/site';
+
+const site = await getSite();
+const nav = site.nav;
 const year = new Date().getFullYear();
 ---
 <footer class="site-foot">
   <div class="wrap inner">
     <div class="col brand-col">
       <Logo />
-      <p class="tag">{SITE.tagline}</p>
+      <p class="tag">{site.tagline}</p>
     </div>
 
-    <nav class="col" aria-label="روابط الموقع">
-      <h3 class="ttl">الموقع</h3>
-      {NAV.map((i) => <a href={i.href}>{i.label}</a>)}
-    </nav>
+    {nav.length > 0 && (
+      <nav class="col" aria-label="روابط الموقع">
+        <h3 class="ttl">الموقع</h3>
+        {nav.map((i) => <a href={i.href}>{i.label}</a>)}
+      </nav>
+    )}
 
     <div class="col">
       <h3 class="ttl">تابعني</h3>
-      {SITE.youtube && <a href={SITE.youtube} rel="me noopener" target="_blank"><Icon name="youtube" size={17} /> يوتيوب</a>}
+      {site.youtube && <a href={site.youtube} rel="me noopener" target="_blank"><Icon name="youtube" size={17} /> يوتيوب</a>}
+      {site.linkedin && <a href={site.linkedin} rel="me noopener" target="_blank"><Icon name="board" size={17} /> لينكدإن</a>}
       <a href="/rss.xml"><Icon name="rss" size={17} /> RSS</a>
-      {SITE.email && <a href={`mailto:${SITE.email}`}><Icon name="mail" size={17} /> بريد</a>}
+      {site.email && <a href={`mailto:${site.email}`}><Icon name="mail" size={17} /> بريد</a>}
     </div>
   </div>
 
   <div class="wrap bottom">
-    <span>© {year} {SITE.name}</span>
+    <span>© {year} {site.name}</span>
     <span class="grow"></span>
-    <span class="made">كل المحتوى بالعربي، ومستضاف على دومين مستقل.</span>
+    {site.footerNote && <span class="made">{site.footerNote}</span>}
   </div>
 </footer>
 

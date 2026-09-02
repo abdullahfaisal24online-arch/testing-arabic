@@ -1,0 +1,25 @@
+{
+  "name": "Testing بالعربي",
+  "logoTop": "Testing",
+  "logoBottom": "بالعربي",
+  "tagline": "تعلّم اختبار البرمجيات بالعربي — من الصفر لحدّ الأتمتة",
+  "description": "منصة عربية لتعليم اختبار البرمجيات: دروس مصوّرة، مسارات مرتّبة، ومقالات عملية في الاختبار اليدوي والأتمتة وأدوات الـ QA.",
+  "url": "https://testing-arabic.com",
+  "author": "عبدالله",
+  "youtube": "https://www.youtube.com/@testingbilarabi",
+  "linkedin": "",
+  "email": "testingarabic94@gmail.com",
+  "newsletterAction": "",
+  "bunnyLibraryId": "",
+  "bunnyCdnHostname": "",
+  "headerCtaLabel": "ابدأ من هنا",
+  "headerCtaHref": "/tracks/",
+  "footerNote": "كل المحتوى بالعربي، ومستضاف على دومين مستقل.",
+  "nav": [
+    { "label": "الرئيسية", "href": "/" },
+    { "label": "المسارات", "href": "/tracks/" },
+    { "label": "الدروس", "href": "/lessons/" },
+    { "label": "المقالات", "href": "/articles/" },
+    { "label": "عن المنصة", "href": "/about/" }
+  ]
+}

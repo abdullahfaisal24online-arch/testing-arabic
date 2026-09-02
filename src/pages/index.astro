@@ -6,8 +6,12 @@ import LessonCard from '../components/LessonCard.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import TrackCard from '../components/TrackCard.astro';
 import Newsletter from '../components/Newsletter.astro';
-import { SITE } from '../consts';
+import { getSite, getHome, splitHighlight } from '../lib/site';
 import { bunnyThumb } from '../lib/utils';
+
+const site = await getSite();
+const home = await getHome();
+const heading = splitHighlight(home.heroTitle, home.heroHighlight);
 
 const live = <T extends { data: { draft: boolean } }>(e: T) => !e.data.draft;
 
@@ -24,7 +28,9 @@ const articles = (await getCollection('articles'))
   .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
 
 const featured = lessons.find((l) => l.data.featured) ?? lessons[0];
-const featuredThumb = featured ? bunnyThumb(featured.data.videoId, featured.data.thumbnail) : null;
+const featuredThumb = featured
+  ? bunnyThumb(featured.data.videoId, featured.data.thumbnail, site.bunnyCdnHostname)
+  : null;
 const latest = lessons.filter((l) => l.id !== featured?.id).slice(0, 4);
 
 const countFor = (trackId: string) => lessons.filter((l) => l.data.track === trackId).length;
@@ -33,54 +39,66 @@ const jsonLd = [
   {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: SITE.name,
-    url: SITE.url,
+    name: site.name,
+    url: site.url,
     inLanguage: 'ar',
-    description: SITE.description,
+    description: site.description,
     potentialAction: {
       '@type': 'SearchAction',
-      target: `${SITE.url}/search?q={search_term_string}`,
+      target: `${site.url}/search/?q={search_term_string}`,
       'query-input': 'required name=search_term_string',
     },
   },
   {
     '@context': 'https://schema.org',
     '@type': 'EducationalOrganization',
-    name: SITE.name,
-    url: SITE.url,
-    sameAs: [SITE.youtube].filter(Boolean),
+    name: site.name,
+    url: site.url,
+    sameAs: [site.youtube, site.linkedin].filter(Boolean),
   },
 ];
 ---
-<Base title={SITE.name} description={SITE.description} jsonLd={jsonLd}>
+<Base title={site.name} description={site.description} jsonLd={jsonLd}>
   <!-- ===== البطل ===== -->
   <section class="hero dots">
     <div class="wrap hero-in">
       <div class="hero-txt">
-        <span class="pill"><span class="dot"></span> أول منصة عربية متخصصة باختبار البرمجيات</span>
-        <h1>تعلّم اختبار البرمجيات <span class="cy">بالعربي</span> — من الصفر لحدّ الأتمتة</h1>
-        <p class="lead">
-          كل الدروس والشروحات والمقالات في مكان واحد، مرتّبة بمسارات توصّلك لهدفك — مش مجرّد قائمة تشغيل.
-        </p>
+        {home.heroEyebrow && (
+          <span class="pill"><span class="dot"></span> {home.heroEyebrow}</span>
+        )}
+        <h1>{heading.before}<span class="cy">{heading.mark}</span>{heading.after}</h1>
+        {home.heroSubtitle && <p class="lead">{home.heroSubtitle}</p>}
+
         <div class="cta">
-          <a class="btn btn-primary" href="/tracks/">ابدأ مسار المبتدئين <Icon name="arrow" size={19} /></a>
-          <a class="btn btn-ghost" href="/lessons/"><Icon name="play" size={17} /> تصفّح المكتبة</a>
+          {home.primaryCtaLabel && (
+            <a class="btn btn-primary" href={home.primaryCtaHref}>
+              {home.primaryCtaLabel} <Icon name="arrow" size={19} />
+            </a>
+          )}
+          {home.secondaryCtaLabel && (
+            <a class="btn btn-ghost" href={home.secondaryCtaHref}>
+              <Icon name="play" size={17} /> {home.secondaryCtaLabel}
+            </a>
+          )}
         </div>
-        <div class="stats">
-          <div><b>{lessons.length}</b><span>درس مجاني</span></div>
-          <i></i>
-          <div><b>{tracks.length}</b><span>مسارات تعليمية</span></div>
-          <i></i>
-          <div><b>{articles.length}</b><span>مقالات</span></div>
-        </div>
+
+        {home.showStats && (
+          <div class="stats">
+            <div><b>{lessons.length}</b><span>{home.statLessonsLabel}</span></div>
+            <i></i>
+            <div><b>{tracks.length}</b><span>{home.statTracksLabel}</span></div>
+            <i></i>
+            <div><b>{articles.length}</b><span>{home.statArticlesLabel}</span></div>
+          </div>
+        )}
       </div>
 
-      {featured && (
-        <a class="feat card" href={`/lessons/${featured.id}`}>
+      {home.showFeatured && featured && (
+        <a class="feat card" href={`/lessons/${featured.id}/`}>
           <div class="thumb">
             {featuredThumb ? <img src={featuredThumb} alt="" width="960" height="540" /> : null}
             <span class="play"><Icon name="play" size={22} /></span>
-            <span class="badge badge-orange feat-tag">الأحدث</span>
+            {home.featuredBadge && <span class="badge badge-orange feat-tag">{home.featuredBadge}</span>}
           </div>
           <div class="card-body">
             <span class="feat-ttl">{featured.data.title}</span>
@@ -89,7 +107,7 @@ const jsonLd = [
               <span>·</span>
               <span>{featured.data.category}</span>
               <span class="grow"></span>
-              <span class="go">شاهد الدرس</span>
+              <span class="go">{home.featuredCta}</span>
             </span>
           </div>
         </a>
@@ -98,14 +116,14 @@ const jsonLd = [
   </section>
 
   <!-- ===== المسارات ===== -->
-  {tracks.length > 0 && (
+  {home.showTracks && tracks.length > 0 && (
     <section class="section">
       <div class="wrap">
         <div class="section-head">
           <div>
-            <span class="eyebrow">المسارات التعليمية</span>
-            <h2>امشِ بخط واضح، مش بالعشوائي</h2>
-            <p class="lead">كل مسار مرتّب من أول درس لآخر واحد، مع ملفات وتمارين تشتغل عليها بنفسك.</p>
+            {home.tracksEyebrow && <span class="eyebrow">{home.tracksEyebrow}</span>}
+            <h2>{home.tracksTitle}</h2>
+            {home.tracksSubtitle && <p class="lead">{home.tracksSubtitle}</p>}
           </div>
           <span class="grow"></span>
           <a href="/tracks/" class="more">كل المسارات ←</a>
@@ -118,11 +136,11 @@ const jsonLd = [
   )}
 
   <!-- ===== أحدث الدروس ===== -->
-  {latest.length > 0 && (
+  {home.showLessons && latest.length > 0 && (
     <section class="section">
       <div class="wrap">
         <div class="section-head">
-          <h2>أحدث الدروس</h2>
+          <h2>{home.lessonsTitle}</h2>
           <span class="grow"></span>
           <a href="/lessons/" class="more">كل الدروس ←</a>
         </div>
@@ -134,11 +152,11 @@ const jsonLd = [
   )}
 
   <!-- ===== المقالات ===== -->
-  {articles.length > 0 && (
+  {home.showArticles && articles.length > 0 && (
     <section class="section">
       <div class="wrap">
         <div class="section-head">
-          <h2>من المقالات</h2>
+          <h2>{home.articlesTitle}</h2>
           <span class="grow"></span>
           <a href="/articles/" class="more">كل المقالات ←</a>
         </div>
@@ -198,10 +216,11 @@ const jsonLd = [
   .go { color: var(--cyan); font-weight: 600; }
 
   .more { font-size: 15px; font-weight: 600; }
+  .section-head h2 + .lead { margin-top: 10px; }
+  .eyebrow + h2 { margin-top: 10px; }
+
   @media (max-width: 560px) {
     .cta { display: grid; grid-template-columns: 1fr; }
     .hero-in { padding-block: 44px 52px; }
   }
-  .section-head h2 + .lead { margin-top: 10px; }
-  .eyebrow + h2 { margin-top: 10px; }
 </style>

@@ -1,6 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import { bunnyThumb } from '../lib/utils';
+import { getSite } from '../lib/site';
 
 interface Props {
   lesson: {
@@ -18,7 +19,8 @@ interface Props {
 }
 const { lesson } = Astro.props;
 const { data } = lesson;
-const thumb = bunnyThumb(data.videoId, data.thumbnail);
+const site = await getSite();
+const thumb = bunnyThumb(data.videoId, data.thumbnail, site.bunnyCdnHostname);
 ---
 <a class="card lesson-card" href={`/lessons/${lesson.id}/`}>
   <div class="thumb">

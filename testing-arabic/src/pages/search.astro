@@ -1,0 +1,126 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+---
+<Base title="بحث" description="ابحث في دروس ومقالات ومسارات المنصة." noindex={true}>
+  <section class="page-head dots">
+    <div class="wrap">
+      <h1>بحث</h1>
+      <div class="field">
+        <Icon name="search" size={19} />
+        <label class="sr-only" for="q">كلمة البحث</label>
+        <input id="q" type="search" placeholder="اكتب كلمة… مثلاً: أتمتة، تقرير خلل، Jira" autocomplete="off" />
+      </div>
+      <p class="hint" id="hint">اكتب حرفين على الأقل.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <ul class="results" id="results"></ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-head { background: var(--navy); border-bottom: 1px solid var(--line); padding-block: 52px 40px; }
+  .page-head h1 { margin-bottom: 18px; }
+  .field {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--line-strong);
+    border-radius: var(--r-md); padding: 4px 18px; max-width: 620px;
+    color: var(--muted);
+  }
+  .field input {
+    flex: 1; background: transparent; border: 0; color: var(--ink);
+    font: inherit; font-size: 16px; padding-block: 14px; min-height: 48px;
+  }
+  .field input:focus { outline: none; }
+  .field:focus-within { border-color: var(--cyan); }
+  .hint { margin-top: 12px; font-size: 14px; color: var(--faint); }
+  .results { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .results a {
+    display: grid; gap: 6px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r-md); padding: 18px 20px; color: inherit;
+  }
+  .results a:hover { border-color: var(--line-strong); }
+  .r-kind { font-size: 12px; font-weight: 600; color: var(--orange); }
+  .r-ttl { font-size: 17px; font-weight: 600; }
+  .r-desc { font-size: 14.5px; color: var(--ink-3); }
+</style>
+
+<script>
+  type Item = { title: string; description: string; url: string; kind: string; text: string };
+
+  const input = document.getElementById('q') as HTMLInputElement | null;
+  const list = document.getElementById('results');
+  const hint = document.getElementById('hint');
+  let items: Item[] = [];
+  let loaded = false;
+
+  const normalize = (s: string) =>
+    s
+      .toLowerCase()
+      .replace(/[ً-ْٰ]/g, '')
+      .replace(/[أإآ]/g, 'ا')
+      .replace(/ى/g, 'ي')
+      .replace(/ة/g, 'ه');
+
+  async function load() {
+    if (loaded) return;
+    const res = await fetch('/search-index.json');
+    items = await res.json();
+    loaded = true;
+  }
+
+  function render(q: string) {
+    if (!list || !hint) return;
+    const nq = normalize(q.trim());
+    if (nq.length < 2) {
+      list.innerHTML = '';
+      hint.textContent = 'اكتب حرفين على الأقل.';
+      return;
+    }
+    const terms = nq.split(/\s+/).filter(Boolean);
+    const hits = items
+      .map((it) => {
+        const hay = normalize(`${it.title} ${it.description} ${it.text}`);
+        const title = normalize(it.title);
+        let score = 0;
+        for (const t of terms) {
+          if (title.includes(t)) score += 3;
+          else if (hay.includes(t)) score += 1;
+          else return null;
+        }
+        return { it, score };
+      })
+      .filter(Boolean)
+      .sort((a, b) => b!.score - a!.score)
+      .slice(0, 30);
+
+    hint.textContent = hits.length ? `${hits.length} نتيجة` : 'ما في نتائج مطابقة.';
+    list.innerHTML = hits
+      .map(
+        (h) => `<li><a href="${h!.it.url}">
+          <span class="r-kind">${h!.it.kind}</span>
+          <span class="r-ttl">${h!.it.title}</span>
+          <span class="r-desc">${h!.it.description}</span>
+        </a></li>`
+      )
+      .join('');
+  }
+
+  input?.addEventListener('input', async () => {
+    await load();
+    render(input.value);
+  });
+
+  const params = new URLSearchParams(location.search);
+  const initial = params.get('q');
+  if (initial && input) {
+    input.value = initial;
+    load().then(() => render(initial));
+  }
+  input?.focus();
+</script>

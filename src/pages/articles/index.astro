@@ -2,7 +2,9 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
-import { SITE } from '../../consts';
+import { getSite } from '../../lib/site';
+
+const site = await getSite();
 
 const articles = (await getCollection('articles'))
   .filter((a) => !a.data.draft)
@@ -11,8 +13,8 @@ const articles = (await getCollection('articles'))
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Blog',
-  name: `مقالات ${SITE.name}`,
-  url: `${SITE.url}/articles`,
+  name: `مقالات ${site.name}`,
+  url: `${site.url}/articles/`,
   inLanguage: 'ar',
 };
 ---

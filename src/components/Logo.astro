@@ -1,6 +1,9 @@
 ---
+import { getSite } from '../lib/site';
+
 interface Props { size?: number; withText?: boolean; }
 const { size = 38, withText = true } = Astro.props;
+const site = await getSite();
 ---
 <span class="logo">
   <span class="mark" style={`width:${size}px;height:${size}px`}>
@@ -13,8 +16,8 @@ const { size = 38, withText = true } = Astro.props;
   </span>
   {withText && (
     <span class="txt">
-      <b>Testing</b>
-      <i>بالعربي</i>
+      <b>{site.logoTop}</b>
+      <i>{site.logoBottom}</i>
     </span>
   )}
 </span>

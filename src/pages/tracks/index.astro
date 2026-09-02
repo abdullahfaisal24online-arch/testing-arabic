@@ -2,7 +2,9 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import TrackCard from '../../components/TrackCard.astro';
-import { SITE } from '../../consts';
+import { getSite } from '../../lib/site';
+
+const site = await getSite();
 
 const tracks = (await getCollection('tracks'))
   .filter((t) => !t.data.draft)
@@ -18,7 +20,7 @@ const jsonLd = {
     '@type': 'ListItem',
     position: i + 1,
     name: t.data.title,
-    url: `${SITE.url}/tracks/${t.id}`,
+    url: `${site.url}/tracks/${t.id}/`,
   })),
 };
 ---

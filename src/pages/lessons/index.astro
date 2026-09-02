@@ -2,7 +2,9 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import LessonCard from '../../components/LessonCard.astro';
-import { SITE } from '../../consts';
+import { getSite } from '../../lib/site';
+
+const site = await getSite();
 
 const lessons = (await getCollection('lessons'))
   .filter((l) => !l.data.draft)
@@ -14,7 +16,7 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
   name: 'كل الدروس',
-  url: `${SITE.url}/lessons`,
+  url: `${site.url}/lessons/`,
   inLanguage: 'ar',
 };
 ---

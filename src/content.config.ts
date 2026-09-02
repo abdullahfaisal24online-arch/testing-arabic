@@ -4,7 +4,7 @@ import { glob } from 'astro/loaders';
 const levels = ['مبتدئ', 'متوسط', 'متقدّم'] as const;
 
 /**
- * لوحة التحكم بتكتب الحقول الفاضية كـ فراغ أو null بدل ما تحذفها،
+ * لوحة التحكم بتكتب الحقول الفاضية كفراغ أو null بدل ما تحذفها،
  * وهاي الدوال بتتعامل مع هيك حالات حتى ما يفشل البناء بسبب حقل اختياري فاضي.
  */
 const blank = (v: unknown) => (v === '' || v === null || v === undefined ? undefined : v);
@@ -17,6 +17,7 @@ const bool = (def: boolean) => z.preprocess(fallback(def), z.boolean());
 const num = (def: number) => z.preprocess(fallback(def), z.coerce.number());
 const level = z.preprocess(fallback('مبتدئ'), z.enum(levels));
 
+/* ===== الدروس ===== */
 const lessons = defineCollection({
   loader: glob({ base: './src/content/lessons', pattern: '**/*.{md,mdx}' }),
   schema: z.object({
@@ -26,15 +27,10 @@ const lessons = defineCollection({
     updatedDate: optDate,
     category: str('أساسيات'),
     level,
-    // مدة الفيديو بصيغة MM:SS أو HH:MM:SS
     duration: str('00:00'),
-    // معرّف الفيديو على Bunny Stream
     videoId: optString,
-    // رابط النسخة على يوتيوب (اختياري)
     youtubeUrl: optString,
-    // صورة مصغّرة مخصّصة (اختيارية)
     thumbnail: optString,
-    // المسار التعليمي الذي ينتمي له الدرس + ترتيبه داخله
     track: optString,
     order: num(0),
     resources: z.preprocess(
@@ -46,6 +42,7 @@ const lessons = defineCollection({
   }),
 });
 
+/* ===== المقالات ===== */
 const articles = defineCollection({
   loader: glob({ base: './src/content/articles', pattern: '**/*.{md,mdx}' }),
   schema: z.object({
@@ -60,6 +57,7 @@ const articles = defineCollection({
   }),
 });
 
+/* ===== المسارات ===== */
 const tracks = defineCollection({
   loader: glob({ base: './src/content/tracks', pattern: '**/*.{md,mdx}' }),
   schema: z.object({
@@ -73,4 +71,76 @@ const tracks = defineCollection({
   }),
 });
 
-export const collections = { lessons, articles, tracks };
+/* ===== صفحات حرّة (عن المنصة، الخصوصية، تواصل…) ===== */
+const pages = defineCollection({
+  loader: glob({ base: './src/content/pages', pattern: '**/*.{md,mdx}' }),
+  schema: z.object({
+    title: z.string(),
+    description: str(''),
+    order: num(0),
+    draft: bool(false),
+  }),
+});
+
+/* ===== إعدادات الموقع ===== */
+const site = defineCollection({
+  loader: glob({ base: './src/content/settings', pattern: 'site.json' }),
+  schema: z.object({
+    name: optString,
+    logoTop: optString,
+    logoBottom: optString,
+    tagline: optString,
+    description: optString,
+    url: optString,
+    author: optString,
+    youtube: optString,
+    linkedin: optString,
+    email: optString,
+    newsletterAction: optString,
+    bunnyLibraryId: optString,
+    bunnyCdnHostname: optString,
+    headerCtaLabel: optString,
+    headerCtaHref: optString,
+    footerNote: optString,
+    nav: z.preprocess(
+      fallback([]),
+      z.array(z.object({ label: str(''), href: str('/') })),
+    ),
+  }),
+});
+
+/* ===== نصوص الصفحة الرئيسية ===== */
+const home = defineCollection({
+  loader: glob({ base: './src/content/settings', pattern: 'home.json' }),
+  schema: z.object({
+    heroEyebrow: optString,
+    heroTitle: optString,
+    heroHighlight: optString,
+    heroSubtitle: optString,
+    primaryCtaLabel: optString,
+    primaryCtaHref: optString,
+    secondaryCtaLabel: optString,
+    secondaryCtaHref: optString,
+    showStats: bool(true),
+    statLessonsLabel: optString,
+    statTracksLabel: optString,
+    statArticlesLabel: optString,
+    showFeatured: bool(true),
+    featuredBadge: optString,
+    featuredCta: optString,
+    showTracks: bool(true),
+    tracksEyebrow: optString,
+    tracksTitle: optString,
+    tracksSubtitle: optString,
+    showLessons: bool(true),
+    lessonsTitle: optString,
+    showArticles: bool(true),
+    articlesTitle: optString,
+    newsletterTitle: optString,
+    newsletterText: optString,
+    newsletterButton: optString,
+    newsletterNote: optString,
+  }),
+});
+
+export const collections = { lessons, articles, tracks, pages, site, home };

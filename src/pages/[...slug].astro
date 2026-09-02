@@ -1,0 +1,43 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { getSite } from '../lib/site';
+
+export async function getStaticPaths() {
+  const pages = (await getCollection('pages')).filter((p) => !p.data.draft);
+  return pages.map((page) => ({ params: { slug: page.id }, props: { page } }));
+}
+
+const { page } = Astro.props;
+const { data } = page;
+const { Content } = await render(page);
+const site = await getSite();
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: data.title,
+  description: data.description,
+  url: `${site.url}/${page.id}/`,
+  inLanguage: 'ar',
+};
+---
+<Base title={data.title} description={data.description} jsonLd={jsonLd}>
+  <section class="page-head dots">
+    <div class="wrap">
+      <h1>{data.title}</h1>
+      {data.description && <p class="lead">{data.description}</p>}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="prose"><Content /></div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-head { background: var(--navy); border-bottom: 1px solid var(--line); padding-block: 52px 44px; }
+  .page-head h1 { margin-bottom: 12px; }
+</style>

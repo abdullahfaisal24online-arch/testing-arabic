@@ -1,9 +1,10 @@
 import rss from '@astrojs/rss';
 import type { APIContext } from 'astro';
 import { getCollection } from 'astro:content';
-import { SITE } from '../consts';
+import { getSite } from '../lib/site';
 
 export async function GET(context: APIContext) {
+  const site = await getSite();
   const [lessons, articles] = await Promise.all([
     getCollection('lessons'),
     getCollection('articles'),
@@ -25,9 +26,9 @@ export async function GET(context: APIContext) {
   ].sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
 
   return rss({
-    title: SITE.name,
-    description: SITE.description,
-    site: context.site ?? SITE.url,
+    title: site.name,
+    description: site.description,
+    site: context.site ?? site.url,
     customData: '<language>ar</language>',
     items,
   });

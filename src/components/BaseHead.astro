@@ -1,5 +1,5 @@
 ---
-import { SITE } from '../consts';
+import { getSite } from '../lib/site';
 
 interface Props {
   title: string;
@@ -12,9 +12,10 @@ interface Props {
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
+const site = await getSite();
 const {
   title,
-  description = SITE.description,
+  description = site.description,
   image = '/og-default.png',
   type = 'website',
   publishDate,
@@ -23,9 +24,10 @@ const {
   jsonLd,
 } = Astro.props;
 
-const canonical = new URL(Astro.url.pathname, Astro.site);
-const ogImage = new URL(image, Astro.site);
-const fullTitle = title === SITE.name ? `${SITE.name} — ${SITE.tagline}` : `${title} | ${SITE.name}`;
+const base = Astro.site ?? new URL(site.url);
+const canonical = new URL(Astro.url.pathname, base);
+const ogImage = new URL(image, base);
+const fullTitle = title === site.name ? `${site.name} — ${site.tagline}` : `${title} | ${site.name}`;
 const blocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
 <meta charset="utf-8" />
@@ -36,12 +38,12 @@ const blocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 {noindex && <meta name="robots" content="noindex, nofollow" />}
 
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-<link rel="alternate" type="application/rss+xml" title={SITE.name} href="/rss.xml" />
+<link rel="alternate" type="application/rss+xml" title={site.name} href="/rss.xml" />
 <link rel="sitemap" href="/sitemap-index.xml" />
 
 <meta property="og:type" content={type} />
-<meta property="og:site_name" content={SITE.name} />
-<meta property="og:locale" content={SITE.locale} />
+<meta property="og:site_name" content={site.name} />
+<meta property="og:locale" content="ar_JO" />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />

@@ -1,8 +1,10 @@
 ---
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
-import { NAV } from '../consts';
+import { getSite } from '../lib/site';
 
+const site = await getSite();
+const nav = site.nav.length ? site.nav : [{ label: 'الرئيسية', href: '/' }];
 const path = Astro.url.pathname;
 const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
 ---
@@ -11,7 +13,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     <a href="/" class="brand" aria-label="الصفحة الرئيسية"><Logo /></a>
 
     <nav class="nav" aria-label="القائمة الرئيسية">
-      {NAV.map((item) => (
+      {nav.map((item) => (
         <a href={item.href} class:list={['nav-link', { on: isActive(item.href) }]}
            aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a>
       ))}
@@ -20,7 +22,9 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     <div class="grow"></div>
 
     <a href="/search/" class="icon-btn" aria-label="بحث"><Icon name="search" size={19} /></a>
-    <a href="/tracks/" class="btn btn-primary btn-sm start">ابدأ من هنا</a>
+    {site.headerCtaLabel && (
+      <a href={site.headerCtaHref} class="btn btn-primary btn-sm start">{site.headerCtaLabel}</a>
+    )}
 
     <button class="icon-btn menu-btn" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="القائمة">
       <Icon name="list" size={20} />
@@ -28,7 +32,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   </div>
 
   <nav class="mobile-nav" id="mobile-nav" hidden aria-label="القائمة">
-    {NAV.map((item) => <a href={item.href} class:list={['m-link', { on: isActive(item.href) }]}>{item.label}</a>)}
+    {nav.map((item) => <a href={item.href} class:list={['m-link', { on: isActive(item.href) }]}>{item.label}</a>)}
     <a href="/search/" class="m-link">بحث</a>
   </nav>
 </header>

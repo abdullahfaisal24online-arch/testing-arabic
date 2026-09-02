@@ -232,3 +232,233 @@ collections:
         label: "نص إضافي بصفحة المسار"
         widget: markdown
         required: false
+
+  - name: pages
+    label: "الصفحات"
+    label_singular: "صفحة"
+    folder: src/content/pages
+    create: true
+    slug: "{{fields.slug}}"
+    extension: md
+    format: frontmatter
+    summary: "{{title}}"
+    fields:
+      - name: title
+        label: "عنوان الصفحة"
+        widget: string
+      - name: slug
+        label: "الرابط بالإنجليزي بدون مسافات"
+        widget: string
+        hint: "مثال: about — بيصير رابط الصفحة /about/"
+      - name: description
+        label: "الوصف المختصر"
+        widget: text
+        required: false
+      - name: order
+        label: "الترتيب"
+        widget: number
+        default: 1
+        value_type: int
+        min: 0
+        required: false
+      - name: draft
+        label: "مسودّة لا تُنشر"
+        widget: boolean
+        default: false
+      - name: body
+        label: "محتوى الصفحة"
+        widget: markdown
+        hint: "تقدر تحط نصوص وصور وعناوين — وحتى كود تضمين فيديو"
+
+  - name: settings
+    label: "إعدادات الموقع"
+    files:
+      - name: site
+        label: "إعدادات عامة"
+        file: src/content/settings/site.json
+        fields:
+          - name: name
+            label: "اسم الموقع"
+            widget: string
+          - name: logoTop
+            label: "الشعار — السطر الأول"
+            widget: string
+          - name: logoBottom
+            label: "الشعار — السطر الثاني"
+            widget: string
+          - name: tagline
+            label: "الجملة التعريفية"
+            widget: string
+          - name: description
+            label: "وصف الموقع لمحركات البحث"
+            widget: text
+          - name: url
+            label: "عنوان الموقع"
+            widget: string
+            hint: "مثال: https://testing-arabic.com — بدون شرطة مالحة بالآخر"
+          - name: author
+            label: "اسم صاحب المحتوى"
+            widget: string
+          - name: youtube
+            label: "رابط قناة يوتيوب"
+            widget: string
+            required: false
+          - name: linkedin
+            label: "رابط لينكدإن"
+            widget: string
+            required: false
+          - name: email
+            label: "بريد التواصل"
+            widget: string
+            required: false
+          - name: newsletterAction
+            label: "رابط نموذج النشرة البريدية"
+            widget: string
+            required: false
+            hint: "اتركه فاضي وقسم النشرة بينخفي من الموقع"
+          - name: bunnyLibraryId
+            label: "رقم مكتبة Bunny Stream"
+            widget: string
+            required: false
+          - name: bunnyCdnHostname
+            label: "نطاق البث من Bunny"
+            widget: string
+            required: false
+            hint: "مثال: vz-xxxxxxxx-xxx.b-cdn.net"
+          - name: headerCtaLabel
+            label: "نص زر الهيدر"
+            widget: string
+            required: false
+          - name: headerCtaHref
+            label: "رابط زر الهيدر"
+            widget: string
+            required: false
+          - name: footerNote
+            label: "جملة أسفل الموقع"
+            widget: string
+            required: false
+          - name: nav
+            label: "القائمة العلوية"
+            widget: list
+            summary: "{{fields.label}}"
+            fields:
+              - name: label
+                label: "النص"
+                widget: string
+              - name: href
+                label: "الرابط"
+                widget: string
+                hint: "مثال: /tracks/ أو /about/"
+
+      - name: home
+        label: "الصفحة الرئيسية"
+        file: src/content/settings/home.json
+        fields:
+          - name: heroEyebrow
+            label: "الشارة الصغيرة فوق العنوان"
+            widget: string
+            required: false
+          - name: heroTitle
+            label: "العنوان الرئيسي"
+            widget: string
+          - name: heroHighlight
+            label: "الكلمة المميّزة باللون السماوي"
+            widget: string
+            required: false
+            hint: "لازم تكون كلمة موجودة داخل العنوان الرئيسي"
+          - name: heroSubtitle
+            label: "النص تحت العنوان"
+            widget: text
+            required: false
+          - name: primaryCtaLabel
+            label: "الزر الأساسي — النص"
+            widget: string
+            required: false
+          - name: primaryCtaHref
+            label: "الزر الأساسي — الرابط"
+            widget: string
+            required: false
+          - name: secondaryCtaLabel
+            label: "الزر الثاني — النص"
+            widget: string
+            required: false
+          - name: secondaryCtaHref
+            label: "الزر الثاني — الرابط"
+            widget: string
+            required: false
+          - name: showStats
+            label: "إظهار أرقام الإحصائيات"
+            widget: boolean
+            default: true
+          - name: statLessonsLabel
+            label: "وصف رقم الدروس"
+            widget: string
+            required: false
+          - name: statTracksLabel
+            label: "وصف رقم المسارات"
+            widget: string
+            required: false
+          - name: statArticlesLabel
+            label: "وصف رقم المقالات"
+            widget: string
+            required: false
+          - name: showFeatured
+            label: "إظهار بطاقة الدرس المميّز"
+            widget: boolean
+            default: true
+          - name: featuredBadge
+            label: "شارة البطاقة المميّزة"
+            widget: string
+            required: false
+          - name: featuredCta
+            label: "نص رابط البطاقة المميّزة"
+            widget: string
+            required: false
+          - name: showTracks
+            label: "إظهار قسم المسارات"
+            widget: boolean
+            default: true
+          - name: tracksEyebrow
+            label: "قسم المسارات — الشارة"
+            widget: string
+            required: false
+          - name: tracksTitle
+            label: "قسم المسارات — العنوان"
+            widget: string
+            required: false
+          - name: tracksSubtitle
+            label: "قسم المسارات — النص"
+            widget: text
+            required: false
+          - name: showLessons
+            label: "إظهار قسم أحدث الدروس"
+            widget: boolean
+            default: true
+          - name: lessonsTitle
+            label: "قسم الدروس — العنوان"
+            widget: string
+            required: false
+          - name: showArticles
+            label: "إظهار قسم المقالات"
+            widget: boolean
+            default: true
+          - name: articlesTitle
+            label: "قسم المقالات — العنوان"
+            widget: string
+            required: false
+          - name: newsletterTitle
+            label: "قسم النشرة — العنوان"
+            widget: string
+            required: false
+          - name: newsletterText
+            label: "قسم النشرة — النص"
+            widget: text
+            required: false
+          - name: newsletterButton
+            label: "قسم النشرة — نص الزر"
+            widget: string
+            required: false
+          - name: newsletterNote
+            label: "قسم النشرة — الملاحظة الصغيرة"
+            widget: string
+            required: false

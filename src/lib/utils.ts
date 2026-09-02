@@ -1,5 +1,3 @@
-import { BUNNY } from '../consts';
-
 const dateFmt = new Intl.DateTimeFormat('ar-JO-u-nu-latn', {
   day: 'numeric',
   month: 'long',
@@ -32,15 +30,19 @@ export function readingTime(body: string | undefined): number {
   return Math.max(1, Math.round(words / 180));
 }
 
-export function bunnyEmbed(videoId: string): string {
-  if (!BUNNY.libraryId) return '';
-  return `https://iframe.mediadelivery.net/embed/${BUNNY.libraryId}/${videoId}?autoplay=false&preload=false`;
+export function bunnyEmbed(videoId: string, libraryId: string): string {
+  if (!libraryId || !videoId) return '';
+  return `https://iframe.mediadelivery.net/embed/${libraryId}/${videoId}?autoplay=false&preload=false`;
 }
 
-export function bunnyThumb(videoId?: string, custom?: string): string | null {
+export function bunnyThumb(
+  videoId: string | undefined,
+  custom: string | undefined,
+  cdnHostname: string,
+): string | null {
   if (custom) return custom;
-  if (!videoId || !BUNNY.cdnHostname) return null;
-  return `https://${BUNNY.cdnHostname}/${videoId}/thumbnail.jpg`;
+  if (!videoId || !cdnHostname) return null;
+  return `https://${cdnHostname}/${videoId}/thumbnail.jpg`;
 }
 
 export function excerpt(text: string, max = 160): string {
@@ -51,7 +53,7 @@ export function excerpt(text: string, max = 160): string {
 /** جمع عربي صحيح: مفرد / مثنى / جمع قلة (3-10) / تمييز مفرد منصوب (11+) */
 export function arabicPlural(
   n: number,
-  forms: { one: string; two: string; few: string; many: string }
+  forms: { one: string; two: string; few: string; many: string },
 ): string {
   if (n === 1) return forms.one;
   if (n === 2) return forms.two;
@@ -60,12 +62,7 @@ export function arabicPlural(
 }
 
 export function minutesLabel(n: number): string {
-  return arabicPlural(n, {
-    one: 'دقيقة',
-    two: 'دقيقتان',
-    few: 'دقائق',
-    many: 'دقيقة',
-  });
+  return arabicPlural(n, { one: 'دقيقة', two: 'دقيقتان', few: 'دقائق', many: 'دقيقة' });
 }
 
 export function lessonsLabel(n: number): string {

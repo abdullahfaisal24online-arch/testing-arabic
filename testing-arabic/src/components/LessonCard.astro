@@ -1,0 +1,41 @@
+---
+import Icon from './Icon.astro';
+import { bunnyThumb } from '../lib/utils';
+
+interface Props {
+  lesson: {
+    id: string;
+    data: {
+      title: string;
+      description: string;
+      category: string;
+      duration: string;
+      videoId?: string;
+      thumbnail?: string;
+      publishDate: Date;
+    };
+  };
+}
+const { lesson } = Astro.props;
+const { data } = lesson;
+const thumb = bunnyThumb(data.videoId, data.thumbnail);
+---
+<a class="card lesson-card" href={`/lessons/${lesson.id}/`}>
+  <div class="thumb">
+    {thumb ? <img src={thumb} alt="" loading="lazy" decoding="async" width="640" height="360" /> : null}
+    <span class="play"><Icon name="play" size={20} /></span>
+    <span class="time mono">{data.duration}</span>
+  </div>
+  <div class="card-body">
+    <span class="cat">{data.category}</span>
+    <span class="card-title">{data.title}</span>
+    <span class="card-meta">
+      <Icon name="clock" size={14} /> {data.duration}
+    </span>
+  </div>
+</a>
+
+<style>
+  .lesson-card { color: inherit; }
+  .cat { font-size: 12px; font-weight: 600; color: var(--orange); }
+</style>
