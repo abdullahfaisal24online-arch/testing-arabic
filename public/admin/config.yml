@@ -2,8 +2,7 @@
 # غيّر repo لاسم مستخدمك على GitHub واسم المستودع.
 backend:
   name: github
-  repo: abdullahqafaisal-cyber/testing-arabic
-  branch: main
+repo: abdullahfaisal24online-arch/testing-arabic  branch: main
   # للدخول بضغطة زر بدل التوكن، انشر Sveltia CMS Authenticator وحط رابطه هون:
   # base_url: https://YOUR-WORKER.workers.dev
 
