@@ -5,21 +5,36 @@
   "tagline": "تعلّم اختبار البرمجيات بالعربي — من الصفر لحدّ الأتمتة",
   "description": "منصة عربية لتعليم اختبار البرمجيات: دروس مصوّرة، مسارات مرتّبة، ومقالات عملية في الاختبار اليدوي والأتمتة وأدوات الـ QA.",
   "url": "https://testing-arabic.com",
-  "author": "عبدالله",
-  "youtube": "https://www.youtube.com/@testingbilarabi",
-  "linkedin": "",
-  "email": "testingarabic94@gmail.com",
+  "author": "Abdullah Faisal",
+  "youtube": "https://www.youtube.com/@testingbilarabic",
+  "linkedin": "https://www.linkedin.com/in/abdullah94faisal/",
+  "email": "abdullahqafaisal@gmail.com",
   "newsletterAction": "",
   "bunnyLibraryId": "",
   "bunnyCdnHostname": "",
   "headerCtaLabel": "ابدأ من هنا",
   "headerCtaHref": "/tracks/",
-  "footerNote": "كل المحتوى بالعربي، ومستضاف على دومين مستقل.",
+  "footerNote": "الموقع قيد التطوير والصيانة ، ربنا يسهّل 🔻",
   "nav": [
-    { "label": "الرئيسية", "href": "/" },
-    { "label": "المسارات", "href": "/tracks/" },
-    { "label": "الدروس", "href": "/lessons/" },
-    { "label": "المقالات", "href": "/articles/" },
-    { "label": "عن المنصة", "href": "/about/" }
+    {
+      "label": "الرئيسية",
+      "href": "/"
+    },
+    {
+      "label": "المسارات",
+      "href": "/tracks/"
+    },
+    {
+      "label": "الدروس",
+      "href": "/lessons/"
+    },
+    {
+      "label": "المقالات",
+      "href": "/articles/"
+    },
+    {
+      "label": "عن المنصة",
+      "href": "/about/"
+    }
   ]
 }
