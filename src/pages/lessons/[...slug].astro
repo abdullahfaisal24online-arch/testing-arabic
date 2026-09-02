@@ -1,0 +1,263 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import LessonCard from '../../components/LessonCard.astro';
+import { SITE } from '../../consts';
+import { formatDate, durationToISO, bunnyEmbed, bunnyThumb } from '../../lib/utils';
+
+export async function getStaticPaths() {
+  const lessons = (await getCollection('lessons')).filter((l) => !l.data.draft);
+  const tracks = await getCollection('tracks');
+  return lessons.map((lesson) => {
+    const track = tracks.find((t) => t.id === lesson.data.track);
+    const siblings = lessons
+      .filter((l) => l.data.track && l.data.track === lesson.data.track)
+      .sort((a, b) => a.data.order - b.data.order);
+    const idx = siblings.findIndex((l) => l.id === lesson.id);
+    const related = lessons
+      .filter((l) => l.id !== lesson.id && l.data.category === lesson.data.category)
+      .slice(0, 4);
+    return {
+      params: { slug: lesson.id },
+      props: {
+        lesson,
+        track,
+        siblings,
+        prev: idx > 0 ? siblings[idx - 1] : undefined,
+        next: idx >= 0 && idx < siblings.length - 1 ? siblings[idx + 1] : undefined,
+        related,
+      },
+    };
+  });
+}
+
+const { lesson, track, siblings, prev, next, related } = Astro.props;
+const { data } = lesson;
+const { Content } = await render(lesson);
+
+const embed = data.videoId ? bunnyEmbed(data.videoId) : '';
+const thumb = bunnyThumb(data.videoId, data.thumbnail);
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    name: data.title,
+    description: data.description,
+    uploadDate: data.publishDate.toISOString(),
+    duration: durationToISO(data.duration),
+    thumbnailUrl: thumb ? [thumb] : undefined,
+    embedUrl: embed || undefined,
+    inLanguage: 'ar',
+    publisher: { '@type': 'Organization', name: SITE.name, url: SITE.url },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: SITE.url },
+      { '@type': 'ListItem', position: 2, name: 'الدروس', item: `${SITE.url}/lessons` },
+      { '@type': 'ListItem', position: 3, name: data.title, item: `${SITE.url}/lessons/${lesson.id}` },
+    ],
+  },
+];
+---
+<Base
+  title={data.title}
+  description={data.description}
+  type="video.other"
+  publishDate={data.publishDate}
+  updatedDate={data.updatedDate}
+  image={thumb ?? undefined}
+  jsonLd={jsonLd}
+>
+  <div class="wrap crumbs">
+    <a href="/">الرئيسية</a><span>›</span>
+    {track ? <><a href={`/tracks/${track.id}/`}>{track.data.title}</a><span>›</span></> : <><a href="/lessons/">الدروس</a><span>›</span></>}
+    <span class="now">{data.title}</span>
+  </div>
+
+  <div class="wrap layout">
+    <article class="main">
+      <div class="player">
+        {embed ? (
+          <iframe
+            src={embed}
+            title={data.title}
+            loading="lazy"
+            allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
+            allowfullscreen
+          ></iframe>
+        ) : (
+          <div class="player-empty">
+            <span class="play"><Icon name="play" size={26} /></span>
+            <p>الفيديو لسا ما انربط. أضف <code>videoId</code> للدرس ورقم المكتبة في <code>src/consts.ts</code>.</p>
+          </div>
+        )}
+      </div>
+
+      <header class="head">
+        <h1>{data.title}</h1>
+        <div class="meta">
+          <span>{formatDate(data.publishDate)}</span><span>·</span>
+          <span class="mono">{data.duration}</span><span>·</span>
+          <span class="badge badge-orange">{data.level}</span>
+          <span class="badge badge-outline">{data.category}</span>
+        </div>
+        <p class="lead">{data.description}</p>
+        {data.youtubeUrl && (
+          <a class="yt" href={data.youtubeUrl} target="_blank" rel="noopener">
+            <Icon name="youtube" size={17} /> شاهد نفس الدرس على يوتيوب
+          </a>
+        )}
+      </header>
+
+      <div class="prose"><Content /></div>
+
+      <nav class="pager" aria-label="التنقّل بين دروس المسار">
+        {prev ? (
+          <a class="pg" href={`/lessons/${prev.id}/`}>
+            <span class="pg-lbl">الدرس السابق</span>
+            <span class="pg-ttl">{prev.data.title}</span>
+          </a>
+        ) : <span></span>}
+        {next ? (
+          <a class="pg nx" href={`/lessons/${next.id}/`}>
+            <span class="pg-lbl">الدرس التالي</span>
+            <span class="pg-ttl">{next.data.title}</span>
+          </a>
+        ) : <span></span>}
+      </nav>
+    </article>
+
+    <aside class="side">
+      {data.resources.length > 0 && (
+        <section class="box">
+          <h2 class="box-ttl">ملفات الدرس</h2>
+          <div class="files">
+            {data.resources.map((r) => (
+              <a class="file" href={r.url} target="_blank" rel="noopener">
+                <Icon name="file" size={17} /><span class="mono">{r.label}</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {track && siblings.length > 0 && (
+        <section class="box">
+          <span class="eyebrow">محتوى المسار</span>
+          <h2 class="box-ttl">{track.data.title}</h2>
+          <ol class="pl">
+            {siblings.map((s, i) => (
+              <li>
+                <a href={`/lessons/${s.id}/`} class:list={['pl-item', { on: s.id === lesson.id }]}
+                   aria-current={s.id === lesson.id ? 'true' : undefined}>
+                  <span class="num mono">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="pl-ttl">{s.data.title}</span>
+                  <span class="dur mono">{s.data.duration}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+          <a class="btn btn-ghost btn-sm full" href={`/tracks/${track.id}/`}>صفحة المسار</a>
+        </section>
+      )}
+    </aside>
+  </div>
+
+  {related.length > 0 && (
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head"><h2>دروس متعلّقة</h2></div>
+        <div class="grid grid-4">{related.map((l) => <LessonCard lesson={l} />)}</div>
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .crumbs {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding-block: 18px; font-size: 14px; color: var(--muted);
+  }
+  .crumbs .now { color: var(--ink); }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 40px; align-items: start; padding-bottom: 20px; }
+  @media (max-width: 1000px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+
+  .player {
+    aspect-ratio: 16 / 9;
+    background: #060f1f;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .player iframe { width: 100%; height: 100%; border: 0; display: block; }
+  .player-empty {
+    height: 100%;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 16px;
+    text-align: center;
+    padding: 24px;
+    background: linear-gradient(155deg, #10233f 0%, #070f1e 100%);
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .player-empty .play {
+    display: grid; place-items: center;
+    width: 74px; height: 74px; border-radius: 999px;
+    background: var(--cyan-soft); border: 2px solid var(--cyan); color: var(--cyan);
+  }
+  .player-empty code { background: var(--cyan-soft); color: var(--cyan-bright); padding: 2px 6px; border-radius: 5px; }
+
+  .head { display: grid; gap: 14px; margin-block: 26px 30px; }
+  .meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
+  .yt { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; justify-self: start; }
+
+  .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 44px; }
+  .pg {
+    display: grid; gap: 6px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r-md); padding: 16px 18px; color: inherit;
+  }
+  .pg:hover { border-color: var(--line-strong); }
+  .pg.nx { text-align: left; }
+  .pg-lbl { font-size: 12px; color: var(--orange); font-weight: 600; }
+  .pg-ttl { font-size: 15px; font-weight: 600; }
+
+  .side { display: grid; gap: 18px; position: sticky; top: 84px; }
+  @media (max-width: 1000px) { .side { position: static; } }
+  .box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 22px; display: grid; gap: 12px; }
+  .box-ttl { font-size: 17px; }
+  .files { display: grid; gap: 9px; }
+  .file {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--navy); border: 1px solid var(--line);
+    border-radius: var(--r-sm); padding: 12px 14px;
+    font-size: 13px; color: var(--ink-2); min-height: 44px;
+  }
+  .file:hover { border-color: var(--line-strong); color: var(--cyan); }
+
+  .pl { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  .pl-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border-radius: var(--r-sm);
+    color: var(--ink-2);
+    font-size: 14.5px;
+    min-height: 44px;
+  }
+  .pl-item:hover { background: var(--surface-2); color: var(--ink); }
+  .pl-item.on { background: var(--orange-soft); color: #fff; font-weight: 600; }
+  .pl-item .num { font-size: 12px; color: var(--cyan); }
+  .pl-item.on .num { color: var(--orange); }
+  .pl-item .dur { font-size: 12px; color: var(--faint); }
+  .full { width: 100%; }
+</style>

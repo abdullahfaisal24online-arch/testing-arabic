@@ -1,0 +1,130 @@
+# Testing بالعربي — المنصة
+
+موقع تعليمي عربي (RTL) مبني بـ **Astro**، ثابت بالكامل، ومجاني الاستضافة.
+المحتوى (دروس، مقالات، مسارات) بيتدار من **لوحة تحكم على الموقع** بدون كود، والفيديو مستضاف على **Bunny Stream**.
+
+---
+
+## 1. شو في المشروع
+
+| المجلّد | شو فيه |
+| --- | --- |
+| `src/consts.ts` | **إعدادات الموقع** — الاسم، الدومين، روابط التواصل، بيانات Bunny، رابط النشرة |
+| `src/content/lessons/` | الدروس (ملف `.md` لكل درس) |
+| `src/content/articles/` | المقالات |
+| `src/content/tracks/` | المسارات التعليمية |
+| `src/pages/` | صفحات الموقع |
+| `src/components/` | مكوّنات الواجهة |
+| `src/styles/global.css` | ألوان الهوية وأنماط التصميم |
+| `public/admin/` | لوحة التحكم (Sveltia CMS) |
+| `public/uploads/` | الصور والملفات المرفوعة من اللوحة |
+| `scripts/make-og.py` | يولّد صورة المشاركة الافتراضية |
+
+---
+
+## 2. الإقلاع لأول مرة
+
+### أ. ارفع المشروع على GitHub
+
+1. أنشئ مستودع جديد باسم `testing-arabic` (خاص أو عام، الاتنين بيزبطوا).
+2. ارفع محتويات هذا المجلّد كاملة (بدون `node_modules` و`dist`).
+
+### ب. انشر على Cloudflare Pages (مجاني)
+
+1. من لوحة Cloudflare: **Workers & Pages → Create → Pages → Connect to Git**.
+2. اختر المستودع، وحط:
+   - **Framework preset**: Astro
+   - **Build command**: `npm run build`
+   - **Build output directory**: `dist`
+3. احفظ وانشر. رح يعطيك رابط مؤقت مثل `testing-arabic.pages.dev`.
+
+بعد هيك، كل تعديل بينحفظ على GitHub بينشر تلقائياً خلال دقيقة تقريباً.
+
+### ج. اربط الدومين
+
+1. احجز الدومين (Cloudflare Registrar بيبيعه بسعر التكلفة تقريباً).
+2. من صفحة المشروع على Pages: **Custom domains → Set up a domain**.
+3. غيّر العنوان بثلاث أماكن:
+   - `astro.config.mjs` → `site`
+   - `src/consts.ts` → `SITE.url`
+   - `public/robots.txt` → سطر `Sitemap:`
+
+### د. فعّل لوحة التحكم
+
+1. حقل `repo` في `public/admin/config.yml` معبّى مسبقاً بـ `abdullahqafaisal-cyber/testing-arabic` — غيّره فقط لو غيّرت اسم المستودع.
+2. من GitHub: **Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**
+   - **Repository access**: هذا المستودع فقط
+   - **Permissions → Repository permissions → Contents**: `Read and write`
+   - انسخ التوكن واحتفظ فيه بمكان آمن (ما بينعرض مرة تانية).
+3. افتح `https://your-domain.com/admin/` واضغط **Sign In with Token** والصق التوكن.
+
+> بتحب تسجيل دخول بضغطة زر بدل التوكن؟ انشر
+> [Sveltia CMS Authenticator](https://github.com/sveltia/sveltia-cms-auth) على Cloudflare Workers،
+> وشيل التعليق عن سطر `base_url` في `config.yml`.
+
+### هـ. اربط Bunny Stream
+
+1. أنشئ **Video Library** من لوحة Bunny.
+2. انسخ **Library ID** واسم نطاق البث (`vz-xxxx.b-cdn.net`) وحطهم في `src/consts.ts`:
+   ```ts
+   export const BUNNY = {
+     libraryId: '123456',
+     cdnHostname: 'vz-xxxxxxxx-xxx.b-cdn.net',
+   } as const;
+   ```
+3. لكل درس: ارفع الفيديو على Bunny، انسخ **Video ID**، وحطه بحقل "معرّف الفيديو" باللوحة.
+
+### و. سجّل الموقع بجوجل
+
+1. [Google Search Console](https://search.google.com/search-console) → أضف الدومين ووثّقه.
+2. أرسل خريطة الموقع: `https://your-domain.com/sitemap-index.xml`.
+
+---
+
+## 3. الاستخدام اليومي
+
+افتح `/admin/` واختر:
+
+- **الدروس** — عنوان، رابط إنجليزي، وصف، تاريخ، تصنيف، مدة، معرّف فيديو Bunny، المسار وترتيب الدرس فيه، ملفات، ثم **الشرح المكتوب**.
+- **المقالات** — نفس الفكرة، والنص كله ماركداون.
+- **المسارات** — لتجميع الدروس بترتيب.
+
+اضغط **Publish** وبينحفظ على GitHub وبينشر تلقائياً.
+
+> **أهم نصيحة للسيو:** حقل "الشرح المكتوب" هو اللي بيجيب الزيارات. جوجل ما بيقرأ الصوت —
+> اكتب نص الدرس وخطواته وأكواده، مش بس سطرين وصف.
+
+خانة **مسودّة** بتخلّي الدرس محفوظ بدون ما ينعرض على الموقع.
+
+---
+
+## 4. التشغيل على جهازك (اختياري)
+
+```bash
+npm install
+npm run dev      # معاينة على http://localhost:4321
+npm run build    # بناء نسخة الإنتاج في dist/
+```
+
+يحتاج Node.js نسخة 20 أو أحدث.
+
+---
+
+## 5. الصيانة والنسخ الاحتياطي
+
+- **النسخة الاحتياطية**: المستودع على GitHub هو نسخة كاملة من كل المحتوى. الفيديوهات نسختها الأصلية عندك + على Bunny.
+- **تحديث الحزم**: كل بضعة شهور `npm update` ثم `npm run build` للتأكد إنه كل شي تمام.
+- **صورة المشاركة**: بعد ما تغيّر الدومين، شغّل `python3 scripts/make-og.py` لتحديث `public/og-default.png`.
+
+## 6. التكلفة
+
+| البند | التكلفة |
+| --- | --- |
+| Cloudflare Pages | مجاني |
+| الدومين | ~12$ بالسنة |
+| Bunny Stream | من 1$ شهرياً (تخزين 0.01$/جيجا، بث 0.005$/جيجا) |
+| لوحة التحكم | مجاني |
+
+---
+
+بُني بـ [Astro](https://astro.build) · لوحة التحكم [Sveltia CMS](https://sveltiacms.app) · الفيديو [Bunny Stream](https://bunny.net)

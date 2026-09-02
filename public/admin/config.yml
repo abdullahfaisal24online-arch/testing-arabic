@@ -1,0 +1,100 @@
+# ===== إعدادات لوحة التحكم =====
+# غيّر repo لاسم مستخدمك على GitHub واسم المستودع.
+backend:
+  name: github
+  repo: abdullahqafaisal-cyber/testing-arabic
+  branch: main
+  # للدخول بضغطة زر بدل التوكن، انشر Sveltia CMS Authenticator وحط رابطه هون:
+  # base_url: https://YOUR-WORKER.workers.dev
+
+locale: ar
+publish_mode: simple
+media_folder: public/uploads
+public_folder: /uploads
+
+collections:
+  # ---------- الدروس ----------
+  - name: lessons
+    label: الدروس
+    label_singular: درس
+    folder: src/content/lessons
+    create: true
+    slug: "{{fields.slug}}"
+    extension: md
+    format: frontmatter
+    preview_path: lessons/{{slug}}
+    summary: "{{title}}"
+    sortable_fields: [publishDate, title, order]
+    fields:
+      - { name: title, label: عنوان الدرس, widget: string }
+      - { name: slug, label: "الرابط بالإنجليزي (بدون مسافات)", widget: string, hint: "مثال: bug-report-that-works", pattern: ['^[a-z0-9-]+$', 'حروف إنجليزية صغيرة وأرقام وشرطات فقط'] }
+      - { name: description, label: الوصف المختصر, widget: text, hint: "سطر أو سطرين — هذا اللي بيظهر بنتائج البحث" }
+      - { name: publishDate, label: تاريخ النشر, widget: datetime, format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false, picker_utc: true }
+      - { name: updatedDate, label: تاريخ التحديث, widget: datetime, format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false, picker_utc: true, required: false }
+      - { name: category, label: التصنيف, widget: select, default: أساسيات, options: [أساسيات, أتمتة, أدوات, "Jira و Agile", مهارات] }
+      - { name: level, label: المستوى, widget: select, default: مبتدئ, options: [مبتدئ, متوسط, متقدّم] }
+      - { name: duration, label: مدة الفيديو, widget: string, default: "00:00", hint: "بصيغة MM:SS مثل 18:24" }
+      - { name: videoId, label: "معرّف الفيديو على Bunny", widget: string, required: false, hint: "انسخه من لوحة Bunny Stream" }
+      - { name: youtubeUrl, label: رابط النسخة على يوتيوب, widget: string, required: false }
+      - { name: thumbnail, label: صورة مصغّرة مخصّصة, widget: image, required: false }
+      - { name: track, label: المسار التعليمي, widget: relation, collection: tracks, search_fields: [title], value_field: "{{filename}}", display_fields: [title], required: false }
+      - { name: order, label: ترتيب الدرس داخل المسار, widget: number, default: 1, value_type: int, min: 0 }
+      - name: resources
+        label: ملفات ومصادر
+        widget: list
+        required: false
+        summary: "{{fields.label}}"
+        fields:
+          - { name: label, label: اسم الملف, widget: string }
+          - { name: url, label: الرابط, widget: string }
+      - { name: featured, label: "درس مميّز (يظهر بالواجهة)", widget: boolean, default: false }
+      - { name: draft, label: "مسودّة (لا يُنشر)", widget: boolean, default: false }
+      - { name: body, label: "الشرح المكتوب", widget: markdown, hint: "أهم جزء للسيو — اكتب هون نص الدرس والنقاط والأكواد" }
+
+  # ---------- المقالات ----------
+  - name: articles
+    label: المقالات
+    label_singular: مقال
+    folder: src/content/articles
+    create: true
+    slug: "{{fields.slug}}"
+    extension: md
+    format: frontmatter
+    preview_path: articles/{{slug}}
+    summary: "{{title}}"
+    sortable_fields: [publishDate, title]
+    fields:
+      - { name: title, label: عنوان المقال, widget: string }
+      - { name: slug, label: "الرابط بالإنجليزي (بدون مسافات)", widget: string, pattern: ['^[a-z0-9-]+$', 'حروف إنجليزية صغيرة وأرقام وشرطات فقط'] }
+      - { name: description, label: الوصف المختصر, widget: text }
+      - { name: publishDate, label: تاريخ النشر, widget: datetime, format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false, picker_utc: true }
+      - { name: updatedDate, label: تاريخ التحديث, widget: datetime, format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false, picker_utc: true, required: false }
+      - { name: category, label: التصنيف, widget: select, default: مهارات, options: [مهارات, أدوات, أتمتة, قوالب, أساسيات] }
+      - { name: cover, label: صورة الغلاف, widget: image, required: false }
+      - { name: featured, label: مقال مميّز, widget: boolean, default: false }
+      - { name: draft, label: "مسودّة (لا يُنشر)", widget: boolean, default: false }
+      - { name: body, label: نص المقال, widget: markdown }
+
+  # ---------- المسارات ----------
+  - name: tracks
+    label: المسارات
+    label_singular: مسار
+    folder: src/content/tracks
+    create: true
+    slug: "{{fields.slug}}"
+    extension: md
+    format: frontmatter
+    preview_path: tracks/{{slug}}
+    summary: "{{title}}"
+    fields:
+      - { name: title, label: اسم المسار, widget: string }
+      - { name: slug, label: "الرابط بالإنجليزي (بدون مسافات)", widget: string, pattern: ['^[a-z0-9-]+$', 'حروف إنجليزية صغيرة وأرقام وشرطات فقط'] }
+      - { name: description, label: الوصف, widget: text }
+      - { name: level, label: المستوى, widget: select, default: مبتدئ, options: [مبتدئ, متوسط, متقدّم] }
+      - { name: order, label: ترتيب المسار بالصفحة, widget: number, default: 1, value_type: int, min: 0 }
+      - { name: accent, label: اللون المميّز, widget: select, default: cyan, options: [cyan, orange] }
+      - { name: recommended, label: "موصى فيه للبداية", widget: boolean, default: false }
+      - { name: draft, label: "مسودّة (لا يُنشر)", widget: boolean, default: false }
+      - { name: body, label: "نص إضافي بصفحة المسار", widget: markdown, required: false }
+
+  # ---------- إعدادات عامة (اختياري) ----------

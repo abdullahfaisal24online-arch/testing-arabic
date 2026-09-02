@@ -1,0 +1,207 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import LessonCard from '../components/LessonCard.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import TrackCard from '../components/TrackCard.astro';
+import Newsletter from '../components/Newsletter.astro';
+import { SITE } from '../consts';
+import { bunnyThumb } from '../lib/utils';
+
+const live = <T extends { data: { draft: boolean } }>(e: T) => !e.data.draft;
+
+const lessons = (await getCollection('lessons'))
+  .filter(live)
+  .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+
+const tracks = (await getCollection('tracks'))
+  .filter(live)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const articles = (await getCollection('articles'))
+  .filter(live)
+  .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+
+const featured = lessons.find((l) => l.data.featured) ?? lessons[0];
+const featuredThumb = featured ? bunnyThumb(featured.data.videoId, featured.data.thumbnail) : null;
+const latest = lessons.filter((l) => l.id !== featured?.id).slice(0, 4);
+
+const countFor = (trackId: string) => lessons.filter((l) => l.data.track === trackId).length;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE.name,
+    url: SITE.url,
+    inLanguage: 'ar',
+    description: SITE.description,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${SITE.url}/search?q={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'EducationalOrganization',
+    name: SITE.name,
+    url: SITE.url,
+    sameAs: [SITE.youtube].filter(Boolean),
+  },
+];
+---
+<Base title={SITE.name} description={SITE.description} jsonLd={jsonLd}>
+  <!-- ===== البطل ===== -->
+  <section class="hero dots">
+    <div class="wrap hero-in">
+      <div class="hero-txt">
+        <span class="pill"><span class="dot"></span> أول منصة عربية متخصصة باختبار البرمجيات</span>
+        <h1>تعلّم اختبار البرمجيات <span class="cy">بالعربي</span> — من الصفر لحدّ الأتمتة</h1>
+        <p class="lead">
+          كل الدروس والشروحات والمقالات في مكان واحد، مرتّبة بمسارات توصّلك لهدفك — مش مجرّد قائمة تشغيل.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" href="/tracks/">ابدأ مسار المبتدئين <Icon name="arrow" size={19} /></a>
+          <a class="btn btn-ghost" href="/lessons/"><Icon name="play" size={17} /> تصفّح المكتبة</a>
+        </div>
+        <div class="stats">
+          <div><b>{lessons.length}</b><span>درس مجاني</span></div>
+          <i></i>
+          <div><b>{tracks.length}</b><span>مسارات تعليمية</span></div>
+          <i></i>
+          <div><b>{articles.length}</b><span>مقالات</span></div>
+        </div>
+      </div>
+
+      {featured && (
+        <a class="feat card" href={`/lessons/${featured.id}`}>
+          <div class="thumb">
+            {featuredThumb ? <img src={featuredThumb} alt="" width="960" height="540" /> : null}
+            <span class="play"><Icon name="play" size={22} /></span>
+            <span class="badge badge-orange feat-tag">الأحدث</span>
+          </div>
+          <div class="card-body">
+            <span class="feat-ttl">{featured.data.title}</span>
+            <span class="card-meta">
+              <Icon name="clock" size={14} /> {featured.data.duration}
+              <span>·</span>
+              <span>{featured.data.category}</span>
+              <span class="grow"></span>
+              <span class="go">شاهد الدرس</span>
+            </span>
+          </div>
+        </a>
+      )}
+    </div>
+  </section>
+
+  <!-- ===== المسارات ===== -->
+  {tracks.length > 0 && (
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">المسارات التعليمية</span>
+            <h2>امشِ بخط واضح، مش بالعشوائي</h2>
+            <p class="lead">كل مسار مرتّب من أول درس لآخر واحد، مع ملفات وتمارين تشتغل عليها بنفسك.</p>
+          </div>
+          <span class="grow"></span>
+          <a href="/tracks/" class="more">كل المسارات ←</a>
+        </div>
+        <div class="grid grid-3">
+          {tracks.slice(0, 3).map((t) => <TrackCard track={t} count={countFor(t.id)} />)}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- ===== أحدث الدروس ===== -->
+  {latest.length > 0 && (
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>أحدث الدروس</h2>
+          <span class="grow"></span>
+          <a href="/lessons/" class="more">كل الدروس ←</a>
+        </div>
+        <div class="grid grid-4">
+          {latest.map((l) => <LessonCard lesson={l} />)}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- ===== المقالات ===== -->
+  {articles.length > 0 && (
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>من المقالات</h2>
+          <span class="grow"></span>
+          <a href="/articles/" class="more">كل المقالات ←</a>
+        </div>
+        <div class="grid grid-3">
+          {articles.slice(0, 3).map((a) => <ArticleCard article={a} />)}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <Newsletter />
+</Base>
+
+<style>
+  .hero { background: var(--navy); border-bottom: 1px solid var(--line); }
+  .hero-in {
+    display: flex;
+    gap: 52px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding-block: 66px 74px;
+  }
+  .hero-txt { flex: 1 1 520px; display: grid; gap: 22px; align-content: start; }
+  .pill {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--cyan-soft);
+    border: 1px solid var(--line-strong);
+    color: var(--cyan);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 999px;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 999px; background: var(--cyan); }
+  .cy { color: var(--cyan); }
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; }
+  .stats {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .stats div { display: grid; gap: 2px; }
+  .stats b { font-size: 26px; font-variant-numeric: tabular-nums; }
+  .stats span { font-size: 14px; color: var(--muted); }
+  .stats i { width: 1px; height: 34px; background: var(--line); }
+
+  .feat { flex: 1 1 440px; max-width: 560px; color: inherit; box-shadow: 0 24px 60px rgba(3, 10, 24, 0.5); }
+  .feat .card-body { padding: 20px 22px 24px; }
+  .feat-tag { position: absolute; inset-block-start: 14px; inset-inline-start: 14px; }
+  .feat-ttl { font-size: 20px; font-weight: 700; line-height: 1.6; }
+  .go { color: var(--cyan); font-weight: 600; }
+
+  .more { font-size: 15px; font-weight: 600; }
+  @media (max-width: 560px) {
+    .cta { display: grid; grid-template-columns: 1fr; }
+    .hero-in { padding-block: 44px 52px; }
+  }
+  .section-head h2 + .lead { margin-top: 10px; }
+  .eyebrow + h2 { margin-top: 10px; }
+</style>

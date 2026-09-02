@@ -1,0 +1,59 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { SITE, NAV } from '../consts';
+const year = new Date().getFullYear();
+---
+<footer class="site-foot">
+  <div class="wrap inner">
+    <div class="col brand-col">
+      <Logo />
+      <p class="tag">{SITE.tagline}</p>
+    </div>
+
+    <nav class="col" aria-label="روابط الموقع">
+      <h3 class="ttl">الموقع</h3>
+      {NAV.map((i) => <a href={i.href}>{i.label}</a>)}
+    </nav>
+
+    <div class="col">
+      <h3 class="ttl">تابعني</h3>
+      {SITE.youtube && <a href={SITE.youtube} rel="me noopener" target="_blank"><Icon name="youtube" size={17} /> يوتيوب</a>}
+      <a href="/rss.xml"><Icon name="rss" size={17} /> RSS</a>
+      {SITE.email && <a href={`mailto:${SITE.email}`}><Icon name="mail" size={17} /> بريد</a>}
+    </div>
+  </div>
+
+  <div class="wrap bottom">
+    <span>© {year} {SITE.name}</span>
+    <span class="grow"></span>
+    <span class="made">كل المحتوى بالعربي، ومستضاف على دومين مستقل.</span>
+  </div>
+</footer>
+
+<style>
+  .site-foot { background: var(--navy); border-top: 1px solid var(--line); margin-top: 40px; }
+  .inner {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr;
+    gap: 32px;
+    padding-block: 46px 34px;
+  }
+  .col { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+  .col a { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 15px; }
+  .col a:hover { color: var(--cyan); }
+  .ttl { font-size: 14px; color: var(--ink); margin-bottom: 2px; }
+  .tag { color: var(--muted); font-size: 15px; max-width: 42ch; }
+  .bottom {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding-block: 18px 26px;
+    border-top: 1px solid var(--line);
+    font-size: 13px;
+    color: var(--faint);
+  }
+  @media (max-width: 760px) {
+    .inner { grid-template-columns: 1fr; gap: 26px; }
+  }
+</style>

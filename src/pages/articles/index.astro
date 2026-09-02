@@ -1,0 +1,42 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { SITE } from '../../consts';
+
+const articles = (await getCollection('articles'))
+  .filter((a) => !a.data.draft)
+  .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  name: `مقالات ${SITE.name}`,
+  url: `${SITE.url}/articles`,
+  inLanguage: 'ar',
+};
+---
+<Base
+  title="المقالات"
+  description="مقالات عملية في اختبار البرمجيات بالعربي: مهارات، أدوات، قوالب جاهزة، ونصائح من الشغل الفعلي."
+  jsonLd={jsonLd}
+>
+  <section class="page-head dots">
+    <div class="wrap">
+      <h1>المقالات</h1>
+      <p class="lead">شروحات مكتوبة تقرأها بدقائق — للي بيقرأ أسرع مما بيشاهد.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="grid grid-3">{articles.map((a) => <ArticleCard article={a} />)}</div>
+      {articles.length === 0 && <p class="lead">ما في مقالات منشورة بعد.</p>}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-head { background: var(--navy); border-bottom: 1px solid var(--line); padding-block: 52px 44px; }
+  .page-head h1 { margin-bottom: 12px; }
+</style>

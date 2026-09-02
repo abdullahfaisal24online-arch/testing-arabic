@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="الصفحة غير موجودة" noindex={true}>
+  <section class="nf wrap">
+    <span class="code mono">404</span>
+    <h1>الصفحة اللي بتدوّر عليها مش موجودة</h1>
+    <p class="lead">ممكن يكون الرابط قديم أو فيه خطأ مطبعي. جرّب تبدأ من هون:</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="/">الرئيسية</a>
+      <a class="btn btn-ghost" href="/lessons/">كل الدروس</a>
+      <a class="btn btn-ghost" href="/search/">بحث</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf { display: grid; gap: 18px; justify-items: start; padding-block: 90px 110px; }
+  .code { font-size: 15px; color: var(--cyan); letter-spacing: 2px; }
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; }
+</style>
