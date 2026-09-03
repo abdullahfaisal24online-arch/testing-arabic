@@ -783,10 +783,37 @@ collections:
             label: "وصف رقم المقالات"
             widget: string
             required: false
+          - name: showWelcome
+            label: "بطاقة الفيديو الترحيبي"
+            widget: boolean
+            default: false
+            hint: "لما تشغّلها بتحلّ محل بطاقة آخر درس بالواجهة"
+          - name: welcomeVideoId
+            label: "معرّف الفيديو الترحيبي على Bunny"
+            widget: string
+            required: false
+            hint: "انسخه من لوحة Bunny Stream — بدونه بتظهر صورة بديلة"
+          - name: welcomeTitle
+            label: "عنوان تحت الفيديو الترحيبي"
+            widget: string
+            required: false
+          - name: welcomeText
+            label: "نص تحت الفيديو الترحيبي"
+            widget: text
+            required: false
+          - name: welcomeThumbnail
+            label: "صورة بديلة قبل ربط الفيديو"
+            widget: image
+            required: false
+          - name: welcomeBadge
+            label: "شارة على الفيديو الترحيبي"
+            widget: string
+            required: false
           - name: showFeatured
             label: "إظهار بطاقة الدرس المميّز"
             widget: boolean
             default: true
+            hint: "بتنعرض فقط لما تكون بطاقة الفيديو الترحيبي مطفية"
           - name: featuredBadge
             label: "شارة البطاقة المميّزة"
             widget: string

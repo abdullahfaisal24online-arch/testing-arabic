@@ -254,6 +254,13 @@ const home = defineCollection({
     showFeatured: bool(true),
     featuredBadge: optString,
     featuredCta: optString,
+    // بطاقة الفيديو الترحيبي — بتحلّ محل بطاقة آخر درس لما تنفعّل
+    showWelcome: bool(false),
+    welcomeBadge: optString,
+    welcomeTitle: optString,
+    welcomeText: optString,
+    welcomeVideoId: optString,
+    welcomeThumbnail: optString,
     showCourses: bool(true),
     coursesEyebrow: optString,
     coursesTitle: optString,
