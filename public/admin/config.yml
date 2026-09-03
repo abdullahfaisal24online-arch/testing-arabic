@@ -208,16 +208,30 @@ collections:
         widget: string
         required: false
         hint: "مثال: My Demo App v2.2.0"
+      - name: exerciseTitle
+        label: "عنوان التمرين"
+        widget: string
+        required: false
+        hint: "اتركه فاضي ورح يظهر: طبّق اللي تعلّمته"
       - name: exercise
-        label: "تمرين الدرس"
-        widget: markdown
+        label: "خطوات التمرين"
+        widget: list
         required: false
-        hint: "قيد التفعيل — بينعرض بتحديث قادم"
+        hint: "خطوة بكل سطر — بيظهر بصندوق برتقالي بنهاية الدرس"
+      - name: exerciseNote
+        label: "ملاحظة على التمرين"
+        widget: string
+        required: false
       - name: solution
-        label: "حل التمرين"
-        widget: markdown
+        label: "خطوات الحل"
+        widget: list
         required: false
-        hint: "قيد التفعيل — بينعرض بزر يكشف الحل"
+        hint: "بتظهر خلف زر «اكشف الحل»"
+      - name: solutionCode
+        label: "كود الحل"
+        widget: text
+        required: false
+        hint: "اختياري — بيظهر بصندوق كود"
       - name: resources
         label: "ملفات ومصادر"
         widget: list
@@ -436,6 +450,71 @@ collections:
       - name: body
         label: "نص الخبر"
         widget: markdown
+
+  - name: questions
+    label: "بنك أسئلة المقابلات"
+    label_singular: "سؤال"
+    folder: src/content/questions
+    create: true
+    slug: "{{fields.slug}}"
+    extension: md
+    format: frontmatter
+    summary: "{{title}}"
+    fields:
+      - name: title
+        label: "نص السؤال"
+        widget: string
+      - name: slug
+        label: "الرابط بالإنجليزي بدون مسافات"
+        widget: string
+        hint: "مثال: severity-vs-priority"
+      - name: level
+        label: "المستوى"
+        widget: select
+        default: "مبتدئ"
+        options:
+          - "مبتدئ"
+          - "متوسط"
+          - "متقدّم"
+      - name: domain
+        label: "المجال"
+        widget: select
+        default: "أساسيات"
+        options:
+          - "أساسيات"
+          - "يدوي"
+          - "أتمتة"
+          - "API"
+          - "أدوات"
+          - "إدارة الاختبار"
+          - "سلوكي"
+      - name: shortAnswer
+        label: "الجواب المختصر"
+        widget: text
+        hint: "سطر أو سطرين — هذا اللي بينكشف بوضع التدريب"
+      - name: tags
+        label: "الوسوم"
+        widget: list
+        required: false
+      - name: relatedLessons
+        label: "دروس تشرح الموضوع"
+        widget: relation
+        collection: lessons
+        multiple: true
+        search_fields:
+          - title
+        value_field: slug
+        display_fields:
+          - title
+        required: false
+      - name: draft
+        label: "مسودّة لا تُنشر"
+        widget: boolean
+        default: false
+      - name: body
+        label: "الشرح الكامل"
+        widget: markdown
+        hint: "ليش بينسأل، جواب نموذجي، والفخ الشائع"
 
   - name: glossary
     label: "قاموس المصطلحات"

@@ -162,6 +162,40 @@ const jsonLd = [
 
       {bodyHtml ? <Prose html={bodyHtml} /> : <div class="prose"><Content /></div>}
 
+      {data.exercise.length > 0 && (
+        <section class="exercise">
+          <div class="ex-head">
+            <span class="ex-tag">تمرين</span>
+            <h2>{data.exerciseTitle ?? 'طبّق اللي تعلّمته'}</h2>
+          </div>
+          <ol class="ex-list">
+            {data.exercise.map((step) => <li>{step}</li>)}
+          </ol>
+          {data.exerciseNote && <p class="ex-note">{data.exerciseNote}</p>}
+
+          {(data.solution.length > 0 || data.solutionCode) && (
+            <details class="sol">
+              <summary>اكشف الحل</summary>
+              <div class="sol-body">
+                {data.solution.length > 0 && (
+                  <ul class="sol-list">
+                    {data.solution.map((step) => <li>{step}</li>)}
+                  </ul>
+                )}
+                {data.solutionCode && <pre class="sol-code"><code>{data.solutionCode}</code></pre>}
+              </div>
+            </details>
+          )}
+        </section>
+      )}
+
+      <div class="progress-row">
+        <button class="btn btn-ghost btn-sm done-btn" type="button" id="done-btn" data-lesson={lesson.id} aria-pressed="false">
+          <Icon name="check" size={16} /> <span class="done-label">علّم كمنتهي</span>
+        </button>
+        <span class="done-hint">التتبّع محفوظ بمتصفّحك فقط — بدون حساب ولا تسجيل.</span>
+      </div>
+
       <InlineNewsletter text="اشترك بالنشرة وبيوصلك كل درس جديد على بريدك، بدون ما تعتمد على خوارزمية." />
 
       <nav class="pager" aria-label="التنقّل بين دروس الدورة">
@@ -291,6 +325,42 @@ const jsonLd = [
   .meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
   .yt { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; justify-self: start; }
 
+  .exercise {
+    background: var(--surface); border: 1px solid var(--orange-line);
+    border-radius: var(--r-lg); padding: 24px 26px; margin-top: 36px; max-width: var(--read);
+  }
+  .ex-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .ex-tag {
+    font-size: 12px; font-weight: 700; color: var(--orange);
+    background: var(--orange-soft); padding: 5px 12px; border-radius: 999px;
+  }
+  .exercise h2 { font-size: 20px; margin: 0; }
+  .ex-list { margin: 16px 0 0; padding-inline-start: 22px; display: grid; gap: 10px; color: var(--ink-2); font-size: 16px; line-height: 1.85; }
+  .ex-list li::marker { color: var(--orange); font-weight: 600; }
+  .ex-note { margin: 14px 0 0; font-size: 14.5px; color: var(--muted); line-height: 1.8; }
+
+  .sol { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 16px; }
+  .sol summary {
+    cursor: pointer; font-size: 15px; font-weight: 600; color: var(--cyan);
+    list-style: none; display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 0; min-height: 40px;
+  }
+  .sol summary::-webkit-details-marker { display: none; }
+  .sol summary::before { content: '▸'; transition: transform .15s ease; }
+  .sol[open] summary::before { transform: rotate(-90deg); }
+  .sol-body { padding-top: 8px; }
+  .sol-list { margin: 0; padding-inline-start: 22px; display: grid; gap: 9px; color: var(--ink-2); font-size: 16px; line-height: 1.85; }
+  .sol-list li::marker { color: var(--cyan); }
+  .sol-code {
+    margin: 14px 0 0; padding: 16px 18px; border-radius: var(--r-md);
+    border: 1px solid var(--line); background: var(--bg);
+    overflow-x: auto; font-size: 14px; line-height: 1.9; text-align: left; direction: ltr;
+  }
+
+  .progress-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 30px; }
+  .done-btn.on { background: var(--cyan-soft); border-color: var(--cyan); color: var(--cyan); }
+  .done-hint { font-size: 13px; color: var(--faint); }
+
   .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 44px; }
   .pg {
     display: grid; gap: 6px;
@@ -334,3 +404,58 @@ const jsonLd = [
   .pl-item .dur { font-size: 12px; color: var(--faint); }
   .full { width: 100%; }
 </style>
+
+<script>
+  // ===== تتبّع التقدّم — محفوظ بمتصفّح الزائر فقط =====
+  const DONE_KEY = 'ta-done';
+  const LAST_KEY = 'ta-last';
+
+  const readDone = (): string[] => {
+    try {
+      return JSON.parse(localStorage.getItem(DONE_KEY) ?? '[]');
+    } catch {
+      return [];
+    }
+  };
+  const writeDone = (list: string[]) => {
+    try {
+      localStorage.setItem(DONE_KEY, JSON.stringify(list));
+    } catch {
+      /* المتصفّح مانع التخزين */
+    }
+  };
+
+  const btn = document.getElementById('done-btn') as HTMLButtonElement | null;
+  const label = btn?.querySelector('.done-label');
+  const id = btn?.dataset.lesson ?? '';
+
+  function paint(done: boolean) {
+    if (!btn || !label) return;
+    btn.classList.toggle('on', done);
+    btn.setAttribute('aria-pressed', String(done));
+    label.textContent = done ? 'خلّصت هذا الدرس' : 'علّم كمنتهي';
+  }
+
+  if (btn && id) {
+    paint(readDone().includes(id));
+    btn.addEventListener('click', () => {
+      const list = readDone();
+      const i = list.indexOf(id);
+      if (i === -1) list.push(id);
+      else list.splice(i, 1);
+      writeDone(list);
+      paint(list.includes(id));
+    });
+  }
+
+  // حفظ آخر درس مفتوح حتى تظهر بطاقة «كمّل من وين وقفت» بالرئيسية
+  try {
+    const h1 = document.querySelector('h1');
+    localStorage.setItem(
+      LAST_KEY,
+      JSON.stringify({ href: location.pathname, title: h1?.textContent?.trim() ?? '' }),
+    );
+  } catch {
+    /* لا شي */
+  }
+</script>

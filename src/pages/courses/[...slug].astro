@@ -110,11 +110,18 @@ const jsonLd = [
           </section>
         )}
 
-        <h2 class="ttl">محتوى الدورة</h2>
+        <div class="curr-head">
+          <h2 class="ttl">محتوى الدورة</h2>
+          <div class="prog" id="prog" hidden>
+            <div class="bar"><span id="bar-fill"></span></div>
+            <span class="prog-txt" id="prog-txt"></span>
+            <button class="reset" type="button" id="reset-prog">تصفير</button>
+          </div>
+        </div>
         <ol class="curr">
           {lessons.map((l, i) => (
             <li>
-              <a class="row-item" href={`/lessons/${l.id}/`}>
+              <a class="row-item" href={`/lessons/${l.id}/`} data-lesson={l.id}>
                 <span class="num mono">{String(i + 1).padStart(2, '0')}</span>
                 <span class="name">{l.data.title}</span>
                 <span class="dur mono">{l.data.duration}</span>
@@ -147,7 +154,20 @@ const jsonLd = [
 
   .grid-wrap { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 44px; align-items: start; }
   @media (max-width: 940px) { .grid-wrap { grid-template-columns: minmax(0, 1fr); } }
-  .ttl { font-size: 22px; margin-bottom: 16px; }
+  .curr-head { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 16px; }
+  .ttl { font-size: 22px; margin: 0; }
+  .prog { display: flex; align-items: center; gap: 12px; margin-inline-start: auto; }
+  .bar { width: 150px; height: 6px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+  .bar span { display: block; height: 100%; width: 0; background: var(--cyan); border-radius: 999px; transition: width .25s ease; }
+  .prog-txt { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .reset {
+    font: inherit; font-size: 12.5px; color: var(--faint); background: none;
+    border: 0; cursor: pointer; text-decoration: underline; padding: 4px;
+  }
+  .reset:hover { color: var(--orange); }
+  .row-item.done { border-color: var(--line-strong); }
+  .row-item.done .name { color: var(--muted); }
+  .row-item.done .num::after { content: ' ✓'; color: var(--cyan); }
   .panel {
     background: var(--surface); border: 1px solid var(--line);
     border-radius: var(--r-md); padding: 20px 22px; margin-bottom: 20px;
@@ -177,3 +197,48 @@ const jsonLd = [
   .dur { font-size: 13px; color: var(--muted); }
   .notes .prose { font-size: 16px; }
 </style>
+
+<script>
+  // ===== شريط تقدّم الدورة — من تخزين المتصفّح =====
+  const DONE_KEY = 'ta-done';
+  const rows = document.querySelectorAll<HTMLElement>('.row-item[data-lesson]');
+  const wrap = document.getElementById('prog');
+  const fill = document.getElementById('bar-fill');
+  const txt = document.getElementById('prog-txt');
+
+  const readDone = (): string[] => {
+    try {
+      return JSON.parse(localStorage.getItem(DONE_KEY) ?? '[]');
+    } catch {
+      return [];
+    }
+  };
+
+  function paint() {
+    const done = readDone();
+    let n = 0;
+    rows.forEach((r) => {
+      const isDone = done.includes(r.dataset.lesson ?? '');
+      r.classList.toggle('done', isDone);
+      if (isDone) n++;
+    });
+    if (rows.length === 0) return;
+    if (wrap) wrap.hidden = n === 0;
+    if (fill) fill.style.width = `${Math.round((n / rows.length) * 100)}%`;
+    if (txt) txt.textContent = `${n} من ${rows.length}`;
+  }
+
+  document.getElementById('reset-prog')?.addEventListener('click', () => {
+    try {
+      const done = readDone().filter(
+        (id) => ![...rows].some((r) => r.dataset.lesson === id),
+      );
+      localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    } catch {
+      /* لا شي */
+    }
+    paint();
+  });
+
+  paint();
+</script>

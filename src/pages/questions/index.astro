@@ -1,0 +1,221 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { getSite } from '../../lib/site';
+
+const site = await getSite();
+
+const questions = (await getCollection('questions'))
+  .filter((q) => !q.data.draft)
+  .sort((a, b) => a.data.title.localeCompare(b.data.title, 'ar'));
+
+const levels = ['مبتدئ', 'متوسط', 'متقدّم'].filter((l) =>
+  questions.some((q) => q.data.level === l),
+);
+const domains = [...new Set(questions.map((q) => q.data.domain))];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: questions.map((q) => ({
+    '@type': 'Question',
+    name: q.data.title,
+    acceptedAnswer: { '@type': 'Answer', text: q.data.shortAnswer },
+    url: `${site.url}/questions/${q.id}/`,
+  })),
+};
+---
+<Base
+  title="بنك أسئلة مقابلات QA"
+  description="أسئلة مقابلات اختبار البرمجيات اللي بتتكرر بالسوق العربي، مع جواب نموذجي لكل سؤال وشرح ليش بينسأل."
+  jsonLd={jsonLd}
+>
+  <section class="page-head dots">
+    <div class="wrap">
+      <h1>بنك أسئلة المقابلات</h1>
+      <p class="lead">
+        {questions.length} سؤال بتتكرر بمقابلات الـ QA، كل واحد بجواب نموذجي وشرح ليش بينسأل والفخ اللي بيوقعوا فيه.
+      </p>
+
+      <div class="tools">
+        <div class="chips" role="group" aria-label="تصفية حسب المستوى">
+          <button class="chip lvl on" type="button" data-lvl="all">كل المستويات</button>
+          {levels.map((l) => <button class="chip lvl" type="button" data-lvl={l}>{l}</button>)}
+        </div>
+        <div class="chips" role="group" aria-label="تصفية حسب المجال">
+          <button class="chip dom on" type="button" data-dom="all">كل المجالات</button>
+          {domains.map((d) => <button class="chip dom" type="button" data-dom={d}>{d}</button>)}
+        </div>
+        <button class="btn btn-ghost btn-sm practice" type="button" id="practice-btn">
+          <Icon name="play" size={16} /> وضع التدريب
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- وضع التدريب: سؤال عشوائي مع كشف الجواب -->
+  <section class="section practice-box" id="practice" hidden>
+    <div class="wrap">
+      <div class="pcard">
+        <span class="p-meta">
+          <span class="badge" id="p-lvl"></span>
+          <span class="badge badge-outline" id="p-dom"></span>
+        </span>
+        <h2 id="p-q"></h2>
+        <details class="reveal">
+          <summary>اكشف الجواب</summary>
+          <p id="p-a"></p>
+        </details>
+        <div class="p-actions">
+          <button class="btn btn-primary btn-sm" type="button" id="p-next">سؤال تاني</button>
+          <a class="btn btn-ghost btn-sm" id="p-open" href="/questions/">اقرأ الشرح الكامل</a>
+          <button class="btn btn-ghost btn-sm" type="button" id="p-close">إغلاق</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <ul class="qlist" id="q-list">
+        {questions.map((q) => (
+          <li data-lvl={q.data.level} data-dom={q.data.domain}>
+            <a class="q" href={`/questions/${q.id}/`}>
+              <span class="q-top">
+                <span class="badge">{q.data.level}</span>
+                <span class="badge badge-outline">{q.data.domain}</span>
+              </span>
+              <span class="q-ttl">{q.data.title}</span>
+              <span class="q-ans">{q.data.shortAnswer}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p class="empty" hidden>ما في أسئلة مطابقة للتصفية.</p>
+    </div>
+  </section>
+
+  <script type="application/json" id="q-data" set:html={JSON.stringify(
+    questions.map((q) => ({
+      t: q.data.title,
+      a: q.data.shortAnswer,
+      l: q.data.level,
+      d: q.data.domain,
+      u: `/questions/${q.id}/`,
+    })),
+  )} />
+</Base>
+
+<style>
+  .page-head { background: var(--navy); border-bottom: 1px solid var(--line); padding-block: 52px 40px; }
+  .page-head h1 { margin-bottom: 12px; }
+  .tools { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; align-items: center; }
+  .chips { display: flex; gap: 10px; flex-wrap: wrap; }
+  .chip {
+    font: inherit; font-size: 14px; font-weight: 500; color: var(--muted);
+    background: transparent; border: 1px solid var(--line); border-radius: 999px;
+    padding: 8px 16px; min-height: 40px; cursor: pointer;
+  }
+  .chip:hover { color: var(--ink); }
+  .chip.on { background: var(--cyan-soft); color: var(--cyan); border-color: var(--line-strong); }
+  .practice { margin-inline-start: auto; }
+
+  .qlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .q {
+    display: grid; gap: 9px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r-md); padding: 20px 22px; color: inherit;
+  }
+  .q:hover { border-color: var(--line-strong); }
+  .q-top { display: flex; gap: 8px; flex-wrap: wrap; }
+  .q-ttl { font-size: 18px; font-weight: 700; line-height: 1.6; }
+  .q-ans { font-size: 15px; color: var(--ink-3); line-height: 1.85; }
+  .empty { color: var(--muted); }
+
+  .practice-box { padding-block: 10px 0; }
+  .pcard {
+    background: var(--surface); border: 1px solid var(--line-strong);
+    border-radius: var(--r-lg); padding: 26px 28px; display: grid; gap: 14px;
+  }
+  .p-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pcard h2 { font-size: 23px; line-height: 1.6; margin: 0; }
+  .p-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+</style>
+
+<script>
+  const items = document.querySelectorAll<HTMLElement>('#q-list > li');
+  const empty = document.querySelector<HTMLElement>('.empty');
+  const lvlChips = document.querySelectorAll<HTMLButtonElement>('.chip.lvl');
+  const domChips = document.querySelectorAll<HTMLButtonElement>('.chip.dom');
+
+  let lvl = 'all';
+  let dom = 'all';
+
+  function apply() {
+    let shown = 0;
+    items.forEach((li) => {
+      const ok = (lvl === 'all' || li.dataset.lvl === lvl) && (dom === 'all' || li.dataset.dom === dom);
+      li.style.display = ok ? '' : 'none';
+      if (ok) shown++;
+    });
+    if (empty) empty.hidden = shown > 0;
+  }
+
+  lvlChips.forEach((c) =>
+    c.addEventListener('click', () => {
+      lvlChips.forEach((x) => x.classList.toggle('on', x === c));
+      lvl = c.dataset.lvl ?? 'all';
+      apply();
+    }),
+  );
+  domChips.forEach((c) =>
+    c.addEventListener('click', () => {
+      domChips.forEach((x) => x.classList.toggle('on', x === c));
+      dom = c.dataset.dom ?? 'all';
+      apply();
+    }),
+  );
+
+  // ===== وضع التدريب =====
+  type Q = { t: string; a: string; l: string; d: string; u: string };
+  const raw = document.getElementById('q-data')?.textContent ?? '[]';
+  const data: Q[] = JSON.parse(raw);
+
+  const box = document.getElementById('practice');
+  const btn = document.getElementById('practice-btn');
+  const qEl = document.getElementById('p-q');
+  const aEl = document.getElementById('p-a');
+  const lEl = document.getElementById('p-lvl');
+  const dEl = document.getElementById('p-dom');
+  const openEl = document.getElementById('p-open') as HTMLAnchorElement | null;
+  const details = document.querySelector<HTMLDetailsElement>('.pcard .reveal');
+
+  let lastIndex = -1;
+  function pick() {
+    const pool = data.filter(
+      (q) => (lvl === 'all' || q.l === lvl) && (dom === 'all' || q.d === dom),
+    );
+    if (pool.length === 0) return;
+    let i = Math.floor(Math.random() * pool.length);
+    if (pool.length > 1 && i === lastIndex) i = (i + 1) % pool.length;
+    lastIndex = i;
+    const q = pool[i];
+    if (qEl) qEl.textContent = q.t;
+    if (aEl) aEl.textContent = q.a;
+    if (lEl) lEl.textContent = q.l;
+    if (dEl) dEl.textContent = q.d;
+    if (openEl) openEl.href = q.u;
+    if (details) details.open = false;
+  }
+
+  btn?.addEventListener('click', () => {
+    if (box) box.hidden = false;
+    pick();
+    box?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+  document.getElementById('p-next')?.addEventListener('click', pick);
+  document.getElementById('p-close')?.addEventListener('click', () => {
+    if (box) box.hidden = true;
+  });
+</script>

@@ -47,9 +47,12 @@ const lessons = defineCollection({
     relatedLessons: strList,
     // التطبيق أو الأداة المستخدمة بالدرس
     appUsed: optString,
-    // تمرين وحلّه (تُعرض بمرحلة لاحقة)
-    exercise: optString,
-    solution: optString,
+    // تمرين الدرس وحلّه
+    exerciseTitle: optString,
+    exercise: strList,
+    exerciseNote: optString,
+    solution: strList,
+    solutionCode: optString,
     resources: z.preprocess(
       fallback([]),
       z.array(z.object({ label: str(''), url: str('') })),
@@ -126,6 +129,21 @@ const resources = defineCollection({
     tags: strList,
     cover: optString,
     featured: bool(false),
+    draft: bool(false),
+  }),
+});
+
+/* ===== بنك أسئلة المقابلات ===== */
+const questions = defineCollection({
+  loader: glob({ base: './src/content/questions', pattern: '**/*.{md,mdx}' }),
+  schema: z.object({
+    title: z.string(),
+    level: level,
+    domain: str('أساسيات'),
+    // الجواب المختصر الذي يُعرض عند كشف الإجابة
+    shortAnswer: str(''),
+    tags: strList,
+    relatedLessons: strList,
     draft: bool(false),
   }),
 });
@@ -254,4 +272,4 @@ const home = defineCollection({
   }),
 });
 
-export const collections = { lessons, articles, courses, news, resources, glossary, pages, site, home, start };
+export const collections = { lessons, articles, courses, news, resources, glossary, questions, pages, site, home, start };

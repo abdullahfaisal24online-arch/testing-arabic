@@ -143,6 +143,20 @@ const jsonLd = [
     </div>
   </section>
 
+  <!-- ===== كمّل من وين وقفت ===== -->
+  <section class="section resume-wrap" id="resume" hidden>
+    <div class="wrap">
+      <a class="resume" id="resume-link" href="/lessons/">
+        <span class="r-ic"><Icon name="play" size={20} /></span>
+        <span class="r-txt">
+          <span class="r-lbl">كمّل من وين وقفت</span>
+          <span class="r-ttl" id="resume-title"></span>
+        </span>
+        <Icon name="arrow" size={18} />
+      </a>
+    </div>
+  </section>
+
   <!-- ===== الدورات ===== -->
   {home.showCourses && courses.length > 0 && (
     <section class="section">
@@ -299,6 +313,21 @@ const jsonLd = [
   .v-txt { font-size: 14.5px; color: var(--muted); line-height: 1.8; }
   @media (max-width: 760px) { .values { grid-template-columns: 1fr; gap: 14px; } }
 
+  .resume-wrap { padding-block: 30px 0; }
+  .resume {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px;
+    background: var(--surface); border: 1px solid var(--orange-line);
+    border-radius: var(--r-lg); padding: 18px 22px; color: var(--ink);
+  }
+  .resume:hover { border-color: var(--orange); color: var(--ink); }
+  .r-ic {
+    display: grid; place-items: center; width: 44px; height: 44px;
+    border-radius: var(--r-md); background: var(--orange-soft); color: var(--orange);
+  }
+  .r-txt { display: grid; gap: 3px; min-width: 0; }
+  .r-lbl { font-size: 12.5px; font-weight: 600; color: var(--orange); }
+  .r-ttl { font-size: 17px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
   .more { font-size: 15px; font-weight: 600; }
   .section-head h2 + .lead { margin-top: 10px; }
   .eyebrow + h2 { margin-top: 10px; }
@@ -308,3 +337,25 @@ const jsonLd = [
     .hero-in { padding-block: 44px 52px; }
   }
 </style>
+
+<script>
+  // بطاقة «كمّل من وين وقفت» — بتظهر فقط لو الزائر فتح درس قبل
+  try {
+    const raw = localStorage.getItem('ta-last');
+    if (raw) {
+      const last = JSON.parse(raw) as { href?: string; title?: string };
+      if (last?.href && last?.title) {
+        const box = document.getElementById('resume');
+        const link = document.getElementById('resume-link') as HTMLAnchorElement | null;
+        const ttl = document.getElementById('resume-title');
+        if (box && link && ttl) {
+          link.href = last.href;
+          ttl.textContent = last.title;
+          box.hidden = false;
+        }
+      }
+    }
+  } catch {
+    /* المتصفّح مانع التخزين — البطاقة بتضل مخفية */
+  }
+</script>

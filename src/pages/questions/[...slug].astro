@@ -1,0 +1,169 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import Prose from '../../components/Prose.astro';
+import InlineNewsletter from '../../components/InlineNewsletter.astro';
+import { getSite } from '../../lib/site';
+import { tagSlug } from '../../lib/tags';
+
+export async function getStaticPaths() {
+  const questions = (await getCollection('questions')).filter((q) => !q.data.draft);
+  const lessons = (await getCollection('lessons')).filter((l) => !l.data.draft);
+
+  return questions.map((question, i) => ({
+    params: { slug: question.id },
+    props: {
+      question,
+      prev: i > 0 ? questions[i - 1] : undefined,
+      next: i < questions.length - 1 ? questions[i + 1] : undefined,
+      related: question.data.relatedLessons
+        .map((slug) => lessons.find((l) => l.id === slug))
+        .filter(Boolean),
+      sameDomain: questions
+        .filter((q) => q.id !== question.id && q.data.domain === question.data.domain)
+        .slice(0, 5),
+    },
+  }));
+}
+
+const { question, prev, next, related, sameDomain } = Astro.props;
+const { data } = question;
+const { Content } = await render(question);
+const bodyHtml = (question as any).rendered?.html ?? '';
+const site = await getSite();
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'QAPage',
+    mainEntity: {
+      '@type': 'Question',
+      name: data.title,
+      answerCount: 1,
+      acceptedAnswer: { '@type': 'Answer', text: data.shortAnswer },
+    },
+    inLanguage: 'ar',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: site.url },
+      { '@type': 'ListItem', position: 2, name: 'بنك الأسئلة', item: `${site.url}/questions/` },
+      { '@type': 'ListItem', position: 3, name: data.title, item: `${site.url}/questions/${question.id}/` },
+    ],
+  },
+];
+---
+<Base title={data.title} description={data.shortAnswer} jsonLd={jsonLd}>
+  <div class="wrap crumbs">
+    <a href="/">الرئيسية</a><span>›</span><a href="/questions/">بنك الأسئلة</a><span>›</span>
+    <span class="now">{data.domain}</span>
+  </div>
+
+  <div class="wrap layout">
+    <article class="main">
+      <header class="head">
+        <div class="meta">
+          <span class="badge">{data.level}</span>
+          <span class="badge badge-outline">{data.domain}</span>
+        </div>
+        <h1>{data.title}</h1>
+      </header>
+
+      <div class="answer">
+        <span class="a-lbl">الجواب المختصر</span>
+        <p>{data.shortAnswer}</p>
+      </div>
+
+      {bodyHtml ? <Prose html={bodyHtml} /> : <div class="prose"><Content /></div>}
+
+      {data.tags.length > 0 && (
+        <div class="tags">
+          {data.tags.map((t) => <a class="tag" href={`/tags/${tagSlug(t)}/`}>{t}</a>)}
+        </div>
+      )}
+
+      <InlineNewsletter text="اشترك بالنشرة وبيوصلك كل سؤال جديد بينضاف للبنك." />
+
+      <nav class="pager" aria-label="التنقّل بين الأسئلة">
+        {prev ? (
+          <a class="pg" href={`/questions/${prev.id}/`}>
+            <span class="pg-lbl">السؤال السابق</span>
+            <span class="pg-ttl">{prev.data.title}</span>
+          </a>
+        ) : <span></span>}
+        {next ? (
+          <a class="pg nx" href={`/questions/${next.id}/`}>
+            <span class="pg-lbl">السؤال التالي</span>
+            <span class="pg-ttl">{next.data.title}</span>
+          </a>
+        ) : <span></span>}
+      </nav>
+    </article>
+
+    <aside class="side">
+      {related.length > 0 && (
+        <section class="box">
+          <h2 class="box-ttl">دروس تشرح الموضوع</h2>
+          <div class="links">
+            {related.map((l: any) => (
+              <a href={`/lessons/${l.id}/`}>{l.data.title}</a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {sameDomain.length > 0 && (
+        <section class="box">
+          <h2 class="box-ttl">أسئلة بنفس المجال</h2>
+          <div class="links">
+            {sameDomain.map((q) => <a href={`/questions/${q.id}/`}>{q.data.title}</a>)}
+          </div>
+        </section>
+      )}
+
+      <a class="btn btn-ghost btn-sm all" href="/questions/">
+        <Icon name="arrow" size={16} /> كل الأسئلة
+      </a>
+    </aside>
+  </div>
+</Base>
+
+<style>
+  .crumbs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-block: 18px; font-size: 14px; color: var(--muted); }
+  .crumbs .now { color: var(--orange); font-weight: 600; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 44px; align-items: start; padding-bottom: 30px; }
+  @media (max-width: 1000px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+  .head { display: grid; gap: 12px; margin-bottom: 22px; }
+  .meta { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .answer {
+    background: var(--surface); border: 1px solid var(--line);
+    border-inline-start: 3px solid var(--cyan);
+    border-radius: var(--r-md); padding: 20px 22px; margin-bottom: 28px; max-width: var(--read);
+  }
+  .a-lbl { font-size: 12.5px; font-weight: 600; color: var(--cyan); }
+  .answer p { margin: 8px 0 0; font-size: 17px; line-height: 1.9; color: var(--ink-2); }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+  .tag { font-size: 12.5px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; }
+  .tag:hover { color: var(--cyan); border-color: var(--line-strong); }
+
+  .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 34px; }
+  .pg { display: grid; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: 16px 18px; color: inherit; }
+  .pg:hover { border-color: var(--line-strong); }
+  .pg.nx { text-align: left; }
+  .pg-lbl { font-size: 12px; color: var(--orange); font-weight: 600; }
+  .pg-ttl { font-size: 15px; font-weight: 600; }
+
+  .side { display: grid; gap: 16px; position: sticky; top: 84px; }
+  @media (max-width: 1000px) { .side { position: static; } }
+  .box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 20px; display: grid; gap: 12px; }
+  .box-ttl { font-size: 16px; margin: 0; }
+  .links { display: grid; gap: 10px; }
+  .links a { color: var(--ink-2); font-size: 15px; line-height: 1.65; }
+  .links a:hover { color: var(--cyan); }
+  .all { justify-self: start; }
+</style>
