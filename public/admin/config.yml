@@ -307,6 +307,92 @@ collections:
         label: "نص المقال"
         widget: markdown
 
+  - name: resources
+    label: "الموارد والقوالب"
+    label_singular: "مورد"
+    folder: src/content/resources
+    create: true
+    slug: "{{fields.slug}}"
+    extension: md
+    format: frontmatter
+    summary: "{{title}}"
+    fields:
+      - name: title
+        label: "اسم المورد"
+        widget: string
+      - name: slug
+        label: "الرابط بالإنجليزي بدون مسافات"
+        widget: string
+        hint: "مثال: bug-report-template"
+      - name: description
+        label: "الوصف المختصر"
+        widget: text
+      - name: publishDate
+        label: "تاريخ النشر"
+        widget: datetime
+        format: "YYYY-MM-DD"
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        picker_utc: true
+      - name: updatedDate
+        label: "تاريخ التحديث"
+        widget: datetime
+        format: "YYYY-MM-DD"
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        picker_utc: true
+        required: false
+      - name: category
+        label: "النوع"
+        widget: select
+        default: "قوالب"
+        options:
+          - "قوالب"
+          - "تشك ليست"
+          - "تقارير"
+          - "أدوات"
+          - "أوراق مرجعية"
+      - name: audience
+        label: "لمين هذا المورد"
+        widget: string
+        required: false
+      - name: format
+        label: "صيغة الملف"
+        widget: string
+        required: false
+        hint: "مثال: Markdown أو CSV أو PDF"
+      - name: files
+        label: "ملفات التحميل"
+        widget: list
+        summary: "{{fields.label}}"
+        fields:
+          - name: label
+            label: "اسم الملف كما يظهر"
+            widget: string
+          - name: url
+            label: "الملف"
+            widget: file
+            hint: "ارفع الملف أو الصق مساره مثل /resources/bug-report-template.md"
+      - name: tags
+        label: "الوسوم"
+        widget: list
+        required: false
+      - name: cover
+        label: "صورة"
+        widget: image
+        required: false
+      - name: featured
+        label: "مورد مميّز يظهر أولاً"
+        widget: boolean
+        default: false
+      - name: draft
+        label: "مسودّة لا تُنشر"
+        widget: boolean
+        default: false
+      - name: body
+        label: "شرح المورد وكيفية استعماله"
+        widget: markdown
+
   - name: news
     label: "آخر الأخبار"
     label_singular: "خبر"
@@ -505,9 +591,29 @@ collections:
             widget: string
             required: false
           - name: showStats
-            label: "إظهار أرقام الإحصائيات"
+            label: "إظهار الشريط تحت الأزرار"
             widget: boolean
             default: true
+          - name: statsStyle
+            label: "شكل الشريط"
+            widget: select
+            default: "قيم"
+            options:
+              - "قيم"
+              - "أرقام"
+            hint: "«قيم» بتعرض ثلاث جمل، و«أرقام» بتعرض عدد الدروس والدورات والمقالات"
+          - name: values
+            label: "القيم الثلاث"
+            widget: list
+            required: false
+            summary: "{{fields.title}}"
+            fields:
+              - name: title
+                label: "العنوان"
+                widget: string
+              - name: text
+                label: "الشرح"
+                widget: string
           - name: statLessonsLabel
             label: "وصف رقم الدروس"
             widget: string
@@ -564,6 +670,22 @@ collections:
             label: "قسم المقالات — العنوان"
             widget: string
             required: false
+          - name: showResources
+            label: "إظهار قسم الموارد"
+            widget: boolean
+            default: true
+          - name: resourcesEyebrow
+            label: "قسم الموارد — الشارة"
+            widget: string
+            required: false
+          - name: resourcesTitle
+            label: "قسم الموارد — العنوان"
+            widget: string
+            required: false
+          - name: resourcesSubtitle
+            label: "قسم الموارد — النص"
+            widget: text
+            required: false
           - name: showNews
             label: "إظهار قسم آخر الأخبار"
             widget: boolean
@@ -588,3 +710,60 @@ collections:
             label: "قسم النشرة — الملاحظة الصغيرة"
             widget: string
             required: false
+          - name: inlineNewsletterTitle
+            label: "صندوق الاشتراك داخل المحتوى — العنوان"
+            widget: string
+            required: false
+          - name: inlineNewsletterText
+            label: "صندوق الاشتراك داخل المحتوى — النص الافتراضي"
+            widget: text
+            required: false
+
+      - name: start
+        label: "صفحة ابدأ من هنا"
+        file: src/content/settings/start.json
+        fields:
+          - name: title
+            label: "عنوان الصفحة"
+            widget: string
+          - name: intro
+            label: "المقدّمة"
+            widget: text
+            required: false
+          - name: note
+            label: "نصيحة بأسفل الصفحة"
+            widget: text
+            required: false
+          - name: stages
+            label: "المراحل"
+            widget: list
+            summary: "{{fields.title}}"
+            fields:
+              - name: label
+                label: "ترقيم المرحلة"
+                widget: string
+                required: false
+                hint: "مثال: المرحلة الأولى"
+              - name: title
+                label: "عنوان المرحلة"
+                widget: string
+              - name: body
+                label: "شرح المرحلة"
+                widget: text
+              - name: items
+                label: "روابط المرحلة"
+                widget: list
+                summary: "{{fields.label}}"
+                fields:
+                  - name: label
+                    label: "النص"
+                    widget: string
+                  - name: href
+                    label: "الرابط"
+                    widget: string
+                    hint: "مثال: /courses/qa-basics/"
+                  - name: kind
+                    label: "النوع"
+                    widget: string
+                    required: false
+                    hint: "دورة / درس / قالب / مقال"

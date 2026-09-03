@@ -1,0 +1,95 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ResourceCard from '../../components/ResourceCard.astro';
+import { getSite } from '../../lib/site';
+
+const site = await getSite();
+
+const resources = (await getCollection('resources'))
+  .filter((r) => !r.data.draft)
+  .sort((a, b) => {
+    if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
+    return b.data.publishDate.valueOf() - a.data.publishDate.valueOf();
+  });
+
+const categories = [...new Set(resources.map((r) => r.data.category))];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'الموارد والقوالب',
+  itemListElement: resources.map((r, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: r.data.title,
+    url: `${site.url}/resources/${r.id}/`,
+  })),
+};
+---
+<Base
+  title="الموارد والقوالب"
+  description="قوالب وتشك ليستات جاهزة للتحميل بالعربي: حالة اختبار، تقرير خلل، خطة اختبار، ريجريشن، وتقرير جودة السبرنت."
+  jsonLd={jsonLd}
+>
+  <section class="page-head dots">
+    <div class="wrap">
+      <h1>الموارد والقوالب</h1>
+      <p class="lead">
+        ملفات جاهزة تنزّلها وتستعملها بشغلك من بكرا — مكتوبة بالعربي، ومجرّبة بمشاريع حقيقية. كلها مجانية وبدون تسجيل.
+      </p>
+      {categories.length > 1 && (
+        <div class="filters" role="group" aria-label="تصفية حسب النوع">
+          <button class="chip on" type="button" data-cat="all">الكل</button>
+          {categories.map((c) => <button class="chip" type="button" data-cat={c}>{c}</button>)}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="grid grid-3" id="res-grid">
+        {resources.map((r) => (
+          <div data-cat={r.data.category}><ResourceCard resource={r} /></div>
+        ))}
+      </div>
+      {resources.length === 0 && <p class="lead">ما في موارد منشورة بعد.</p>}
+      <p class="empty" hidden>ما في موارد بهذا النوع.</p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-head { background: var(--navy); border-bottom: 1px solid var(--line); padding-block: 52px 40px; }
+  .page-head h1 { margin-bottom: 12px; }
+  .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+  .chip {
+    font: inherit; font-size: 14px; font-weight: 500; color: var(--muted);
+    background: transparent; border: 1px solid var(--line); border-radius: 999px;
+    padding: 9px 18px; min-height: 40px; cursor: pointer;
+  }
+  .chip:hover { color: var(--ink); }
+  .chip.on { background: var(--cyan-soft); color: var(--cyan); border-color: var(--line-strong); }
+  #res-grid > [data-cat] { display: contents; }
+  .empty { color: var(--muted); }
+</style>
+
+<script>
+  const chips = document.querySelectorAll<HTMLButtonElement>('.chip[data-cat]');
+  const cells = document.querySelectorAll<HTMLElement>('#res-grid > [data-cat]');
+  const empty = document.querySelector<HTMLElement>('.empty');
+  chips.forEach((chip) =>
+    chip.addEventListener('click', () => {
+      chips.forEach((c) => c.classList.toggle('on', c === chip));
+      const cat = chip.dataset.cat;
+      let shown = 0;
+      cells.forEach((cell) => {
+        const match = cat === 'all' || cell.dataset.cat === cat;
+        cell.style.display = match ? '' : 'none';
+        if (match) shown++;
+      });
+      if (empty) empty.hidden = shown > 0;
+    }),
+  );
+</script>

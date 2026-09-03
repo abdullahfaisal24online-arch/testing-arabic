@@ -1,0 +1,45 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  resource: {
+    id: string;
+    data: { title: string; description: string; category: string; format?: string; files: { label: string; url: string }[] };
+  };
+}
+const { resource } = Astro.props;
+const { data } = resource;
+---
+<a class="card res" href={`/resources/${resource.id}/`}>
+  <div class="card-body">
+    <div class="top">
+      <span class="ic"><Icon name="file" size={20} /></span>
+      <span class="badge">{data.category}</span>
+    </div>
+    <span class="ttl">{data.title}</span>
+    <p class="desc">{data.description}</p>
+    <span class="meta">
+      <Icon name="arrow" size={14} />
+      {data.files.length > 1 ? `${data.files.length} ملفات` : 'تحميل مجاني'}
+      {data.format && <span class="fmt mono">{data.format}</span>}
+    </span>
+  </div>
+</a>
+
+<style>
+  .res { color: inherit; }
+  .res .card-body { padding: 24px; gap: 12px; }
+  .top { display: flex; align-items: center; justify-content: space-between; }
+  .ic {
+    display: grid; place-items: center;
+    width: 44px; height: 44px; border-radius: var(--r-md);
+    background: var(--orange-soft); color: var(--orange);
+  }
+  .ttl { font-size: 19px; font-weight: 700; line-height: 1.55; }
+  .desc { font-size: 15px; color: var(--ink-3); line-height: 1.85; }
+  .meta {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    font-size: 13.5px; color: var(--cyan); font-weight: 600; margin-top: auto;
+  }
+  .fmt { color: var(--faint); font-weight: 400; font-size: 12px; }
+</style>

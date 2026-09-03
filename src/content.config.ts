@@ -108,6 +108,52 @@ const news = defineCollection({
   }),
 });
 
+/* ===== الموارد والقوالب ===== */
+const resources = defineCollection({
+  loader: glob({ base: './src/content/resources', pattern: '**/*.{md,mdx}' }),
+  schema: z.object({
+    title: z.string(),
+    description: str(''),
+    publishDate: z.coerce.date(),
+    updatedDate: optDate,
+    category: str('قوالب'),
+    audience: optString,
+    format: optString,
+    files: z.preprocess(
+      fallback([]),
+      z.array(z.object({ label: str(''), url: str('') })),
+    ),
+    tags: strList,
+    cover: optString,
+    featured: bool(false),
+    draft: bool(false),
+  }),
+});
+
+/* ===== صفحة ابدأ من هنا ===== */
+const start = defineCollection({
+  loader: glob({ base: './src/content/settings', pattern: 'start.json' }),
+  schema: z.object({
+    title: optString,
+    intro: optString,
+    note: optString,
+    stages: z.preprocess(
+      fallback([]),
+      z.array(
+        z.object({
+          label: optString,
+          title: str(''),
+          body: str(''),
+          items: z.preprocess(
+            fallback([]),
+            z.array(z.object({ label: str(''), href: str('/'), kind: optString })),
+          ),
+        }),
+      ),
+    ),
+  }),
+});
+
 /* ===== صفحات حرّة ===== */
 const pages = defineCollection({
   loader: glob({ base: './src/content/pages', pattern: '**/*.{md,mdx}' }),
@@ -159,6 +205,11 @@ const home = defineCollection({
     secondaryCtaLabel: optString,
     secondaryCtaHref: optString,
     showStats: bool(true),
+    statsStyle: z.preprocess(fallback('قيم'), z.enum(['قيم', 'أرقام'])),
+    values: z.preprocess(
+      fallback([]),
+      z.array(z.object({ title: str(''), text: str('') })),
+    ),
     statLessonsLabel: optString,
     statCoursesLabel: optString,
     statArticlesLabel: optString,
@@ -173,8 +224,14 @@ const home = defineCollection({
     lessonsTitle: optString,
     showArticles: bool(true),
     articlesTitle: optString,
+    showResources: bool(true),
+    resourcesEyebrow: optString,
+    resourcesTitle: optString,
+    resourcesSubtitle: optString,
     showNews: bool(true),
     newsTitle: optString,
+    inlineNewsletterTitle: optString,
+    inlineNewsletterText: optString,
     newsletterTitle: optString,
     newsletterText: optString,
     newsletterButton: optString,
@@ -182,4 +239,4 @@ const home = defineCollection({
   }),
 });
 
-export const collections = { lessons, articles, courses, news, pages, site, home };
+export const collections = { lessons, articles, courses, news, resources, pages, site, home, start };

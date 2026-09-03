@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
+import InlineNewsletter from '../../components/InlineNewsletter.astro';
 import { getSite } from '../../lib/site';
 import { formatDate, readingTime, minutesLabel } from '../../lib/utils';
 
@@ -81,6 +82,8 @@ const jsonLd = [
       {data.cover && <img class="cover" src={data.cover} alt="" width="1200" height="630" />}
 
       <div class="prose"><Content /></div>
+
+      <InlineNewsletter text="اشترك بالنشرة وبيوصلك كل مقال جديد أول ما ينزل." />
     </article>
 
     <aside class="side">

@@ -1,0 +1,127 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import InlineNewsletter from '../../components/InlineNewsletter.astro';
+import { getSite, getStart } from '../../lib/site';
+
+const site = await getSite();
+const start = await getStart();
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: start.title,
+  description: start.intro,
+  inLanguage: 'ar',
+  step: start.stages.map((s, i) => ({
+    '@type': 'HowToStep',
+    position: i + 1,
+    name: s.title,
+    text: s.body,
+    url: `${site.url}/start/#stage-${i + 1}`,
+  })),
+};
+---
+<Base
+  title={start.title}
+  description={start.intro || 'خارطة طريق مرتّبة لتعلّم اختبار البرمجيات بالعربي — من وين تبدأ وشو بعده.'}
+  jsonLd={jsonLd}
+>
+  <section class="hero dots">
+    <div class="wrap">
+      <span class="eyebrow">خارطة طريق</span>
+      <h1>{start.title}</h1>
+      {start.intro && <p class="intro">{start.intro}</p>}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap road">
+      {start.stages.map((stage, i) => (
+        <article class="stage" id={`stage-${i + 1}`}>
+          <div class="rail">
+            <span class="dot mono">{i + 1}</span>
+            {i < start.stages.length - 1 && <span class="line"></span>}
+          </div>
+          <div class="body">
+            {stage.label && <span class="label">{stage.label}</span>}
+            <h2>{stage.title}</h2>
+            <p>{stage.body}</p>
+            {stage.items.length > 0 && (
+              <ul class="items">
+                {stage.items.map((it) => (
+                  <li>
+                    <a href={it.href}>
+                      {it.kind && <span class="kind">{it.kind}</span>}
+                      <span class="lbl">{it.label}</span>
+                      <Icon name="arrow" size={16} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </article>
+      ))}
+
+      {start.note && (
+        <aside class="note">
+          <h2 class="note-ttl">نصيحة قبل ما تبدأ</h2>
+          <p>{start.note}</p>
+        </aside>
+      )}
+
+      <InlineNewsletter text="اشترك بالنشرة وبيوصلك كل درس جديد بالترتيب، بدون ما تدوّر عليه." />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero { background: var(--navy); border-bottom: 1px solid var(--line); padding-block: 56px 46px; }
+  .hero h1 { margin-top: 10px; }
+  .intro { margin-top: 16px; font-size: 18px; line-height: 1.9; color: var(--ink-3); max-width: 62ch; }
+
+  .road { display: grid; gap: 0; max-width: 860px; }
+  .stage { display: grid; grid-template-columns: 44px 1fr; gap: 22px; padding-bottom: 34px; }
+  .rail { display: grid; grid-template-rows: auto 1fr; justify-items: center; gap: 8px; }
+  .dot {
+    display: grid; place-items: center;
+    width: 42px; height: 42px; border-radius: 999px;
+    background: var(--cyan-soft); border: 1px solid var(--line-strong);
+    color: var(--cyan); font-size: 15px; font-weight: 500;
+  }
+  .line { width: 2px; background: var(--line); border-radius: 2px; min-height: 100%; }
+  .label {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 12px; letter-spacing: .6px; color: var(--orange);
+  }
+  .stage h2 { font-size: 24px; margin: 8px 0 0; }
+  .stage p { margin: 10px 0 0; color: var(--ink-3); font-size: 17px; line-height: 1.9; max-width: 62ch; }
+
+  .items { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 9px; max-width: 620px; }
+  .items a {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r-md); padding: 14px 16px; color: var(--ink);
+    min-height: 48px; font-size: 16px; font-weight: 500;
+  }
+  .items a:hover { border-color: var(--line-strong); color: var(--ink); }
+  .kind {
+    font-size: 12px; font-weight: 600; color: var(--cyan);
+    background: var(--cyan-soft); padding: 4px 10px; border-radius: 999px; white-space: nowrap;
+  }
+
+  .note {
+    background: var(--surface); border: 1px solid rgba(246, 130, 59, 0.3);
+    border-inline-start: 3px solid var(--orange);
+    border-radius: var(--r-md); padding: 22px 24px; margin-inline-start: 66px;
+  }
+  .note-ttl { font-size: 17px; margin: 0 0 8px; }
+  .note p { margin: 0; color: var(--ink-2); font-size: 16px; line-height: 1.9; }
+
+  @media (max-width: 640px) {
+    .stage { grid-template-columns: 1fr; gap: 10px; }
+    .rail { display: none; }
+    .note { margin-inline-start: 0; }
+  }
+</style>

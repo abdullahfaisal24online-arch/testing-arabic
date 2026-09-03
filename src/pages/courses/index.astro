@@ -6,12 +6,18 @@ import { getSite } from '../../lib/site';
 
 const site = await getSite();
 
-const courses = (await getCollection('courses'))
-  .filter((c) => !c.data.draft)
-  .sort((a, b) => a.data.order - b.data.order);
 const lessons = (await getCollection('lessons')).filter((l) => !l.data.draft);
 const countFor = (id: string) =>
   lessons.filter((l) => (l.data.course ?? l.data.track) === id).length;
+
+// الدورات الجاهزة أولاً، والقادمة بآخر القائمة
+const courses = (await getCollection('courses'))
+  .filter((c) => !c.data.draft)
+  .sort((a, b) => {
+    const ea = countFor(a.id) === 0 ? 1 : 0;
+    const eb = countFor(b.id) === 0 ? 1 : 0;
+    return ea - eb || a.data.order - b.data.order;
+  });
 
 const jsonLd = {
   '@context': 'https://schema.org',

@@ -6,6 +6,7 @@ import LessonCard from '../components/LessonCard.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import CourseCard from '../components/CourseCard.astro';
 import NewsCard from '../components/NewsCard.astro';
+import ResourceCard from '../components/ResourceCard.astro';
 import Newsletter from '../components/Newsletter.astro';
 import { getSite, getHome, splitHighlight } from '../lib/site';
 import { bunnyThumb } from '../lib/utils';
@@ -23,6 +24,13 @@ const lessons = (await getCollection('lessons'))
 const courses = (await getCollection('courses'))
   .filter(live)
   .sort((a, b) => a.data.order - b.data.order);
+
+const resources = (await getCollection('resources'))
+  .filter(live)
+  .sort((a, b) => {
+    if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
+    return b.data.publishDate.valueOf() - a.data.publishDate.valueOf();
+  });
 
 const news = (await getCollection('news'))
   .filter(live)
@@ -91,13 +99,24 @@ const jsonLd = [
           )}
         </div>
 
-        {home.showStats && (
+        {home.showStats && home.statsStyle === 'أرقام' && (
           <div class="stats">
             <div><b>{lessons.length}</b><span>{home.statLessonsLabel}</span></div>
             <i></i>
             <div><b>{courses.length}</b><span>{home.statCoursesLabel}</span></div>
             <i></i>
             <div><b>{articles.length}</b><span>{home.statArticlesLabel}</span></div>
+          </div>
+        )}
+
+        {home.showStats && home.statsStyle === 'قيم' && home.values.length > 0 && (
+          <div class="values">
+            {home.values.map((v) => (
+              <div class="val">
+                <span class="v-ttl">{v.title}</span>
+                <span class="v-txt">{v.text}</span>
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -138,7 +157,15 @@ const jsonLd = [
           <a href="/courses/" class="more">كل الدورات ←</a>
         </div>
         <div class="grid grid-3">
-          {courses.slice(0, 3).map((c) => <CourseCard course={c} count={countFor(c.id)} />)}
+          {courses
+            .slice()
+            .sort((a, b) => {
+              const ea = countFor(a.id) === 0 ? 1 : 0;
+              const eb = countFor(b.id) === 0 ? 1 : 0;
+              return ea - eb || a.data.order - b.data.order;
+            })
+            .slice(0, 3)
+            .map((c) => <CourseCard course={c} count={countFor(c.id)} />)}
         </div>
       </div>
     </section>
@@ -171,6 +198,26 @@ const jsonLd = [
         </div>
         <div class="grid grid-3">
           {articles.slice(0, 3).map((a) => <ArticleCard article={a} />)}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- ===== الموارد ===== -->
+  {home.showResources && resources.length > 0 && (
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            {home.resourcesEyebrow && <span class="eyebrow">{home.resourcesEyebrow}</span>}
+            <h2>{home.resourcesTitle}</h2>
+            {home.resourcesSubtitle && <p class="lead">{home.resourcesSubtitle}</p>}
+          </div>
+          <span class="grow"></span>
+          <a href="/resources/" class="more">كل الموارد ←</a>
+        </div>
+        <div class="grid grid-3">
+          {resources.slice(0, 3).map((r) => <ResourceCard resource={r} />)}
         </div>
       </div>
     </section>
@@ -239,6 +286,18 @@ const jsonLd = [
   .feat-tag { position: absolute; inset-block-start: 14px; inset-inline-start: 14px; }
   .feat-ttl { font-size: 20px; font-weight: 700; line-height: 1.6; }
   .go { color: var(--cyan); font-weight: 600; }
+
+  .values {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+  }
+  .val { display: grid; gap: 5px; }
+  .v-ttl { font-size: 16px; font-weight: 700; color: var(--ink); }
+  .v-txt { font-size: 14.5px; color: var(--muted); line-height: 1.8; }
+  @media (max-width: 760px) { .values { grid-template-columns: 1fr; gap: 14px; } }
 
   .more { font-size: 15px; font-weight: 600; }
   .section-head h2 + .lead { margin-top: 10px; }

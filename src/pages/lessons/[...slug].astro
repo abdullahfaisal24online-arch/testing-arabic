@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import LessonCard from '../../components/LessonCard.astro';
+import InlineNewsletter from '../../components/InlineNewsletter.astro';
 import { getSite } from '../../lib/site';
 import { formatDate, durationToISO, bunnyEmbed, bunnyThumb } from '../../lib/utils';
 
@@ -157,6 +158,8 @@ const jsonLd = [
       )}
 
       <div class="prose"><Content /></div>
+
+      <InlineNewsletter text="اشترك بالنشرة وبيوصلك كل درس جديد على بريدك، بدون ما تعتمد على خوارزمية." />
 
       <nav class="pager" aria-label="التنقّل بين دروس الدورة">
         {prev ? (

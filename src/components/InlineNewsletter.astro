@@ -1,0 +1,62 @@
+---
+import Icon from './Icon.astro';
+import { getSite, getHome } from '../lib/site';
+
+interface Props {
+  /** نص مخصّص حسب مكان الظهور */
+  text?: string;
+}
+const { text } = Astro.props;
+const site = await getSite();
+const home = await getHome();
+---
+{site.newsletterAction && (
+  <aside class="inline-nl">
+    <div class="txt">
+      <span class="ic"><Icon name="mail" size={20} /></span>
+      <div>
+        <h2>{home.inlineNewsletterTitle}</h2>
+        <p>{text ?? home.inlineNewsletterText}</p>
+      </div>
+    </div>
+    <form action={site.newsletterAction} method="post" target="_blank">
+      <label class="sr-only" for={`nl-${Math.random().toString(36).slice(2, 8)}`}>بريدك الإلكتروني</label>
+      <input type="email" name="email" required placeholder="بريدك الإلكتروني" />
+      <button class="btn btn-primary btn-sm" type="submit">اشترك</button>
+    </form>
+  </aside>
+)}
+
+<style>
+  .inline-nl {
+    display: grid;
+    gap: 18px;
+    background: var(--surface);
+    border: 1px solid rgba(246, 130, 59, 0.28);
+    border-radius: var(--r-lg);
+    padding: 24px 26px;
+    margin-block: 40px 8px;
+    max-width: var(--read);
+  }
+  .txt { display: flex; gap: 14px; align-items: flex-start; }
+  .ic {
+    display: grid; place-items: center; flex-shrink: 0;
+    width: 42px; height: 42px; border-radius: var(--r-md);
+    background: var(--orange-soft); color: var(--orange);
+  }
+  .inline-nl h2 { font-size: 18px; margin: 0 0 4px; }
+  .inline-nl p { font-size: 15px; color: var(--ink-3); margin: 0; line-height: 1.8; }
+  form { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+  input {
+    background: var(--bg);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-md);
+    padding: 12px 16px;
+    color: var(--ink);
+    font: inherit;
+    font-size: 15px;
+    min-height: 46px;
+  }
+  input::placeholder { color: var(--faint); }
+  @media (max-width: 520px) { form { grid-template-columns: 1fr; } }
+</style>

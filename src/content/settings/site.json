@@ -7,14 +7,14 @@
   "url": "https://testing-arabic.com",
   "author": "عبدالله",
   "youtube": "https://www.youtube.com/@testingbilarabi",
-  "linkedin": "https://www.linkedin.com/in/abdullah94faisal/",
-  "email": "abdullahqafaisal@gmail.com",
+  "linkedin": "",
+  "email": "testingarabic94@gmail.com",
   "newsletterAction": "",
   "bunnyLibraryId": "",
   "bunnyCdnHostname": "",
   "headerCtaLabel": "ابدأ من هنا",
-  "headerCtaHref": "/courses/",
-  "footerNote": "الموقع قيد الصيانة والتطوير ، ربنا يسهّل 🔻",
+  "headerCtaHref": "/start/",
+  "footerNote": "كل المحتوى بالعربي، ومستضاف على دومين مستقل.",
   "nav": [
     {
       "label": "الرئيسية",
@@ -29,6 +29,10 @@
       "href": "/lessons/"
     },
     {
+      "label": "الموارد",
+      "href": "/resources/"
+    },
+    {
       "label": "المقالات",
       "href": "/articles/"
     },
@@ -39,10 +43,6 @@
     {
       "label": "عن المنصة",
       "href": "/about/"
-    },
-    {
-      "label": "مهم",
-      "href": "/Important/"
     }
   ]
 }

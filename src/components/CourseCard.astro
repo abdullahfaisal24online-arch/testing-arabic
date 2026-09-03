@@ -13,7 +13,7 @@ const { course, count } = Astro.props;
 const { data } = course;
 const icon = data.accent === 'orange' ? 'board' : 'list';
 ---
-<a class="card course" href={`/courses/${course.id}/`} data-accent={data.accent}>
+<a class="card course" href={`/courses/${course.id}/`} data-accent={data.accent} data-soon={count === 0 ? 'true' : undefined}>
   <div class="card-body">
     <div class="top">
       <span class="ic"><Icon name={icon} size={21} /></span>
@@ -21,8 +21,10 @@ const icon = data.accent === 'orange' ? 'board' : 'list';
     </div>
     <span class="ttl">{data.title}</span>
     <p class="desc">{data.description}</p>
-    <span class="meta">{count === 0 ? 'قيد الإضافة' : lessonsLabel(count)}</span>
-    {data.recommended && <span class="rec">موصى فيها للبداية</span>}
+    <span class="meta">
+      {count === 0 ? <span class="soon">قريباً</span> : lessonsLabel(count)}
+    </span>
+    {data.recommended && count > 0 && <span class="rec">موصى فيها للبداية</span>}
   </div>
 </a>
 
@@ -40,4 +42,12 @@ const icon = data.accent === 'orange' ? 'board' : 'list';
   .desc { font-size: 15px; color: var(--ink-3); line-height: 1.85; }
   .meta { font-size: 14px; color: var(--muted); }
   .rec { font-size: 12px; font-weight: 600; color: var(--orange); }
+
+  /* دورة بدون دروس بعد: أهدأ بصرياً حتى ما تنافس الجاهزة */
+  [data-soon] { opacity: 0.66; border-style: dashed; }
+  [data-soon]:hover { opacity: 1; }
+  .soon {
+    font-size: 12px; font-weight: 600; color: var(--muted);
+    border: 1px solid var(--line); border-radius: 999px; padding: 3px 11px;
+  }
 </style>
