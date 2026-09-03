@@ -90,6 +90,24 @@ const jsonLd = [
   <section class="section">
     <div class="wrap grid-wrap">
       <div>
+        {data.outcomes.length > 0 && (
+          <section class="panel out">
+            <h2 class="mini-ttl">شو رح تتعلّم</h2>
+            <ul class="mini-list">
+              {data.outcomes.map((o) => <li>{o}</li>)}
+            </ul>
+          </section>
+        )}
+
+        {data.prerequisites.length > 0 && (
+          <section class="panel pre">
+            <h2 class="mini-ttl">متطلبات سابقة</h2>
+            <ul class="mini-list">
+              {data.prerequisites.map((p) => <li>{p}</li>)}
+            </ul>
+          </section>
+        )}
+
         <h2 class="ttl">محتوى الدورة</h2>
         <ol class="curr">
           {lessons.map((l, i) => (
@@ -128,6 +146,16 @@ const jsonLd = [
   .grid-wrap { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 44px; align-items: start; }
   @media (max-width: 940px) { .grid-wrap { grid-template-columns: minmax(0, 1fr); } }
   .ttl { font-size: 22px; margin-bottom: 16px; }
+  .panel {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r-md); padding: 20px 22px; margin-bottom: 20px;
+  }
+  .panel.out { border-inline-start: 3px solid var(--cyan); }
+  .panel.pre { border-inline-start: 3px solid var(--orange); }
+  .mini-ttl { font-size: 16px; margin: 0 0 10px; }
+  .mini-list { margin: 0; padding-inline-start: 20px; display: grid; gap: 8px; color: var(--ink-2); font-size: 16px; line-height: 1.85; }
+  .mini-list li::marker { color: var(--cyan); }
+  .panel.pre .mini-list li::marker { color: var(--orange); }
   .curr { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
   .row-item {
     display: grid;

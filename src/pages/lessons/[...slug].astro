@@ -16,19 +16,36 @@ export async function getStaticPaths() {
       .filter((l) => courseId && (l.data.course ?? l.data.track) === courseId)
       .sort((a, b) => a.data.order - b.data.order);
     const idx = siblings.findIndex((l) => l.id === lesson.id);
-    const related = lessons
-      .filter((l) => l.id !== lesson.id && l.data.category === lesson.data.category)
+
+    // الدروس المرتبطة يدوياً تتقدّم على الاقتراح التلقائي حسب التصنيف
+    const manual = (lesson.data.relatedLessons ?? [])
+      .map((slug) => lessons.find((l) => l.id === slug))
+      .filter((l): l is (typeof lessons)[number] => Boolean(l) && l!.id !== lesson.id);
+    const auto = lessons
+      .filter(
+        (l) =>
+          l.id !== lesson.id &&
+          l.data.category === lesson.data.category &&
+          !manual.some((m) => m.id === l.id),
+      )
       .slice(0, 4);
+    const related = manual.length ? [...manual, ...auto].slice(0, 4) : auto;
+
+    // التنقّل: داخل الدورة إن وُجدت، وإلا ضمن نفس التصنيف حسب التاريخ
+    let prev = idx > 0 ? siblings[idx - 1] : undefined;
+    let next = idx >= 0 && idx < siblings.length - 1 ? siblings[idx + 1] : undefined;
+    if (!courseId) {
+      const solo = lessons
+        .filter((l) => !(l.data.course ?? l.data.track) && l.data.category === lesson.data.category)
+        .sort((a, b) => a.data.publishDate.valueOf() - b.data.publishDate.valueOf());
+      const si = solo.findIndex((l) => l.id === lesson.id);
+      prev = si > 0 ? solo[si - 1] : undefined;
+      next = si >= 0 && si < solo.length - 1 ? solo[si + 1] : undefined;
+    }
+
     return {
       params: { slug: lesson.id },
-      props: {
-        lesson,
-        course,
-        siblings,
-        prev: idx > 0 ? siblings[idx - 1] : undefined,
-        next: idx >= 0 && idx < siblings.length - 1 ? siblings[idx + 1] : undefined,
-        related,
-      },
+      props: { lesson, course, siblings, prev, next, related },
     };
   });
 }
@@ -106,14 +123,38 @@ const jsonLd = [
           <span class="mono">{data.duration}</span><span>·</span>
           <span class="badge badge-orange">{data.level}</span>
           <span class="badge badge-outline">{data.category}</span>
+          <span class="badge badge-outline">{data.lessonType}</span>
         </div>
         <p class="lead">{data.description}</p>
+        {data.tags.length > 0 && (
+          <div class="tags">
+            {data.tags.map((t) => <span class="tag">{t}</span>)}
+          </div>
+        )}
         {data.youtubeUrl && (
           <a class="yt" href={data.youtubeUrl} target="_blank" rel="noopener">
             <Icon name="youtube" size={17} /> شاهد نفس الدرس على يوتيوب
           </a>
         )}
       </header>
+
+      {data.prerequisites.length > 0 && (
+        <section class="pre">
+          <h2 class="mini-ttl">قبل ما تبدأ</h2>
+          <ul class="mini-list">
+            {data.prerequisites.map((p) => <li>{p}</li>)}
+          </ul>
+        </section>
+      )}
+
+      {data.summary.length > 0 && (
+        <section class="summary">
+          <h2 class="mini-ttl">الخلاصة بنقاط</h2>
+          <ul class="mini-list">
+            {data.summary.map((p) => <li>{p}</li>)}
+          </ul>
+        </section>
+      )}
 
       <div class="prose"><Content /></div>
 
@@ -134,6 +175,13 @@ const jsonLd = [
     </article>
 
     <aside class="side">
+      {data.appUsed && (
+        <section class="box">
+          <h2 class="box-ttl">التطبيق المستخدم</h2>
+          <p class="app">{data.appUsed}</p>
+        </section>
+      )}
+
       {data.resources.length > 0 && (
         <section class="box">
           <h2 class="box-ttl">ملفات الدرس</h2>
@@ -217,6 +265,22 @@ const jsonLd = [
   .player-empty code { background: var(--cyan-soft); color: var(--cyan-bright); padding: 2px 6px; border-radius: 5px; }
 
   .head { display: grid; gap: 14px; margin-block: 26px 30px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag {
+    font-size: 12.5px; color: var(--muted);
+    border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px;
+  }
+  .pre, .summary {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r-md); padding: 20px 22px; margin-bottom: 24px;
+  }
+  .pre { border-inline-start: 3px solid var(--orange); }
+  .summary { border-inline-start: 3px solid var(--cyan); }
+  .mini-ttl { font-size: 16px; margin: 0 0 10px; }
+  .mini-list { margin: 0; padding-inline-start: 20px; display: grid; gap: 8px; color: var(--ink-2); font-size: 16px; line-height: 1.85; }
+  .mini-list li::marker { color: var(--cyan); }
+  .pre .mini-list li::marker { color: var(--orange); }
+  .app { font-size: 15px; color: var(--ink-2); margin: 0; line-height: 1.8; }
   .meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
   .yt { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; justify-self: start; }
 

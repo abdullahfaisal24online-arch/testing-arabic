@@ -10,7 +10,17 @@ const lessons = (await getCollection('lessons'))
   .filter((l) => !l.data.draft)
   .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
 
+const courses = (await getCollection('courses')).filter((c) => !c.data.draft);
+const courseTitle = (id?: string) => courses.find((c) => c.id === id)?.data.title;
+
+const rows = lessons.map((l) => {
+  const cid = l.data.course ?? l.data.track;
+  return { lesson: l, courseId: cid, title: courseTitle(cid) };
+});
+
 const categories = [...new Set(lessons.map((l) => l.data.category))];
+const inCourse = rows.filter((r) => r.title).length;
+const standalone = rows.length - inCourse;
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -22,31 +32,43 @@ const jsonLd = {
 ---
 <Base
   title="كل الدروس"
-  description="مكتبة دروس اختبار البرمجيات بالعربي: دروس الدورات وفيديوهات متفرقة — مجاناً وبترتيب واضح."
+  description="أرشيف كامل لدروس اختبار البرمجيات بالعربي: دروس الدورات وفيديوهات متفرقة — مجاناً وبترتيب واضح."
   jsonLd={jsonLd}
 >
   <section class="page-head dots">
     <div class="wrap">
       <h1>كل الدروس</h1>
-      <p class="lead">{lessons.length} درس مجاني بالعربي — من الدورات ومن الفيديوهات المتفرقة. اختر تصنيف أو ابدأ من الأحدث.</p>
-      {categories.length > 1 && (
-        <div class="filters" role="group" aria-label="تصفية حسب التصنيف">
-          <button class="chip on" type="button" data-cat="all">الكل</button>
-          {categories.map((c) => <button class="chip" type="button" data-cat={c}>{c}</button>)}
+      <p class="lead">
+        الأرشيف الكامل — {lessons.length} درس، منها {inCourse} ضمن دورات و{standalone} فيديو متفرّق.
+      </p>
+
+      <div class="filters">
+        <div class="fgroup" role="group" aria-label="تصفية حسب الانتماء">
+          <button class="chip on" type="button" data-scope="all">الكل</button>
+          <button class="chip" type="button" data-scope="course">ضمن دورة</button>
+          <button class="chip" type="button" data-scope="solo">متفرّقة</button>
         </div>
-      )}
+        {categories.length > 1 && (
+          <div class="fgroup" role="group" aria-label="تصفية حسب التصنيف">
+            <button class="chip cat on" type="button" data-cat="all">كل التصنيفات</button>
+            {categories.map((c) => <button class="chip cat" type="button" data-cat={c}>{c}</button>)}
+          </div>
+        )}
+      </div>
     </div>
   </section>
 
   <section class="section">
     <div class="wrap">
       <div class="grid grid-4" id="lesson-grid">
-        {lessons.map((l) => (
-          <div class="cell" data-cat={l.data.category}><LessonCard lesson={l} /></div>
+        {rows.map((r) => (
+          <div data-cat={r.lesson.data.category} data-scope={r.title ? 'course' : 'solo'}>
+            <LessonCard lesson={r.lesson} courseTitle={r.title} />
+          </div>
         ))}
       </div>
       {lessons.length === 0 && <p class="lead">ما في دروس منشورة بعد.</p>}
-      <p class="empty" hidden>ما في دروس بهذا التصنيف.</p>
+      <p class="empty" hidden>ما في دروس مطابقة للتصفية.</p>
     </div>
   </section>
 </Base>
@@ -54,7 +76,8 @@ const jsonLd = {
 <style>
   .page-head { background: var(--navy); border-bottom: 1px solid var(--line); padding-block: 52px 40px; }
   .page-head h1 { margin-bottom: 12px; }
-  .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+  .filters { display: grid; gap: 12px; margin-top: 24px; }
+  .fgroup { display: flex; gap: 10px; flex-wrap: wrap; }
   .chip {
     font: inherit;
     font-size: 14px;
@@ -69,25 +92,44 @@ const jsonLd = {
   }
   .chip:hover { color: var(--ink); }
   .chip.on { background: var(--cyan-soft); color: var(--cyan); border-color: var(--line-strong); }
-  .cell { display: contents; }
+  #lesson-grid > [data-cat] { display: contents; }
   .empty { color: var(--muted); }
 </style>
 
 <script>
-  const chips = document.querySelectorAll<HTMLButtonElement>('.chip');
+  const scopeChips = document.querySelectorAll<HTMLButtonElement>('.chip[data-scope]');
+  const catChips = document.querySelectorAll<HTMLButtonElement>('.chip[data-cat]');
   const cells = document.querySelectorAll<HTMLElement>('#lesson-grid > [data-cat]');
   const empty = document.querySelector<HTMLElement>('.empty');
-  chips.forEach((chip) => {
-    chip.addEventListener('click', () => {
-      chips.forEach((c) => c.classList.toggle('on', c === chip));
-      const cat = chip.dataset.cat;
-      let shown = 0;
-      cells.forEach((cell) => {
-        const match = cat === 'all' || cell.dataset.cat === cat;
-        cell.style.display = match ? '' : 'none';
-        if (match) shown++;
-      });
-      if (empty) empty.hidden = shown > 0;
+
+  let scope = 'all';
+  let cat = 'all';
+
+  function apply() {
+    let shown = 0;
+    cells.forEach((cell) => {
+      const okScope = scope === 'all' || cell.dataset.scope === scope;
+      const okCat = cat === 'all' || cell.dataset.cat === cat;
+      const match = okScope && okCat;
+      cell.style.display = match ? '' : 'none';
+      if (match) shown++;
     });
-  });
+    if (empty) empty.hidden = shown > 0;
+  }
+
+  scopeChips.forEach((chip) =>
+    chip.addEventListener('click', () => {
+      scopeChips.forEach((c) => c.classList.toggle('on', c === chip));
+      scope = chip.dataset.scope ?? 'all';
+      apply();
+    }),
+  );
+
+  catChips.forEach((chip) =>
+    chip.addEventListener('click', () => {
+      catChips.forEach((c) => c.classList.toggle('on', c === chip));
+      cat = chip.dataset.cat ?? 'all';
+      apply();
+    }),
+  );
 </script>

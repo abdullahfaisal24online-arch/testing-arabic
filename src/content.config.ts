@@ -16,6 +16,7 @@ const str = (def: string) => z.preprocess(fallback(def), z.string());
 const bool = (def: boolean) => z.preprocess(fallback(def), z.boolean());
 const num = (def: number) => z.preprocess(fallback(def), z.coerce.number());
 const level = z.preprocess(fallback('مبتدئ'), z.enum(levels));
+const strList = z.preprocess(fallback([]), z.array(str('')));
 
 /* ===== الدروس ===== */
 const lessons = defineCollection({
@@ -35,6 +36,20 @@ const lessons = defineCollection({
     course: optString,
     track: optString,
     order: num(0),
+    // نوع الدرس ووسومه
+    lessonType: z.preprocess(fallback('شرح'), z.enum(['شرح', 'عملي', 'مراجعة', 'أدوات'])),
+    tags: strList,
+    // ملخّص بنقاط يظهر أعلى الشرح
+    summary: strList,
+    // متطلبات سابقة قبل هذا الدرس
+    prerequisites: strList,
+    // دروس مرتبطة يدوياً (slug لكل درس) — تتقدّم على الاقتراح التلقائي
+    relatedLessons: strList,
+    // التطبيق أو الأداة المستخدمة بالدرس
+    appUsed: optString,
+    // تمرين وحلّه (تُعرض بمرحلة لاحقة)
+    exercise: optString,
+    solution: optString,
     resources: z.preprocess(
       fallback([]),
       z.array(z.object({ label: str(''), url: str('') })),
@@ -53,6 +68,7 @@ const articles = defineCollection({
     publishDate: z.coerce.date(),
     updatedDate: optDate,
     category: str('مقالات'),
+    tags: strList,
     cover: optString,
     featured: bool(false),
     draft: bool(false),
@@ -70,6 +86,11 @@ const courses = defineCollection({
     accent: z.preprocess(fallback('cyan'), z.enum(['cyan', 'orange'])),
     recommended: bool(false),
     cover: optString,
+    // شو رح يتعلّمه المتدرّب من الدورة
+    outcomes: strList,
+    // متطلبات سابقة قبل البدء
+    prerequisites: strList,
+    tags: strList,
     draft: bool(false),
   }),
 });

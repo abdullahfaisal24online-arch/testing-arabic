@@ -53,6 +53,19 @@ collections:
         label: "موصى فيها للبداية"
         widget: boolean
         default: false
+      - name: outcomes
+        label: "شو رح يتعلّم"
+        widget: list
+        required: false
+        hint: "نقطة بكل سطر — بتظهر بصندوق بصفحة الدورة"
+      - name: prerequisites
+        label: "متطلبات سابقة"
+        widget: list
+        required: false
+      - name: tags
+        label: "الوسوم"
+        widget: list
+        required: false
       - name: cover
         label: "صورة الدورة"
         widget: image
@@ -154,6 +167,57 @@ collections:
         default: 1
         value_type: int
         min: 0
+      - name: lessonType
+        label: "نوع الدرس"
+        widget: select
+        default: "شرح"
+        options:
+          - "شرح"
+          - "عملي"
+          - "مراجعة"
+          - "أدوات"
+      - name: tags
+        label: "الوسوم"
+        widget: list
+        required: false
+        hint: "كلمات مفتاحية مفصولة بفاصلة — مثال: تقرير خلل، جيرا"
+      - name: summary
+        label: "الخلاصة بنقاط"
+        widget: list
+        required: false
+        hint: "نقطة بكل سطر — بتظهر بصندوق أعلى الشرح"
+      - name: prerequisites
+        label: "متطلبات سابقة"
+        widget: list
+        required: false
+        hint: "شو لازم يكون عارفه قبل هذا الدرس"
+      - name: relatedLessons
+        label: "دروس مرتبطة"
+        widget: relation
+        collection: lessons
+        multiple: true
+        search_fields:
+          - title
+        value_field: slug
+        display_fields:
+          - title
+        required: false
+        hint: "اتركه فاضي والموقع بيقترح دروس من نفس التصنيف"
+      - name: appUsed
+        label: "التطبيق أو الأداة المستخدمة"
+        widget: string
+        required: false
+        hint: "مثال: My Demo App v2.2.0"
+      - name: exercise
+        label: "تمرين الدرس"
+        widget: markdown
+        required: false
+        hint: "قيد التفعيل — بينعرض بتحديث قادم"
+      - name: solution
+        label: "حل التمرين"
+        widget: markdown
+        required: false
+        hint: "قيد التفعيل — بينعرض بزر يكشف الحل"
       - name: resources
         label: "ملفات ومصادر"
         widget: list
@@ -223,6 +287,10 @@ collections:
           - "أتمتة"
           - "قوالب"
           - "أساسيات"
+      - name: tags
+        label: "الوسوم"
+        widget: list
+        required: false
       - name: cover
         label: "صورة الغلاف"
         widget: image

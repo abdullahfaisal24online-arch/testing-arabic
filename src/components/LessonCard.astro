@@ -16,8 +16,10 @@ interface Props {
       publishDate: Date;
     };
   };
+  /** اسم الدورة التي ينتمي لها الدرس — يظهر كشارة على البطاقة */
+  courseTitle?: string;
 }
-const { lesson } = Astro.props;
+const { lesson, courseTitle } = Astro.props;
 const { data } = lesson;
 const site = await getSite();
 const thumb = bunnyThumb(data.videoId, data.thumbnail, site.bunnyCdnHostname);
@@ -32,7 +34,13 @@ const thumb = bunnyThumb(data.videoId, data.thumbnail, site.bunnyCdnHostname);
     <span class="cat">{data.category}</span>
     <span class="card-title">{data.title}</span>
     <span class="card-meta">
-      <Icon name="clock" size={14} /> {data.duration}
+      {courseTitle ? (
+        <span class="in-course" title={`ضمن دورة ${courseTitle}`}>
+          <Icon name="list" size={13} /> {courseTitle}
+        </span>
+      ) : (
+        <span class="standalone"><Icon name="play" size={12} /> فيديو متفرّق</span>
+      )}
     </span>
   </div>
 </a>
@@ -40,4 +48,18 @@ const thumb = bunnyThumb(data.videoId, data.thumbnail, site.bunnyCdnHostname);
 <style>
   .lesson-card { color: inherit; }
   .cat { font-size: 12px; font-weight: 600; color: var(--orange); }
+  .in-course,
+  .standalone {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    max-width: 100%;
+  }
+  .in-course { background: var(--cyan-soft); color: var(--cyan); }
+  .standalone { border: 1px solid var(--line); color: var(--muted); }
+  .in-course span,
+  .standalone span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>

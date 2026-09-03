@@ -8,6 +8,19 @@ level: مبتدئ
 duration: "19:30"
 course: qa-basics
 order: 3
+lessonType: عملي
+tags:
+  - تقرير خلل
+  - مهارات أساسية
+  - جيرا
+summary:
+  - عنوان الخلل بيوصف النتيجة الخاطئة مش الشعور فيها
+  - خطوات إعادة الإنتاج بتبدأ من نقطة بداية معروفة
+  - كل تذكرة فيها مشكلة وحدة بس
+prerequisites:
+  - تعرف شو يعني حالة اختبار
+  - جرّبت تكتب خطوات لسيناريو بسيط
+appUsed: أي تطبيق ويب أو موبايل بتشتغل عليه
 draft: false
 resources:
   - label: bug-report-template.md
