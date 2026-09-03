@@ -6,10 +6,12 @@
   "description": "منصة عربية لتعليم اختبار البرمجيات: دورات مرتّبة، دروس مصوّرة، ومقالات عملية في الاختبار اليدوي والأتمتة وأدوات الـ QA.",
   "url": "https://testing-arabic.com",
   "author": "عبدالله",
-  "youtube": "https://www.youtube.com/@testingbilarabi",
-  "linkedin": "",
-  "email": "testingarabic94@gmail.com",
+  "youtube": "",
+  "linkedin": "https://www.linkedin.com/in/abdullah94faisal/",
+  "email": "abdullahqafaisal@gmail.com",
   "newsletterAction": "",
+  "newsletterField": "email",
+  "newsletterHidden": [],
   "bunnyLibraryId": "",
   "bunnyCdnHostname": "",
   "headerCtaLabel": "ابدأ من هنا",
@@ -44,7 +46,5 @@
       "label": "عن المنصة",
       "href": "/about/"
     }
-  ],
-  "newsletterField": "email",
-  "newsletterHidden": []
+  ]
 }
