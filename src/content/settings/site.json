@@ -44,5 +44,7 @@
       "label": "عن المنصة",
       "href": "/about/"
     }
-  ]
+  ],
+  "newsletterField": "email",
+  "newsletterHidden": []
 }

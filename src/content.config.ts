@@ -213,6 +213,11 @@ const site = defineCollection({
     linkedin: optString,
     email: optString,
     newsletterAction: optString,
+    newsletterField: optString,
+    newsletterHidden: z.preprocess(
+      fallback([]),
+      z.array(z.object({ name: str(''), value: str('') })),
+    ),
     bunnyLibraryId: optString,
     bunnyCdnHostname: optString,
     headerCtaLabel: optString,

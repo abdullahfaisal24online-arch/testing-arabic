@@ -21,7 +21,8 @@ const home = await getHome();
     </div>
     <form action={site.newsletterAction} method="post" target="_blank">
       <label class="sr-only" for={`nl-${Math.random().toString(36).slice(2, 8)}`}>بريدك الإلكتروني</label>
-      <input type="email" name="email" required placeholder="بريدك الإلكتروني" />
+      <input type="email" name={site.newsletterField} required placeholder="بريدك الإلكتروني" />
+          {site.newsletterHidden.map((h) => <input type="hidden" name={h.name} value={h.value} />)}
       <button class="btn btn-primary btn-sm" type="submit">اشترك</button>
     </form>
   </aside>

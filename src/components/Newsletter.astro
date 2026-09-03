@@ -13,7 +13,8 @@ const home = await getHome();
         </div>
         <form class="form" action={site.newsletterAction} method="post" target="_blank">
           <label class="sr-only" for="nl-email">بريدك الإلكتروني</label>
-          <input id="nl-email" name="email" type="email" required placeholder="بريدك الإلكتروني" />
+          <input id="nl-email" name={site.newsletterField} type="email" required placeholder="بريدك الإلكتروني" />
+          {site.newsletterHidden.map((h) => <input type="hidden" name={h.name} value={h.value} />)}
           <button class="btn btn-primary" type="submit">{home.newsletterButton}</button>
           {home.newsletterNote && <span class="note">{home.newsletterNote}</span>}
         </form>

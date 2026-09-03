@@ -658,6 +658,25 @@ collections:
             widget: string
             required: false
             hint: "اتركه فاضي وقسم النشرة بينخفي من الموقع"
+          - name: newsletterField
+            label: "اسم حقل البريد بالنموذج"
+            widget: string
+            required: false
+            default: email
+            hint: "Buttondown: email — Kit: email_address"
+          - name: newsletterHidden
+            label: "حقول مخفية يطلبها المزوّد"
+            widget: list
+            required: false
+            summary: "{{fields.name}}"
+            fields:
+              - name: name
+                label: "اسم الحقل"
+                widget: string
+              - name: value
+                label: "القيمة"
+                widget: string
+            hint: "Buttondown بيطلب حقل embed قيمته 1"
           - name: bunnyLibraryId
             label: "رقم مكتبة Bunny Stream"
             widget: string

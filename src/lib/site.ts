@@ -13,6 +13,8 @@ const SITE_DEFAULTS = {
   linkedin: '',
   email: '',
   newsletterAction: '',
+  newsletterField: 'email',
+  newsletterHidden: [] as { name: string; value: string }[],
   bunnyLibraryId: '',
   bunnyCdnHostname: '',
   headerCtaLabel: 'ابدأ من هنا',
