@@ -4,7 +4,9 @@ import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import LessonCard from '../../components/LessonCard.astro';
 import InlineNewsletter from '../../components/InlineNewsletter.astro';
+import Prose from '../../components/Prose.astro';
 import { getSite } from '../../lib/site';
+import { tagSlug } from '../../lib/tags';
 import { formatDate, durationToISO, bunnyEmbed, bunnyThumb } from '../../lib/utils';
 
 export async function getStaticPaths() {
@@ -54,6 +56,7 @@ export async function getStaticPaths() {
 const { lesson, course, siblings, prev, next, related } = Astro.props;
 const { data } = lesson;
 const { Content } = await render(lesson);
+const bodyHtml = (lesson as any).rendered?.html ?? '';
 const site = await getSite();
 
 const embed = data.videoId ? bunnyEmbed(data.videoId, site.bunnyLibraryId) : '';
@@ -129,7 +132,7 @@ const jsonLd = [
         <p class="lead">{data.description}</p>
         {data.tags.length > 0 && (
           <div class="tags">
-            {data.tags.map((t) => <span class="tag">{t}</span>)}
+            {data.tags.map((t) => <a class="tag" href={`/tags/${tagSlug(t)}/`}>{t}</a>)}
           </div>
         )}
         {data.youtubeUrl && (
@@ -157,7 +160,7 @@ const jsonLd = [
         </section>
       )}
 
-      <div class="prose"><Content /></div>
+      {bodyHtml ? <Prose html={bodyHtml} /> : <div class="prose"><Content /></div>}
 
       <InlineNewsletter text="اشترك بالنشرة وبيوصلك كل درس جديد على بريدك، بدون ما تعتمد على خوارزمية." />
 
@@ -242,7 +245,7 @@ const jsonLd = [
 
   .player {
     aspect-ratio: 16 / 9;
-    background: #060f1f;
+    background: var(--player-bg);
     border: 1px solid var(--line);
     border-radius: var(--r-lg);
     overflow: hidden;
@@ -256,7 +259,7 @@ const jsonLd = [
     gap: 16px;
     text-align: center;
     padding: 24px;
-    background: linear-gradient(155deg, #10233f 0%, #070f1e 100%);
+    background: linear-gradient(155deg, var(--player-1) 0%, var(--player-2) 100%);
     color: var(--muted);
     font-size: 14px;
   }
@@ -273,6 +276,7 @@ const jsonLd = [
     font-size: 12.5px; color: var(--muted);
     border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px;
   }
+  .tag:hover { color: var(--cyan); border-color: var(--line-strong); }
   .pre, .summary {
     background: var(--surface); border: 1px solid var(--line);
     border-radius: var(--r-md); padding: 20px 22px; margin-bottom: 24px;
@@ -324,7 +328,7 @@ const jsonLd = [
     min-height: 44px;
   }
   .pl-item:hover { background: var(--surface-2); color: var(--ink); }
-  .pl-item.on { background: var(--orange-soft); color: #fff; font-weight: 600; }
+  .pl-item.on { background: var(--orange-soft); color: var(--orange); font-weight: 600; }
   .pl-item .num { font-size: 12px; color: var(--cyan); }
   .pl-item.on .num { color: var(--orange); }
   .pl-item .dur { font-size: 12px; color: var(--faint); }

@@ -1,0 +1,104 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import LessonCard from '../../components/LessonCard.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import ResourceCard from '../../components/ResourceCard.astro';
+import { getSite } from '../../lib/site';
+import { tagSlug } from '../../lib/tags';
+
+export async function getStaticPaths() {
+  const [lessons, articles, resources, courses] = await Promise.all([
+    getCollection('lessons'),
+    getCollection('articles'),
+    getCollection('resources'),
+    getCollection('courses'),
+  ]);
+
+  const live = <T extends { data: { draft: boolean } }>(e: T) => !e.data.draft;
+  const all = new Set<string>();
+  const collect = (tags: string[]) => tags.forEach((t) => t.trim() && all.add(t.trim()));
+
+  lessons.filter(live).forEach((l) => collect(l.data.tags));
+  articles.filter(live).forEach((a) => collect(a.data.tags));
+  resources.filter(live).forEach((r) => collect(r.data.tags));
+
+  return [...all].map((tag) => ({
+    params: { slug: tagSlug(tag) },
+    props: {
+      tag,
+      lessons: lessons.filter(live).filter((l) => l.data.tags.includes(tag)),
+      articles: articles.filter(live).filter((a) => a.data.tags.includes(tag)),
+      resources: resources.filter(live).filter((r) => r.data.tags.includes(tag)),
+      courseTitles: Object.fromEntries(courses.map((c) => [c.id, c.data.title])),
+    },
+  }));
+}
+
+const { tag, lessons, articles, resources, courseTitles } = Astro.props;
+const site = await getSite();
+const total = lessons.length + articles.length + resources.length;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: `وسم: ${tag}`,
+  url: `${site.url}/tags/${tagSlug(tag)}/`,
+  inLanguage: 'ar',
+};
+---
+<Base
+  title={`وسم: ${tag}`}
+  description={`كل الدروس والمقالات والقوالب المرتبطة بـ«${tag}» على منصة ${site.name}.`}
+  jsonLd={jsonLd}
+>
+  <div class="wrap crumbs">
+    <a href="/">الرئيسية</a><span>›</span><a href="/tags/">الوسوم</a><span>›</span>
+    <span class="now">{tag}</span>
+  </div>
+
+  <section class="page-head dots">
+    <div class="wrap">
+      <h1>{tag}</h1>
+      <p class="lead">{total} عنصر مرتبط بهذا الوسم.</p>
+    </div>
+  </section>
+
+  {lessons.length > 0 && (
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head"><h2>دروس</h2></div>
+        <div class="grid grid-4">
+          {lessons.map((l) => (
+            <LessonCard lesson={l} courseTitle={courseTitles[(l.data.course ?? l.data.track) ?? '']} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {articles.length > 0 && (
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head"><h2>مقالات</h2></div>
+        <div class="grid grid-3">{articles.map((a) => <ArticleCard article={a} />)}</div>
+      </div>
+    </section>
+  )}
+
+  {resources.length > 0 && (
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head"><h2>قوالب وموارد</h2></div>
+        <div class="grid grid-3">{resources.map((r) => <ResourceCard resource={r} />)}</div>
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .crumbs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-block: 18px; font-size: 14px; color: var(--muted); }
+  .crumbs .now { color: var(--orange); font-weight: 600; }
+  .page-head { background: var(--navy); border-block: 1px solid var(--line); padding-block: 44px 38px; }
+  .page-head h1 { margin-bottom: 10px; }
+</style>

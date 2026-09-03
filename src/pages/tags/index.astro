@@ -1,0 +1,79 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { getSite } from '../../lib/site';
+import { tagSlug } from '../../lib/tags';
+
+const site = await getSite();
+
+const [lessons, articles, resources] = await Promise.all([
+  getCollection('lessons'),
+  getCollection('articles'),
+  getCollection('resources'),
+]);
+
+const counts = new Map<string, number>();
+const bump = (tags: string[]) => {
+  for (const t of tags) {
+    const key = t.trim();
+    if (!key) continue;
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+};
+lessons.filter((l) => !l.data.draft).forEach((l) => bump(l.data.tags));
+articles.filter((a) => !a.data.draft).forEach((a) => bump(a.data.tags));
+resources.filter((r) => !r.data.draft).forEach((r) => bump(r.data.tags));
+
+const tags = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ar'));
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'الوسوم',
+  url: `${site.url}/tags/`,
+  inLanguage: 'ar',
+};
+---
+<Base
+  title="الوسوم"
+  description="تصفّح محتوى المنصة حسب الموضوع: دروس ومقالات وقوالب مجمّعة تحت كل وسم."
+  jsonLd={jsonLd}
+>
+  <section class="page-head dots">
+    <div class="wrap">
+      <h1>الوسوم</h1>
+      <p class="lead">كل وسم بيجمع الدروس والمقالات والقوالب اللي بتخصّه بمكان واحد.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      {tags.length > 0 ? (
+        <div class="cloud">
+          {tags.map(([tag, n]) => (
+            <a class="tag" href={`/tags/${tagSlug(tag)}/`}>
+              <span>{tag}</span>
+              <span class="n mono">{n}</span>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p class="lead">ما في وسوم بعد — ضيف وسوم للدروس والمقالات من لوحة التحكم.</p>
+      )}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-head { background: var(--navy); border-bottom: 1px solid var(--line); padding-block: 52px 44px; }
+  .page-head h1 { margin-bottom: 12px; }
+  .cloud { display: flex; flex-wrap: wrap; gap: 12px; }
+  .tag {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 999px; padding: 11px 18px; color: var(--ink);
+    font-size: 16px; min-height: 46px;
+  }
+  .tag:hover { border-color: var(--line-strong); color: var(--cyan); }
+  .n { font-size: 13px; color: var(--muted); }
+</style>

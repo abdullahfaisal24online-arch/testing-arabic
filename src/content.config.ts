@@ -130,6 +130,21 @@ const resources = defineCollection({
   }),
 });
 
+/* ===== قاموس المصطلحات ===== */
+const glossary = defineCollection({
+  loader: glob({ base: './src/content/glossary', pattern: '**/*.{md,mdx}' }),
+  schema: z.object({
+    title: z.string(),
+    termEn: optString,
+    description: str(''),
+    category: str('أساسيات'),
+    // كلمات بديلة يربطها الموقع تلقائياً بمتن الدروس
+    aliases: strList,
+    related: strList,
+    draft: bool(false),
+  }),
+});
+
 /* ===== صفحة ابدأ من هنا ===== */
 const start = defineCollection({
   loader: glob({ base: './src/content/settings', pattern: 'start.json' }),
@@ -239,4 +254,4 @@ const home = defineCollection({
   }),
 });
 
-export const collections = { lessons, articles, courses, news, resources, pages, site, home, start };
+export const collections = { lessons, articles, courses, news, resources, glossary, pages, site, home, start };

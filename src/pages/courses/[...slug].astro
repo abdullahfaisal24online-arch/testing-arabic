@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
+import Prose from '../../components/Prose.astro';
 import { getSite } from '../../lib/site';
 
 export async function getStaticPaths() {
@@ -21,6 +22,7 @@ export async function getStaticPaths() {
 const { course, lessons } = Astro.props;
 const { data } = course;
 const { Content } = await render(course);
+const bodyHtml = (course as any).rendered?.html ?? '';
 const site = await getSite();
 
 const totalSeconds = lessons.reduce((sum, l) => {
@@ -125,7 +127,7 @@ const jsonLd = [
       </div>
 
       <div class="notes">
-        <div class="prose"><Content /></div>
+        {bodyHtml ? <Prose html={bodyHtml} /> : <div class="prose"><Content /></div>}
       </div>
     </div>
   </section>

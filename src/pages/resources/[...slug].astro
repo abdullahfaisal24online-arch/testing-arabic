@@ -4,7 +4,9 @@ import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import ResourceCard from '../../components/ResourceCard.astro';
 import InlineNewsletter from '../../components/InlineNewsletter.astro';
+import Prose from '../../components/Prose.astro';
 import { getSite } from '../../lib/site';
+import { tagSlug } from '../../lib/tags';
 import { formatDate } from '../../lib/utils';
 
 export async function getStaticPaths() {
@@ -21,6 +23,7 @@ export async function getStaticPaths() {
 const { resource, more } = Astro.props;
 const { data } = resource;
 const { Content } = await render(resource);
+const bodyHtml = (resource as any).rendered?.html ?? '';
 const site = await getSite();
 
 const jsonLd = [
@@ -72,11 +75,11 @@ const jsonLd = [
           <time datetime={data.publishDate.toISOString()}>{formatDate(data.publishDate)}</time>
         </div>
         {data.tags.length > 0 && (
-          <div class="tags">{data.tags.map((t) => <span class="tag">{t}</span>)}</div>
+          <div class="tags">{data.tags.map((t) => <a class="tag" href={`/tags/${tagSlug(t)}/`}>{t}</a>)}</div>
         )}
       </header>
 
-      <div class="prose"><Content /></div>
+      {bodyHtml ? <Prose html={bodyHtml} /> : <div class="prose"><Content /></div>}
 
       <InlineNewsletter text="اشترك بالنشرة وبيوصلك كل قالب جديد أول ما ينزل." />
     </article>
@@ -126,20 +129,21 @@ const jsonLd = [
   .meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
   .tags { display: flex; flex-wrap: wrap; gap: 8px; }
   .tag { font-size: 12.5px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; }
+  .tag:hover { color: var(--cyan); border-color: var(--line-strong); }
 
   .side { display: grid; gap: 18px; position: sticky; top: 84px; }
   @media (max-width: 1000px) { .side { position: static; } }
   .box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 22px; display: grid; gap: 12px; }
-  .dl { border-color: rgba(246, 130, 59, 0.3); }
+  .dl { border-color: var(--orange-line); }
   .box-ttl { font-size: 17px; margin: 0; }
   .files { display: grid; gap: 9px; }
   .file {
     display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px;
-    background: var(--orange-soft); border: 1px solid rgba(246, 130, 59, 0.3);
+    background: var(--orange-soft); border: 1px solid var(--orange-line);
     border-radius: var(--r-sm); padding: 13px 15px;
     font-size: 13px; color: var(--orange); min-height: 46px; font-weight: 600;
   }
-  .file:hover { background: rgba(246, 130, 59, 0.18); color: var(--orange); }
+  .file:hover { background: var(--orange-soft); border-color: var(--orange); color: var(--orange); }
   .free { font-size: 13px; color: var(--faint); margin: 0; }
   .none { font-size: 14px; color: var(--muted); margin: 0; }
   .aud { font-size: 15px; color: var(--ink-2); margin: 0; line-height: 1.85; }

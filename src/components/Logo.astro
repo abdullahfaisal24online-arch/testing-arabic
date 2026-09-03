@@ -8,10 +8,10 @@ const site = await getSite();
 <span class="logo">
   <span class="mark" style={`width:${size}px;height:${size}px`}>
     <svg width={size * 0.5} height={size * 0.5} viewBox="0 0 24 24" fill="none"
-      stroke="#e8eef9" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="2" y="4" width="20" height="14" rx="2"></rect>
       <path d="M8 21h8"></path><path d="M12 18v3"></path>
-      <path d="m9.5 10.5 2 2 3.5-3.5" stroke="#38bdf8"></path>
+      <path d="m9.5 10.5 2 2 3.5-3.5" stroke="var(--cyan)"></path>
     </svg>
   </span>
   {withText && (
@@ -30,7 +30,8 @@ const site = await getSite();
     border-radius: 999px;
     background: var(--bg);
     border: 2px solid var(--cyan);
-    box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
+    box-shadow: var(--glow);
+    color: var(--ink);
     flex-shrink: 0;
   }
   .txt { display: flex; flex-direction: column; line-height: 1.15; }

@@ -1,0 +1,20 @@
+---
+import { getCollection } from 'astro:content';
+import { linkGlossary } from '../lib/glossary';
+
+interface Props {
+  /** HTML الناتج عن الماركداون */
+  html: string;
+  /** slug المصطلح الحالي حتى ما يربط نفسه */
+  selfSlug?: string;
+  class?: string;
+}
+const { html, selfSlug, class: cls = 'prose' } = Astro.props;
+
+const terms = (await getCollection('glossary'))
+  .filter((t) => !t.data.draft)
+  .map((t) => ({ slug: t.id, labels: [t.data.title, ...t.data.aliases] }));
+
+const linked = linkGlossary(html, terms, selfSlug);
+---
+<div class={cls} set:html={linked} />

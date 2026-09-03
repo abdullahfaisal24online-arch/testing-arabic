@@ -1,0 +1,152 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { getSite } from '../../lib/site';
+
+const site = await getSite();
+
+const terms = (await getCollection('glossary'))
+  .filter((t) => !t.data.draft)
+  .sort((a, b) => a.data.title.localeCompare(b.data.title, 'ar'));
+
+const categories = [...new Set(terms.map((t) => t.data.category))];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTermSet',
+  name: 'قاموس مصطلحات اختبار البرمجيات',
+  url: `${site.url}/glossary/`,
+  inLanguage: 'ar',
+  hasDefinedTerm: terms.map((t) => ({
+    '@type': 'DefinedTerm',
+    name: t.data.title,
+    description: t.data.description,
+    url: `${site.url}/glossary/${t.id}/`,
+  })),
+};
+---
+<Base
+  title="قاموس مصطلحات الاختبار"
+  description="قاموس عربي–إنجليزي لمصطلحات اختبار البرمجيات، كل مصطلح بشرح مختصر وأمثلة عملية."
+  jsonLd={jsonLd}
+>
+  <section class="page-head dots">
+    <div class="wrap">
+      <h1>قاموس المصطلحات</h1>
+      <p class="lead">
+        {terms.length} مصطلح بالعربي والإنجليزي، كل واحد بشرح مختصر ومثال. المصطلحات بتنربط تلقائياً من داخل الدروس.
+      </p>
+      <div class="tools">
+        <div class="field">
+          <label class="sr-only" for="gq">ابحث بالقاموس</label>
+          <input id="gq" type="search" placeholder="اكتب مصطلح… مثلاً: ريجريشن أو Severity" autocomplete="off" />
+        </div>
+        {categories.length > 1 && (
+          <div class="chips" role="group" aria-label="تصفية حسب المجال">
+            <button class="chip on" type="button" data-cat="all">الكل</button>
+            {categories.map((c) => <button class="chip" type="button" data-cat={c}>{c}</button>)}
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="grid grid-3" id="g-grid">
+        {terms.map((t) => (
+          <div data-cat={t.data.category} data-search={`${t.data.title} ${t.data.termEn ?? ''} ${t.data.aliases.join(' ')}`}>
+            <a class="card term" href={`/glossary/${t.id}/`}>
+              <div class="card-body">
+                <span class="ar">{t.data.title}</span>
+                {t.data.termEn && <span class="en mono">{t.data.termEn}</span>}
+                <p class="desc">{t.data.description}</p>
+                <span class="cat">{t.data.category}</span>
+              </div>
+            </a>
+          </div>
+        ))}
+      </div>
+      <p class="empty" hidden>ما في مصطلح مطابق.</p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-head { background: var(--navy); border-bottom: 1px solid var(--line); padding-block: 52px 40px; }
+  .page-head h1 { margin-bottom: 12px; }
+  .tools { display: grid; gap: 14px; margin-top: 24px; }
+  .field {
+    display: flex; align-items: center;
+    background: var(--surface); border: 1px solid var(--line-strong);
+    border-radius: var(--r-md); padding: 2px 18px; max-width: 560px;
+  }
+  .field input {
+    flex: 1; background: transparent; border: 0; color: var(--ink);
+    font: inherit; font-size: 16px; padding-block: 13px; min-height: 46px;
+  }
+  .field input:focus { outline: none; }
+  .field:focus-within { border-color: var(--cyan); }
+  .chips { display: flex; gap: 10px; flex-wrap: wrap; }
+  .chip {
+    font: inherit; font-size: 14px; font-weight: 500; color: var(--muted);
+    background: transparent; border: 1px solid var(--line); border-radius: 999px;
+    padding: 8px 16px; min-height: 40px; cursor: pointer;
+  }
+  .chip:hover { color: var(--ink); }
+  .chip.on { background: var(--cyan-soft); color: var(--cyan); border-color: var(--line-strong); }
+
+  #g-grid > [data-cat] { display: contents; }
+  .term { color: inherit; }
+  .term .card-body { padding: 22px; gap: 8px; }
+  .ar { font-size: 19px; font-weight: 700; }
+  .en { font-size: 13px; color: var(--cyan); }
+  .desc { font-size: 15px; color: var(--ink-3); line-height: 1.8; }
+  .cat { font-size: 12.5px; color: var(--faint); margin-top: auto; }
+  .empty { color: var(--muted); }
+</style>
+
+<script>
+  const input = document.getElementById('gq') as HTMLInputElement | null;
+  const chips = document.querySelectorAll<HTMLButtonElement>('.chip[data-cat]');
+  const cells = document.querySelectorAll<HTMLElement>('#g-grid > [data-cat]');
+  const empty = document.querySelector<HTMLElement>('.empty');
+
+  const normalize = (s: string) =>
+    s
+      .toLowerCase()
+      .replace(/[ً-ْٰـ]/g, '')
+      .replace(/[أإآ]/g, 'ا')
+      .replace(/ؤ/g, 'و')
+      .replace(/ئ/g, 'ي')
+      .replace(/ى/g, 'ي')
+      .replace(/ة/g, 'ه');
+
+  let cat = 'all';
+  let q = '';
+
+  function apply() {
+    let shown = 0;
+    const nq = normalize(q.trim());
+    cells.forEach((cell) => {
+      const okCat = cat === 'all' || cell.dataset.cat === cat;
+      const okQ = nq.length < 2 || normalize(cell.dataset.search ?? '').includes(nq);
+      const match = okCat && okQ;
+      cell.style.display = match ? '' : 'none';
+      if (match) shown++;
+    });
+    if (empty) empty.hidden = shown > 0;
+  }
+
+  chips.forEach((chip) =>
+    chip.addEventListener('click', () => {
+      chips.forEach((c) => c.classList.toggle('on', c === chip));
+      cat = chip.dataset.cat ?? 'all';
+      apply();
+    }),
+  );
+  input?.addEventListener('input', () => {
+    q = input.value;
+    apply();
+  });
+</script>

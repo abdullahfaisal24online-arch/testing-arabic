@@ -9,7 +9,7 @@ import Icon from '../components/Icon.astro';
       <div class="field">
         <Icon name="search" size={19} />
         <label class="sr-only" for="q">كلمة البحث</label>
-        <input id="q" type="search" placeholder="اكتب كلمة… مثلاً: أتمتة، تقرير خلل، Jira" autocomplete="off" />
+        <input id="q" type="search" placeholder="اكتب كلمة… مثلاً: ريجريشن، تقرير خلل، Severity" autocomplete="off" />
       </div>
       <p class="hint" id="hint">اكتب حرفين على الأقل.</p>
     </div>
@@ -62,10 +62,42 @@ import Icon from '../components/Icon.astro';
   const normalize = (s: string) =>
     s
       .toLowerCase()
-      .replace(/[ً-ْٰ]/g, '')
+      .replace(/[ً-ْٰـ]/g, '')
       .replace(/[أإآ]/g, 'ا')
+      .replace(/ؤ/g, 'و')
+      .replace(/ئ/g, 'ي')
       .replace(/ى/g, 'ي')
-      .replace(/ة/g, 'ه');
+      .replace(/ة/g, 'ه')
+      .replace(/[٠-٩]/g, (d) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)));
+
+
+  // مرادفات: الناس بتكتب المصطلح معرّب أو إنجليزي، والمحتوى مكتوب بالعربي
+  const SYNONYMS: Record<string, string[]> = {
+    اوتوميشن: ['اتمته', 'automation'],
+    automation: ['اتمته', 'اوتوميشن'],
+    اتمته: ['automation', 'اوتوميشن'],
+    تست: ['اختبار', 'test'],
+    test: ['اختبار', 'تست'],
+    testing: ['اختبار'],
+    باج: ['خلل', 'bug'],
+    bug: ['خلل', 'باج'],
+    defect: ['خلل'],
+    خلل: ['bug', 'باج'],
+    ريجريشن: ['انحدار', 'regression'],
+    regression: ['انحدار', 'ريجريشن'],
+    سيفيرتي: ['شده', 'severity'],
+    severity: ['شده', 'سيفيرتي'],
+    priority: ['اولويه'],
+    كيس: ['حاله اختبار', 'case'],
+    سكربت: ['script'],
+    جيرا: ['jira'],
+    jira: ['جيرا'],
+    qa: ['ضمان الجوده'],
+    qc: ['مراقبه الجوده'],
+    api: ['واجهه برمجيه'],
+  };
+
+  const variants = (t: string) => [t, ...(SYNONYMS[t] ?? []).map(normalize)];
 
   async function load() {
     if (loaded) return;
@@ -89,8 +121,9 @@ import Icon from '../components/Icon.astro';
         const title = normalize(it.title);
         let score = 0;
         for (const t of terms) {
-          if (title.includes(t)) score += 3;
-          else if (hay.includes(t)) score += 1;
+          const vs = variants(t);
+          if (vs.some((v) => title.includes(v))) score += 3;
+          else if (vs.some((v) => hay.includes(v))) score += 1;
           else return null;
         }
         return { it, score };

@@ -1,5 +1,7 @@
 /* ===== هوية Testing بالعربي ===== */
-:root {
+/* الوضع الغامق هو الأساس، والفاتح بينفعّل بمفتاح بالهيدر أو حسب إعداد النظام */
+:root,
+:root[data-theme='dark'] {
   --bg: #0a1428;
   --navy: #0d1b33;
   --surface: #12213d;
@@ -18,7 +20,62 @@
   --cyan-bright: #7dd3fc;
   --orange: #f6823b;
   --orange-soft: rgba(246, 130, 59, 0.12);
+  --orange-line: rgba(246, 130, 59, 0.3);
+  --orange-hover: #ff9553;
+  --on-orange: #0a1428;
 
+  --head-bg: rgba(13, 27, 51, 0.92);
+  --glow: 0 0 16px rgba(56, 189, 248, 0.3);
+  --shadow-lg: 0 24px 60px rgba(3, 10, 24, 0.5);
+  --thumb-1: #16305a;
+  --thumb-2: #0c1b33;
+  --player-bg: #060f1f;
+  --player-1: #10233f;
+  --player-2: #070f1e;
+  --scrim: rgba(10, 20, 40, 0.55);
+  --scrim-strong: rgba(10, 20, 40, 0.82);
+
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #f6f8fc;
+  --navy: #eef3fa;
+  --surface: #ffffff;
+  --surface-2: #e7eef8;
+  --line: #dde5f0;
+  --line-strong: #b9cde2;
+
+  --ink: #0d1b33;
+  --ink-2: #2a3c5c;
+  --ink-3: #45587a;
+  --muted: #5b6d8c;
+  --faint: #7b8aa5;
+
+  --cyan: #0a6e9e;
+  --cyan-soft: #e3f0f9;
+  --cyan-bright: #06557a;
+  --orange: #b3500f;
+  --orange-soft: #fbeade;
+  --orange-line: rgba(179, 80, 15, 0.28);
+  --orange-hover: #8f3f0a;
+  --on-orange: #ffffff;
+
+  --head-bg: rgba(255, 255, 255, 0.92);
+  --glow: 0 0 0 1px rgba(10, 110, 158, 0.12);
+  --shadow-lg: 0 20px 44px rgba(13, 27, 51, 0.12);
+  --thumb-1: #dbe7f5;
+  --thumb-2: #c4d7ec;
+  --player-bg: #e7eef8;
+  --player-1: #e7eef8;
+  --player-2: #d5e3f2;
+  --scrim: rgba(255, 255, 255, 0.7);
+  --scrim-strong: rgba(255, 255, 255, 0.9);
+
+  color-scheme: light;
+}
+
+:root {
   --r-sm: 8px;
   --r-md: 12px;
   --r-lg: 16px;
@@ -26,8 +83,6 @@
 
   --wrap: 1200px;
   --read: 68ch;
-
-  color-scheme: dark;
 }
 
 *,
@@ -147,8 +202,8 @@ code, pre, kbd {
   transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
 .btn:hover { transform: translateY(-1px); }
-.btn-primary { background: var(--orange); color: #0a1428; }
-.btn-primary:hover { background: #ff9553; color: #0a1428; }
+.btn-primary { background: var(--orange); color: var(--on-orange); }
+.btn-primary:hover { background: var(--orange-hover); color: var(--on-orange); }
 .btn-ghost { border-color: var(--line-strong); color: var(--ink); background: transparent; }
 .btn-ghost:hover { border-color: var(--cyan); color: var(--ink); background: var(--cyan-soft); }
 .btn-sm { min-height: 40px; padding: 9px 18px; font-size: 14px; }
@@ -186,7 +241,7 @@ code, pre, kbd {
 .thumb {
   position: relative;
   aspect-ratio: 16 / 9;
-  background: linear-gradient(150deg, #16305a 0%, #0c1b33 100%);
+  background: linear-gradient(150deg, var(--thumb-1) 0%, var(--thumb-2) 100%);
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -197,17 +252,17 @@ code, pre, kbd {
   width: 56px;
   height: 56px;
   border-radius: 999px;
-  background: rgba(10, 20, 40, 0.55);
+  background: var(--scrim);
   border: 2px solid var(--cyan);
   display: grid;
   place-items: center;
-  box-shadow: 0 0 26px rgba(56, 189, 248, 0.28);
+  box-shadow: var(--glow);
 }
 .thumb .time {
   position: absolute;
   inset-block-end: 10px;
   inset-inline-start: 10px;
-  background: rgba(10, 20, 40, 0.82);
+  background: var(--scrim-strong);
   color: var(--ink);
   font-size: 12px;
   padding: 4px 8px;
@@ -227,6 +282,15 @@ code, pre, kbd {
 .prose ul, .prose ol { padding-inline-start: 22px; display: grid; gap: 10px; }
 .prose li::marker { color: var(--cyan); }
 .prose a { text-decoration: underline; text-underline-offset: 4px; }
+/* روابط القاموس التلقائية — أهدأ من الروابط العادية */
+.prose a.glossary-link {
+  color: inherit;
+  text-decoration: underline dotted;
+  text-decoration-color: var(--cyan);
+  text-underline-offset: 5px;
+  cursor: help;
+}
+.prose a.glossary-link:hover { color: var(--cyan); text-decoration-style: solid; }
 .prose strong { color: var(--ink); font-weight: 600; }
 .prose blockquote {
   margin: 0;
@@ -273,9 +337,9 @@ code, pre, kbd {
   inset-inline-start: 16px;
   z-index: 100;
   background: var(--orange);
-  color: #0a1428;
+  color: var(--on-orange);
   padding: 10px 18px;
   border-radius: 0 0 var(--r-sm) var(--r-sm);
   font-weight: 700;
 }
-.skip-link:focus { inset-block-start: 0; color: #0a1428; }
+.skip-link:focus { inset-block-start: 0; color: var(--on-orange); }

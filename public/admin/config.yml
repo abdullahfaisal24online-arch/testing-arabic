@@ -437,6 +437,65 @@ collections:
         label: "نص الخبر"
         widget: markdown
 
+  - name: glossary
+    label: "قاموس المصطلحات"
+    label_singular: "مصطلح"
+    folder: src/content/glossary
+    create: true
+    slug: "{{fields.slug}}"
+    extension: md
+    format: frontmatter
+    summary: "{{title}}"
+    fields:
+      - name: title
+        label: "المصطلح بالعربي"
+        widget: string
+      - name: slug
+        label: "الرابط بالإنجليزي بدون مسافات"
+        widget: string
+        hint: "مثال: regression"
+      - name: termEn
+        label: "المصطلح بالإنجليزي"
+        widget: string
+        required: false
+        hint: "مثال: Regression Testing"
+      - name: description
+        label: "تعريف بسطر واحد"
+        widget: text
+      - name: category
+        label: "المجال"
+        widget: select
+        default: "أساسيات"
+        options:
+          - "أساسيات"
+          - "أنواع الاختبار"
+          - "إدارة الاختبار"
+          - "أتمتة"
+          - "أدوات"
+      - name: aliases
+        label: "كلمات بديلة"
+        widget: list
+        required: false
+        hint: "الكلمات اللي بتنربط تلقائياً بمتن الدروس — مثال: ريجريشن، الريجريشن، Regression"
+      - name: related
+        label: "مصطلحات مرتبطة"
+        widget: relation
+        collection: glossary
+        multiple: true
+        search_fields:
+          - title
+        value_field: slug
+        display_fields:
+          - title
+        required: false
+      - name: draft
+        label: "مسودّة لا تُنشر"
+        widget: boolean
+        default: false
+      - name: body
+        label: "الشرح الكامل"
+        widget: markdown
+
   - name: pages
     label: "الصفحات"
     label_singular: "صفحة"

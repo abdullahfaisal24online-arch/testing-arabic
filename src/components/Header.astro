@@ -21,6 +21,10 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 
     <div class="grow"></div>
 
+    <button class="icon-btn theme-btn" type="button" aria-label="تبديل وضع القراءة" title="تبديل الوضع الفاتح والغامق">
+      <span class="i-dark"><Icon name="sun" size={19} /></span>
+      <span class="i-light"><Icon name="moon" size={19} /></span>
+    </button>
     <a href="/search/" class="icon-btn" aria-label="بحث"><Icon name="search" size={19} /></a>
     {site.headerCtaLabel && (
       <a href={site.headerCtaHref} class="btn btn-primary btn-sm start">{site.headerCtaLabel}</a>
@@ -42,7 +46,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     position: sticky;
     top: 0;
     z-index: 40;
-    background: rgba(13, 27, 51, 0.92);
+    background: var(--head-bg);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--line);
   }
@@ -57,7 +61,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     border-bottom: 2px solid transparent;
   }
   .nav-link:hover { color: var(--ink); }
-  .nav-link.on { color: #fff; border-bottom-color: var(--orange); }
+  .nav-link.on { color: var(--ink); border-bottom-color: var(--orange); }
   .icon-btn {
     display: grid;
     place-items: center;
@@ -71,6 +75,10 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   }
   .icon-btn:hover { color: var(--ink); border-color: var(--line-strong); }
   .menu-btn { display: none; }
+  .theme-btn { display: grid; }
+  .theme-btn .i-light { display: none; }
+  :root[data-theme='light'] .theme-btn .i-dark { display: none; }
+  :root[data-theme='light'] .theme-btn .i-light { display: grid; }
   .mobile-nav { display: none; }
 
   @media (max-width: 900px) {
@@ -98,6 +106,19 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 </style>
 
 <script>
+  // مفتاح الوضع الفاتح/الغامق
+  const themeBtn = document.querySelector<HTMLButtonElement>('.theme-btn');
+  themeBtn?.addEventListener('click', () => {
+    const root = document.documentElement;
+    const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+    root.dataset.theme = next;
+    try {
+      localStorage.setItem('ta-theme', next);
+    } catch {
+      /* المتصفّح مانع التخزين — الاختيار بيضل لهذه الصفحة بس */
+    }
+  });
+
   const btn = document.querySelector<HTMLButtonElement>('.menu-btn');
   const nav = document.getElementById('mobile-nav');
   btn?.addEventListener('click', () => {

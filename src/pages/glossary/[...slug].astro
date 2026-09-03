@@ -1,0 +1,155 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import Prose from '../../components/Prose.astro';
+import { getSite } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const terms = (await getCollection('glossary')).filter((t) => !t.data.draft);
+  const lessons = (await getCollection('lessons')).filter((l) => !l.data.draft);
+  const articles = (await getCollection('articles')).filter((a) => !a.data.draft);
+
+  return terms.map((term) => {
+    const labels = [term.data.title, ...term.data.aliases].map((s) => s.trim()).filter(Boolean);
+    const mentions = (body: string | undefined) =>
+      labels.some((l) => (body ?? '').includes(l));
+
+    return {
+      params: { slug: term.id },
+      props: {
+        term,
+        related: term.data.related
+          .map((slug) => terms.find((t) => t.id === slug))
+          .filter(Boolean),
+        siblings: terms
+          .filter((t) => t.id !== term.id && t.data.category === term.data.category)
+          .slice(0, 6),
+        usedIn: [
+          ...lessons.filter((l) => mentions(l.body)).slice(0, 4).map((l) => ({
+            title: l.data.title,
+            href: `/lessons/${l.id}/`,
+            kind: 'درس',
+          })),
+          ...articles.filter((a) => mentions(a.body)).slice(0, 3).map((a) => ({
+            title: a.data.title,
+            href: `/articles/${a.id}/`,
+            kind: 'مقال',
+          })),
+        ],
+      },
+    };
+  });
+}
+
+const { term, related, siblings, usedIn } = Astro.props;
+const { data } = term;
+const { Content } = await render(term);
+const bodyHtml = (term as any).rendered?.html ?? '';
+const site = await getSite();
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'DefinedTerm',
+    name: data.title,
+    alternateName: data.termEn,
+    description: data.description,
+    inLanguage: 'ar',
+    url: `${site.url}/glossary/${term.id}/`,
+    inDefinedTermSet: {
+      '@type': 'DefinedTermSet',
+      name: 'قاموس مصطلحات اختبار البرمجيات',
+      url: `${site.url}/glossary/`,
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: site.url },
+      { '@type': 'ListItem', position: 2, name: 'قاموس المصطلحات', item: `${site.url}/glossary/` },
+      { '@type': 'ListItem', position: 3, name: data.title, item: `${site.url}/glossary/${term.id}/` },
+    ],
+  },
+];
+---
+<Base
+  title={`${data.title}${data.termEn ? ` — ${data.termEn}` : ''}`}
+  description={data.description}
+  jsonLd={jsonLd}
+>
+  <div class="wrap crumbs">
+    <a href="/">الرئيسية</a><span>›</span><a href="/glossary/">قاموس المصطلحات</a><span>›</span>
+    <span class="now">{data.category}</span>
+  </div>
+
+  <div class="wrap layout">
+    <article class="main">
+      <header class="head">
+        <h1>{data.title}</h1>
+        {data.termEn && <p class="en mono">{data.termEn}</p>}
+        <p class="short">{data.description}</p>
+      </header>
+
+      {bodyHtml ? <Prose html={bodyHtml} selfSlug={term.id} /> : <div class="prose"><Content /></div>}
+    </article>
+
+    <aside class="side">
+      {usedIn.length > 0 && (
+        <section class="box">
+          <h2 class="box-ttl">وين بينستعمل</h2>
+          <div class="links">
+            {usedIn.map((u) => (
+              <a href={u.href}>
+                <span class="kind">{u.kind}</span>
+                <span class="lbl">{u.title}</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {(related.length > 0 || siblings.length > 0) && (
+        <section class="box">
+          <h2 class="box-ttl">مصطلحات قريبة</h2>
+          <div class="pills">
+            {[...related, ...siblings].slice(0, 8).map((t: any) => (
+              <a class="pill" href={`/glossary/${t.id}/`}>{t.data.title}</a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <a class="btn btn-ghost btn-sm all" href="/glossary/">
+        <Icon name="arrow" size={16} /> كل المصطلحات
+      </a>
+    </aside>
+  </div>
+</Base>
+
+<style>
+  .crumbs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-block: 18px; font-size: 14px; color: var(--muted); }
+  .crumbs .now { color: var(--orange); font-weight: 600; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 44px; align-items: start; padding-bottom: 32px; }
+  @media (max-width: 1000px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+  .head { display: grid; gap: 10px; margin-bottom: 26px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+  .en { font-size: 15px; color: var(--cyan); margin: 0; }
+  .short { font-size: 19px; line-height: 1.85; color: var(--ink-3); max-width: var(--read); margin: 6px 0 0; }
+
+  .side { display: grid; gap: 16px; position: sticky; top: 84px; }
+  @media (max-width: 1000px) { .side { position: static; } }
+  .box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 20px; display: grid; gap: 12px; }
+  .box-ttl { font-size: 16px; margin: 0; }
+  .links { display: grid; gap: 8px; }
+  .links a { display: grid; gap: 4px; color: var(--ink-2); font-size: 15px; line-height: 1.6; }
+  .links a:hover { color: var(--cyan); }
+  .kind { font-size: 11.5px; color: var(--orange); font-weight: 600; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill {
+    font-size: 13.5px; color: var(--ink-2);
+    border: 1px solid var(--line); border-radius: 999px; padding: 6px 13px;
+  }
+  .pill:hover { border-color: var(--line-strong); color: var(--cyan); }
+  .all { justify-self: start; }
+</style>

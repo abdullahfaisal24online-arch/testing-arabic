@@ -3,12 +3,13 @@ import { getCollection } from 'astro:content';
 import { excerpt } from '../lib/utils';
 
 export const GET: APIRoute = async () => {
-  const [lessons, articles, courses, news, resources, pages] = await Promise.all([
+  const [lessons, articles, courses, news, resources, glossary, pages] = await Promise.all([
     getCollection('lessons'),
     getCollection('articles'),
     getCollection('courses'),
     getCollection('news'),
     getCollection('resources'),
+    getCollection('glossary'),
     getCollection('pages'),
   ]);
 
@@ -57,6 +58,15 @@ export const GET: APIRoute = async () => {
         description: r.data.description,
         url: `/resources/${r.id}/`,
         text: excerpt(r.body ?? '', 800),
+      })),
+    ...glossary
+      .filter((g) => !g.data.draft)
+      .map((g) => ({
+        kind: 'مصطلح',
+        title: `${g.data.title}${g.data.termEn ? ` — ${g.data.termEn}` : ''}`,
+        description: g.data.description,
+        url: `/glossary/${g.id}/`,
+        text: `${g.data.aliases.join(' ')} ${excerpt(g.body ?? '', 500)}`,
       })),
     ...pages
       .filter((p) => !p.data.draft)

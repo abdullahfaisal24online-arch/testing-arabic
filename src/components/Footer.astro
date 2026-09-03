@@ -22,6 +22,14 @@ const year = new Date().getFullYear();
     )}
 
     <div class="col">
+      <h3 class="ttl">روابط سريعة</h3>
+      <a href="/start/">ابدأ من هنا</a>
+      <a href="/resources/">الموارد والقوالب</a>
+      <a href="/glossary/">قاموس المصطلحات</a>
+      <a href="/search/">بحث</a>
+    </div>
+
+    <div class="col">
       <h3 class="ttl">تابعني</h3>
       {site.youtube && <a href={site.youtube} rel="me noopener" target="_blank"><Icon name="youtube" size={17} /> يوتيوب</a>}
       {site.linkedin && <a href={site.linkedin} rel="me noopener" target="_blank"><Icon name="board" size={17} /> لينكدإن</a>}
@@ -41,7 +49,7 @@ const year = new Date().getFullYear();
   .site-foot { background: var(--navy); border-top: 1px solid var(--line); margin-top: 40px; }
   .inner {
     display: grid;
-    grid-template-columns: 1.6fr 1fr 1fr;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
     gap: 32px;
     padding-block: 46px 34px;
   }
@@ -59,7 +67,6 @@ const year = new Date().getFullYear();
     font-size: 13px;
     color: var(--faint);
   }
-  @media (max-width: 760px) {
-    .inner { grid-template-columns: 1fr; gap: 26px; }
-  }
+  @media (max-width: 980px) { .inner { grid-template-columns: 1fr 1fr; gap: 28px; } }
+  @media (max-width: 620px) { .inner { grid-template-columns: 1fr; gap: 26px; } }
 </style>
