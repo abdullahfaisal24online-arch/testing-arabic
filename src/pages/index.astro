@@ -55,6 +55,11 @@ const welcomeEmbed = home.welcomeVideoId ? bunnyEmbed(home.welcomeVideoId, site.
 const countFor = (courseId: string) =>
   lessons.filter((l) => (l.data.course ?? l.data.track) === courseId).length;
 
+const courseTitles = Object.fromEntries(courses.map((c) => [c.id, c.data.title]));
+
+const courseTitleOf = (l: (typeof lessons)[number]) =>
+  courseTitles[(l.data.course ?? l.data.track) ?? ''];
+
 const jsonLd = [
   {
     '@context': 'https://schema.org',
@@ -228,7 +233,7 @@ const jsonLd = [
           <a href="/lessons/" class="more">كل الدروس ←</a>
         </div>
         <div class="grid grid-4">
-          {latest.map((l) => <LessonCard lesson={l} />)}
+          {latest.map((l) => <LessonCard lesson={l} courseTitle={courseTitleOf(l)} />)}
         </div>
       </div>
     </section>
