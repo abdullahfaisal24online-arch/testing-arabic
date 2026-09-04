@@ -1,0 +1,211 @@
+---
+import Icon from './Icon.astro';
+import { getSite } from '../lib/site';
+
+interface Props {
+  /** مسار الصفحة كما يظهر بالرابط، مثال: /lessons/qa-vs-qc/ */
+  page: string;
+  /** عنوان الصفحة — يظهر بصفحة المراجعة عندك */
+  title: string;
+}
+const { page, title } = Astro.props;
+const site = await getSite();
+---
+{site.commentsEnabled && (
+  <section id="comments" class="comments" data-page={page} data-title={title} aria-labelledby="comments-h">
+    <div class="head">
+      <h2 id="comments-h">{site.commentsTitle}</h2>
+      <span class="count" id="c-count" hidden></span>
+    </div>
+
+    <ol class="list" id="c-list" hidden></ol>
+
+    <form class="form" id="c-form" novalidate>
+      <p class="hint">{site.commentsNote}</p>
+      <div class="row">
+        <label class="sr-only" for="c-name">اسمك</label>
+        <input id="c-name" name="name" type="text" maxlength="40" required
+               placeholder="اسمك أو اسم مستعار" autocomplete="nickname" />
+      </div>
+      <label class="sr-only" for="c-body">تعليقك</label>
+      <textarea id="c-body" name="body" maxlength="2000" required rows="4"
+                placeholder={site.commentsPlaceholder}></textarea>
+
+      <!-- فخ البوتات: مخفي عن الناس، البوت بيعبّيه -->
+      <div class="hp" aria-hidden="true">
+        <label for="c-website">لا تعبّي هذا الحقل</label>
+        <input id="c-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary btn-sm" type="submit" id="c-submit">أرسل</button>
+        <span class="status" id="c-status" role="status"></span>
+      </div>
+    </form>
+  </section>
+)}
+
+<style>
+  .comments {
+    max-width: var(--read);
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+  }
+  .head { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .head h2 { font-size: 22px; margin: 0; }
+  .count {
+    font-size: 13px; color: var(--muted);
+    background: var(--surface-2); border-radius: 999px; padding: 3px 12px;
+  }
+
+  .list { list-style: none; margin: 0 0 28px; padding: 0; display: grid; gap: 14px; }
+  .list :global(.item) {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r-md); padding: 18px 20px;
+  }
+  .list :global(.who) { font-size: 15px; font-weight: 600; color: var(--ink); }
+  .list :global(.when) { font-size: 13px; color: var(--faint); }
+  .list :global(.meta) { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .list :global(.text) { margin: 0; font-size: 16px; line-height: 1.9; color: var(--ink-2); white-space: pre-wrap; }
+  .list :global(.owner-reply) {
+    margin-top: 14px; padding: 14px 16px;
+    background: var(--navy); border-inline-start: 3px solid var(--cyan);
+    border-radius: var(--r-sm);
+  }
+  .list :global(.owner-badge) {
+    font-size: 11.5px; font-weight: 700; color: var(--cyan);
+    background: var(--cyan-soft); border-radius: 999px; padding: 3px 10px;
+  }
+
+  .form { display: grid; gap: 12px; }
+  .hint { margin: 0; font-size: 14px; color: var(--muted); }
+  .form input[type='text'], .form textarea {
+    width: 100%; background: var(--surface); border: 1px solid var(--line-strong);
+    border-radius: var(--r-md); padding: 13px 16px; color: var(--ink);
+    font: inherit; font-size: 15.5px; min-height: 48px;
+  }
+  .form textarea { resize: vertical; line-height: 1.85; }
+  .form input::placeholder, .form textarea::placeholder { color: var(--faint); }
+  .actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .status { font-size: 14px; color: var(--muted); }
+  .status[data-tone='ok'] { color: var(--cyan); }
+  .status[data-tone='err'] { color: var(--orange); }
+
+  /* الفخ: مخفي بصرياً وعن قارئات الشاشة */
+  .hp { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('.comments');
+  if (root) {
+    const page = root.dataset.page ?? location.pathname;
+    const pageTitle = root.dataset.title ?? document.title;
+    const list = document.getElementById('c-list') as HTMLOListElement | null;
+    const countEl = document.getElementById('c-count');
+    const form = document.getElementById('c-form') as HTMLFormElement | null;
+    const statusEl = document.getElementById('c-status');
+    const submit = document.getElementById('c-submit') as HTMLButtonElement | null;
+    const openedAt = Date.now();
+
+    const fmt = new Intl.DateTimeFormat('ar-JO-u-nu-latn', {
+      day: 'numeric', month: 'long', year: 'numeric',
+    });
+
+    const escape = (s: string) => {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    };
+
+    function setStatus(msg: string, tone?: 'ok' | 'err') {
+      if (!statusEl) return;
+      statusEl.textContent = msg;
+      if (tone) statusEl.dataset.tone = tone;
+      else delete statusEl.dataset.tone;
+    }
+
+    type Reply = { id: string; name: string; body: string; isOwner: boolean; createdAt: number };
+    type Comment = { id: string; name: string; body: string; createdAt: number; replies: Reply[] };
+
+    function render(comments: Comment[]) {
+      if (!list || !countEl) return;
+      if (comments.length === 0) {
+        list.hidden = true;
+        countEl.hidden = true;
+        return;
+      }
+      list.innerHTML = comments
+        .map(
+          (c) => `<li class="item">
+            <div class="meta">
+              <span class="who">${escape(c.name)}</span>
+              <span class="when">${fmt.format(new Date(c.createdAt))}</span>
+            </div>
+            <p class="text">${escape(c.body)}</p>
+            ${c.replies
+              .map(
+                (r) => `<div class="owner-reply">
+                  <div class="meta">
+                    <span class="who">${escape(r.name)}</span>
+                    ${r.isOwner ? '<span class="owner-badge">صاحب المنصة</span>' : ''}
+                  </div>
+                  <p class="text">${escape(r.body)}</p>
+                </div>`,
+              )
+              .join('')}
+          </li>`,
+        )
+        .join('');
+      list.hidden = false;
+      countEl.textContent = String(comments.length);
+      countEl.hidden = false;
+    }
+
+    async function load() {
+      try {
+        const res = await fetch(`/api/comments?page=${encodeURIComponent(page)}`);
+        const data = await res.json();
+        if (data?.ok) render(data.comments as Comment[]);
+      } catch {
+        /* التعليقات مش متاحة حالياً — الفورم بيضل شغّال */
+      }
+    }
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = (document.getElementById('c-name') as HTMLInputElement).value.trim();
+      const body = (document.getElementById('c-body') as HTMLTextAreaElement).value.trim();
+      const website = (document.getElementById('c-website') as HTMLInputElement).value;
+
+      if (name.length < 2) return setStatus('اكتب اسمك أو اسم مستعار.', 'err');
+      if (body.length < 2) return setStatus('اكتب تعليقك.', 'err');
+
+      if (submit) submit.disabled = true;
+      setStatus('عم نرسل…');
+
+      try {
+        const res = await fetch('/api/comments', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ page, pageTitle, name, body, website, t: openedAt }),
+        });
+        const data = await res.json();
+        if (data?.ok) {
+          form.reset();
+          setStatus('وصل تعليقك — بيظهر بعد المراجعة.', 'ok');
+        } else if (data?.error === 'too_many') {
+          setStatus('أرسلت تعليقات كتير بوقت قصير. جرّب بعد شوي.', 'err');
+        } else {
+          setStatus('صار خطأ. جرّب مرة تانية.', 'err');
+        }
+      } catch {
+        setStatus('ما قدرنا نرسل التعليق. تأكد من اتصالك.', 'err');
+      } finally {
+        if (submit) submit.disabled = false;
+      }
+    });
+
+    load();
+  }
+</script>

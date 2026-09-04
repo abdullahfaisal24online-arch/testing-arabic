@@ -4,6 +4,7 @@ import Base from '../../layouts/Base.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
 import InlineNewsletter from '../../components/InlineNewsletter.astro';
 import Prose from '../../components/Prose.astro';
+import Comments from '../../components/Comments.astro';
 import { getSite } from '../../lib/site';
 import { tagSlug } from '../../lib/tags';
 import { formatDate, readingTime, minutesLabel } from '../../lib/utils';
@@ -87,6 +88,8 @@ const jsonLd = [
       {bodyHtml ? <Prose html={bodyHtml} /> : <div class="prose"><Content /></div>}
 
       <InlineNewsletter text="اشترك بالنشرة وبيوصلك كل مقال جديد أول ما ينزل." />
+
+      <Comments page={`/articles/${article.id}/`} title={data.title} />
     </article>
 
     <aside class="side">

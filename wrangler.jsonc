@@ -1,8 +1,22 @@
 {
   "name": "testing-arabic",
   "compatibility_date": "2026-09-01",
+  "main": "worker/index.ts",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "404-page"
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    // لازم الـ Worker يمسك مسارات التعليقات قبل الملفات الثابتة
+    "run_worker_first": ["/api/comments", "/api/comments/*", "/admin/comments", "/admin/comments/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "testing-arabic-comments",
+      "database_id": "e5744c71-13a1-4b03-b142-3120c11ee9d1"
+    }
+  ],
+  "observability": {
+    "enabled": true
   }
 }

@@ -5,6 +5,7 @@ import Icon from '../../components/Icon.astro';
 import LessonCard from '../../components/LessonCard.astro';
 import InlineNewsletter from '../../components/InlineNewsletter.astro';
 import Prose from '../../components/Prose.astro';
+import Comments from '../../components/Comments.astro';
 import { getSite } from '../../lib/site';
 import { tagSlug } from '../../lib/tags';
 import { formatDate, durationToISO, bunnyEmbed, bunnyThumb } from '../../lib/utils';
@@ -212,6 +213,8 @@ const jsonLd = [
           </a>
         ) : <span></span>}
       </nav>
+
+      <Comments page={`/lessons/${lesson.id}/`} title={data.title} />
     </article>
 
     <aside class="side">

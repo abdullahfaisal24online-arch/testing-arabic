@@ -20,6 +20,10 @@ const SITE_DEFAULTS = {
   headerCtaLabel: 'ابدأ من هنا',
   headerCtaHref: '/tracks/',
   footerNote: '',
+  commentsEnabled: false,
+  commentsTitle: 'النقاش',
+  commentsNote: 'اكتب سؤالك أو ملاحظتك. التعليقات بتظهر بعد المراجعة.',
+  commentsPlaceholder: 'سؤالك أو ملاحظتك…',
   nav: [] as { label: string; href: string }[],
 };
 

@@ -694,6 +694,24 @@ collections:
             label: "رابط زر الهيدر"
             widget: string
             required: false
+          - name: commentsEnabled
+            label: "تفعيل التعليقات"
+            widget: boolean
+            default: false
+            hint: "بتظهر بالدروس والمقالات والدورات فقط — مش بالأخبار"
+          - name: commentsTitle
+            label: "عنوان قسم التعليقات"
+            widget: string
+            required: false
+            default: "النقاش"
+          - name: commentsNote
+            label: "الجملة فوق النموذج"
+            widget: string
+            required: false
+          - name: commentsPlaceholder
+            label: "النص داخل خانة التعليق"
+            widget: string
+            required: false
           - name: footerNote
             label: "جملة أسفل الموقع"
             widget: string

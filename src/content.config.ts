@@ -223,6 +223,11 @@ const site = defineCollection({
     headerCtaLabel: optString,
     headerCtaHref: optString,
     footerNote: optString,
+    // التعليقات
+    commentsEnabled: bool(false),
+    commentsTitle: optString,
+    commentsNote: optString,
+    commentsPlaceholder: optString,
     nav: z.preprocess(
       fallback([]),
       z.array(z.object({ label: str(''), href: str('/') })),
