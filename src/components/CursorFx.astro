@@ -100,13 +100,20 @@
       document.body.appendChild(el);
       live++;
 
+      let settled = false;
       const done = () => {
+        if (settled) return;
+        settled = true;
         el.remove();
         live--;
       };
 
+      // شبكة أمان: لو المتصفح جمّد الأنيميشن (تاب بالخلفية مثلاً) وحدث finish
+      // ما انطلق، بننضّف العنصر على أي حال بدل ما يضل معلّق
+      setTimeout(done, 1500);
+
       if (typeof el.animate !== 'function') {
-        setTimeout(done, 0);
+        done();
         return;
       }
 
