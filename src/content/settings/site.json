@@ -16,6 +16,10 @@
   "bunnyCdnHostname": "",
   "headerCtaLabel": "ابدأ من هنا",
   "headerCtaHref": "/start/",
+  "commentsEnabled": true,
+  "commentsTitle": "النقاش",
+  "commentsNote": "",
+  "commentsPlaceholder": "",
   "footerNote": "الموقع قيد التطوير 🔻",
   "nav": [
     {
