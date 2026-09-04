@@ -2,31 +2,46 @@
 // CursorFx — مؤشر مثلّث 🔻 فوق العناصر القابلة للنقر + موجة مثلّث عند النقر.
 // يُستدعى مرة وحدة من الـ layout الأساسي: <CursorFx />
 // لا يشتغل على اللمس، ولا مع من فعّل «تقليل الحركة» بنظامه.
+//
+// ملاحظة على !important: ستايلات الموقع بتحدّد cursor: pointer على كلاسات
+// (.btn و .icon-btn و .chip و .sol summary)، وأي كلاس بيتغلّب على مُحدِّد
+// العنصر (button, a) بقواعد الأولوية بالـ CSS. بدون !important المثلّث
+// بينطبق بس على العناصر اللي ما عندها قاعدة خاصة — وهاد اللي كان بيصير.
 ---
 
 <style is:global>
   @media (hover: hover) and (pointer: fine) {
-  a[href], area[href], button, summary, label[for], select,
-  [role="button"], [role="link"], [role="tab"], [role="menuitem"], [role="option"],
-  input[type="submit"], input[type="button"], input[type="reset"],
-  input[type="checkbox"], input[type="radio"], input[type="file"], input[type="color"],
-  .tri-cursor {
-      cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEEklEQVR4nOVXTWhcVRg9371vks7EOI2Tqa2BxETRoJaimUKgbVINiI0IxlJFWi1FNLF0IUTjT0tQtOiqboSCLoUqWipuDLgwUFxpYwvdpDbmr2KDScxkMpNMZt69x8W8iZNMk8zUaRZ6NsM8vnu/8537fefdB/zfIbl/SMpqgSVNKsKNyFMQlir2qg8BMJidBS6PA8ESZZkFsL0WCAYBQAOIioi7RICk8kLPwdoWKGW8wFLCAFAAhgC0AEjlEtAiYphK7YHPd94MjSLR1w9VEQCt/VdZRSnYxDw2NT+Csp07AGMOiuOcyebMPYIMCfIcp6Mdw3v3p830jIMyH2BvomeyO1tClJj6/rPKaaj9RUR2klQiYgHAyVlCkrI4NfVOeXX1U3e+262v93wAJ3SHwHVvrnxHw0zPIHTsiDgNtcqNx99cQS9vDLMqnAbQNbbvBeOOjGnxbypeBRHAdYGKgGno/1oj4O8TkfZsjmyYWrGMJAXjU+8DSIRf7xSbSlNkZVgB+ZWCiScQOnpYEPBbRKPHIfk2s2xn71y01IX/AHAq0LZb+SM7jI0nAFUECRHYZBK+hjo3+OIBBeCMVFVdpLXLqs8j4MGQVNHR0VMAroffPqatMUWNQqbzFxju7lQQJDAx0ev5TN455hHwbFJV1ddHAXxY/vBDUvl4q7WxOYguwBqyY9e03VQ82aYAfCbbto0AWOr8NQl4MCQV+vo+BXC1+o0uDcexhXiCiICptN3S3aUAzODKlZOe0d2wi29IwFNBpL19EanUCaehToL722mjsbVV0AomNgd/azPLd0UUgI+ksXEqs2V+9asS8EgYkkrKy78CMBB67WWlNt9u6LorhjcHloDWNtzzqgLwOwYGPvGqX1W69VpbAMCNx3vUlpBsPvQMTGwOovJVEK1hY3O47Ym9LHvgPjGpVK9EIvOZWlZ//a77/s8xp+8wv7Bv+NEDBol5DccBuHxfuq65+/svlK7ZehkDAxE0NRkAXItAYcMtAkSjxxHw29DRw2LiCUiOL2SrDz7/NHTNVsHi4gmJRNJYp3qgAAWAZSp8DuLQaNuzrpn405GyMgAEDEGfNvf0n9UIVp4XkdaVlrsaCrW3jEVPTPRCkAh3dyqbWKAoBVEaJhZD6JWDgmAlEYu9VeCexYGk9n4/JsnxjpfSQ/e38LcHH+Pwng6XyUWS/CY3ttQEFEnFwcFqkn8lf/zZXL13l/m1vtnGvvzWkEwnJycbSUrODavkJLIq9JDktee63JHdHWlmcDo35lYREJKKFy4ESF5L/nTJzvX9YEjGOTZ51y2tPodEVoUj/Afvec+ctVeXhoB4/eAzrjtIY6Ikg96zoj9simYsIvQulWmSJ2FMjYjMknSyd/0Nx0Z90v038Tdk9jQ0R0tDEwAAAABJRU5ErkJggg==") 3 5, pointer;
+    a[href], area[href], button, summary, label[for], select,
+    [role="button"], [role="link"], [role="tab"], [role="menuitem"], [role="option"],
+    input[type="submit"], input[type="button"], input[type="reset"],
+    input[type="checkbox"], input[type="radio"], input[type="file"], input[type="color"],
+    .btn, .icon-btn, .chip, .tri-cursor {
+      cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEEklEQVR4nOVXTWhcVRg9371vks7EOI2Tqa2BxETRoJaimUKgbVINiI0IxlJFWi1FNLF0IUTjT0tQtOiqboSCLoUqWipuDLgwUFxpYwvdpDbmr2KDScxkMpNMZt69x8W8iZNMk8zUaRZ6NsM8vnu/8537fefdB/zfIbl/SMpqgSVNKsKNyFMQlir2qg8BMJidBS6PA8ESZZkFsL0WCAYBQAOIioi7RICk8kLPwdoWKGW8wFLCAFAAhgC0AEjlEtAiYphK7YHPd94MjSLR1w9VEQCt/VdZRSnYxDw2NT+Csp07AGMOiuOcyebMPYIMCfIcp6Mdw3v3p830jIMyH2BvomeyO1tClJj6/rPKaaj9RUR2klQiYgHAyVlCkrI4NfVOeXX1U3e+262v93wAJ3SHwHVvrnxHw0zPIHTsiDgNtcqNx99cQS9vDLMqnAbQNbbvBeOOjGnxbypeBRHAdYGKgGno/1oj4O8TkfZsjmyYWrGMJAXjU+8DSIRf7xSbSlNkZVgB+ZWCiScQOnpYEPBbRKPHIfk2s2xn71y01IX/AHAq0LZb+SM7jI0nAFUECRHYZBK+hjo3+OIBBeCMVFVdpLXLqs8j4MGQVNHR0VMAroffPqatMUWNQqbzFxju7lQQJDAx0ev5TN455hHwbFJV1ddHAXxY/vBDUvl4q7WxOYguwBqyY9e03VQ82aYAfCbbto0AWOr8NQl4MCQV+vo+BXC1+o0uDcexhXiCiICptN3S3aUAzODKlZOe0d2wi29IwFNBpL19EanUCaehToL722mjsbVV0AomNgd/azPLd0UUgI+ksXEqs2V+9asS8EgYkkrKy78CMBB67WWlNt9u6LorhjcHloDWNtzzqgLwOwYGPvGqX1W69VpbAMCNx3vUlpBsPvQMTGwOovJVEK1hY3O47Ym9LHvgPjGpVK9EIvOZWlZ//a77/s8xp+8wv7Bv+NEDBol5DccBuHxfuq65+/svlK7ZehkDAxE0NRkAXItAYcMtAkSjxxHw29DRw2LiCUiOL2SrDz7/NHTNVsHi4gmJRNJYp3qgAAWAZSp8DuLQaNuzrpn405GyMgAEDEGfNvf0n9UIVp4XkdaVlrsaCrW3jEVPTPRCkAh3dyqbWKAoBVEaJhZD6JWDgmAlEYu9VeCexYGk9n4/JsnxjpfSQ/e38LcHH+Pwng6XyUWS/CY3ttQEFEnFwcFqkn8lf/zZXL13l/m1vtnGvvzWkEwnJycbSUrODavkJLIq9JDktee63JHdHWlmcDo35lYREJKKFy4ESF5L/nTJzvX9YEjGOTZ51y2tPodEVoUj/Afvec+ctVeXhoB4/eAzrjtIY6Ikg96zoj9simYsIvQulWmSJ2FMjYjMknSyd/0Nx0Z90v038Tdk9jQ0R0tDEwAAAABJRU5ErkJggg==") 3 5, pointer !important;
+    }
+
+    /* استثناء مقصود: روابط قاموس المصطلحات بتضل مؤشر «مساعدة» زي ما هي بالتصميم */
+    a.glossary-link,
+    .prose a.glossary-link {
+      cursor: help !important;
     }
 
     /* العناصر المعطّلة ترجع لمؤشرها الطبيعي */
     button:disabled,
     input:disabled,
     select:disabled,
-    [aria-disabled="true"] {
-      cursor: not-allowed;
+    textarea:disabled,
+    a[aria-disabled="true"],
+    button[aria-disabled="true"],
+    [role="button"][aria-disabled="true"] {
+      cursor: not-allowed !important;
     }
 
     /* لا نسرق مؤشر الكتابة داخل الحقول النصية */
     input[type="text"], input[type="email"], input[type="search"],
     input[type="url"], input[type="tel"], input[type="password"],
-    input[type="number"], textarea, [contenteditable="true"] {
-      cursor: text;
+    input[type="number"], input[type="date"], textarea,
+    [contenteditable="true"] {
+      cursor: text !important;
     }
   }
 
@@ -62,8 +77,11 @@
       '[role="button"]', '[role="link"]', '[role="tab"]', '[role="menuitem"]', '[role="option"]',
       'input[type="submit"]', 'input[type="button"]', 'input[type="reset"]',
       'input[type="checkbox"]', 'input[type="radio"]', 'input[type="file"]', 'input[type="color"]',
-      '.tri-cursor',
+      '.btn', '.icon-btn', '.chip', '.tri-cursor',
     ].join(', ');
+
+    // نفس استثناءات الـ CSS: هدول ما بيطلع عليهم مثلّث، فما بيطلع عليهم موجة
+    const EXEMPT = '.glossary-link, :disabled, [aria-disabled="true"]';
 
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -110,7 +128,7 @@
 
         const hit = e.target instanceof Element ? e.target.closest(CLICKABLE) : null;
         if (!hit) return;
-        if (hit.matches(':disabled, [aria-disabled="true"]')) return;
+        if (hit.matches(EXEMPT)) return;
 
         ripple(e.clientX, e.clientY);
       },
