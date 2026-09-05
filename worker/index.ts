@@ -77,6 +77,38 @@ async function hashIp(ip: string, secret: string): Promise<string> {
   return (await hmac(secret, `ip:${ip}`)).slice(0, 32);
 }
 
+/**
+ * التعليق بيحدد صفحته بنفسه، فلازم نتأكد إنه مسار داخلي فعلاً.
+ * "//evil.com" بيبدأ بـ "/" بس هو رابط خارجي كامل — لهيك منرفضه.
+ */
+const isInternalPath = (p: string) =>
+  p.startsWith('/') && !p.startsWith('//') && !p.startsWith('/\\') && !p.includes('\\') && p.length <= 200;
+
+/**
+ * الطلبات اللي بتغيّر حالة (نشر/حذف/رد) لازم تكون جاية من الموقع نفسه.
+ * بوابة Access بتحمي المسار، بس هذا بيقفل باب التزوير عبر المواقع (CSRF).
+ */
+function sameOrigin(req: Request): boolean {
+  const host = new URL(req.url).host;
+  const origin = req.headers.get('origin');
+  if (origin) {
+    try {
+      return new URL(origin).host === host;
+    } catch {
+      return false;
+    }
+  }
+  const referer = req.headers.get('referer');
+  if (referer) {
+    try {
+      return new URL(referer).host === host;
+    } catch {
+      return false;
+    }
+  }
+  return false;
+}
+
 const readCookie = (req: Request, name: string) =>
   (req.headers.get('cookie') ?? '')
     .split(';')
@@ -159,7 +191,7 @@ async function createComment(req: Request, env: Env) {
   const honey = (data.website ?? '').trim();
   const openedAt = Number(data.t ?? 0);
 
-  if (!page.startsWith('/') || page.length > 200) return json({ ok: false, error: 'bad_page' }, 400);
+  if (!isInternalPath(page)) return json({ ok: false, error: 'bad_page' }, 400);
   if (name.length < 2 || name.length > MAX_NAME) return json({ ok: false, error: 'bad_name' }, 400);
   if (body.length < MIN_BODY || body.length > MAX_BODY) return json({ ok: false, error: 'bad_body' }, 400);
 
@@ -298,7 +330,7 @@ async function adminPage(req: Request, env: Env, view: string) {
 <div class="meta">
 <span class="who">${esc(c.name)}</span>
 <span>·</span><span>${fmtDate(c.created_at)}</span>
-<span>·</span><a class="page-link" href="${esc(c.page)}" target="_blank">${esc(c.page_title || c.page)}</a>
+<span>·</span><a class="page-link" href="${esc(c.page)}" target="_blank" rel="noopener noreferrer">${esc(c.page_title || c.page)}</a>
 </div>
 <p class="body">${esc(c.body)}</p>
 <div class="acts">
@@ -392,8 +424,15 @@ export default {
     if (path === '/api/comments') {
       if (req.method === 'GET') {
         const page = url.searchParams.get('page') ?? '';
-        if (!page.startsWith('/')) return json({ ok: false, error: 'bad_page' }, 400);
-        return json({ ok: true, comments: await listComments(env, page) });
+        if (!isInternalPath(page)) return json({ ok: false, error: 'bad_page' }, 400);
+        const body = JSON.stringify({ ok: true, comments: await listComments(env, page) });
+        // كاش قصير بمتصفّح الزائر: التعليق الجديد بدّه موافقتك أصلاً، فدقيقة تأخير ما بتضر
+        return new Response(body, {
+          headers: {
+            'content-type': 'application/json; charset=utf-8',
+            'cache-control': 'public, max-age=60',
+          },
+        });
       }
       if (req.method === 'POST') return createComment(req, env);
       return json({ ok: false, error: 'method' }, 405);
@@ -403,7 +442,10 @@ export default {
     if (path.startsWith('/admin/comments')) {
       if (!behindAccess(req)) return html(accessMissingPage(), 403);
 
-      if (path === '/admin/comments/action' && req.method === 'POST') return adminAction(req, env);
+      if (path === '/admin/comments/action' && req.method === 'POST') {
+        if (!sameOrigin(req)) return html(shell('<div class="wrap"><h1>طلب مرفوض</h1><p class="sub">هذا الطلب مش جاي من الموقع نفسه.</p></div>', 'طلب مرفوض'), 403);
+        return adminAction(req, env);
+      }
 
       // عدّاد التعليقات المنتظرة — بتستعمله القائمة الجانبية بلوحة المحتوى
       if (path === '/admin/comments/count') {
