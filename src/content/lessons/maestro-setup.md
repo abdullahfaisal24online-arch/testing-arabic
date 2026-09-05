@@ -7,7 +7,7 @@ updatedDate: ''
 category: أتمتة
 level: متقدّم
 duration: 09:15
-videoId: 0f3c11f9-8fab-4dad-8683-ba1cd2712325
+videoId: ''
 youtubeUrl: ''
 thumbnail: ''
 course: maestro-automation
