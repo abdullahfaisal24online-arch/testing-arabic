@@ -5,13 +5,19 @@
  * هذا الخادم بيشتغل فقط على:
  *   POST /api/comments        إرسال تعليق جديد
  *   GET  /api/comments?page=  جلب التعليقات المنشورة لصفحة
- *   GET  /admin/comments      صفحة المراجعة (محمية بكلمة سر)
+ *   GET  /admin/comments      صفحة المراجعة (محمية بـ Cloudflare Access)
+ *
+ * الحماية: كل مسار تحت /admin محمي ببوابة Cloudflare Access على مستوى الشبكة،
+ * قبل ما الطلب يوصل لهذا الخادم أصلاً. ما في كلمة سر يدوية ولا جلسة خاصة هون.
  */
 
 interface Env {
   DB: D1Database;
   ASSETS: Fetcher;
-  ADMIN_PASSWORD: string;
+  /** ملح بصمة الآي بي. اختياري — إذا مش مضبوط بينستعمل ADMIN_PASSWORD القديمة. */
+  IP_SALT?: string;
+  /** قديمة: كانت كلمة سر صفحة المراجعة. هلأ بتستعمل كملح فقط. */
+  ADMIN_PASSWORD?: string;
 }
 
 type Row = {
@@ -29,8 +35,8 @@ type Row = {
 const MAX_NAME = 40;
 const MAX_BODY = 2000;
 const MIN_BODY = 2;
-const COOKIE = 'ta_admin';
-const SESSION_DAYS = 14;
+const MAX_PER_HOUR = 12;
+const FALLBACK_SALT = 'ta-comments-ip-salt';
 
 /* ===================== أدوات ===================== */
 
@@ -40,10 +46,18 @@ const json = (data: unknown, status = 200) =>
     headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
   });
 
+const html = (body: string, status = 200) =>
+  new Response(body, {
+    status,
+    headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
+  });
+
 const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 const uid = () => crypto.randomUUID();
+
+const ipSalt = (env: Env) => env.IP_SALT || env.ADMIN_PASSWORD || FALLBACK_SALT;
 
 async function hmac(secret: string, value: string): Promise<string> {
   const key = await crypto.subtle.importKey(
@@ -62,33 +76,40 @@ async function hashIp(ip: string, secret: string): Promise<string> {
   return (await hmac(secret, `ip:${ip}`)).slice(0, 32);
 }
 
-const safeEqual = (a: string, b: string) => {
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return diff === 0;
-};
-
-/* ===================== جلسة المراجعة ===================== */
-
-async function makeToken(secret: string): Promise<string> {
-  const exp = Date.now() + SESSION_DAYS * 864e5;
-  return `${exp}.${await hmac(secret, String(exp))}`;
-}
-
-async function validToken(token: string | undefined, secret: string): Promise<boolean> {
-  if (!token) return false;
-  const [exp, sig] = token.split('.');
-  if (!exp || !sig) return false;
-  if (Number(exp) < Date.now()) return false;
-  return safeEqual(sig, await hmac(secret, exp));
-}
-
 const readCookie = (req: Request, name: string) =>
   (req.headers.get('cookie') ?? '')
     .split(';')
     .map((c) => c.trim().split('='))
     .find(([k]) => k === name)?.[1];
+
+/* ===================== بوابة Cloudflare Access ===================== */
+
+/**
+ * الطلب اللي بيعدّي من Access بيوصل ومعه ترويسة JWT وإيميل المستخدم.
+ * إذا ما وصلت هالترويسات معناها إنو البوابة مش قدّام هذا المسار —
+ * وقتها منرفض بدل ما نفتح اللوحة للعالم.
+ */
+const accessEmail = (req: Request) =>
+  req.headers.get('cf-access-authenticated-user-email') ?? '';
+
+const behindAccess = (req: Request) =>
+  Boolean(
+    req.headers.get('cf-access-jwt-assertion') ||
+      accessEmail(req) ||
+      readCookie(req, 'CF_Authorization'),
+  );
+
+function accessMissingPage() {
+  return shell(
+    `<div class="wrap">
+      <h1>البوابة مش مفعّلة</h1>
+      <p class="sub">هذه الصفحة لازم تكون خلف Cloudflare Access. الطلب وصل بدون هوية، فانرفض.</p>
+      <p class="sub">افحص: Zero Trust → Access controls → Applications → التطبيق على
+      <code>/admin</code> شغّال ومربوط بهذا الدومين.</p>
+    </div>`,
+    'البوابة مش مفعّلة',
+  );
+}
 
 /* ===================== واجهة التعليقات العامة ===================== */
 
@@ -146,9 +167,9 @@ async function createComment(req: Request, env: Env) {
     honey.length > 0 || (openedAt > 0 && Date.now() - openedAt < 3000) || (body.match(/https?:\/\//g) ?? []).length > 2;
 
   const ip = req.headers.get('cf-connecting-ip') ?? '0.0.0.0';
-  const ipHash = await hashIp(ip, env.ADMIN_PASSWORD);
+  const ipHash = await hashIp(ip, ipSalt(env));
 
-  // منع الإغراق: 5 تعليقات كحد أقصى بالساعة من نفس المصدر
+  // منع الإغراق: حد أقصى بالساعة من نفس المصدر
   const since = Date.now() - 3600_000;
   const recent = await env.DB.prepare(
     `SELECT COUNT(*) AS n FROM comments WHERE ip_hash = ?1 AND created_at > ?2`,
@@ -156,7 +177,7 @@ async function createComment(req: Request, env: Env) {
     .bind(ipHash, since)
     .first<{ n: number }>();
 
-  if ((recent?.n ?? 0) >= 12) return json({ ok: false, error: 'too_many' }, 429);
+  if ((recent?.n ?? 0) >= MAX_PER_HOUR) return json({ ok: false, error: 'too_many' }, 429);
 
   await env.DB.prepare(
     `INSERT INTO comments (id, page, page_title, name, body, status, is_owner, parent_id, ip_hash, created_at)
@@ -195,6 +216,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans A
 .wrap{max-width:900px;margin:0 auto;padding:28px 20px 70px}
 h1{font-size:26px;margin:0 0 6px}
 .sub{color:var(--muted);font-size:15px;margin:0 0 24px}
+.sub code{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:14px}
+.who-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px;color:var(--muted);margin:0 0 20px}
+.who-bar .mail{color:var(--cyan)}
 .tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px}
 .tab{font:inherit;font-size:14px;color:var(--muted);background:transparent;border:1px solid var(--line);
 border-radius:999px;padding:8px 16px;text-decoration:none;display:inline-block}
@@ -220,28 +244,12 @@ form.inline{display:contents}
 .rep{background:var(--navy);border-inline-start:3px solid var(--cyan);border-radius:10px;padding:12px 14px;margin-top:12px}
 .rep .who{font-size:14px;color:var(--cyan)}
 .empty{color:var(--muted);text-align:center;padding:50px 0}
-.login{max-width:380px;margin:14vh auto;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:28px}
-.login h1{font-size:20px;margin-bottom:16px}
-.login button{width:100%;margin-top:12px;background:var(--orange);color:#0a1428}
-.err{color:var(--orange);font-size:14px;margin-top:10px}
 .count{background:rgba(246,130,59,.14);color:var(--orange);border-radius:999px;padding:2px 10px;font-size:13px}
 a.back{color:var(--muted);font-size:14px;text-decoration:none}
 </style></head><body>${inner}</body></html>`;
 }
 
-function loginPage(error = '') {
-  return shell(
-    `<form class="login" method="post" action="/admin/comments/login">
-      <h1>مراجعة التعليقات</h1>
-      <input type="password" name="password" placeholder="كلمة السر" autofocus required>
-      <button type="submit">دخول</button>
-      ${error ? `<p class="err">${esc(error)}</p>` : ''}
-    </form>`,
-    'دخول المراجعة',
-  );
-}
-
-async function adminPage(env: Env, view: string) {
+async function adminPage(req: Request, env: Env, view: string) {
   const status = view === 'approved' ? 'approved' : view === 'spam' ? 'spam' : 'pending';
 
   const { results } = await env.DB.prepare(
@@ -277,56 +285,62 @@ async function adminPage(env: Env, view: string) {
         .filter((r) => r.parent_id === c.id)
         .map(
           (r) => `<div class="rep"><div class="who">ردّك</div><div class="body">${esc(r.body)}</div>
-            <form method="post" action="/admin/comments/action" class="inline">
-              <input type="hidden" name="id" value="${r.id}">
-              <input type="hidden" name="view" value="${status}">
-              <button class="del" name="action" value="delete" type="submit">حذف الرد</button>
-            </form></div>`,
+<form method="post" action="/admin/comments/action" class="inline">
+<input type="hidden" name="id" value="${r.id}">
+<input type="hidden" name="view" value="${status}">
+<button class="del" name="action" value="delete" type="submit">حذف الرد</button>
+</form></div>`,
         )
         .join('');
 
       return `<article class="c${status === 'spam' ? ' spam' : ''}">
-      <div class="meta">
-        <span class="who">${esc(c.name)}</span>
-        <span>·</span><span>${fmtDate(c.created_at)}</span>
-        <span>·</span><a class="page-link" href="${esc(c.page)}" target="_blank">${esc(c.page_title || c.page)}</a>
-      </div>
-      <p class="body">${esc(c.body)}</p>
-      <div class="acts">
-        <form method="post" action="/admin/comments/action" class="inline">
-          <input type="hidden" name="id" value="${c.id}">
-          <input type="hidden" name="view" value="${status}">
-          ${status !== 'approved' ? '<button class="ok" name="action" value="approve" type="submit">نشر</button>' : ''}
-          ${status !== 'pending' ? '<button class="no" name="action" value="unapprove" type="submit">إرجاع للانتظار</button>' : ''}
-          ${status !== 'spam' ? '<button class="no" name="action" value="spam" type="submit">سبام</button>' : ''}
-          <button class="del" name="action" value="delete" type="submit">حذف</button>
-        </form>
-      </div>
-      ${myReplies}
-      <details class="reply">
-        <summary>اكتب رد</summary>
-        <form method="post" action="/admin/comments/action" style="margin-top:12px">
-          <input type="hidden" name="id" value="${c.id}">
-          <input type="hidden" name="view" value="${status}">
-          <textarea name="reply" placeholder="ردّك على ${esc(c.name)}…" required></textarea>
-          <button class="ok" name="action" value="reply" type="submit">انشر الرد</button>
-        </form>
-      </details>
-    </article>`;
+<div class="meta">
+<span class="who">${esc(c.name)}</span>
+<span>·</span><span>${fmtDate(c.created_at)}</span>
+<span>·</span><a class="page-link" href="${esc(c.page)}" target="_blank">${esc(c.page_title || c.page)}</a>
+</div>
+<p class="body">${esc(c.body)}</p>
+<div class="acts">
+<form method="post" action="/admin/comments/action" class="inline">
+<input type="hidden" name="id" value="${c.id}">
+<input type="hidden" name="view" value="${status}">
+${status !== 'approved' ? '<button class="ok" name="action" value="approve" type="submit">نشر</button>' : ''}
+${status !== 'pending' ? '<button class="no" name="action" value="unapprove" type="submit">إرجاع للانتظار</button>' : ''}
+${status !== 'spam' ? '<button class="no" name="action" value="spam" type="submit">سبام</button>' : ''}
+<button class="del" name="action" value="delete" type="submit">حذف</button>
+</form>
+</div>
+${myReplies}
+<details class="reply">
+<summary>اكتب رد</summary>
+<form method="post" action="/admin/comments/action" style="margin-top:12px">
+<input type="hidden" name="id" value="${c.id}">
+<input type="hidden" name="view" value="${status}">
+<textarea name="reply" placeholder="ردّك على ${esc(c.name)}…" required></textarea>
+<button class="ok" name="action" value="reply" type="submit">انشر الرد</button>
+</form>
+</details>
+</article>`;
     })
     .join('');
 
+  const email = accessEmail(req);
+
   return shell(`<div class="wrap">
-    <h1>مراجعة التعليقات</h1>
-    <p class="sub">التعليقات ما بتظهر على الموقع إلا بعد ما توافق عليها.</p>
-    <nav class="tabs">
-      ${tab('pending', 'بانتظار المراجعة')}
-      ${tab('approved', 'منشورة')}
-      ${tab('spam', 'سبام')}
-      <a class="tab" href="/admin/comments/logout">خروج</a>
-    </nav>
-    ${cards || '<p class="empty">ما في تعليقات هون.</p>'}
-  </div>`);
+<h1>مراجعة التعليقات</h1>
+<p class="sub">التعليقات ما بتظهر على الموقع إلا بعد ما توافق عليها.</p>
+<div class="who-bar">
+${email ? `<span>داخل باسم <span class="mail">${esc(email)}</span></span><span>·</span>` : ''}
+<a class="back" href="/admin/">لوحة المحتوى</a>
+</div>
+<nav class="tabs">
+${tab('pending', 'بانتظار المراجعة')}
+${tab('approved', 'منشورة')}
+${tab('spam', 'سبام')}
+<a class="tab" href="/cdn-cgi/access/logout">خروج</a>
+</nav>
+${cards || '<p class="empty">ما في تعليقات هون.</p>'}
+</div>`);
 }
 
 async function adminAction(req: Request, env: Env) {
@@ -384,56 +398,18 @@ export default {
       return json({ ok: false, error: 'method' }, 405);
     }
 
-    // ---------- صفحة المراجعة ----------
+    // ---------- صفحة المراجعة (خلف Cloudflare Access) ----------
     if (path.startsWith('/admin/comments')) {
-      if (!env.ADMIN_PASSWORD) {
-        return new Response('ADMIN_PASSWORD غير مضبوط', { status: 500 });
-      }
-
-      if (path === '/admin/comments/login' && req.method === 'POST') {
-        const form = await req.formData();
-        const pass = String(form.get('password') ?? '');
-        if (!safeEqual(pass, env.ADMIN_PASSWORD)) {
-          return new Response(loginPage('كلمة السر غير صحيحة'), {
-            status: 401,
-            headers: { 'content-type': 'text/html; charset=utf-8' },
-          });
-        }
-        const token = await makeToken(env.ADMIN_PASSWORD);
-        return new Response(null, {
-          status: 303,
-          headers: {
-            location: '/admin/comments',
-            'set-cookie': `${COOKIE}=${token}; HttpOnly; Secure; SameSite=Lax; Path=/admin; Max-Age=${
-              SESSION_DAYS * 86400
-            }`,
-          },
-        });
-      }
-
-      if (path === '/admin/comments/logout') {
-        return new Response(null, {
-          status: 303,
-          headers: {
-            location: '/admin/comments',
-            'set-cookie': `${COOKIE}=; HttpOnly; Secure; SameSite=Lax; Path=/admin; Max-Age=0`,
-          },
-        });
-      }
-
-      const authed = await validToken(readCookie(req, COOKIE), env.ADMIN_PASSWORD);
-      if (!authed) {
-        return new Response(loginPage(), {
-          status: 401,
-          headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
-        });
-      }
+      if (!behindAccess(req)) return html(accessMissingPage(), 403);
 
       if (path === '/admin/comments/action' && req.method === 'POST') return adminAction(req, env);
 
-      return new Response(await adminPage(env, url.searchParams.get('view') ?? 'pending'), {
-        headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
-      });
+      // روابط قديمة من نسخة كلمة السر
+      if (path === '/admin/comments/login' || path === '/admin/comments/logout') {
+        return Response.redirect(new URL('/admin/comments', req.url).toString(), 303);
+      }
+
+      return html(await adminPage(req, env, url.searchParams.get('view') ?? 'pending'));
     }
 
     // ---------- كل شي تاني: الملفات الثابتة ----------
