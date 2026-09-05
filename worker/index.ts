@@ -5,7 +5,8 @@
  * هذا الخادم بيشتغل فقط على:
  *   POST /api/comments        إرسال تعليق جديد
  *   GET  /api/comments?page=  جلب التعليقات المنشورة لصفحة
- *   GET  /admin/comments      صفحة المراجعة (محمية بـ Cloudflare Access)
+ *   GET  /admin/comments        صفحة المراجعة (محمية بـ Cloudflare Access)
+ *   GET  /admin/comments/count  عدد التعليقات المنتظرة (للقائمة الجانبية)
  *
  * الحماية: كل مسار تحت /admin محمي ببوابة Cloudflare Access على مستوى الشبكة،
  * قبل ما الطلب يوصل لهذا الخادم أصلاً. ما في كلمة سر يدوية ولا جلسة خاصة هون.
@@ -403,6 +404,14 @@ export default {
       if (!behindAccess(req)) return html(accessMissingPage(), 403);
 
       if (path === '/admin/comments/action' && req.method === 'POST') return adminAction(req, env);
+
+      // عدّاد التعليقات المنتظرة — بتستعمله القائمة الجانبية بلوحة المحتوى
+      if (path === '/admin/comments/count') {
+        const row = await env.DB.prepare(
+          `SELECT COUNT(*) AS n FROM comments WHERE status = 'pending'`,
+        ).first<{ n: number }>();
+        return json({ ok: true, pending: row?.n ?? 0 });
+      }
 
       // روابط قديمة من نسخة كلمة السر
       if (path === '/admin/comments/login' || path === '/admin/comments/logout') {

@@ -9,5 +9,131 @@
   </head>
   <body>
     <script src="https://unpkg.com/@sveltia/cms@0.205.0/dist/sveltia-cms.js"></script>
+
+    <!--
+      زر «مراجعة التعليقات» بالقائمة الجانبية.
+
+      Sveltia CMS ما بتدعم إضافة روابط للقائمة رسمياً، فمنضيفه بنسخ عنصر موجود
+      ومنحطّه بآخر القائمة. الكود دفاعي بالكامل: إذا تغيّر شكل اللوحة بأي تحديث،
+      الزر بس ما بيظهر — ما بينكسر إشي باللوحة نفسها.
+    -->
+    <script>
+      (function () {
+        var TARGET = '/admin/comments';
+        var LABEL = 'مراجعة التعليقات';
+        var ICON = 'forum';
+        var MARK = 'ta-comments-link';
+
+        function group() {
+          var sidebar = document.querySelector('.primary-sidebar');
+          if (!sidebar) return null;
+          var g = sidebar.querySelector('[role="listbox"] [role="group"] > .inner');
+          return g && g.querySelector('button[role="option"]') ? g : null;
+        }
+
+        function build(sample) {
+          var opt = sample.cloneNode(true);
+          opt.setAttribute('data-' + MARK, '1');
+
+          var btn = opt.querySelector('button[role="option"]');
+          if (!btn) return null;
+
+          btn.removeAttribute('id');
+          btn.removeAttribute('tabindex');
+          btn.setAttribute('aria-selected', 'false');
+          btn.setAttribute('value', LABEL);
+          btn.setAttribute('data-search-value', LABEL);
+          btn.setAttribute('data-label', LABEL);
+          btn.setAttribute('data-value', LABEL);
+          btn.setAttribute('title', 'مراجعة تعليقات الزوار');
+
+          var label = btn.querySelector('.label');
+          if (label) label.textContent = LABEL;
+
+          var icons = btn.querySelectorAll('.sui.icon');
+          if (icons.length) icons[0].textContent = ICON;
+
+          var count = btn.querySelector('.count');
+          if (count) {
+            count.textContent = '';
+            count.style.display = 'none';
+          }
+
+          btn.addEventListener(
+            'click',
+            function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              window.location.href = TARGET;
+            },
+            true,
+          );
+
+          return opt;
+        }
+
+        // عدد التعليقات المنتظرة — الطلب بيمرّ من نفس بوابة Access
+        function refreshCount(opt) {
+          fetch('/admin/comments/count', { headers: { accept: 'application/json' } })
+            .then(function (r) {
+              return r.ok ? r.json() : null;
+            })
+            .then(function (d) {
+              if (!d || !d.ok) return;
+              var badge = opt.querySelector('.count');
+              if (!badge) return;
+              if (d.pending > 0) {
+                badge.textContent = String(d.pending);
+                badge.style.display = '';
+              } else {
+                badge.textContent = '';
+                badge.style.display = 'none';
+              }
+            })
+            .catch(function () {});
+        }
+
+        function inject() {
+          try {
+            var g = group();
+            if (!g) return false;
+            if (g.querySelector('[data-' + MARK + ']')) return true;
+
+            var sample = g.querySelector('button[role="option"]');
+            sample = sample && sample.parentElement;
+            if (!sample) return false;
+
+            var opt = build(sample);
+            if (!opt) return false;
+
+            g.appendChild(opt);
+            refreshCount(opt);
+            setInterval(function () {
+              if (document.body.contains(opt)) refreshCount(opt);
+            }, 120000);
+            return true;
+          } catch (err) {
+            return false;
+          }
+        }
+
+        // اللوحة بتبني نفسها بعد ما تحمّل، وبتعيد بناء القائمة أحياناً —
+        // فمنراقب ومنرجّع الزر إذا اختفى.
+        var observer = new MutationObserver(function () {
+          inject();
+        });
+
+        function start() {
+          inject();
+          observer.observe(document.body, { childList: true, subtree: true });
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', start);
+        } else {
+          start();
+        }
+      })();
+    </script>
   </body>
 </html>
