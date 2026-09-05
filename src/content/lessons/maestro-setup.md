@@ -3,16 +3,31 @@ title: إعداد بيئة Maestro وأول فلو
 slug: maestro-setup
 description: تنصيب Maestro، ربطه بالمحاكي، وكتابة أول ملف فلو يشتغل فعلاً على تطبيق تجريبي.
 publishDate: 2026-08-20
+updatedDate: ''
 category: أتمتة
 level: متقدّم
-duration: "09:15"
+duration: 09:15
+videoId: 0f3c11f9-8fab-4dad-8683-ba1cd2712325
+youtubeUrl: ''
+thumbnail: ''
 course: maestro-automation
 order: 1
-featured: true
-draft: false
+lessonType: شرح
+tags: []
+summary: []
+prerequisites: []
+relatedLessons: []
+appUsed: ''
+exerciseTitle: ''
+exercise: []
+exerciseNote: ''
+solution: []
+solutionCode: ''
 resources:
   - label: first-flow.yaml
-    url: "/uploads/first-flow.yaml"
+    url: /uploads/first-flow.yaml
+featured: true
+draft: false
 ---
 
 ## نظرة عامة
