@@ -5,7 +5,14 @@ import { lessonsLabel } from '../lib/utils';
 interface Props {
   course: {
     id: string;
-    data: { title: string; description: string; level: string; accent: 'cyan' | 'orange'; recommended: boolean };
+    data: {
+      title: string;
+      description: string;
+      level: string;
+      accent: 'cyan' | 'orange';
+      recommended: boolean;
+      cover?: string;
+    };
   };
   count: number;
 }
@@ -14,6 +21,11 @@ const { data } = course;
 const icon = data.accent === 'orange' ? 'board' : 'list';
 ---
 <a class="card course" href={`/courses/${course.id}/`} data-accent={data.accent} data-soon={count === 0 ? 'true' : undefined}>
+  {data.cover && (
+    <div class="thumb">
+      <img src={data.cover} alt="" loading="lazy" decoding="async" width="1280" height="720" />
+    </div>
+  )}
   <div class="card-body">
     <div class="top">
       <span class="ic"><Icon name={icon} size={21} /></span>
