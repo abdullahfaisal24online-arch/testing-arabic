@@ -35,6 +35,9 @@ const hours = Math.floor(totalSeconds / 3600);
 const mins = Math.round((totalSeconds % 3600) / 60);
 const totalLabel = hours > 0 ? `${hours} ساعة و${mins} دقيقة` : `${mins} دقيقة`;
 
+// صورة الدورة — بتظهر بالهيدر وبتنستعمل كصورة مشاركة على السوشال
+const coverUrl = data.cover ? new URL(data.cover, site.url).href : undefined;
+
 const jsonLd = [
   {
     '@context': 'https://schema.org',
@@ -43,6 +46,7 @@ const jsonLd = [
     description: data.description,
     inLanguage: 'ar',
     url: `${site.url}/courses/${course.id}/`,
+    ...(coverUrl ? { image: coverUrl } : {}),
     provider: { '@type': 'Organization', name: site.name, url: site.url },
     isAccessibleForFree: true,
     hasCourseInstance: {
@@ -62,14 +66,14 @@ const jsonLd = [
   },
 ];
 ---
-<Base title={data.title} description={data.description} jsonLd={jsonLd}>
+<Base title={data.title} description={data.description} image={data.cover} jsonLd={jsonLd}>
   <div class="wrap crumbs">
     <a href="/">الرئيسية</a><span>›</span><a href="/courses/">الدورات</a><span>›</span>
     <span class="now">{data.title}</span>
   </div>
 
   <section class="hero dots">
-    <div class="wrap hero-in">
+    <div class="wrap hero-in" data-has-cover={data.cover ? 'true' : undefined}>
       <div class="txt">
         {data.recommended && <span class="badge badge-orange">الدورة الموصى فيها للبداية</span>}
         <h1>{data.title}</h1>
@@ -87,6 +91,17 @@ const jsonLd = [
           </a>
         )}
       </div>
+      {data.cover && (
+        <figure class="cover">
+          <img
+            src={data.cover}
+            alt={`غلاف دورة ${data.title}`}
+            width="1280"
+            height="720"
+            decoding="async"
+          />
+        </figure>
+      )}
     </div>
   </section>
 
@@ -158,6 +173,27 @@ const jsonLd = [
   .stats b { font-size: 22px; }
   .stats span { font-size: 13px; color: var(--muted); }
   .stats i { width: 1px; height: 32px; background: var(--line); }
+
+  /* غلاف الدورة جنب النص — وبينزل تحته على الشاشات الصغيرة */
+  .hero-in[data-has-cover] {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 40px;
+    align-items: center;
+  }
+  @media (max-width: 940px) {
+    .hero-in[data-has-cover] { grid-template-columns: minmax(0, 1fr); gap: 30px; }
+  }
+  .cover { margin: 0; }
+  .cover img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+  }
 
   .grid-wrap { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 44px; align-items: start; }
   @media (max-width: 940px) { .grid-wrap { grid-template-columns: minmax(0, 1fr); } }
