@@ -6,7 +6,7 @@ publishDate: 2026-09-06
 updatedDate: ''
 category: أساسيات
 level: مبتدئ
-duration: 00:00
+duration: 01:00:00
 videoId: 14a946c9-be86-4e17-922e-79a8610fe0ff
 youtubeUrl: ''
 thumbnail: /uploads/istqb-ctfl4-lesson-04.png
