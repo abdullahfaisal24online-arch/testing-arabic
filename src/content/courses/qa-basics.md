@@ -19,7 +19,7 @@ tags:
   - ISTQB
   - CTFL
   - شهادات
-cover: ''
+cover: /uploads/istqb-ctfl4-cover-clean.png
 draft: false
 ---
 
