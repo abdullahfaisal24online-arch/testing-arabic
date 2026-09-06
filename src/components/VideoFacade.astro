@@ -1,0 +1,136 @@
+---
+// واجهة المشغّل — بتحلّ مشكلتين:
+// 1) صورة الغلاف بتصير من لوحة التحكّم (حقل «صورة الغلاف») بدل الصورة اللي بيولّدها Bunny تلقائياً.
+// 2) مشغّل Bunny ما بينحمّل إلا لما يضغط الزائر — الصفحة بتفتح أسرع وبتتحسّن نتيجة الـ LCP.
+//
+// طريقة الاستعمال: أي حاوية عليها data-poster وجوّاتها <iframe data-src="...">.
+// إذا ما في صورة غلاف، المشغّل بينحمّل عادي زي قبل — بدون أي تغيير بالسلوك.
+---
+
+<style is:global>
+  .vf-btn {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    cursor: pointer;
+    background: var(--player-bg, #0d1526);
+    overflow: hidden;
+  }
+
+  .vf-btn img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.35s ease, filter 0.25s ease;
+  }
+
+  .vf-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(6, 12, 24, 0) 45%, rgba(6, 12, 24, 0.35) 100%);
+    pointer-events: none;
+  }
+
+  .vf-play {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline: 0;
+    margin-inline: auto;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    width: 74px;
+    height: 74px;
+    border-radius: 999px;
+    background: var(--orange, #f6823b);
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    transition: transform 0.2s ease, background 0.2s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* المؤشّر المثلّث تبع الموقع بيغطّي الأيقونة، فبنخلّي الحركة على الزر نفسه */
+  .vf-btn:hover img { transform: scale(1.03); filter: brightness(1.05); }
+  .vf-btn:hover .vf-play { transform: translateY(-50%) scale(1.07); }
+  .vf-btn:focus-visible { outline: 2px solid var(--cyan, #38bdf8); outline-offset: -3px; }
+
+  @media (max-width: 560px) {
+    .vf-play { width: 58px; height: 58px; }
+    .vf-play svg { width: 22px; height: 22px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .vf-btn img, .vf-play { transition: none; }
+    .vf-btn:hover img { transform: none; }
+    .vf-btn:hover .vf-play { transform: translateY(-50%); }
+  }
+</style>
+
+<script>
+  const PLAY_ICON =
+    '<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.3-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14Z"/></svg>';
+
+  document.querySelectorAll<HTMLIFrameElement>('iframe[data-src]').forEach((frame) => {
+    const src = frame.dataset.src;
+    if (!src) return;
+
+    const box = frame.closest<HTMLElement>('[data-poster]');
+    const poster = box?.getAttribute('data-poster');
+
+    // بلا صورة غلاف؟ نحمّل المشغّل فوراً — نفس السلوك القديم
+    if (!box || !poster) {
+      frame.src = src;
+      return;
+    }
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'vf-btn';
+    btn.setAttribute('aria-label', 'شغّل الفيديو');
+
+    const img = document.createElement('img');
+    img.src = poster;
+    img.alt = '';
+    img.width = 1280;
+    img.height = 720;
+    img.decoding = 'async';
+
+    const play = document.createElement('span');
+    play.className = 'vf-play';
+    play.innerHTML = PLAY_ICON;
+
+    btn.append(img, play);
+    frame.style.display = 'none';
+    box.insertBefore(btn, frame);
+
+    // تهيئة الاتصال بمزوّد الفيديو أول ما يمرّ الماوس — التشغيل بيصير أسرع
+    btn.addEventListener(
+      'pointerenter',
+      () => {
+        const link = document.createElement('link');
+        link.rel = 'preconnect';
+        link.href = 'https://iframe.mediadelivery.net';
+        document.head.appendChild(link);
+      },
+      { once: true },
+    );
+
+    btn.addEventListener(
+      'click',
+      () => {
+        frame.src = src.replace('autoplay=false', 'autoplay=true').replace('preload=false', 'preload=true');
+        frame.style.display = '';
+        btn.remove();
+        frame.focus();
+      },
+      { once: true },
+    );
+  });
+</script>
