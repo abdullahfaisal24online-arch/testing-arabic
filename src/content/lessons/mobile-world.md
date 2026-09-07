@@ -28,7 +28,8 @@ summary:
 prerequisites:
   - شهادة ISTQB CTFL أو معرفة بأساسيات الاختبار ومصطلحاته
   - استخدام عملي لتطبيقات الموبايل — ما بتحتاج خلفية برمجية
-relatedLessons: []
+relatedLessons:
+  - fundamentals-of-testing
 appUsed: ''
 exerciseTitle: حلّل تطبيق موبايل من زاوية الأعمال والتقنية
 exercise:
