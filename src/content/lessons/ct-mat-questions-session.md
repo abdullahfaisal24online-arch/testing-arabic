@@ -28,7 +28,12 @@ summary:
 prerequisites:
   - خلّص الفصول الخمسة من الدورة قبل هذه الجلسة
   - جهّز ورقة وقلم — رح توقف الفيديو وتجاوب قبل كل حل
-relatedLessons: []
+relatedLessons:
+  - mobile-world
+  - mobile-application-test-types
+  - common-test-types-and-test-process
+  - mobile-platforms-tools-and-environment
+  - automating-the-test-execution
 appUsed: ''
 exerciseTitle: أعد حل أسئلة الفيديو بنفسك
 exercise:
