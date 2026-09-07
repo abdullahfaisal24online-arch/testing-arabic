@@ -6,12 +6,32 @@ import { getSite } from '../../lib/site';
 
 const site = await getSite();
 
-const lessons = (await getCollection('lessons'))
-  .filter((l) => !l.data.draft)
-  .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
-
 const courses = (await getCollection('courses')).filter((c) => !c.data.draft);
 const courseTitle = (id?: string) => courses.find((c) => c.id === id)?.data.title;
+
+/**
+ * ترتيب الأرشيف: دروس الدورات أولاً — كل دورة بترتيبها (order)، وفصولها بترتيب الدرس —
+ * وبعدها الفيديوهات المتفرقة من الأحدث للأقدم.
+ */
+const SOLO_RANK = Number.MAX_SAFE_INTEGER;
+const courseRank = (id?: string) => {
+  const c = id ? courses.find((x) => x.id === id) : undefined;
+  return c ? c.data.order : SOLO_RANK;
+};
+
+const lessons = (await getCollection('lessons'))
+  .filter((l) => !l.data.draft)
+  .sort((a, b) => {
+    const ca = a.data.course ?? a.data.track;
+    const cb = b.data.course ?? b.data.track;
+    const ra = courseRank(ca);
+    const rb = courseRank(cb);
+    if (ra !== rb) return ra - rb;
+    if (ra === SOLO_RANK) return b.data.publishDate.valueOf() - a.data.publishDate.valueOf();
+    if (ca !== cb) return String(ca).localeCompare(String(cb));
+    if (a.data.order !== b.data.order) return a.data.order - b.data.order;
+    return a.data.publishDate.valueOf() - b.data.publishDate.valueOf();
+  });
 
 const rows = lessons.map((l) => {
   const cid = l.data.course ?? l.data.track;
@@ -30,6 +50,7 @@ const jsonLd = {
   inLanguage: 'ar',
 };
 ---
+
 <Base
   title="كل الدروس"
   description="أرشيف كامل لدروس اختبار البرمجيات بالعربي: دروس الدورات وفيديوهات متفرقة — مجاناً وبترتيب واضح."
