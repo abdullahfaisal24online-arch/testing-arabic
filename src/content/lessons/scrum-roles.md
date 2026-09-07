@@ -1,5 +1,5 @@
 ---
-title: الأدوار في Scrum — Scrum Roles
+title: Scrum Roles - Scrum الأدوار في
 slug: scrum-roles
 description: 'الدرس الثالث من دورة أساسيات Scrum: فريق Scrum ومسؤولياته الثلاث — Product Owner و Scrum Master و Developers — ووين بيوقع المختبر، وأشهر الأخطاء بتوزيع الأدوار.'
 publishDate: 2026-09-07
