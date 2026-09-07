@@ -28,7 +28,8 @@ summary:
 prerequisites:
   - 'الفصل الأول: عالم الموبايل — أنواع الأجهزة والتطبيقات والمعمارية'
   - معرفة بأساسيات أنواع الاختبار من منهج CTFL
-relatedLessons: []
+relatedLessons:
+  - mobile-world
 appUsed: ''
 exerciseTitle: خطّط اختبارات التوافق والاتصال لتطبيق موبايل
 exercise:
