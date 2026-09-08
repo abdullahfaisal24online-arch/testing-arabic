@@ -34,6 +34,7 @@ relatedLessons:
   - jira-issue-types
   - jira-sprint
   - jira-versions-releases
+  - jira-reports
 appUsed: Jira Cloud (Free plan)
 exerciseTitle: اضبط فريقك وصلاحياته
 exercise:
