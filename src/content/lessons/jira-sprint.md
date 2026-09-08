@@ -28,7 +28,13 @@ summary:
 prerequisites:
   - مشروع بقالب Scrum من الدرس الثاني
   - Issues جاهزة بالـ Backlog من الدرس الثالث
-relatedLessons: []
+relatedLessons:
+  - jira-intro
+  - jira-first-project
+  - jira-issue-types
+  - jira-versions-releases
+  - jira-project-settings
+  - jira-reports
 appUsed: Jira Cloud (Free plan)
 exerciseTitle: شغّل أول Sprint من الصفر
 exercise:
