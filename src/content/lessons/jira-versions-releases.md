@@ -33,6 +33,8 @@ relatedLessons:
   - jira-first-project
   - jira-issue-types
   - jira-sprint
+  - jira-project-settings
+  - jira-reports
 appUsed: Jira Cloud (Free plan)
 exerciseTitle: أطلع أول Release من مشروعك
 exercise:
