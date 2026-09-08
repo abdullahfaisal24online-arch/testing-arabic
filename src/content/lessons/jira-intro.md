@@ -20,15 +20,21 @@ tags:
   - Atlassian
   - أدوات
 summary:
-  - 'Jira أداة من Atlassian لتتبّع الشغل: كل مهمة أو باق بتصير Issue إلها حالة ومسؤول وتاريخ'
+  - 'Jira أداة من Atlassian لتتبّع الشغل: كل مهمة أو bug بتصير Issue إلها حالة ومسؤول وتاريخ'
   - 'الهرمية ببساطة: الـ Project بيجمّع الـ Issues، والـ Epic بيجمّع مجموعة Issues تحت هدف واحد'
-  - الـ Board عرض بصري لحالات الشغل، والـ Backlog مخزن الشغل اللي لسا ما دخل السبرنت
+  - الـ Board عرض بصري لحالات الشغل، والـ Backlog مخزن الشغل اللي لسا ما دخل الـ Sprint
   - الـ Workflow هو رحلة الـ Issue بين الحالات، وكل حركة بينهم اسمها Transition وبتنسجّل بالسجل
-  - 'قيمة Jira للمختبر: الباق بيصير موثّق ومربوط بالسبرنت والإصدار بدل ما يضيع بالمحادثات'
+  - 'قيمة Jira للمختبر: الـ bug بيصير موثّق ومربوط بالـ Sprint والإصدار بدل ما يضيع بالمحادثات'
 prerequisites:
   - ما بتحتاج أي خلفية برمجية
   - افتح حساب مجاني على Jira Cloud قبل الدرس عشان تطبّق معي
-relatedLessons: []
+relatedLessons:
+  - jira-first-project
+  - jira-issue-types
+  - jira-sprint
+  - jira-versions-releases
+  - jira-project-settings
+  - jira-reports
 appUsed: Jira Cloud (Free plan)
 exerciseTitle: تجوّل بداخل Jira قبل ما تبني مشروعك
 exercise:
@@ -45,7 +51,7 @@ solution:
   - الأعمدة الافتراضية To Do / In Progress / Done — وهي تمثيل بصري لحالات الـ Workflow
   - مفتاح الـ Issue (مثل KAN-1) = مفتاح المشروع + رقم تسلسلي، وما بينعاد استخدامه
   - سحب الـ Issue بين الأعمدة = تنفيذ Transition، وبينسجّل مين غيّر الحالة وإيمتى
-  - البورد بيعرض شغل السبرنت أو التدفّق الحالي، والباكلوق بيعرض الشغل اللي لسا ما دخل
+  - الـ Board بيعرض شغل الـ Sprint أو التدفّق الحالي، والـ Backlog بيعرض الشغل اللي لسا ما دخل
 solutionCode: ''
 resources: []
 featured: false
@@ -71,6 +77,6 @@ draft: false
 
 ## وين بيوقع المختبر؟
 
-الBug بينكتب Issue نوعه Bug، وبينربط بالسبرنت وبالإصدار، وحالته بتحكي وين وصل. يعني Jira مش أداة مدير بس — هي سجل الجودة كمان.
+الـ bug بينكتب Issue نوعه Bug، وبينربط بالـ Sprint وبالإصدار، وحالته بتحكي وين وصل. يعني Jira مش أداة مدير بس — هي سجل الجودة كمان.
 
 بالدرس الجاي: إنشاء أول Project حقيقي خطوة بخطوة.
