@@ -1,0 +1,82 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const products = (await getCollection('products')).filter((p) => !p.data.draft);
+  return products.map((product) => ({
+    params: { slug: product.id },
+    props: { product },
+  }));
+}
+
+const { product } = Astro.props;
+const { data } = product;
+---
+
+<Base title={data.title} description={data.pitch || data.title} noindex={true}>
+  <div class="wrap crumbs">
+    <a href="/pro/">موادي</a><span>›</span>
+    <span class="now">{data.title}</span>
+  </div>
+
+  <section class="hero">
+    <div class="wrap">
+      <span class="eyebrow">{data.kind}</span>
+      <h1>{data.title}</h1>
+
+      <div class="panel">
+        <h2>المادة قيد التجهيز</h2>
+        <p>
+          وصولك مفتوح ومحفوظ على هاد الجهاز. المحتوى بينزل هون أول ما يجهز، ورح توصلك
+          رسالة على إيميلك لما ينزل — بدون ما تعمل أي إشي.
+        </p>
+        {
+          data.includes.length > 0 && (
+            <ul class="items">{data.includes.map((it) => <li>{it}</li>)}</ul>
+          )
+        }
+      </div>
+
+      <p class="acts"><a class="btn" href="/pro/">رجوع لموادي</a></p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .crumbs { padding-top: 26px; font-size: 13px; color: var(--faint); display: flex; gap: 8px; flex-wrap: wrap; }
+  .crumbs a { color: var(--muted); text-decoration: none; }
+  .crumbs a:hover { color: var(--orange); }
+  .crumbs .now { color: var(--ink); }
+
+  .hero { padding-block: 26px 70px; }
+  .hero h1 { margin-top: 10px; }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--orange-line);
+    border-radius: var(--r-xl);
+    padding: 24px 22px;
+    margin-top: 26px;
+    max-width: 720px;
+    display: grid;
+    gap: 12px;
+  }
+  .panel h2 { font-size: 18px; margin: 0; }
+  .panel p { margin: 0; color: var(--muted); }
+
+  .items { display: grid; gap: 10px; padding-inline-start: 0; list-style: none; margin: 0; }
+  .items li { position: relative; padding-inline-start: 22px; color: var(--muted); }
+  .items li::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    top: 9px;
+    width: 9px;
+    height: 9px;
+    background: var(--orange);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+
+  .acts { margin-top: 30px; }
+</style>
