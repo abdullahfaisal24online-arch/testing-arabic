@@ -51,5 +51,34 @@ const props = Astro.props;
     <Footer />
     <CursorFx />
     <VideoFacade poster={props.type === 'video.other' ? props.image : undefined} />
+    <!-- نسخة احتياطية من إيميلات المشتركين بقاعدة البيانات عندنا — ما بتلمس مسار الاشتراك نفسه -->
+    <script is:inline>
+      document.addEventListener(
+        'submit',
+        (e) => {
+          const form = e.target;
+          if (!(form instanceof HTMLFormElement)) return;
+          let host = '';
+          try {
+            host = new URL(form.action, location.href).hostname;
+          } catch (err) {
+            return;
+          }
+          if (!/(^|\.)(kit|convertkit)\.com$/.test(host)) return;
+          const field = form.querySelector('input[type="email"]');
+          const email = field && field.value ? field.value.trim() : '';
+          if (!email) return;
+          try {
+            navigator.sendBeacon(
+              '/api/subscribe',
+              new Blob([JSON.stringify({ email })], { type: 'application/json' }),
+            );
+          } catch (err) {
+            /* لو فشلت النسخة الاحتياطية، الاشتراك عند Kit بيضل شغّال */
+          }
+        },
+        true,
+      );
+    </script>
   </body>
 </html>
