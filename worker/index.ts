@@ -438,6 +438,38 @@ export default {
       return json({ ok: false, error: 'method' }, 405);
     }
 
+    // ---------- نسخة محلية من مشتركي النشرة ----------
+    // النموذج بيضل يبعت لـ Kit مباشرة؛ هاد الـ endpoint بس بيسجّل الإيميل عندنا كنسخة احتياطية
+    if (path === '/api/subscribe') {
+      if (req.method !== 'POST') return json({ ok: false, error: 'method' }, 405);
+      if (!sameOrigin(req)) return json({ ok: false, error: 'origin' }, 403);
+
+      let email = '';
+      if ((req.headers.get('content-type') ?? '').includes('application/json')) {
+        const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+        email = String(body.email ?? '');
+      } else {
+        const form = await req.formData().catch(() => null);
+        email = String(form?.get('email') ?? '');
+      }
+      email = email.trim().toLowerCase();
+
+      if (email.length > 254 || !/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)) {
+        return json({ ok: false, error: 'email' }, 400);
+      }
+
+      const now = Date.now();
+      await env.DB.prepare(
+        `INSERT INTO subscribers (email, source, created_at, last_seen_at)
+         VALUES (?1, ?2, ?3, ?3)
+         ON CONFLICT(email) DO UPDATE SET last_seen_at = ?3`,
+      )
+        .bind(email, (req.headers.get('referer') ?? '').slice(0, 300), now)
+        .run();
+
+      return json({ ok: true });
+    }
+
     // ---------- صفحة المراجعة (خلف Cloudflare Access) ----------
     if (path.startsWith('/admin/comments')) {
       if (!behindAccess(req)) return html(accessMissingPage(), 403);
