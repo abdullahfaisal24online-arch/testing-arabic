@@ -13,7 +13,7 @@
     "binding": "ASSETS",
     "not_found_handling": "404-page",
     // لازم الـ Worker يمسك مسارات التعليقات قبل الملفات الثابتة
-    "run_worker_first": ["/api/comments", "/api/comments/*", "/admin/comments", "/admin/comments/*"]
+    "run_worker_first": ["/api/comments", "/api/comments/*", "/api/subscribe", "/admin/comments", "/admin/comments/*"]
   },
   "d1_databases": [
     {
