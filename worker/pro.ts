@@ -434,9 +434,11 @@ export async function proAdminPage(req: Request, env: Env, justCreated = ''): Pr
       h2 { font-size: 17px; margin: 30px 0 10px; }
       .add { margin: 10px 0 26px; }
       .picks { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
-      .pick { display: flex; align-items: center; gap: 7px; border: 1px solid #2a3a55; border-radius: 8px; padding: 7px 11px; font-size: 14px; cursor: pointer; }
-      .line { display: flex; flex-wrap: wrap; gap: 8px; }
-      .add input { padding: 8px 10px; }
+      .pick { flex: 0 0 auto; display: flex; align-items: center; gap: 7px; border: 1px solid #2a3a55; border-radius: 8px; padding: 7px 11px; font-size: 14px; cursor: pointer; white-space: nowrap; }
+      .pick input { flex: 0 0 auto; width: 16px; height: 16px; }
+      .line { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }
+      .line input { flex: 1 1 150px; width: auto; min-width: 0; padding: 8px 10px; }
+      .line button { flex: 0 0 auto; }
       table { width: 100%; border-collapse: collapse; font-size: 14px; }
       th, td { text-align: right; padding: 8px 6px; border-bottom: 1px solid #2a3a55; vertical-align: top; }
       .code { font-family: monospace; font-weight: 700; }
