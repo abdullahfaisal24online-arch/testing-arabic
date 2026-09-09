@@ -59,7 +59,7 @@ import Base from '../../layouts/Base.astro';
 
     // الحروف كلها كبيرة والشرطات تلقائية عشان ما يغلط بالكتابة
     input.addEventListener('input', () => {
-      const raw = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/^TA/, '');
+      const raw = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/^(?:TA)+/, '');
       let out = 'TA';
       if (raw.length) out += '-' + raw.slice(0, 4);
       if (raw.length > 4) out += '-' + raw.slice(4, 8);
