@@ -85,4 +85,4 @@ draft: false
 
 Scrum Master بيتحوّل مدير، PO بس بينقل طلبات بلا ترتيب أولويات، و«team lead» بيوزّع الشغل بدل الفريق.
 
-بالدرس الجاي: اجتماعات Scrum — Scrum Events.
+بالدرس الجاي: الأحداث الخمسة — Scrum Events.

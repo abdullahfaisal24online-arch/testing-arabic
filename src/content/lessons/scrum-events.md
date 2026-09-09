@@ -1,5 +1,5 @@
 ---
-title: اجتماعات Scrum — Scrum Events
+title: الأحداث الخمسة — Scrum Events
 slug: scrum-events
 description: 'الدرس الرابع من دورة أساسيات Scrum: الأحداث الخمسة — الـ Sprint، Sprint Planning، Daily Scrum، Sprint Review، و Sprint Retrospective — مع الصناديق الزمنية وهدف كل حدث وأشهر الأخطاء.'
 publishDate: 2026-09-07
@@ -89,4 +89,4 @@ Sprint أقصر ← صناديق أقصر بالتناسب، إلا الـ Daily
 
 آخر حدث بالـ Sprint: نفتّش الأشخاص والتفاعلات والعملية والأدوات و Definition of Done، ونطلع بتحسينات قابلة للتنفيذ.
 
-بالدرس الجاي: مخرجات Scrum — Scrum Artifacts.
+بالدرس الجاي: المخرجات الثلاثة — Scrum Artifacts.

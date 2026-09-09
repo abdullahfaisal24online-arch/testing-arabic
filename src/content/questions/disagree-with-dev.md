@@ -1,5 +1,5 @@
 ---
-title: "المطوّر بيقول إنه مش عيب — شو بتعمل؟"
+title: "المطوّر بيقول إنه مش Bug — شو بتعمل؟"
 slug: disagree-with-dev
 level: مبتدئ
 domain: سلوكي
