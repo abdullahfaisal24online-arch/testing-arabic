@@ -23,7 +23,7 @@
       "text": "شرح مكتوب مع كل درس، تقرأه بالشغل بدون ما تشغّل فيديو."
     }
   ],
-  "statLessonsLabel": "درس مجاني",
+  "statLessonsLabel": "دروس",
   "statCoursesLabel": "دورات",
   "statArticlesLabel": "مقالات",
   "showWelcome": true,
@@ -38,21 +38,21 @@
   "showCourses": true,
   "coursesEyebrow": "الدورات",
   "coursesTitle": "دورات مرتّبة من الصفر",
-  "coursesSubtitle": "كل دورة مرتّبة من أول درس لآخر واحد، مع ملفات وتمارين تشتغل عليها بنفسك.",
+  "coursesSubtitle": "كل دورة مرتّبة بدروسها وشروحاتها ، مع ملفات وتمارين تشتغل عليها بنفسك.",
   "showLessons": true,
   "lessonsTitle": "أحدث الدروس",
   "showArticles": true,
   "articlesTitle": "من المقالات",
   "showResources": true,
   "resourcesEyebrow": "موارد جاهزة",
-  "resourcesTitle": "قوالب تستعملها من بكرا",
+  "resourcesTitle": "قوالب بإمكانك تستخدمها بأي وقت",
   "resourcesSubtitle": "ملفات جاهزة للتحميل، معدّة للسوق العربي ومجرّبة بشغل حقيقي.",
   "showNews": true,
   "newsTitle": "آخر الأخبار",
-  "newsletterTitle": "خلّي طريقك لعندي مضمون",
-  "newsletterText": "اشترك بالنشرة، وبيوصلك كل درس ومقال جديد على بريدك مباشرة — بدون ما تعتمد على خوارزمية أو منصة واحدة.",
+  "newsletterTitle": "مشان تظل على إطلاع على آخر المستجدات",
+  "newsletterText": "اشترك بالنشرة، وبيوصلك كل درس ومقال جديد على بريدك مباشرة",
   "newsletterButton": "اشترك",
-  "newsletterNote": "بدون سبام. إلغاء الاشتراك بضغطة واحدة.",
-  "inlineNewsletterTitle": "وصلك الجديد أول بأول",
-  "inlineNewsletterText": "درس ومقال جديد كل أسبوع على بريدك، بدون سبام."
+  "newsletterNote": "بإمكانك تلغي اشتراكك بكبسة زر بأي وقت!",
+  "inlineNewsletterTitle": "رح يوصلك جديدنا أول بأول 🔻",
+  "inlineNewsletterText": "كل جديدنا من دورات ودروس مصورة ومقالات وآخر الأخبار ـ رح يوصلك فيها إشعار ـ مشان تظل على إطلاع دائم 🙌"
 }
