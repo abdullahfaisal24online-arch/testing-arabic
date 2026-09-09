@@ -49,6 +49,10 @@
     {
       "label": "عن المنصة",
       "href": "/about/"
+    },
+    {
+      "label": "النشرة",
+      "href": "/newsletter/"
     }
   ]
 }
