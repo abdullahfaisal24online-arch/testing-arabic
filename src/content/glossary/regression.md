@@ -6,14 +6,14 @@ description: "إعادة اختبار ما كان شغّالاً للتأكد إ
 category: أنواع الاختبار
 aliases:
   - اختبار الانحدار
-  - ريجريشن
-  - الريجريشن
+  - Regression
+  - الRegression
   - Regression
 draft: false
 ---
 
-أي تعديل — ميزة جديدة، إصلاح خلل، حتى تحديث مكتبة — ممكن يكسر شي كان شغّال. الريجريشن بيمسك هالحالة.
+أي تعديل — ميزة جديدة، إصلاح عيب، حتى تحديث مكتبة — ممكن يكسر شي كان شغّال. الRegression بيمسك هالحالة.
 
 أول مرشّح للأتمتة، لأنه بيتكرّر بكل دورة ونادراً بيتغيّر.
 
-تشك ليست جاهزة: [تشك ليست ريجريشن](/resources/regression-checklist/).
+Checklist جاهزة: [Regression Checklist](/resources/regression-checklist/).

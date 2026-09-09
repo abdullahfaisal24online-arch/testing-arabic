@@ -2,7 +2,7 @@
 title: الشدّة
 slug: severity
 termEn: Severity
-description: "حجم أثر الخلل على النظام، بغضّ النظر عن استعجال إصلاحه."
+description: "حجم أثر العيب على النظام، بغضّ النظر عن استعجال إصلاحه."
 category: إدارة الاختبار
 aliases:
   - الشدّة

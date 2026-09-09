@@ -9,8 +9,8 @@ recommended: false
 outcomes:
   - 'تفهم إطار Scrum كامل : الأدوار والأحداث والمخرجات'
   - تعرف مسؤوليات Product Owner و Scrum Master والمطوّرين — ووين بيوقع المختبر
-  - 'تشتغل صح بالـ Sprint: التخطيط، الديلي، الريفيو، والريتروسبكتيف'
-  - تفهم Product Backlog و Sprint Goal و Definition of Done وكيف تنقّي الباكلوق
+  - 'تشتغل صح بالـ Sprint: التخطيط، الـ Daily Scrum، الـ Sprint Review، والـ Retrospective'
+  - تفهم Product Backlog و Sprint Goal و Definition of Done وكيف تنقّي الـ Backlog
   - تميّز بين Scrum الحقيقي والممارسات الغلط اللي بتتسمّى Scrum
 prerequisites:
   - ما بتحتاج أي خلفية برمجية
@@ -35,8 +35,8 @@ draft: false
 3. الأحداث الخمسة: Sprint، Sprint Planning، Daily Scrum، Sprint Review، Sprint Retrospective
 4. المخرجات الثلاثة والتزاماتها: Product Backlog + Product Goal، Sprint Backlog + Sprint Goal، Increment + Definition of Done
 5. القيم والمبادئ: الشفافية، التفتيش، التكيّف — والقيم الخمس لـ Scrum
-6. المختبر داخل Scrum: وين يوقع الاختبار بالسبرنت، وشو معنى Done
-7. أخطاء شائعة: Scrum على الورق بس، ديلي بيتحوّل تقرير حالة، وسبرنت بلا هدف
+6. المختبر داخل Scrum: وين يوقع الاختبار بالـ Sprint، وشو معنى Done
+7. أخطاء شائعة: Scrum على الورق بس، Daily Scrum بيتحوّل تقرير حالة، وSprint بلا هدف
 
 ## بشو رح تطلع؟
 

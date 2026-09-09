@@ -1,5 +1,5 @@
 ---
-title: قالب حالة اختبار
+title: قالب Test Case
 slug: test-case-template
 description: "قالب لكتابة حالة اختبار يقدر ينفّذها حدا تاني بدون ما يسألك، بنسختين: ماركداون وجدول CSV."
 category: قوالب

@@ -16,4 +16,4 @@ draft: false
 
 المعيار العملي: **يقدر ينفّذها حدا تاني بدون ما يرجع يسألك ولا سؤال.**
 
-في قالب جاهز على المنصة: [قالب حالة اختبار](/resources/test-case-template/).
+في قالب جاهز على المنصة: [قالب Test Case](/resources/test-case-template/).
