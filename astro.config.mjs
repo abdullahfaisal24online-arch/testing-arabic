@@ -7,7 +7,8 @@ export default defineConfig({
   trailingSlash: 'always',
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/search'),
+      // صفحات /pro/ noindex — ما الها داعي تكون بالـ sitemap
+      filter: (page) => !page.includes('/search') && !page.includes('/pro/'),
     }),
   ],
   markdown: {
