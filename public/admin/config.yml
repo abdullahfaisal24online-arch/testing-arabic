@@ -8,6 +8,97 @@ media_folder: public/uploads
 public_folder: /uploads
 
 collections:
+  - name: products
+    label: "المنتجات المدفوعة"
+    label_singular: "منتج"
+    folder: src/content/products
+    create: true
+    slug: "{{fields.slug}}"
+    extension: md
+    format: frontmatter
+    summary: "{{title}}"
+    fields:
+      - name: title
+        label: "اسم المنتج"
+        widget: string
+      - name: slug
+        label: "الرابط بالإنجليزي بدون مسافات"
+        widget: string
+        hint: "مثال: ctfl-questions — صفحة البيع بتصير /store/ctfl-questions/ والمحتوى المدفوع /pro/ctfl-questions/"
+      - name: kind
+        label: "النوع"
+        widget: select
+        default: "بنك أسئلة"
+        options:
+          - "بنك أسئلة"
+          - "ملخصات"
+          - "قوالب"
+          - "دورة"
+          - "حزمة"
+      - name: pitch
+        label: "سطر واحد يشرح المادة"
+        widget: string
+        required: false
+      - name: price
+        label: "السعر بالدينار"
+        widget: number
+        default: 29
+        value_type: float
+        min: 0
+      - name: offerPrice
+        label: "سعر العرض بالدينار"
+        widget: number
+        required: false
+        value_type: float
+        min: 0
+        hint: "اتركه فاضي إذا ما في عرض"
+      - name: offerNote
+        label: "جملة العرض"
+        widget: string
+        required: false
+        hint: "مثال: لأول ٥٠ مشترك"
+      - name: includes
+        label: "شو جواها"
+        widget: list
+        required: false
+        hint: "نقطة بكل سطر — بتظهر بصفحة البيع"
+      - name: course
+        label: "الدورة اللي بيفتحها هاد المنتج"
+        widget: string
+        required: false
+        hint: "slug الدورة زي ما هو بقسم الدورات — اتركه فاضي لغير الدورات"
+      - name: bundleOf
+        label: "المنتجات داخل الحزمة"
+        widget: list
+        required: false
+        hint: "slug كل منتج بتفتحه الحزمة — للحزم فقط"
+      - name: sampleHref
+        label: "رابط النموذج المجاني"
+        widget: string
+        required: false
+      - name: cover
+        label: "صورة المنتج"
+        widget: image
+        required: false
+      - name: order
+        label: "الترتيب بالمتجر"
+        widget: number
+        default: 1
+        value_type: int
+        min: 0
+      - name: featured
+        label: "مميّز بالمتجر"
+        widget: boolean
+        default: false
+      - name: draft
+        label: "مسودّة لا تُنشر"
+        widget: boolean
+        default: false
+      - name: body
+        label: "الوصف الكامل بصفحة البيع"
+        widget: markdown
+        required: false
+
   - name: courses
     label: "الدورات"
     label_singular: "دورة"
@@ -70,6 +161,11 @@ collections:
         label: "صورة الدورة"
         widget: image
         required: false
+      - name: product
+        label: "المنتج المدفوع لهاي الدورة"
+        widget: string
+        required: false
+        hint: "slug المنتج من قسم (المنتجات المدفوعة) — اتركه فاضي إذا الدورة مجانية"
       - name: draft
         label: "مسودّة لا تُنشر"
         widget: boolean
@@ -716,6 +812,24 @@ collections:
             label: "جملة أسفل الموقع"
             widget: string
             required: false
+          - name: storeTitle
+            label: "عنوان صفحة المتجر"
+            widget: string
+            required: false
+          - name: storeIntro
+            label: "مقدّمة صفحة المتجر"
+            widget: text
+            required: false
+          - name: payInstructions
+            label: "طرق الدفع — تظهر بصفحة كل منتج"
+            widget: text
+            required: false
+            hint: "اكتب تفاصيل الحوالة أو CliQ زي ما بدك تظهر للمشتري"
+          - name: whatsapp
+            label: "رقم واتساب للتواصل"
+            widget: string
+            required: false
+            hint: "بصيغة دولية بدون علامة الجمع — اتركه فاضي لتخفي زر واتساب"
           - name: nav
             label: "القائمة العلوية"
             widget: list
