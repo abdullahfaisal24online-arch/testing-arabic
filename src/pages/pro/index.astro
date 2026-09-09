@@ -2,30 +2,26 @@
 import Base from '../../layouts/Base.astro';
 ---
 <Base
-  title="القسم المدفوع"
-  description="القسم المدفوع على منصة Testing بالعربي — بنك أسئلة ISTQB CTFL وملخّصات وقوالب."
+  title="موادي"
+  description="المواد المدفوعة المفتوحة على هاد الجهاز."
   noindex={true}
 >
   <section class="hero dots">
     <div class="wrap">
       <span class="eyebrow">القسم المدفوع</span>
-      <h1>وصولك مفتوح 🔻</h1>
+      <h1>موادي</h1>
       <p class="intro">
-        الكود اشتغل وهاد الجهاز صار مفتوح للقسم المدفوع. المحتوى قيد التجهيز — بنك أسئلة
-        ISTQB CTFL v4 والملخّصات وحزمة القوالب رح تظهر هون أول ما تجهز.
+        هون بتلاقي كل مادة مدفوعة مفتوحة على هاد الجهاز. الفتح مربوط بالجهاز نفسه —
+        لو فتحت الموقع من جهاز تاني، دخّل الكود مرة وحدة هناك كذلك.
       </p>
 
-      <div class="panel">
-        <h2>اللي جاي بهاد القسم</h2>
-        <ul class="items">
-          <li>بنك أسئلة محاكية لامتحان CTFL v4 — سؤال بالإنجليزي وشرح بالعربي لكل خيار</li>
-          <li>وضع محاكاة الامتحان: ٤٠ سؤال، مؤقّت ٦٠ أو ٧٥ دقيقة، ونتيجة على أساس ٢٦/٤٠</li>
-          <li>ملخّصات مكثّفة للفصول الستة</li>
-          <li>حزمة القوالب الجاهزة</li>
-        </ul>
+      <div id="pro-list" class="list" aria-live="polite">
+        <p class="dim">لحظة…</p>
       </div>
 
-      <p class="muted">
+      <p class="acts">
+        <a class="btn" href="/pro/unlock/">دخّل كود جديد</a>
+        <a class="btn" href="/store/">المتجر</a>
         <button class="btn" type="button" id="pro-logout">إغلاق الوصول على هاد الجهاز</button>
       </p>
     </div>
@@ -34,17 +30,62 @@ import Base from '../../layouts/Base.astro';
 
 <script is:inline>
   (() => {
+    const box = document.getElementById('pro-list');
     const btn = document.getElementById('pro-logout');
-    if (!btn) return;
-    btn.addEventListener('click', async () => {
-      btn.disabled = true;
+
+    const esc = (s) =>
+      String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+    const load = async () => {
+      if (!box) return;
       try {
-        await fetch('/api/pro/logout', { method: 'POST' });
+        const [statusRes, catRes] = await Promise.all([
+          fetch('/api/pro/status'),
+          fetch('/store/products.json'),
+        ]);
+        const status = await statusRes.json().catch(() => ({}));
+        const cat = await catRes.json().catch(() => ({ products: [] }));
+        const open = Array.isArray(status.products) ? status.products : [];
+        const titles = {};
+        for (const p of cat.products || []) titles[p.slug] = p.title;
+
+        if (!open.length) {
+          box.innerHTML =
+            '<p class="dim">ما في مواد مفتوحة على هاد الجهاز. إذا عندك كود، <a href="/pro/unlock/">دخّلو من هون</a>؛ وإذا لأ، شوف <a href="/store/">المتجر</a>.</p>';
+          return;
+        }
+
+        box.innerHTML =
+          '<div class="grid">' +
+          open
+            .map(
+              (slug) =>
+                '<a class="item" href="/pro/' +
+                encodeURIComponent(slug) +
+                '/"><h2>' +
+                esc(titles[slug] || slug) +
+                '</h2><span>افتح المادة ›</span></a>',
+            )
+            .join('') +
+          '</div>';
       } catch (err) {
-        /* ما بيهم — رح نرجّعه لصفحة الكود بأي حال */
+        box.innerHTML = '<p class="dim">ما قدرنا نجيب موادك. حدّث الصفحة وجرّب كمان مرة.</p>';
       }
-      location.href = '/pro/unlock/';
-    });
+    };
+
+    load();
+
+    if (btn) {
+      btn.addEventListener('click', async () => {
+        btn.disabled = true;
+        try {
+          await fetch('/api/pro/logout', { method: 'POST' });
+        } catch (err) {
+          /* ما بيهم — رح نرجّعه لصفحة الكود بأي حال */
+        }
+        location.href = '/pro/unlock/';
+      });
+    }
   })();
 </script>
 
@@ -53,30 +94,23 @@ import Base from '../../layouts/Base.astro';
   .hero h1 { margin-top: 12px; }
   .intro { max-width: 62ch; color: var(--muted); margin-top: 12px; }
 
-  .panel {
+  .list { margin-top: 28px; max-width: 720px; }
+  .dim { color: var(--muted); }
+
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+  .item {
+    display: grid;
+    gap: 8px;
     background: var(--surface);
     border: 1px solid var(--orange-line);
     border-radius: var(--r-xl);
-    padding: 26px 24px;
-    margin-top: 28px;
-    max-width: 720px;
-    display: grid;
-    gap: 12px;
+    padding: 20px;
+    text-decoration: none;
+    color: inherit;
   }
-  .panel h2 { font-size: 18px; }
+  .item:hover { border-color: var(--orange); }
+  .item h2 { font-size: 18px; margin: 0; }
+  .item span { font-size: 13px; color: var(--orange); }
 
-  .items { display: grid; gap: 10px; padding-inline-start: 0; list-style: none; margin: 0; }
-  .items li { position: relative; padding-inline-start: 22px; color: var(--muted); }
-  .items li::before {
-    content: '';
-    position: absolute;
-    inset-inline-start: 0;
-    top: 9px;
-    width: 9px;
-    height: 9px;
-    background: var(--orange);
-    clip-path: polygon(0 0, 100% 0, 50% 100%);
-  }
-
-  .muted { margin-top: 30px; }
+  .acts { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 32px; }
 </style>

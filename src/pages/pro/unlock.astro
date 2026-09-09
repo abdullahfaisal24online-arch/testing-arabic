@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 ---
 <Base
   title="ادخل كود الوصول"
-  description="صفحة إدخال كود الوصول للقسم المدفوع على منصة Testing بالعربي."
+  description="صفحة إدخال كود الوصول للمواد المدفوعة على منصة Testing بالعربي."
   noindex={true}
 >
   <section class="hero dots">
@@ -12,8 +12,10 @@ import Base from '../../layouts/Base.astro';
       <h1>ادخل كود الوصول</h1>
       <p class="intro">
         الكود وصلك بعد ما أكّدنا الحوالة. بتدخّلو مرة وحدة على هاد الجهاز، وبعدها بتفتح
-        القسم المدفوع مباشرة بدون حساب ولا كلمة سر.
+        مادتك مباشرة بدون حساب ولا كلمة سر.
       </p>
+
+      <p class="want" id="unlock-want" hidden></p>
 
       <form class="form" id="unlock-form" novalidate>
         <label class="sr-only" for="pro-code">كود الوصول</label>
@@ -28,13 +30,13 @@ import Base from '../../layouts/Base.astro';
           maxlength="12"
           required
         />
-        <button class="btn btn-primary" type="submit" id="unlock-btn">افتح القسم</button>
+        <button class="btn btn-primary" type="submit" id="unlock-btn">افتح المادة</button>
         <p class="msg" id="unlock-msg" role="status" aria-live="polite"></p>
       </form>
 
       <p class="muted">
-        ما عندك كود؟ الحزمة رح تنفتح للبيع قريباً — <a href="/newsletter/">اشترك بالنشرة</a>
-        عشان تكون أول من يعرف.
+        ما عندك كود؟ شوف <a href="/store/">المتجر</a> — أو
+        <a href="/newsletter/">اشترك بالنشرة</a> عشان تعرف أول ما ينزل جديد.
       </p>
     </div>
   </section>
@@ -46,7 +48,11 @@ import Base from '../../layouts/Base.astro';
     const input = document.getElementById('pro-code');
     const btn = document.getElementById('unlock-btn');
     const msg = document.getElementById('unlock-msg');
+    const want = document.getElementById('unlock-want');
     if (!form || !input || !btn || !msg) return;
+
+    const params = new URLSearchParams(location.search);
+    const wantSlug = (params.get('p') || '').trim();
 
     const errors = {
       format: 'شكل الكود غلط. لازم يكون على شكل TA-XXXX-XXXX.',
@@ -57,18 +63,43 @@ import Base from '../../layouts/Base.astro';
       origin: 'صار خطأ بالطلب. حدّث الصفحة وجرّب من جديد.',
     };
 
+    // أسماء المنتجات — عشان نحكي للزائر شو المادة اللي بدها كود
+    let titles = {};
+    if (wantSlug && want) {
+      fetch('/store/products.json')
+        .then((r) => r.json())
+        .then((cat) => {
+          for (const p of cat.products || []) titles[p.slug] = p.title;
+          if (titles[wantSlug]) {
+            want.textContent = 'المادة المطلوبة: ' + titles[wantSlug];
+            want.hidden = false;
+          }
+        })
+        .catch(() => {
+          /* اسم المادة تحسين بس — الفتح بيشتغل بدونه */
+        });
+    }
+
     // الحروف كلها كبيرة والشرطات تلقائية عشان ما يغلط بالكتابة
     input.addEventListener('input', () => {
-      const raw = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/^(?:TA)+/, '');
+      const raw = input.value
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, '')
+        .replace(/^(?:TA)+/, '');
       let out = 'TA';
       if (raw.length) out += '-' + raw.slice(0, 4);
       if (raw.length > 4) out += '-' + raw.slice(4, 8);
       input.value = out;
     });
 
-    const goto = () => {
-      const to = new URLSearchParams(location.search).get('to') || '/pro/';
-      location.href = /^\/pro\//.test(to) ? to : '/pro/';
+    const goto = (opened) => {
+      const to = params.get('to') || '';
+      // لو الكود ما بيفتح المادة المطلوبة، ما بنرجّعه لنفس المسار — بيصير دوران
+      if (to && /^\/(pro|lessons)\//.test(to) && (!wantSlug || opened.indexOf(wantSlug) !== -1)) {
+        location.href = to;
+        return;
+      }
+      location.href = '/pro/';
     };
 
     form.addEventListener('submit', async (e) => {
@@ -84,9 +115,20 @@ import Base from '../../layouts/Base.astro';
         });
         const data = await res.json().catch(() => ({}));
         if (data && data.ok) {
-          msg.textContent = 'تم! جاري فتح القسم…';
+          const opened = Array.isArray(data.products) ? data.products : [];
+          if (wantSlug && opened.indexOf(wantSlug) === -1) {
+            const names = opened.map((s) => titles[s] || s).join('، ');
+            msg.textContent =
+              'الكود اشتغل، بس هو بيفتح' +
+              (names ? ' ' + names : ' مادة تانية') +
+              ' — مش المادة المطلوبة. رح نوديك لموادك.';
+            msg.className = 'msg ok';
+            setTimeout(() => (location.href = '/pro/'), 2200);
+            return;
+          }
+          msg.textContent = 'تم! جاري فتح المادة…';
           msg.className = 'msg ok';
-          goto();
+          goto(opened);
           return;
         }
         msg.textContent = errors[data && data.error] || 'ما زبطت. جرّب من جديد.';
@@ -104,6 +146,14 @@ import Base from '../../layouts/Base.astro';
   .hero { padding-block: 56px 64px; }
   .hero h1 { margin-top: 12px; }
   .intro { max-width: 58ch; color: var(--muted); margin-top: 12px; }
+
+  .want {
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--orange);
+    border-inline-start: 2px solid var(--orange);
+    padding-inline-start: 12px;
+  }
 
   .form {
     display: grid;
