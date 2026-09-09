@@ -1,0 +1,82 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+<Base
+  title="القسم المدفوع"
+  description="القسم المدفوع على منصة Testing بالعربي — بنك أسئلة ISTQB CTFL وملخّصات وقوالب."
+  noindex={true}
+>
+  <section class="hero dots">
+    <div class="wrap">
+      <span class="eyebrow">القسم المدفوع</span>
+      <h1>وصولك مفتوح 🔻</h1>
+      <p class="intro">
+        الكود اشتغل وهاد الجهاز صار مفتوح للقسم المدفوع. المحتوى قيد التجهيز — بنك أسئلة
+        ISTQB CTFL v4 والملخّصات وحزمة القوالب رح تظهر هون أول ما تجهز.
+      </p>
+
+      <div class="panel">
+        <h2>اللي جاي بهاد القسم</h2>
+        <ul class="items">
+          <li>بنك أسئلة محاكية لامتحان CTFL v4 — سؤال بالإنجليزي وشرح بالعربي لكل خيار</li>
+          <li>وضع محاكاة الامتحان: ٤٠ سؤال، مؤقّت ٦٠ أو ٧٥ دقيقة، ونتيجة على أساس ٢٦/٤٠</li>
+          <li>ملخّصات مكثّفة للفصول الستة</li>
+          <li>حزمة القوالب الجاهزة</li>
+        </ul>
+      </div>
+
+      <p class="muted">
+        <button class="btn" type="button" id="pro-logout">إغلاق الوصول على هاد الجهاز</button>
+      </p>
+    </div>
+  </section>
+</Base>
+
+<script is:inline>
+  (() => {
+    const btn = document.getElementById('pro-logout');
+    if (!btn) return;
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      try {
+        await fetch('/api/pro/logout', { method: 'POST' });
+      } catch (err) {
+        /* ما بيهم — رح نرجّعه لصفحة الكود بأي حال */
+      }
+      location.href = '/pro/unlock/';
+    });
+  })();
+</script>
+
+<style>
+  .hero { padding-block: 56px 64px; }
+  .hero h1 { margin-top: 12px; }
+  .intro { max-width: 62ch; color: var(--muted); margin-top: 12px; }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--orange-line);
+    border-radius: var(--r-xl);
+    padding: 26px 24px;
+    margin-top: 28px;
+    max-width: 720px;
+    display: grid;
+    gap: 12px;
+  }
+  .panel h2 { font-size: 18px; }
+
+  .items { display: grid; gap: 10px; padding-inline-start: 0; list-style: none; margin: 0; }
+  .items li { position: relative; padding-inline-start: 22px; color: var(--muted); }
+  .items li::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    top: 9px;
+    width: 9px;
+    height: 9px;
+    background: var(--orange);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+
+  .muted { margin-top: 30px; }
+</style>
