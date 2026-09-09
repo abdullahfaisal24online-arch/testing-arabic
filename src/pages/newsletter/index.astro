@@ -1,0 +1,140 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getSite } from '../../lib/site';
+
+const site = await getSite();
+
+const perks = [
+  'الدروس الجديدة أول ما تنزل — مرتّبة حسب المسار، مش عشوائي',
+  'المقالات الجديدة: مفاهيم ومقارنات QA بالعربي',
+  'الموارد والقوالب الجاهزة: test case و bug report و test plan',
+  'تنبيه أول ما تنزل دورة جديدة على المنصة',
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'النشرة البريدية — Testing بالعربي',
+  description: 'اشترك بنشرة Testing بالعربي: كل درس ومقال جديد بيوصلك على بريدك.',
+  inLanguage: 'ar',
+  url: `${site.url}/newsletter/`,
+};
+---
+<Base
+  title="النشرة البريدية"
+  description="اشترك بنشرة Testing بالعربي وبيوصلك كل درس ومقال جديد على بريدك — بدون spam، وإلغاء الاشتراك بضغطة."
+  jsonLd={jsonLd}
+>
+  <section class="hero dots">
+    <div class="wrap">
+      <span class="eyebrow">النشرة البريدية</span>
+      <h1>كل درس جديد بيوصلك على بريدك</h1>
+      <p class="intro">
+        الدروس والمقالات الجديدة على المنصة بتوصلك على بريدك أول ما تنزل. بدون spam،
+        وبتقدر تلغي الاشتراك بضغطة وحدة.
+      </p>
+
+      {site.newsletterAction && (
+        <form class="form" action={site.newsletterAction} method="post" target="_blank">
+          <label class="sr-only" for="nl-page-email">بريدك الإلكتروني</label>
+          <input
+            id="nl-page-email"
+            name={site.newsletterField}
+            type="email"
+            required
+            placeholder="بريدك الإلكتروني"
+          />
+          {site.newsletterHidden.map((h) => <input type="hidden" name={h.name} value={h.value} />)}
+          <button class="btn btn-primary" type="submit">اشترك بالنشرة</button>
+          <span class="note">ما رح نشارك بريدك مع أي حد.</span>
+        </form>
+      )}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap grid">
+      <div class="panel dots">
+        <h2>شو بيوصلك؟</h2>
+        <ul class="perks">
+          {perks.map((p) => <li>{p}</li>)}
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h2>ليش بالإيميل؟</h2>
+        <p>
+          أي منصة بتقدر تسكّر حسابك بأي لحظة — وهاد صار معي فعلاً وضاع تواصلي مع
+          متابعيني بيوم وليلة. الإيميل هو الشي الوحيد اللي ما حد بيقدر يقطعه بيني وبينك.
+        </p>
+        <p class="muted">
+          مش جاهز تشترك؟ ابدأ من <a href="/start/">صفحة ابدأ من هنا</a> — فيها المسار
+          كامل من الصفر.
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero { padding-block: 56px 40px; }
+  .hero h1 { margin-top: 12px; }
+  .intro { max-width: 62ch; color: var(--muted); margin-top: 12px; }
+
+  .form {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    max-width: 520px;
+    margin-top: 28px;
+  }
+  .form input {
+    background: var(--bg);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-md);
+    padding: 14px 18px;
+    color: var(--ink);
+    font: inherit;
+    font-size: 15px;
+    min-height: 48px;
+  }
+  .form input::placeholder { color: var(--faint); }
+  .note { grid-column: 1 / -1; font-size: 13px; color: var(--faint); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+  }
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-xl);
+    padding: 28px 26px;
+    display: grid;
+    gap: 12px;
+    align-content: start;
+  }
+  .panel h2 { font-size: 20px; }
+  .panel p { color: var(--muted); }
+  .muted { font-size: 14px; }
+
+  .perks { display: grid; gap: 10px; padding-inline-start: 0; list-style: none; margin: 0; }
+  .perks li { position: relative; padding-inline-start: 22px; color: var(--muted); }
+  .perks li::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    top: 9px;
+    width: 9px;
+    height: 9px;
+    background: var(--orange);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+
+  @media (max-width: 620px) {
+    .form { grid-template-columns: 1fr; }
+    .panel { padding: 22px 20px; }
+  }
+</style>
+
