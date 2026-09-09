@@ -1,0 +1,115 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { getSite } from '../../lib/site';
+
+const site = await getSite();
+const products = (await getCollection('products'))
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const title = site.storeTitle || 'المتجر';
+const intro =
+  site.storeIntro ||
+  'مواد تحضير مدفوعة صنعتها بنفسي: بنوك أسئلة، ملخّصات، وقوالب جاهزة للشغل. الدفع حوالة أو CliQ، وبتوصلك كود بيفتح اللي اشتريته على أجهزتك.';
+
+const jsonLd = products.length
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: title,
+      itemListElement: products.map((p, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: p.data.title,
+        url: `${site.url}/store/${p.id}/`,
+      })),
+    }
+  : undefined;
+---
+
+<Base title={title} description={intro} jsonLd={jsonLd ? [jsonLd] : undefined}>
+  <section class="hero dots">
+    <div class="wrap">
+      <span class="eyebrow">القسم المدفوع</span>
+      <h1>{title}</h1>
+      <p class="intro">{intro}</p>
+    </div>
+  </section>
+
+  <section class="list">
+    <div class="wrap">
+      {
+        products.length === 0 ? (
+          <p class="empty">لسا ما نزل شي للبيع. <a href="/newsletter/">اشترك بالنشرة</a> عشان تكون أول من يعرف.</p>
+        ) : (
+          <div class="grid">
+            {products.map((p) => (
+              <a class={`item ${p.data.featured ? 'star' : ''}`} href={`/store/${p.id}/`}>
+                <span class="kind">{p.data.kind}</span>
+                <h2>{p.data.title}</h2>
+                {p.data.pitch && <p class="pitch">{p.data.pitch}</p>}
+                <p class="price">
+                  {p.data.offerPrice ? (
+                    <>
+                      <strong>{p.data.offerPrice} د.أ</strong>
+                      <span class="was">{p.data.price} د.أ</span>
+                    </>
+                  ) : (
+                    <strong>{p.data.price} د.أ</strong>
+                  )}
+                </p>
+                {p.data.offerNote && <span class="note">{p.data.offerNote}</span>}
+              </a>
+            ))}
+          </div>
+        )
+      }
+
+      <p class="have">
+        عندك كود أصلاً؟ <a href="/pro/unlock/">افتح موادك من هون</a>.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero { padding-block: 56px 34px; }
+  .hero h1 { margin-top: 12px; }
+  .intro { max-width: 64ch; color: var(--muted); margin-top: 12px; }
+
+  .list { padding-block: 10px 70px; }
+  .empty { color: var(--muted); }
+
+  .grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+
+  .item {
+    display: grid;
+    gap: 8px;
+    align-content: start;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-xl);
+    padding: 22px 20px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  .item:hover { border-color: var(--orange); transform: translateY(-2px); }
+  .item.star { border-color: var(--orange-line); }
+
+  .kind { font-size: 12px; color: var(--orange); letter-spacing: .5px; }
+  .item h2 { font-size: 19px; margin: 0; }
+  .pitch { color: var(--muted); font-size: 14px; margin: 0; }
+
+  .price { margin: 6px 0 0; font-size: 20px; }
+  .price strong { font-weight: 700; }
+  .was { font-size: 14px; color: var(--faint); text-decoration: line-through; margin-inline-start: 8px; }
+  .note { font-size: 12px; color: var(--faint); }
+
+  .have { margin-top: 34px; font-size: 14px; color: var(--faint); }
+</style>
