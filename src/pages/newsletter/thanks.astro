@@ -1,0 +1,78 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+<Base
+  title="ضلّت خطوة وحدة"
+  description="أكّد اشتراكك بنشرة Testing بالعربي من الرابط اللي وصلك على بريدك."
+  noindex={true}
+>
+  <section class="hero dots">
+    <div class="wrap">
+      <span class="eyebrow">النشرة البريدية</span>
+      <h1>ضلّت خطوة وحدة 🔻</h1>
+      <p class="intro">
+        بعتنالك إيميل تأكيد. افتحو واضغط زر <strong>«أكّد اشتراكك»</strong> عشان يكتمل
+        اشتراكك — بدون هاي الخطوة ما رح يوصلك إشي.
+      </p>
+
+      <div class="panel">
+        <h2>إذا ما لقيت الإيميل</h2>
+        <ul class="steps">
+          <li>شيك على مجلّد <strong>Spam</strong> أو <strong>Promotions</strong> — أول إيميل عادةً بيروح لهناك.</li>
+          <li>لقيتو بالـ Spam؟ اضغط <strong>Not spam</strong> أول، وبعدها اضغط رابط التأكيد.</li>
+          <li>ضيف <code>newsletter@testing-arabic.com</code> لجهات الاتصال عندك عشان الإيميلات الجاي توصل للـ Inbox.</li>
+        </ul>
+      </div>
+
+      <div class="next">
+        <p class="muted">وبينما تفحص بريدك، هاي أحسن نقاط بداية:</p>
+        <div class="links">
+          <a class="btn btn-primary" href="/start/">ابدأ من هنا</a>
+          <a class="btn" href="/courses/">الدورات</a>
+          <a class="btn" href="/articles/">المقالات</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero { padding-block: 56px 64px; }
+  .hero h1 { margin-top: 12px; }
+  .intro { max-width: 62ch; color: var(--muted); margin-top: 12px; }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--orange-line);
+    border-radius: var(--r-xl);
+    padding: 26px 24px;
+    margin-top: 28px;
+    max-width: 680px;
+    display: grid;
+    gap: 12px;
+  }
+  .panel h2 { font-size: 18px; }
+
+  .steps { display: grid; gap: 10px; padding-inline-start: 0; list-style: none; margin: 0; }
+  .steps li { position: relative; padding-inline-start: 22px; color: var(--muted); }
+  .steps li::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    top: 9px;
+    width: 9px;
+    height: 9px;
+    background: var(--orange);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+  .steps code {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 13px;
+    color: var(--ink);
+  }
+
+  .next { margin-top: 32px; display: grid; gap: 12px; }
+  .muted { font-size: 14px; color: var(--faint); }
+  .links { display: flex; flex-wrap: wrap; gap: 10px; }
+</style>
+
