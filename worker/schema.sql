@@ -15,3 +15,14 @@ CREATE TABLE IF NOT EXISTS comments (
 CREATE INDEX IF NOT EXISTS idx_comments_page   ON comments (page, status, created_at);
 CREATE INDEX IF NOT EXISTS idx_comments_status ON comments (status, created_at);
 CREATE INDEX IF NOT EXISTS idx_comments_iphash ON comments (ip_hash, created_at);
+
+-- جدول مشتركي النشرة — نسخة محلية بجانب Kit، عشان الليستة تضل ملك المنصة
+CREATE TABLE IF NOT EXISTS subscribers (
+  email        TEXT PRIMARY KEY,
+  source       TEXT,
+  status       TEXT NOT NULL DEFAULT 'pending',  -- pending = ما أكّد اشتراكه عند Kit
+  created_at   INTEGER NOT NULL,
+  last_seen_at INTEGER
+);
+
+CREATE INDEX IF NOT EXISTS idx_subscribers_created ON subscribers (created_at);
