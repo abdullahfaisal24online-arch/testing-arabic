@@ -4,16 +4,23 @@ import { formatDate } from '../lib/utils';
 interface Props {
   item: {
     id: string;
-    data: { title: string; description: string; publishDate: Date; pinned: boolean };
+    data: { title: string; description: string; publishDate: Date; pinned: boolean; cover?: string };
   };
 }
 const { item } = Astro.props;
+const cover = item.data.cover;
 ---
 <a class="card news" href={`/news/${item.id}/`}>
+  {cover && (
+    <div class="thumb">
+      <img src={cover} alt="" loading="lazy" decoding="async" width="640" height="360" />
+      {item.data.pinned && <span class="pin-float">مثبّت</span>}
+    </div>
+  )}
   <div class="card-body">
     <span class="meta">
       <time datetime={item.data.publishDate.toISOString()}>{formatDate(item.data.publishDate)}</time>
-      {item.data.pinned && <span class="pin">مثبّت</span>}
+      {item.data.pinned && !cover && <span class="pin">مثبّت</span>}
     </span>
     <span class="ttl">{item.data.title}</span>
     {item.data.description && <p class="desc">{item.data.description}</p>}
@@ -25,6 +32,18 @@ const { item } = Astro.props;
   .news .card-body { padding: 24px; gap: 10px; }
   .meta { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
   .pin { font-size: 11px; font-weight: 600; color: var(--orange); background: var(--orange-soft); padding: 3px 9px; border-radius: 999px; }
+  .pin-float {
+    position: absolute;
+    inset-inline-start: 12px;
+    inset-block-start: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--orange);
+    padding: 4px 10px;
+    border-radius: 999px;
+    z-index: 2;
+  }
   .ttl { font-size: 18px; font-weight: 700; line-height: 1.6; }
   .desc { font-size: 15px; color: var(--ink-3); line-height: 1.85; }
 </style>

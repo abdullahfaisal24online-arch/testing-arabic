@@ -5,13 +5,19 @@ interface Props {
   article: {
     id: string;
     body?: string;
-    data: { title: string; description: string; category: string; publishDate: Date };
+    data: { title: string; description: string; category: string; publishDate: Date; cover?: string };
   };
 }
 const { article } = Astro.props;
 const mins = readingTime(article.body);
+const cover = article.data.cover;
 ---
 <a class="card art" href={`/articles/${article.id}/`}>
+  {cover && (
+    <div class="thumb">
+      <img src={cover} alt="" loading="lazy" decoding="async" width="640" height="360" />
+    </div>
+  )}
   <div class="card-body">
     <span class="meta mono">{article.data.category} · {minutesLabel(mins)} قراءة</span>
     <span class="ttl">{article.data.title}</span>
