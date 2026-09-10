@@ -820,6 +820,30 @@ collections:
             label: "مقدّمة صفحة المتجر"
             widget: text
             required: false
+          - name: storeCoursesTitle
+            label: "عنوان قسم الدورات بالمتجر"
+            widget: string
+            required: false
+          - name: storeCoursesSoon
+            label: "قسم الدورات — نص «قريباً» لما القسم فاضي"
+            widget: text
+            required: false
+          - name: storeQuestionsTitle
+            label: "عنوان قسم بنوك الأسئلة بالمتجر"
+            widget: string
+            required: false
+          - name: storeQuestionsSoon
+            label: "قسم بنوك الأسئلة — نص «قريباً» لما القسم فاضي"
+            widget: text
+            required: false
+          - name: storeSummariesTitle
+            label: "عنوان قسم الملخّصات بالمتجر"
+            widget: string
+            required: false
+          - name: storeSummariesSoon
+            label: "قسم الملخّصات — نص «قريباً» لما القسم فاضي"
+            widget: text
+            required: false
           - name: payInstructions
             label: "طرق الدفع — تظهر بصفحة كل منتج"
             widget: text
