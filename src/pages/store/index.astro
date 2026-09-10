@@ -13,6 +13,42 @@ const intro =
   site.storeIntro ||
   'مواد تحضير مدفوعة صنعتها بنفسي: بنوك أسئلة، ملخّصات، وقوالب جاهزة للشغل. الدفع حوالة أو CliQ، وبتوصلك كود بيفتح اللي اشتريته على أجهزتك.';
 
+// أقسام المتجر — كل قسم بيجمع منتجاته حسب النوع (kind) وبترتيب ثابت.
+// العناوين ونصوص "قريباً" بتتعدّل من لوحة التحكم (إعدادات عامة).
+const categories = [
+  {
+    kind: 'دورة',
+    title: site.storeCoursesTitle || 'الدورات المدفوعة',
+    soon:
+      site.storeCoursesSoon ||
+      'دورات مدفوعة معمّقة قيد التحضير — اشترك بالنشرة عشان تعرف أول ما تنزل.',
+  },
+  {
+    kind: 'بنك أسئلة',
+    title: site.storeQuestionsTitle || 'بنوك الأسئلة',
+    soon: site.storeQuestionsSoon || 'بنوك أسئلة جديدة قيد التحضير.',
+  },
+  {
+    kind: 'ملخصات',
+    title: site.storeSummariesTitle || 'الملخّصات',
+    soon:
+      site.storeSummariesSoon ||
+      'ملخّصات مركّزة قيد التحضير — اشترك بالنشرة عشان تعرف أول ما تنزل.',
+  },
+];
+
+const mainKinds = categories.map((c) => c.kind);
+
+// أي نوع تاني (قوالب، حزمة) بيطلع بقسمه الخاص لحتى ما يختفي منتج
+const extra = [...new Set(products.map((p) => p.data.kind))]
+  .filter((k) => !mainKinds.includes(k))
+  .map((k) => ({ kind: k, title: k, soon: '' }));
+
+const sections = [...categories, ...extra].map((cat) => ({
+  ...cat,
+  items: products.filter((p) => p.data.kind === cat.kind),
+}));
+
 const jsonLd = products.length
   ? {
       '@context': 'https://schema.org',
@@ -39,32 +75,44 @@ const jsonLd = products.length
 
   <section class="list">
     <div class="wrap">
-      {
-        products.length === 0 ? (
-          <p class="empty">لسا ما نزل شي للبيع. <a href="/newsletter/">اشترك بالنشرة</a> عشان تكون أول من يعرف.</p>
-        ) : (
-          <div class="grid">
-            {products.map((p) => (
-              <a class={`item ${p.data.featured ? 'star' : ''}`} href={`/store/${p.id}/`}>
-                <span class="kind">{p.data.kind}</span>
-                <h2>{p.data.title}</h2>
-                {p.data.pitch && <p class="pitch">{p.data.pitch}</p>}
-                <p class="price">
-                  {p.data.offerPrice ? (
-                    <>
-                      <strong>{p.data.offerPrice} د.أ</strong>
-                      <span class="was">{p.data.price} د.أ</span>
-                    </>
-                  ) : (
-                    <strong>{p.data.price} د.أ</strong>
-                  )}
-                </p>
-                {p.data.offerNote && <span class="note">{p.data.offerNote}</span>}
-              </a>
-            ))}
-          </div>
-        )
-      }
+      <div class="cats">
+        {
+          sections.map((cat) => (
+            <section class="cat">
+              <h2 class="cat-h">{cat.title}</h2>
+              <div class="grid">
+                {cat.items.length ? (
+                  cat.items.map((p) => (
+                    <a class={`item ${p.data.featured ? 'star' : ''}`} href={`/store/${p.id}/`}>
+                      <span class="kind">{p.data.kind}</span>
+                      <h3>{p.data.title}</h3>
+                      {p.data.pitch && <p class="pitch">{p.data.pitch}</p>}
+                      <p class="price">
+                        {p.data.offerPrice ? (
+                          <>
+                            <strong>{p.data.offerPrice} د.أ</strong>
+                            <span class="was">{p.data.price} د.أ</span>
+                          </>
+                        ) : (
+                          <strong>{p.data.price} د.أ</strong>
+                        )}
+                      </p>
+                      {p.data.offerNote && <span class="note">{p.data.offerNote}</span>}
+                    </a>
+                  ))
+                ) : (
+                  <div class="item soon">
+                    <span class="kind">قريباً</span>
+                    <h3>{cat.title}</h3>
+                    {cat.soon && <p class="pitch">{cat.soon}</p>}
+                    <a class="soon-link" href="/newsletter/">اشترك بالنشرة ←</a>
+                  </div>
+                )}
+              </div>
+            </section>
+          ))
+        }
+      </div>
 
       <p class="have">
         عندك كود أصلاً؟ <a href="/pro/unlock/">افتح موادك من هون</a>.
@@ -79,7 +127,14 @@ const jsonLd = products.length
   .intro { max-width: 64ch; color: var(--muted); margin-top: 12px; }
 
   .list { padding-block: 10px 70px; }
-  .empty { color: var(--muted); }
+
+  .cats { display: grid; gap: 46px; }
+  .cat-h {
+    font-size: 22px;
+    margin: 0 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line-strong);
+  }
 
   .grid {
     display: grid;
@@ -102,8 +157,31 @@ const jsonLd = products.length
   .item:hover { border-color: var(--orange); transform: translateY(-2px); }
   .item.star { border-color: var(--orange-line); }
 
+  /* بطاقة "قريباً" — نفس شكل الكارت العادي بس باهتة، والليبل متوهّج برتقالي */
+  .item.soon { opacity: .5; }
+  .item.soon h3 { color: var(--muted); }
+  .item.soon .kind {
+    color: var(--orange);
+    text-shadow: 0 0 8px rgba(246, 130, 59, .75), 0 0 18px rgba(246, 130, 59, .45);
+    animation: soonGlow 2.4s ease-in-out infinite;
+  }
+  @keyframes soonGlow {
+    0%, 100% { opacity: .7; }
+    50% { opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .item.soon .kind { animation: none; text-shadow: 0 0 8px rgba(246, 130, 59, .75); }
+  }
+  .soon-link {
+    font-size: 13px;
+    color: var(--orange);
+    text-decoration: none;
+    margin-top: 4px;
+    display: inline-block;
+  }
+
   .kind { font-size: 12px; color: var(--orange); letter-spacing: .5px; }
-  .item h2 { font-size: 19px; margin: 0; }
+  .item h3 { font-size: 19px; margin: 0; }
   .pitch { color: var(--muted); font-size: 14px; margin: 0; }
 
   .price { margin: 6px 0 0; font-size: 20px; }
@@ -111,5 +189,5 @@ const jsonLd = products.length
   .was { font-size: 14px; color: var(--faint); text-decoration: line-through; margin-inline-start: 8px; }
   .note { font-size: 12px; color: var(--faint); }
 
-  .have { margin-top: 34px; font-size: 14px; color: var(--faint); }
+  .have { margin-top: 40px; font-size: 14px; color: var(--faint); }
 </style>
