@@ -56,15 +56,18 @@
     }
   }
 
-  /* ===== أقسام النقشة (الهيرو وبلوك النشرة) =====
-     خلفيتها معتّمة فبتغطي الطبقة العامة، فبتاخد نفس الحركة بطبقة خاصة فيها */
+  /* ===== أقسام النقشة =====
+     الأقسام الشفّافة بتبيّن الطبقة العامة من ورا، فما بدها طبقة خاصة (وإلا صارت النقشة مكرّرة).
+     بس الأقسام المعتّمة اللي بتغطي الطبقة العامة بتاخد طبقتها الخاصة، و.bgfx-band بتتحدد بالـ script تحت */
   html:not([data-theme='light']) .dots {
+    background-image: none;
+  }
+  html:not([data-theme='light']) .dots.bgfx-band {
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    background-image: none;
   }
-  html:not([data-theme='light']) .dots::before {
+  html:not([data-theme='light']) .dots.bgfx-band::before {
     content: '';
     position: absolute;
     inset: -48px;
@@ -74,7 +77,7 @@
     animation: bgfx-drift 40s linear infinite;
     will-change: transform;
   }
-  html:not([data-theme='light']) .dots::after {
+  html:not([data-theme='light']) .dots.bgfx-band::after {
     content: '';
     position: absolute;
     left: 0;
@@ -89,17 +92,17 @@
     opacity: 0;
     transition: opacity 0.45s ease;
   }
-  html:not([data-theme='light']) .dots.bgfx-hot::after {
+  html:not([data-theme='light']) .dots.bgfx-band.bgfx-hot::after {
     opacity: 1;
   }
 
   @media (prefers-reduced-motion: reduce) {
     .bgfx-dots,
-    .dots::before {
+    .dots.bgfx-band::before {
       animation: none;
     }
     .bgfx-glow,
-    .dots::after {
+    .dots.bgfx-band::after {
       display: none;
     }
   }
@@ -107,6 +110,17 @@
 
 <script is:inline>
   (function () {
+    // القسم اللي خلفيته معتّمة بيغطي الطبقة العامة، فبياخد طبقته الخاصة.
+    // الشفّاف بيبيّن الطبقة العامة من ورا فبيضل بدون طبقة — هيك ما تتكرر النقشة.
+    document.querySelectorAll('.dots').forEach(function (el) {
+      var bg = window.getComputedStyle(el).backgroundColor || '';
+      var open = bg.indexOf('(');
+      if (open === -1) return;
+      var parts = bg.slice(open + 1, bg.indexOf(')')).split(',');
+      var alpha = parts.length > 3 ? parseFloat(parts[3]) : 1;
+      if (alpha >= 0.85) el.classList.add('bgfx-band');
+    });
+
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
