@@ -21,7 +21,8 @@ tags:
   - Agile
   - Scrum
   - إدارة المشاريع
-cover: /uploads/jira-course.png
+cover: /uploads/jira.png
+product: ''
 draft: false
 ---
 
