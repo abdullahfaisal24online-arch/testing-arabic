@@ -20,7 +20,8 @@ tags:
   - CT-MAT
   - اختبار الموبايل
   - شهادات
-cover: /uploads/Mobile Application Testing (CT-MAT) (6).png
+cover: /uploads/ISTQB-CT-MAT.png
+product: ''
 draft: false
 ---
 
