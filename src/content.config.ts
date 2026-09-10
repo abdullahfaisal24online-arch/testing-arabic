@@ -256,6 +256,12 @@ const site = defineCollection({
     // المتجر والدفع
     storeTitle: optString,
     storeIntro: optString,
+      storeCoursesTitle: optString,
+      storeCoursesSoon: optString,
+      storeQuestionsTitle: optString,
+      storeQuestionsSoon: optString,
+      storeSummariesTitle: optString,
+      storeSummariesSoon: optString,
     payInstructions: optString,
     whatsapp: optString,
     // التعليقات
