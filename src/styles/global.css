@@ -343,3 +343,38 @@ code, pre, kbd {
   font-weight: 700;
 }
 .skip-link:focus { inset-block-start: 0; color: var(--on-orange); }
+
+/* ===== تمييز رابط المتجر بالـ nav ===== */
+.nav a.nav-link[href="/store/"],
+.mobile-nav a.m-link[href="/store/"] {
+  color: var(--orange);
+  font-weight: 700;
+}
+
+/* التوهج النابض بالوضع الغامق بس */
+html:not([data-theme='light']) .nav a.nav-link[href="/store/"],
+html:not([data-theme='light']) .mobile-nav a.m-link[href="/store/"] {
+  animation: store-glow 3.2s ease-in-out infinite;
+}
+
+@keyframes store-glow {
+  0%,
+  100% {
+    text-shadow:
+      0 0 10px rgba(246, 130, 59, 0.35),
+      0 0 22px rgba(246, 130, 59, 0.14);
+  }
+  50% {
+    text-shadow:
+      0 0 18px rgba(246, 130, 59, 0.85),
+      0 0 44px rgba(246, 130, 59, 0.45);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-theme='light']) .nav a.nav-link[href="/store/"],
+  html:not([data-theme='light']) .mobile-nav a.m-link[href="/store/"] {
+    animation: none;
+    text-shadow: 0 0 14px rgba(246, 130, 59, 0.55);
+  }
+}
