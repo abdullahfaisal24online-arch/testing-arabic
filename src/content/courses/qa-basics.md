@@ -19,7 +19,8 @@ tags:
   - ISTQB
   - CTFL
   - شهادات
-cover: /uploads/istqb-ctfl4-cover-clean.png
+cover: /uploads/ctfl-v4.png
+product: ''
 draft: false
 ---
 
