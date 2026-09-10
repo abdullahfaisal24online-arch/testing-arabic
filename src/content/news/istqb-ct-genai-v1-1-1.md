@@ -3,7 +3,7 @@ title: تحديث طفيف على منهج CT-GenAI — النسخة 1.1
 slug: istqb-ct-genai-v1-1
 description: 'ISTQB أعلنت تحديثاً طفيفاً لمنهج CT-GenAI للنسخة 1.1: تصحيحات وتوضيحات ومصطلحات محدّثة، بدون تغيير بالأهداف أو النطاق أو إعادة اعتماد المدرّبين.'
 publishDate: 2026-09-07
-cover: /uploads/news-istqb-ct-genai-v1-1.png
+cover: /uploads/CT-GenAI.png
 pinned: false
 draft: false
 ---
