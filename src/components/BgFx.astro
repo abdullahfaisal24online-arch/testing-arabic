@@ -1,0 +1,152 @@
+---
+// خلفية متحركة خفيفة: نقشة النقط تزحف ببطء + بقعة ضوء تتبع الماوس.
+// الوضع الغامق فقط، وبتتوقف تلقائياً لمين مفعّل تقليل الحركة (prefers-reduced-motion).
+---
+
+<div id="bgfx" aria-hidden="true">
+  <div class="bgfx-dots"></div>
+  <div class="bgfx-glow"></div>
+</div>
+
+<style is:global>
+  /* ===== الطبقة العامة: خلفية كل الصفحات ===== */
+  html:not([data-theme='light']) {
+    background: var(--bg);
+  }
+  html:not([data-theme='light']) body {
+    background: transparent;
+  }
+
+  #bgfx {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  html[data-theme='light'] #bgfx {
+    display: none;
+  }
+
+  .bgfx-dots {
+    position: absolute;
+    inset: -48px;
+    background-image: radial-gradient(circle at 1px 1px, rgba(56, 189, 248, 0.14) 1px, transparent 0);
+    background-size: 22px 22px;
+    animation: bgfx-drift 40s linear infinite;
+    will-change: transform;
+  }
+
+  .bgfx-glow {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 500px;
+    height: 500px;
+    margin: -250px 0 0 -250px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(246, 130, 59, 0.05), transparent 100%);
+    transform: translate3d(50vw, 40vh, 0);
+    will-change: transform;
+  }
+
+  @keyframes bgfx-drift {
+    to {
+      transform: translate3d(22px, 22px, 0);
+    }
+  }
+
+  /* ===== أقسام النقشة (الهيرو وبلوك النشرة) =====
+     خلفيتها معتّمة فبتغطي الطبقة العامة، فبتاخد نفس الحركة بطبقة خاصة فيها */
+  html:not([data-theme='light']) .dots {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background-image: none;
+  }
+  html:not([data-theme='light']) .dots::before {
+    content: '';
+    position: absolute;
+    inset: -48px;
+    z-index: -1;
+    background-image: radial-gradient(circle at 1px 1px, rgba(56, 189, 248, 0.14) 1px, transparent 0);
+    background-size: 22px 22px;
+    animation: bgfx-drift 40s linear infinite;
+    will-change: transform;
+  }
+  html:not([data-theme='light']) .dots::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    width: 500px;
+    height: 500px;
+    margin: -250px 0 0 -250px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(246, 130, 59, 0.05), transparent 100%);
+    transform: translate3d(var(--bgfx-x, 50%), var(--bgfx-y, 50%), 0);
+    opacity: 0;
+    transition: opacity 0.45s ease;
+  }
+  html:not([data-theme='light']) .dots.bgfx-hot::after {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bgfx-dots,
+    .dots::before {
+      animation: none;
+    }
+    .bgfx-glow,
+    .dots::after {
+      display: none;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+    var glow = document.querySelector('#bgfx .bgfx-glow');
+    var x = window.innerWidth / 2;
+    var y = window.innerHeight / 2;
+    var tx = x;
+    var ty = y;
+    var raf = null;
+    var hot = null;
+
+    if (glow) glow.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
+
+    function tick() {
+      x += (tx - x) * 0.1;
+      y += (ty - y) * 0.1;
+      if (glow) glow.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0)';
+      raf = Math.abs(tx - x) > 0.5 || Math.abs(ty - y) > 0.5 ? requestAnimationFrame(tick) : null;
+    }
+
+    document.addEventListener(
+      'mousemove',
+      function (e) {
+        tx = e.clientX;
+        ty = e.clientY;
+        if (!raf) raf = requestAnimationFrame(tick);
+
+        var sec = e.target instanceof Element ? e.target.closest('.dots') : null;
+        if (sec !== hot) {
+          if (hot) hot.classList.remove('bgfx-hot');
+          hot = sec;
+          if (hot) hot.classList.add('bgfx-hot');
+        }
+        if (sec) {
+          var r = sec.getBoundingClientRect();
+          sec.style.setProperty('--bgfx-x', e.clientX - r.left + 'px');
+          sec.style.setProperty('--bgfx-y', e.clientY - r.top + 'px');
+        }
+      },
+      { passive: true },
+    );
+  })();
+</script>
