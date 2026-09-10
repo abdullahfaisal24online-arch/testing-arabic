@@ -215,8 +215,6 @@ const jsonLd = [
         <span class="done-hint">التتبّع محفوظ بمتصفّحك فقط — بدون حساب ولا تسجيل.</span>
       </div>
 
-      <InlineNewsletter text="اشترك بالنشرة وبيوصلك كل درس جديد على بريدك، بدون ما تعتمد على خوارزمية." />
-
       <nav class="pager" aria-label="التنقّل بين دروس الدورة">
         {prev ? (
           <a class="pg" href={`/lessons/${prev.id}/`}>
@@ -233,6 +231,8 @@ const jsonLd = [
       </nav>
 
       <Comments page={`/lessons/${lesson.id}/`} title={data.title} />
+
+      <InlineNewsletter text="اشترك بالنشرة وبيوصلك كل درس جديد على بريدك، بدون ما تعتمد على خوارزمية." />
     </article>
 
     <aside class="side">
