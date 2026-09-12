@@ -11,7 +11,7 @@ tags:
   - أساسيات الاختبار
   - ISTQB
   - بداية المسار
-cover: /uploads/article-interview-30.png
+cover: /uploads/ChatGPT Image Sep 12, 2026, 06_15_07 PM.png
 featured: false
 draft: false
 ---
