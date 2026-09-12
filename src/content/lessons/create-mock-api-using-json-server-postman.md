@@ -4,15 +4,15 @@ slug: create-mock-api-using-json-server-postman
 description: تعلم كيفية بناء واجهة برمجة تطبيقات وهمية (Mock API) كاملة في دقائق باستخدام مكتبة JSON Server وتطوير سيناريوهات فحص الـ CRUD بـ Postman بدون الحاجة لكتابة كود Backend.
 publishDate: 2026-09-12
 updatedDate: ''
-category: أساسيات
-level: مبتدئ
-duration: 19:30
+category: أدوات
+level: متقدّم
+duration: 13:26
 videoId: db7fd413-7bc1-43d2-b09c-56e7922fbe45
 youtubeUrl: ''
 thumbnail: /uploads/تعلم (2).png
 course: ''
-order: 1
-lessonType: شرح
+order: 2
+lessonType: عملي
 tags:
   - Postman
   - Mock API
