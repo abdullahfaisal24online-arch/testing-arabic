@@ -3,7 +3,7 @@ title: OpenAI تثير جدلاً واسعاً بعد إعلانها حل معض
 slug: OpenAI-Navier-Stokes
 description: أعلنت شركة OpenAI عن تحقيق إنجاز تاريخي تمثل في التوصل إلى حل معادلات "نافير-ستوكس" (Navier-Stokes) المفتوحة منذ تسعة عقود، إلا أن الإعلان سرعان ما واجه تشكيكاً وتساؤلات من الوسط الأكاديمي حول توقيته وظروف الوصول إليه.
 publishDate: 2026-09-10
-cover: /uploads/OpenAI.png
+cover: /uploads/ChatGPT Image Sep 12, 2026, 06_56_31 PM.png
 pinned: false
 draft: false
 ---
