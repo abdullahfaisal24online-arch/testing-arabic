@@ -11,7 +11,7 @@ tags:
   - Jira
   - أساسيات الاختبار
   - ISTQB
-cover: /uploads/article-defect-life-cycle.png
+cover: /uploads/ChatGPT Image Sep 12, 2026, 06_00_49 PM.png
 featured: false
 draft: false
 ---
@@ -61,6 +61,7 @@ draft: false
 المختبر بينفّذ **نفس** خطوات التقرير على النسخة الجديدة (هذا اللي بيتسمّى Retesting أو Confirmation Testing)، وبعدها بيعمل فحص انحدار للمسارات المرتبطة.
 
 النتيجة إمّا:
+
 - انصلح → `Closed`
 - لسا موجود أو انصلح جزئياً → `Reopened`
 
@@ -109,7 +110,7 @@ draft: false
 ## جدول: مين مالك كل حالة
 
 | الحالة | المالك | الخطوة الجاية |
-|---|---|---|
+| --- | --- | --- |
 | New | المختبر | ينتسب لشخص |
 | Assigned | قائد الفريق | يبدأ الإصلاح |
 | In Progress | المطوّر | ينشر الإصلاح على بيئة الاختبار |
