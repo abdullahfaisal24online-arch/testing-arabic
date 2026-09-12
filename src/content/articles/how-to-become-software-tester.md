@@ -11,7 +11,7 @@ tags:
   - بداية المسار
   - خطة تعلّم
   - ISTQB
-cover: /uploads/article-90-days.png
+cover: /uploads/ChatGPT Image Sep 12, 2026, 06_20_10 PM.png
 featured: true
 draft: false
 ---
@@ -43,7 +43,7 @@ draft: false
 ### اليوم 1–30: الأساسيات بالفهم مش بالحفظ
 
 | الأسبوع | شو تتعلّم |
-|---|---|
+| --- | --- |
 | 1 | المصطلحات الأساسية: error / defect / failure، ليش الاختبار ضروري، المبادئ السبعة |
 | 2 | مستويات الاختبار (وحدة، تكامل، نظام، قبول) وأنواعه (وظيفي، غير وظيفي، انحدار) |
 | 3 | تقنيات تصميم الاختبار: Equivalence Partitioning، Boundary Value، Decision Table |
