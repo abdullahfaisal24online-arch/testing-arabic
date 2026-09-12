@@ -10,7 +10,7 @@ duration: 24:01
 videoId: ddcabda2-55ae-4600-8738-5ddfe16e3b1f
 youtubeUrl: ''
 thumbnail: /uploads/تعلم (4).png
-course: ''
+course: postman-course
 order: 4
 lessonType: عملي
 tags:
