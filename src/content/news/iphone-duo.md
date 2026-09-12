@@ -3,7 +3,7 @@ title: آيفون ديو.. آبل تدخل عصر الهواتف القابلة 
 slug: iphone-duo
 description: آيفون ديو يعتمد تصميما قابلا للطي يتيح الانتقال من وضع الهاتف إلى شاشة داخلية أكبر (آبل)
 publishDate: 2026-09-10
-cover: /uploads/ChatGPT Image Sep 10, 2026, 12_27_11 PM.png
+cover: /uploads/ChatGPT Image Sep 12, 2026, 07_04_51 PM.png
 pinned: false
 draft: false
 ---
