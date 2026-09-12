@@ -11,7 +11,7 @@ tags:
   - Testing
   - أساسيات الاختبار
   - ISTQB
-cover: /uploads/article-qa-qc-testing.png
+cover: /uploads/ChatGPT Image Sep 12, 2026, 06_28_41 PM.png
 featured: false
 draft: false
 ---
@@ -38,8 +38,8 @@ draft: false
 
 ## جدول المقارنة
 
-| | QA | QC | Testing |
-|---|---|---|---|
+|  | QA | QC | Testing |
+| --- | --- | --- | --- |
 | التركيز | العمليّة | المنتج | المنتج (تنفيذ وتحليل) |
 | الطبيعة | وقائي | تصحيحي | كاشف |
 | السؤال | ليش بتظهر الـ Bugs؟ | هل المنتج مطابق؟ | وين الـ Bugs وشو حالة الجودة؟ |
