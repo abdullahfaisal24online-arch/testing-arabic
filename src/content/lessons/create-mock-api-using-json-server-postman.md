@@ -10,7 +10,7 @@ duration: 13:26
 videoId: db7fd413-7bc1-43d2-b09c-56e7922fbe45
 youtubeUrl: ''
 thumbnail: /uploads/تعلم (2).png
-course: ''
+course: postman-course
 order: 2
 lessonType: عملي
 tags:
