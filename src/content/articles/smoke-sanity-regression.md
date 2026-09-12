@@ -11,7 +11,7 @@ tags:
   - Regression
   - أساسيات الاختبار
   - ISTQB
-cover: /uploads/article-smoke-sanity-regression.png
+cover: /uploads/ChatGPT Image Sep 12, 2026, 06_05_10 PM.png
 featured: false
 draft: false
 ---
@@ -46,8 +46,8 @@ draft: false
 
 ## جدول المقارنة
 
-| | Smoke | Sanity | Regression |
-|---|---|---|---|
+|  | Smoke | Sanity | Regression |
+| --- | --- | --- | --- |
 | السؤال | النسخة تستاهل اختبار؟ | هذا الإصلاح ضبط؟ | شو انكسر بسبب التعديل؟ |
 | النطاق | عريض وسطحي | ضيّق وعميق | عريض وعميق |
 | التوقيت | بعد كل build | بعد إصلاح أو تعديل صغير | قبل الإصدار وبعد التعديلات الكبيرة |
