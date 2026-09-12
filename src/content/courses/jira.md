@@ -2,7 +2,7 @@
 title: Jira من الصفر للاحتراف
 slug: jira
 description: 'دورة عملية على Jira بالعربي — من إنشاء أول Project لحدّ قراءة التقارير: أنواع الـ Issues، تنظيم الـ Backlog وتشغيل الـ Sprints، إدارة الإصدارات والـ Releases، إعدادات المشروع وتوزيع الصلاحيات. كل درس تطبيق مباشر على الأداة مش شرح نظري.'
-level: مبتدئ
+level: متوسط
 order: 4
 accent: orange
 recommended: false
