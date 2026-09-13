@@ -3,7 +3,7 @@ title: دليل احتراف اختبـار الـ APIs بـاستخدام Postm
 slug: postman-course
 description: دورة عملية شاملة تأهلك لإتقان اختبـار الواجهات البرمجية (API Testing) بـاستخدام أداة Postman. ستتعلم فيها مفاهيم شبكات الـ Web والـ HTTP Requests (مثل GET, POST, PUT, DELETE)، وكيفية التعامل مع الـ Endpoints وفحص الـ Status Codes والـ Response Body.
 level: متقدّم
-order: 5
+order: 6
 accent: orange
 recommended: false
 outcomes:
