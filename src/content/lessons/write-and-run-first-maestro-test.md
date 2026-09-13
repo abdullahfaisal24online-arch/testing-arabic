@@ -4,7 +4,7 @@ slug: write-and-run-first-maestro-test
 description: تعلم كيفية كتابة أول سناريوهات اختبار عملي (Smoke Test & Login Flow) باستخدام ملفات YAML وتشغيلها بنجاح عبر أداة Maestro.
 publishDate: 2026-09-13
 updatedDate: ''
-category: Jira و Agile
+category: أتمتة
 level: متقدّم
 duration: 35:07
 videoId: e89a9d6e-9c07-49d9-b345-a84754b81eae
