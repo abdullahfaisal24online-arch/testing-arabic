@@ -23,7 +23,7 @@ tags:
   - REST API
   - Test Automation
   - QA
-cover: /uploads/Gemini_Generated_Image_sunqj1sunqj1sunq.jpg
+cover: /uploads/api-postman-course.png
 product: ''
 draft: false
 ---
