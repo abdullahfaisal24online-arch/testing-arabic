@@ -4,7 +4,7 @@ slug: install-maestro-and-setup-workspace
 description: خطوات تطبيقية لتثبيت أداة Maestro، إنشاء مساحة العمل (Workspace)، ربط المحاكي أو الجهاز الحقيقي، وتثبيت التطبيق واكتشافه للبدء بالأتمتة.
 publishDate: 2026-09-13
 updatedDate: ''
-category: أدوات
+category: أتمتة
 level: متقدّم
 duration: 16:40
 videoId: 03a7f26e-6445-469c-9dad-3093829c75aa
