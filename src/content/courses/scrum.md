@@ -20,7 +20,7 @@ tags:
   - Agile
   - Sprint
   - مهارات
-cover: /uploads/Scrum.png
+cover: /uploads/scrum.png
 product: ''
 draft: false
 ---
