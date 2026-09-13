@@ -3,7 +3,7 @@ title: أتمتة اختبار تطبيقات الموبايل باستخدام 
 slug: maestro-mobile-automation
 description: تعلم أتمتة اختبار تطبيقات الموبايل (Android & iOS) باستخدام أداة Maestro الحديثة والسهلة. ستتعلم خلال هذه الدورة كيفية كتابة اختبارات التفاعل مع الواجهات (UI Testing) بأسلوب يسيير وبسيط باستخدام ملفات YAML، وتشغيل الاختبارات على المحاكيات والأجهزة الحقيقية.
 level: متقدّم
-order: 6
+order: 7
 accent: orange
 recommended: false
 outcomes:
