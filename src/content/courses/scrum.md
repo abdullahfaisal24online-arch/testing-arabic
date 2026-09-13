@@ -2,8 +2,8 @@
 title: أساسيات Scrum
 slug: scrum
 description: 'دورة Scrum بالعربي مبنية على دليل Scrum الرسمي: الأدوار الثلاثة، الأحداث الخمسة، والمخرجات الثلاثة — بالفهم مش بالحفظ، مع أمثلة من شغل فرق حقيقية وتركيز على موقع المختبر داخل الفريق.'
-level: مبتدئ
-order: 3
+level: متوسط
+order: 4
 accent: cyan
 recommended: false
 outcomes:
