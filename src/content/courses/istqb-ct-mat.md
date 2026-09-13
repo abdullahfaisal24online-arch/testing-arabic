@@ -20,7 +20,7 @@ tags:
   - CT-MAT
   - اختبار الموبايل
   - شهادات
-cover: /uploads/ISTQB-CT-MAT.png
+cover: /uploads/ChatGPT Image Sep 13, 2026, 04_11_44 PM.png
 product: ''
 draft: false
 ---
