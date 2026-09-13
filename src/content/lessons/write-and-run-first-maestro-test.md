@@ -10,7 +10,7 @@ duration: 35:07
 videoId: e89a9d6e-9c07-49d9-b345-a84754b81eae
 youtubeUrl: ''
 thumbnail: /uploads/ep03_A_first_test.jpg
-course: ''
+course: maestro-mobile-automation
 order: 3
 lessonType: أدوات
 tags:
