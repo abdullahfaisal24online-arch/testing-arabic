@@ -1,7 +1,7 @@
 ---
 title: قالب Bug Report
 slug: bug-report-template
-description: قالب تقرير Bug من خمس صفحات — سبع قواعد كتابة، جدول أخطاء شائعة، مثال معبّى بالكامل، قالب فاضي، وChecklist قبل الحفظ.
+description: قالب تقرير Bug — سبع قواعد كتابة، جدول أخطاء شائعة، مثال معبّى بالكامل، قالب فاضي، وChecklist قبل الحفظ.
 publishDate: 2026-09-03
 updatedDate: ''
 category: قوالب
