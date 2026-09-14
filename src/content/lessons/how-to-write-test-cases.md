@@ -10,7 +10,7 @@ duration: 08:43
 videoId: ef00730e-cf73-45d9-a312-ba7828c78743
 youtubeUrl: ''
 thumbnail: /uploads/test-cases.png
-course: ''
+course: qa-fundamentals-and-practical-skills
 order: 6
 lessonType: شرح
 tags:
