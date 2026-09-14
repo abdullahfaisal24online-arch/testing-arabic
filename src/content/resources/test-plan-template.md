@@ -2,18 +2,20 @@
 title: قالب خطة اختبار
 slug: test-plan-template
 description: خطة اختبار بعشرة أقسام — النطاق وخارجه، المستويات والأنواع، البيئات، معايير الدخول والخروج، المخاطر، والموافقات. مع جدول بيشرح شو ينحط بكل قسم.
+publishDate: 2026-09-03
+updatedDate: ''
 category: قوالب
 audience: مسؤول اختبار بيجهّز لإصدار أو ميزة كبيرة
 format: Word + PDF
 files:
   - label: نسخة Word — للتعبئة والتعديل
-    url: /resources/test-plan-template.docx
+    url: /uploads/test-plan-template.docx
   - label: نسخة PDF — للقراءة والطباعة
-    url: /resources/test-plan-template.pdf
+    url: /uploads/test-plan-template.pdf
 tags:
   - خطة اختبار
   - Test Plan
-publishDate: 2026-09-03
+cover: ''
 featured: false
 draft: false
 ---
