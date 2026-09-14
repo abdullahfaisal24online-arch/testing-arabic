@@ -2,21 +2,23 @@
 title: مصفوفة تتبّع المتطلبات — RTM
 slug: rtm-template
 description: تثبت إنّ كل متطلب متغطّى بحالات اختبار، وتعرف بثانية شو بينكسر لو تغيّر متطلب. مع ملف Excel بيحسب نسبة التغطية لحاله.
+publishDate: 2026-09-09
+updatedDate: ''
 category: أوراق مرجعية
 audience: مسؤول اختبار بدّه يثبت التغطية أو يقيس أثر تغيير المتطلبات
 format: Word + PDF + Excel
 files:
   - label: نسخة Word — للتعبئة والتعديل
-    url: /resources/rtm-template.docx
+    url: /uploads/rtm-template.docx
   - label: نسخة PDF — للقراءة والطباعة
-    url: /resources/rtm-template.pdf
+    url: /uploads/rtm-template.pdf
   - label: نسخة Excel — مع احتساب التغطية تلقائياً
     url: /resources/rtm-template.xlsx
 tags:
   - RTM
   - تغطية
   - متطلبات
-publishDate: 2026-09-09
+cover: ''
 featured: false
 draft: false
 ---
