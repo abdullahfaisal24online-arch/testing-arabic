@@ -2,20 +2,24 @@
 title: قالب Test Case
 slug: test-case-template
 description: قالب حالة اختبار بست قواعد كتابة ومثال معبّى وقالب فاضي، مع ملف Excel لإدارة مجموعة حالات كاملة وحساب نسب النجاح تلقائياً.
+publishDate: 2026-09-03
+updatedDate: ''
 category: قوالب
 audience: مختبر بيكتب حالات اختبار لأول مرة أو بيوحّد شكلها بفريقه
 format: Word + PDF + Excel
 files:
-  - label: نسخة Word — للتعبئة والتعديل
-    url: /resources/test-case-template.docx
+  - label: نسخة Word بالعربي — للتعبئة والتعديل
+    url: /uploads/test-case-template.docx
   - label: نسخة PDF — للقراءة والطباعة
-    url: /resources/test-case-template.pdf
+    url: /uploads/test-case-template.pdf
   - label: نسخة Excel — لإدارة مجموعة حالات
     url: /resources/test-case-template.xlsx
+  - label: نسخة Word بالانجليزي — للتعبئة والتعديل
+    url: /uploads/test-case-template-en.docx
 tags:
   - حالة اختبار
   - Test Case
-publishDate: 2026-09-03
+cover: ''
 featured: true
 draft: false
 ---
