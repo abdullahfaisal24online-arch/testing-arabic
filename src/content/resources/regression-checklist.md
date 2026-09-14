@@ -2,20 +2,22 @@
 title: Regression Checklist
 slug: regression-checklist
 description: أربعين بند فحص موزّعين على ثمانية أقسام تتأكد فيهم إنّ اللي كان شغّال ضلّ شغّال، مع طريقة بناء مجموعة ما بتكبر لدرجة إنّها ما تنفّذ.
+publishDate: 2026-09-03
+updatedDate: ''
 category: Checklist
 audience: مختبر مسؤول عن فحص ما قبل الإصدار
 format: Word + PDF + Excel
 files:
   - label: نسخة Word — للتعبئة والتعديل
-    url: /resources/regression-checklist.docx
+    url: /uploads/regression-checklist.docx
   - label: نسخة PDF — للقراءة والطباعة
-    url: /resources/regression-checklist.pdf
+    url: /uploads/regression-checklist.pdf
   - label: نسخة Excel — للتعبئة مع حساب النتائج
     url: /resources/regression-checklist.xlsx
 tags:
   - Regression
   - Checklist
-publishDate: 2026-09-03
+cover: ''
 featured: false
 draft: false
 ---
