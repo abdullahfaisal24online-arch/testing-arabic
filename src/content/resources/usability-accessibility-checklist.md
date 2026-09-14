@@ -1,5 +1,5 @@
 ---
-title: قائمة تحقق اختبار سهولة الاستخدام والوصول (Usability & Accessibility Checklist)
+title: Usability & Accessibility Checklist
 slug: usability-accessibility-checklist
 description: قائمة تحقق شاملة لمُختبري الجودة ومصممي UX لتأمين تجربة استخدام سلسة وضمان توافق التطبيقات والمواقع مع معايير إمكانية الوصول العالمي (WCAG).
 publishDate: 2026-09-14
