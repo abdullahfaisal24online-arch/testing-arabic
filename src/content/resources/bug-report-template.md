@@ -2,18 +2,25 @@
 title: قالب Bug Report
 slug: bug-report-template
 description: قالب تقرير Bug من خمس صفحات — سبع قواعد كتابة، جدول أخطاء شائعة، مثال معبّى بالكامل، قالب فاضي، وChecklist قبل الحفظ.
+publishDate: 2026-09-03
+updatedDate: ''
 category: قوالب
 audience: أي مختبر بيكتب تذاكر Bug على Jira أو غيرها
 format: Word + PDF
 files:
-  - label: نسخة Word — للتعبئة والتعديل
-    url: /resources/bug-report-template.docx
-  - label: نسخة PDF — للقراءة والطباعة
-    url: /resources/bug-report-template.pdf
+  - label: نسخة Word بالعربي — للتعبئة والتعديل
+    url: /uploads/bug-report-template (1).docx
+  - label: نسخة Word بالانجليزي — للتعبئة والتعديل
+    url: /uploads/Bug Report Template (English Version).docx
+  - label: نسخة PDF - للقراءة والطباعة
+    url: /uploads/Bug Report Template (English Version).pdf
 tags:
   - تقرير Bug
   - Jira
-publishDate: 2026-09-03
+  - Bug report
+  - تقرير خلل
+  - تقرير خطأ
+cover: ''
 featured: true
 draft: false
 ---
