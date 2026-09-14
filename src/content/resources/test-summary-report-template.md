@@ -2,18 +2,20 @@
 title: قالب تقرير تنفيذ الاختبار
 slug: test-summary-report-template
 description: تقرير إغلاق دورة اختبار أو إصدار — نتائج التنفيذ، الـ Bugs وقرار كل واحد، الانحرافات عن الخطة، ما لم يُختبر، ودروس مستفادة.
+publishDate: 2026-09-09
+updatedDate: ''
 category: تقارير
 audience: مسؤول اختبار بيقفل دورة اختبار أو بيوثّق قرار إطلاق
 format: Word + PDF
 files:
   - label: نسخة Word — للتعبئة والتعديل
-    url: /resources/test-summary-report-template.docx
+    url: /uploads/test-summary-report-template.docx
   - label: نسخة PDF — للقراءة والطباعة
-    url: /resources/test-summary-report-template.pdf
+    url: /uploads/test-summary-report-template.pdf
 tags:
   - تقارير
   - إطلاق
-publishDate: 2026-09-09
+cover: ''
 featured: false
 draft: false
 ---
