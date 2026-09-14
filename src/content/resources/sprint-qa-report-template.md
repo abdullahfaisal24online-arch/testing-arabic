@@ -2,18 +2,20 @@
 title: قالب تقرير جودة الـ Sprint
 slug: sprint-qa-report-template
 description: تقرير بيقرأه مدير المنتج بدقيقة — توصية بأول سطر، مؤشرات تنفيذ، Bugs حسب الشدّة، وما لم يُختبر وليش. مع مثال معبّى بالكامل.
+publishDate: 2026-09-03
+updatedDate: ''
 category: تقارير
 audience: مسؤول اختبار بيرفع حالة الجودة للفريق أو للعميل
 format: Word + PDF
 files:
   - label: نسخة Word — للتعبئة والتعديل
-    url: /resources/sprint-qa-report-template.docx
+    url: /uploads/sprint-qa-report-template.docx
   - label: نسخة PDF — للقراءة والطباعة
-    url: /resources/sprint-qa-report-template.pdf
+    url: /uploads/sprint-qa-report-template.pdf
 tags:
   - تقارير
   - Sprint
-publishDate: 2026-09-03
+cover: ''
 featured: false
 draft: false
 ---
