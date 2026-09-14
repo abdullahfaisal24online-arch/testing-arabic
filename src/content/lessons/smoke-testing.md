@@ -1,5 +1,5 @@
 ---
-title: Smoke Testing
+title: Smoke Testing  - أول اختبار
 slug: smoke-testing
 description: تعرّف على فحص الدخان (Smoke Testing) وأهميته كخطوة أولى واختبار أولي لثبات البناء (Build Stability) قبل البدء بالفحص التفصيلي للتطبيق.
 publishDate: 2026-09-14
