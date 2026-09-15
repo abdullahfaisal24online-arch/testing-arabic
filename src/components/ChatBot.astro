@@ -19,13 +19,11 @@ const CHATBOT_ENABLED = true;
       <div class="tachat-head">
         <span class="tachat-av" aria-hidden="true"><svg class="tachat-rbt" viewBox="0 0 48 48" fill="none"><path d="M24 6v5" stroke="#f6823b" stroke-width="2.6" stroke-linecap="round"/><circle cx="24" cy="4.5" r="2.4" fill="#ff9a57"/><rect x="4.5" y="20" width="4" height="10" rx="2" fill="#e56b1f"/><rect x="39.5" y="20" width="4" height="10" rx="2" fill="#e56b1f"/><rect x="9" y="12" width="30" height="26" rx="9" fill="#f6823b"/><rect x="13.5" y="17.5" width="21" height="15" rx="6.5" fill="#0a1428"/><circle class="tachat-eye" cx="19.5" cy="24" r="2.7" fill="#38bdf8"/><circle class="tachat-eye" cx="28.5" cy="24" r="2.7" fill="#38bdf8"/><path d="M19.5 28.6c2.7 2 6.3 2 9 0" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round"/></svg></span>
         <div class="tachat-tt">
-          <b>Testo <span class="tachat-name-sub">· مساعد الاختبار</span></b>
-          <small><span class="tachat-dot"></span> بجاوب أسئلة الـ QA و الـ testing</small>
+          <b>Testo <span class="tachat-name-sub">مساعد ذكي 🔻</span></b>
+          <small><span class="tachat-dot"></span> متصل الآن</small>
         </div>
         <button class="tachat-x" id="tachat-close" type="button" aria-label="إغلاق">✕</button>
       </div>
-
-      <div class="tachat-disc">🤖 مساعد ذكي — مصمّم لأسئلة الـ QA / testing فقط. تأكّد من المعلومة قبل الاعتماد عليها.</div>
 
       <div class="tachat-msgs" id="tachat-msgs"></div>
 
@@ -89,7 +87,7 @@ const CHATBOT_ENABLED = true;
 
       .tachat-input{padding:11px 13px;border-top:1px solid var(--line,rgba(56,189,248,.16));display:flex;gap:9px;align-items:center}
       /* 16px عن قصد: iOS بيكبّر الصفحة تلقائياً لو أصغر من هيك عند الكتابة */
-      .tachat-input input{flex:1;background:var(--bg,#0a1428);border:1px solid var(--line,rgba(56,189,248,.16));border-radius:12px;
+      .tachat-input input{flex:1;min-width:0;background:var(--bg,#0a1428);border:1px solid var(--line,rgba(56,189,248,.16));border-radius:12px;
         color:var(--ink,#e8eef9);font-family:inherit;font-size:16px;padding:11px 14px;outline:none}
       .tachat-input input:focus{border-color:#f6823b}
       .tachat-send{background:linear-gradient(135deg,#f6823b,#e56b1f);border:none;color:#fff;width:44px;height:44px;
@@ -148,7 +146,7 @@ const CHATBOT_ENABLED = true;
           if (started) return;
           started = true;
           botBubble(
-            'أهلين! أنا Testo، مساعد المنصة 👋\nاسألني أي إشي عن الـ QA و الـ testing — المصطلحات، الدورات، أو مفاهيم عامة. أنا مصمّم لهالمجال بس.',
+            'أهلين! أنا Testo، مساعد المنصة الذكي 👋\nاسألني أي إشي عن الـ QA و الـ testing — المصطلحات، الدورات، أو مفاهيم عامة. أنا موجود مشان أساعدك.\nغير هذا السياق بعتذر عن الإجابة عن أي أسئلة ما الها علاقة بموضوعنا 😅',
             []
           );
         }
