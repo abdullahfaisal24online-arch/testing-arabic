@@ -1,5 +1,5 @@
 ---
-import { formatDate, readingTime, minutesLabel } from '../lib/utils';
+import { formatDate, readingTime, minutesLabel, toWebp } from '../lib/utils';
 
 interface Props {
   article: {
@@ -11,11 +11,15 @@ interface Props {
 const { article } = Astro.props;
 const mins = readingTime(article.body);
 const cover = article.data.cover;
+const coverWebp = toWebp(cover);
 ---
 <a class="card art" href={`/articles/${article.id}/`}>
   {cover && (
     <div class="thumb">
-      <img src={cover} alt="" loading="lazy" decoding="async" width="640" height="360" />
+      <picture>
+        {coverWebp && <source srcset={coverWebp} type="image/webp" />}
+        <img src={cover} alt="" loading="lazy" decoding="async" width="640" height="360" />
+      </picture>
     </div>
   )}
   <div class="card-body">
@@ -27,10 +31,12 @@ const cover = article.data.cover;
 </a>
 
 <style>
-  .art { color: inherit; background: var(--navy); }
-  .art .card-body { padding: 24px; gap: 12px; }
-  .meta { font-size: 12px; font-weight: 500; color: var(--cyan); }
-  .ttl { font-size: 19px; font-weight: 700; line-height: 1.6; }
-  .desc { font-size: 15px; color: var(--ink-3); line-height: 1.85; }
-  .date { font-size: 13px; color: var(--faint); margin-top: auto; }
+.art { color: inherit; background: var(--navy); }
+.art .card-body { padding: 24px; gap: 12px; }
+.meta { font-size: 12px; font-weight: 500; color: var(--cyan); }
+.ttl { font-size: 19px; font-weight: 700; line-height: 1.6; }
+.desc { font-size: 15px; color: var(--ink-3); line-height: 1.85; }
+.date { font-size: 13px; color: var(--faint); margin-top: auto; }
+/* <picture> شفّاف في التخطيط حتى تبقى الصورة تملأ .thumb تماماً */
+.thumb picture { display: contents; }
 </style>

@@ -68,3 +68,12 @@ export function minutesLabel(n: number): string {
 export function lessonsLabel(n: number): string {
   return arabicPlural(n, { one: 'درس واحد', two: 'درسان', few: 'دروس', many: 'درساً' });
 }
+
+/**
+ * مسار نسخة WebP لأي صورة PNG/JPG — النسخ تُولَّد وقت الـ build عبر scripts/build-webp.mjs.
+ * يرجع null إذا لم يكن المسار صورة PNG/JPG (مثل WebP أو SVG جاهزة) فلا نضيف <source> عندها.
+ */
+export function toWebp(src: string | undefined | null): string | null {
+  if (!src) return null;
+  return /\.(png|jpe?g)$/i.test(src) ? src.replace(/\.(png|jpe?g)$/i, '.webp') : null;
+}

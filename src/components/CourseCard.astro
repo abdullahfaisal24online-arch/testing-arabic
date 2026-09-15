@@ -1,6 +1,6 @@
 ---
 import Icon from './Icon.astro';
-import { lessonsLabel } from '../lib/utils';
+import { lessonsLabel, toWebp } from '../lib/utils';
 
 interface Props {
   course: {
@@ -19,11 +19,15 @@ interface Props {
 const { course, count } = Astro.props;
 const { data } = course;
 const icon = data.accent === 'orange' ? 'board' : 'list';
+const coverWebp = toWebp(data.cover);
 ---
 <a class="card course" href={`/courses/${course.id}/`} data-accent={data.accent} data-soon={count === 0 ? 'true' : undefined}>
   {data.cover && (
     <div class="thumb">
-      <img src={data.cover} alt="" loading="lazy" decoding="async" width="1280" height="720" />
+      <picture>
+        {coverWebp && <source srcset={coverWebp} type="image/webp" />}
+        <img src={data.cover} alt="" loading="lazy" decoding="async" width="1280" height="720" />
+      </picture>
     </div>
   )}
   <div class="card-body">
@@ -41,25 +45,27 @@ const icon = data.accent === 'orange' ? 'board' : 'list';
 </a>
 
 <style>
-  .course { color: inherit; }
-  .course .card-body { padding: 26px; gap: 12px; }
-  .top { display: flex; align-items: center; justify-content: space-between; }
-  .ic {
-    display: grid; place-items: center;
-    width: 46px; height: 46px; border-radius: var(--r-md);
-    background: var(--cyan-soft); color: var(--cyan);
-  }
-  [data-accent='orange'] .ic { background: var(--orange-soft); color: var(--orange); }
-  .ttl { font-size: 20px; font-weight: 700; line-height: 1.55; }
-  .desc { font-size: 15px; color: var(--ink-3); line-height: 1.85; }
-  .meta { font-size: 14px; color: var(--muted); }
-  .rec { font-size: 12px; font-weight: 600; color: var(--orange); }
+.course { color: inherit; }
+.course .card-body { padding: 26px; gap: 12px; }
+.top { display: flex; align-items: center; justify-content: space-between; }
+.ic {
+  display: grid; place-items: center;
+  width: 46px; height: 46px; border-radius: var(--r-md);
+  background: var(--cyan-soft); color: var(--cyan);
+}
+[data-accent='orange'] .ic { background: var(--orange-soft); color: var(--orange); }
+.ttl { font-size: 20px; font-weight: 700; line-height: 1.55; }
+.desc { font-size: 15px; color: var(--ink-3); line-height: 1.85; }
+.meta { font-size: 14px; color: var(--muted); }
+.rec { font-size: 12px; font-weight: 600; color: var(--orange); }
 
-  /* دورة بدون دروس بعد: أهدأ بصرياً حتى ما تنافس الجاهزة */
-  [data-soon] { opacity: 0.66; border-style: dashed; }
-  [data-soon]:hover { opacity: 1; }
-  .soon {
-    font-size: 12px; font-weight: 600; color: var(--muted);
-    border: 1px solid var(--line); border-radius: 999px; padding: 3px 11px;
-  }
+/* دورة بدون دروس بعد: أهدأ بصرياً حتى ما تنافس الجاهزة */
+[data-soon] { opacity: 0.66; border-style: dashed; }
+[data-soon]:hover { opacity: 1; }
+.soon {
+  font-size: 12px; font-weight: 600; color: var(--muted);
+  border: 1px solid var(--line); border-radius: 999px; padding: 3px 11px;
+}
+/* <picture> شفّاف في التخطيط حتى تبقى الصورة تملأ .thumb تماماً */
+.thumb picture { display: contents; }
 </style>

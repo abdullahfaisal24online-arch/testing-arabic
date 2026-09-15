@@ -1,5 +1,5 @@
 ---
-import { formatDate } from '../lib/utils';
+import { formatDate, toWebp } from '../lib/utils';
 
 interface Props {
   item: {
@@ -9,11 +9,15 @@ interface Props {
 }
 const { item } = Astro.props;
 const cover = item.data.cover;
+const coverWebp = toWebp(cover);
 ---
 <a class="card news" href={`/news/${item.id}/`}>
   {cover && (
     <div class="thumb">
-      <img src={cover} alt="" loading="lazy" decoding="async" width="640" height="360" />
+      <picture>
+        {coverWebp && <source srcset={coverWebp} type="image/webp" />}
+        <img src={cover} alt="" loading="lazy" decoding="async" width="640" height="360" />
+      </picture>
       {item.data.pinned && <span class="pin-float">مثبّت</span>}
     </div>
   )}
@@ -28,22 +32,24 @@ const cover = item.data.cover;
 </a>
 
 <style>
-  .news { color: inherit; background: var(--navy); }
-  .news .card-body { padding: 24px; gap: 10px; }
-  .meta { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
-  .pin { font-size: 11px; font-weight: 600; color: var(--orange); background: var(--orange-soft); padding: 3px 9px; border-radius: 999px; }
-  .pin-float {
-    position: absolute;
-    inset-inline-start: 12px;
-    inset-block-start: 12px;
-    font-size: 11px;
-    font-weight: 600;
-    color: #fff;
-    background: var(--orange);
-    padding: 4px 10px;
-    border-radius: 999px;
-    z-index: 2;
-  }
-  .ttl { font-size: 18px; font-weight: 700; line-height: 1.6; }
-  .desc { font-size: 15px; color: var(--ink-3); line-height: 1.85; }
+.news { color: inherit; background: var(--navy); }
+.news .card-body { padding: 24px; gap: 10px; }
+.meta { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.pin { font-size: 11px; font-weight: 600; color: var(--orange); background: var(--orange-soft); padding: 3px 9px; border-radius: 999px; }
+.pin-float {
+  position: absolute;
+  inset-inline-start: 12px;
+  inset-block-start: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--orange);
+  padding: 4px 10px;
+  border-radius: 999px;
+  z-index: 2;
+}
+.ttl { font-size: 18px; font-weight: 700; line-height: 1.6; }
+.desc { font-size: 15px; color: var(--ink-3); line-height: 1.85; }
+/* <picture> شفّاف في التخطيط حتى تبقى الصورة تملأ .thumb تماماً */
+.thumb picture { display: contents; }
 </style>
