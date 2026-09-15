@@ -4,7 +4,7 @@ slug: scrum
 description: 'دورة Scrum بالعربي مبنية على دليل Scrum الرسمي: الأدوار الثلاثة، الأحداث الخمسة، والمخرجات الثلاثة — بالفهم مش بالحفظ، مع أمثلة من شغل فرق حقيقية وتركيز على موقع المختبر داخل الفريق.'
 level: متوسط
 order: 4
-accent: cyan
+accent: orange
 recommended: false
 outcomes:
   - 'تفهم إطار Scrum كامل : الأدوار والأحداث والمخرجات'
@@ -21,8 +21,8 @@ tags:
   - Sprint
   - مهارات
 cover: /uploads/scrum.png
-product: ''
 draft: false
+product: ''
 ---
 
 ## لمين هاي الدورة؟
