@@ -138,19 +138,20 @@ const jsonLd = [
           <span class="badge badge-outline">{data.lessonType}</span>
         </div>
         <p class="lead">{data.description}</p>
+        <div class="tag-row">
         {data.tags.length > 0 && (
           <div class="tags">
             {data.tags.map((t) => <a class="tag" href={`/tags/${tagSlug(t)}/`}>{t}</a>)}
           </div>
         )}
+          <LikeButton page={`/lessons/${lesson.id}/`} />
+        </div>
         {data.youtubeUrl && (
           <a class="yt" href={data.youtubeUrl} target="_blank" rel="noopener">
             <Icon name="youtube" size={17} /> شاهد نفس الدرس على يوتيوب
           </a>
         )}
       </header>
-
-      <LikeButton page={`/lessons/${lesson.id}/`} />
 
       {data.prerequisites.length > 0 && (
         <section class="pre">
@@ -446,6 +447,14 @@ const jsonLd = [
   .pl-item.on .num { color: var(--orange); }
   .pl-item .dur { font-size: 12px; color: var(--faint); }
   .full { width: 100%; }
+
+.tag-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.tag-row .tags { flex: 1 1 auto; }
+.tag-row :global(.likebar) { margin-inline-start: auto; border: 0; padding: 0; margin: 0; }
+@media (max-width: 480px) {
+  .tag-row { flex-direction: column; align-items: flex-start; }
+  .tag-row :global(.likebar) { margin-inline-start: 0; }
+}
 </style>
 
 <script>
