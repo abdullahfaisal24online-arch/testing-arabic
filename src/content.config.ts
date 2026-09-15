@@ -246,6 +246,27 @@ const site = defineCollection({
   }),
 });
 
+/* ===== مساعد Testo ===== */
+const chat = defineCollection({
+  loader: glob({ base: './src/content/settings', pattern: 'chat.json' }),
+  schema: z.object({
+    // تشغيل/إطفاء البوت من غير حذف الكود
+    enabled: bool(true),
+    // الموديل المجاني على Workers AI
+    model: str('@cf/meta/llama-3.3-70b-instruct-fp8-fast'),
+    // تعليمات وشخصية إضافية تتراكم فوق القواعد الأساسية المقفلة
+    instructions: optString,
+    // رسالة الترحيب أول ما يفتح الزائر البوت
+    welcome: optString,
+    // أقصى طول للرد (كل ما زاد، الرد أطول واستهلاك أكثر)
+    maxTokens: num(512),
+    // عدد الرسائل المسموحة لكل زائر بالساعة
+    perHour: num(15),
+    // الرسالة لما الزائر يوصل الحد
+    limitMessage: optString,
+  }),
+});
+
 /* ===== نصوص الصفحة الرئيسية ===== */
 const home = defineCollection({
   loader: glob({ base: './src/content/settings', pattern: 'home.json' }),
@@ -300,4 +321,4 @@ const home = defineCollection({
   }),
 });
 
-export const collections = { lessons, articles, courses, news, resources, glossary, questions, pages, site, home, start };
+export const collections = { lessons, articles, courses, news, resources, glossary, questions, pages, site, home, start, chat };

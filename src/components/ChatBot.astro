@@ -1,11 +1,23 @@
 ---
 /**
- * مساعد الموقع — بوت أسئلة QA / testing فقط.
- * بيتصل بـ /api/chat (Workers AI). الشكل معتمد من المستخدم.
- *
- * لإطفاء البوت مؤقتاً: بدّل السطر التالي لـ false.
+ * مساعد الموقع "Testo" — بوت أسئلة QA / testing فقط.
+ * بيتصل بـ /api/chat (Workers AI).
+ * الإعدادات (تشغيل/إطفاء + رسالة الترحيب) بتتحكّم فيها من لوحة التحكم:
+ * إعدادات الموقع ← مساعد Testo.
  */
-const CHATBOT_ENABLED = true;
+import { getCollection } from 'astro:content';
+
+let chatCfg: Record<string, any> = {};
+try {
+  const items = await getCollection('chat');
+  chatCfg = (items && items[0] && items[0].data) || {};
+} catch (e) {
+  chatCfg = {};
+}
+const CHATBOT_ENABLED = chatCfg.enabled !== false;
+const WELCOME =
+  (typeof chatCfg.welcome === 'string' && chatCfg.welcome.trim()) ||
+  'أهلين! أنا Testo، مساعد المنصة الذكي 👋\nاسألني أي إشي عن الـ QA و الـ testing — المصطلحات، الدورات، أو مفاهيم عامة. أنا موجود مشان أساعدك.\nغير هذا السياق بعتذر عن الإجابة عن أي أسئلة ما الها علاقة بموضوعنا 😅';
 ---
 
 {CHATBOT_ENABLED && (
@@ -25,6 +37,7 @@ const CHATBOT_ENABLED = true;
         <button class="tachat-x" id="tachat-close" type="button" aria-label="إغلاق">✕</button>
       </div>
 
+      <div id="tachat-welcome" hidden set:text={WELCOME}></div>
       <div class="tachat-msgs" id="tachat-msgs"></div>
 
       <div class="tachat-input">
@@ -145,10 +158,12 @@ const CHATBOT_ENABLED = true;
         function greet() {
           if (started) return;
           started = true;
-          botBubble(
-            'أهلين! أنا Testo، مساعد المنصة الذكي 👋\nاسألني أي إشي عن الـ QA و الـ testing — المصطلحات، الدورات، أو مفاهيم عامة. أنا موجود مشان أساعدك.\nغير هذا السياق بعتذر عن الإجابة عن أي أسئلة ما الها علاقة بموضوعنا 😅',
-            []
-          );
+          var wEl = document.getElementById('tachat-welcome');
+          var welcome =
+            wEl && wEl.textContent && wEl.textContent.trim()
+              ? wEl.textContent
+              : 'أهلين! أنا Testo، مساعد المنصة الذكي 👋';
+          botBubble(welcome, []);
         }
 
         function open() {

@@ -705,7 +705,7 @@ collections:
               - name: value
                 label: "القيمة"
                 widget: string
-            hint: "Buttondown بيطلب حقل embed قيمته 1"
+                hint: "Buttondown بيطلب حقل embed قيمته 1"
           - name: bunnyLibraryId
             label: "رقم مكتبة Bunny Stream"
             widget: string
@@ -1016,3 +1016,53 @@ collections:
                     widget: string
                     required: false
                     hint: "دورة / درس / قالب / مقال"
+
+      - name: chat
+        label: "مساعد Testo"
+        file: src/content/settings/chat.json
+        fields:
+          - name: enabled
+            label: "تشغيل المساعد على الموقع"
+            widget: boolean
+            default: true
+            hint: "أطفئه لو بدك تخفي Testo من الموقع مؤقتاً"
+          - name: model
+            label: "الموديل"
+            widget: select
+            default: "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+            options:
+              - label: "الأقوى بالعربي — Llama 3.3 70B"
+                value: "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+              - label: "الأسرع والأخف — Llama 3.1 8B"
+                value: "@cf/meta/llama-3.1-8b-instruct-fast"
+            hint: "لو حسّيت استهلاك عالي أو بطء، جرّب الأخف"
+          - name: instructions
+            label: "تعليمات وشخصية إضافية"
+            widget: text
+            required: false
+            hint: "بتتراكم فوق القواعد الأساسية المقفلة (يجاوب QA فقط، ما يقول ما بعرف، يرفض البرّا). اكتب هون نبرته أو أي توجيهات إضافية."
+          - name: welcome
+            label: "رسالة الترحيب"
+            widget: text
+            required: false
+            hint: "أول رسالة بتظهر لما يفتح الزائر المساعد. اتركها فاضية وبتظهر الرسالة الافتراضية."
+          - name: maxTokens
+            label: "أقصى طول للرد"
+            widget: number
+            default: 512
+            value_type: int
+            min: 128
+            max: 1024
+            hint: "كل ما زاد الرقم صار الرد أطول واستهلك أكثر — 512 مناسب"
+          - name: perHour
+            label: "عدد الرسائل المسموحة لكل زائر بالساعة"
+            widget: number
+            default: 15
+            value_type: int
+            min: 1
+            hint: "حماية من الاستهلاك الزائد"
+          - name: limitMessage
+            label: "رسالة الوصول للحد"
+            widget: text
+            required: false
+            hint: "اتركها فاضية وبتظهر الرسالة الافتراضية"

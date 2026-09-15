@@ -152,3 +152,30 @@ for (const col of COLLECTIONS) {
 if (!existsSync(dirname(outFile))) mkdirSync(dirname(outFile), { recursive: true });
 writeFileSync(outFile, JSON.stringify(index), 'utf8');
 console.log(`[chat-index] بنيت ${index.length} وحدة → public/chat-index.json`);
+
+/* ---------- إعدادات المساعد (من لوحة التحكم) → public/chat-config.json ----------
+ * الـ Worker بيقرأ هالملف وقت التشغيل. لو ما ضبط أي إعداد من البانل،
+ * بيشتغل بالقيم الافتراضية. */
+const chatDefaults = {
+  enabled: true,
+  model: '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+  instructions: '',
+  welcome: '',
+  maxTokens: 512,
+  perHour: 15,
+  limitMessage: '',
+};
+const chatCfg = { ...chatDefaults };
+const chatFile = join(contentDir, 'settings', 'chat.json');
+if (existsSync(chatFile)) {
+  try {
+    const raw = JSON.parse(readFileSync(chatFile, 'utf8'));
+    for (const k of Object.keys(chatDefaults)) {
+      if (raw[k] !== undefined && raw[k] !== null && raw[k] !== '') chatCfg[k] = raw[k];
+    }
+  } catch {
+    /* ملف فيه غلط → منكمل بالافتراضي */
+  }
+}
+writeFileSync(join(root, 'public', 'chat-config.json'), JSON.stringify(chatCfg), 'utf8');
+console.log(`[chat-config] الموديل: ${chatCfg.model} · الحد/ساعة: ${chatCfg.perHour}`);
