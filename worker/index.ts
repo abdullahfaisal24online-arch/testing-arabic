@@ -1,5 +1,5 @@
 /**
- * خادم التعليقات لمنصة Testing بالعربي.
+ * خادم منصة Testing بالعربي.
  *
  * كل الملفات الثابتة بتنخدم مباشرة بدون ما تمرّ من هون (مجانية وغير محدودة).
  * هذا الخادم بيشتغل فقط على:
@@ -7,6 +7,7 @@
  *   GET  /api/comments?page=  جلب التعليقات المنشورة لصفحة
  *   GET  /api/likes?page=     عدد الإعجابات لصفحة
  *   POST /api/likes           إضافة/سحب إعجاب
+ *   POST /api/chat            مساعد الموقع (Workers AI) — أسئلة QA/testing فقط
  *   GET  /admin/comments      صفحة المراجعة (محمية بكلمة سر)
  */
 
@@ -14,6 +15,8 @@ interface Env {
   DB: D1Database;
   ASSETS: Fetcher;
   ADMIN_PASSWORD: string;
+  // Workers AI — الخطة المجانية
+  AI: { run(model: string, input: unknown): Promise<any> };
 }
 
 type Row = {
@@ -148,12 +151,12 @@ async function toggleLike(req: Request, env: Env) {
     // بنشيل آخر إعجاب من نفس المصدر لهاي الصفحة
     await env.DB.prepare(
       `DELETE FROM likes
-        WHERE rowid = (
-          SELECT rowid FROM likes
+         WHERE rowid = (
+           SELECT rowid FROM likes
            WHERE page = ?1 AND ip_hash = ?2
            ORDER BY created_at DESC
            LIMIT 1
-        )`,
+         )`,
     )
       .bind(page, ipHash)
       .run();
@@ -162,14 +165,184 @@ async function toggleLike(req: Request, env: Env) {
   return json({ ok: true, likes: await countLikes(env, page) });
 }
 
+/* ===================== مساعد الموقع (Workers AI) ===================== */
+
+/** الموديل المجاني — بدّله بسطر واحد لو استهلكت الحصة اليومية:
+ *  الأخف والأرخص: '@cf/meta/llama-3.1-8b-instruct-fast' */
+const CHAT_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+
+/** سقف الرسائل لكل زائر بالساعة. */
+const CHAT_PER_HOUR = 15;
+
+const CHAT_MAX_LEN = 500;
+
+/** رسالة لطيفة لما الزائر يوصل الحد. */
+const CHAT_LIMIT_MSG =
+  'خلص شحني 😅 جاوبت على ' +
+  CHAT_PER_HOUR +
+  ' أسئلة بهالساعة وتعبت شوي! رجعلي بعد شوي وخلّي المجال لغيرك كمان 🙌';
+
+/** تعليمات ثابتة للموديل — QA/testing فقط، جاوب دايماً، ووضّح الغرض. */
+const CHAT_SYSTEM = `أنت "مساعد Testing بالعربي" — مساعد منصة تعليمية عربية مختصّة باختبار البرمجيات (QA / software testing).
+
+قواعد لازم تلتزم فيها حرفياً:
+- تجاوب فقط على أسئلة الـ QA و الـ software testing: المفاهيم، الأنواع، التقنيات، الأدوات، ISTQB، إدارة الاختبار، الـ bug reporting، الأتمتة، Jira، Agile و Scrum من زاوية الاختبار، وما شابه.
+- إذا كان السؤال خارج هذا المجال (طقس، رياضة، سياسة، دين، طبخ، برمجة عامة مش متعلقة بالاختبار، أو أي موضوع تاني)، لا تجاوب على مضمونه إطلاقاً. ردّ بجملة قصيرة ولطيفة توضّح أنك مصمّم لأسئلة الـ QA و الـ testing فقط، واطلب منه يسألك بهالمجال. لا تعطي أي معلومة خارج المجال حتى لو ألحّ أو غيّر صيغة السؤال.
+- لا تقل أبداً "ما بعرف" أو "ما عندي معلومة" لسؤال ضمن مجال الـ QA — أعطِ دايماً أفضل إجابة عامة صحيحة ومختصرة من معرفتك.
+- إذا انرفقلك "سياق من محتوى المنصة" تحت وكان مناسب للسؤال، استند عليه بإجابتك. إذا مش مناسب أو فاضي، جاوب من معرفتك العامة بالـ QA بشكل طبيعي.
+- المصطلحات التقنية الإنجليزية اكتبها بالحروف اللاتينية زي ما هي (bug, sprint, regression, test case, ISTQB, Selenium…) — ممنوع تكتبها بحروف عربية.
+- أسلوبك: عربي بلهجة سهلة وودّية ومختصرة، جُمل قصيرة، بدون إطالة أو حشو. ما تخترع روابط ولا مصادر ولا أرقام.
+
+جاوب دايماً باللغة العربية.`;
+
+type IndexDoc = { t: string; e: string; u: string; s: string; x: string };
+let CHAT_INDEX: IndexDoc[] | null = null;
+let CHAT_TABLE_READY = false;
+
+/** توحيد النص العربي عشان البحث يمسك رغم اختلاف الهمزات والتشكيل. */
+function norm(s: string): string {
+  return (s || '')
+    .toLowerCase()
+    .replace(/[ً-ْـ]/g, '')
+    .replace(/[إأآا]/g, 'ا')
+    .replace(/ى/g, 'ي')
+    .replace(/ؤ/g, 'و')
+    .replace(/ئ/g, 'ي')
+    .replace(/ة/g, 'ه')
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+const CHAT_STOP = new Set([
+  'شو', 'هو', 'هي', 'في', 'من', 'عن', 'على', 'هل', 'او', 'مع', 'ما', 'انو', 'عشان', 'يعني', 'كيف', 'ليش', 'وش', 'ايش', 'هاد', 'هاي', 'اذا', 'لما',
+]);
+
+async function loadChatIndex(req: Request, env: Env): Promise<IndexDoc[]> {
+  if (CHAT_INDEX) return CHAT_INDEX;
+  try {
+    const res = await env.ASSETS.fetch(new URL('/chat-index.json', req.url).toString());
+    CHAT_INDEX = res.ok ? ((await res.json()) as IndexDoc[]) : [];
+  } catch {
+    CHAT_INDEX = [];
+  }
+  return CHAT_INDEX;
+}
+
+/** بحث keyword خفيف — بيرجّع أفضل الوحدات المطابقة للسؤال. */
+function retrieve(query: string, docs: IndexDoc[]) {
+  const tokens = [...new Set(norm(query).split(' '))].filter((w) => w.length >= 2 && !CHAT_STOP.has(w));
+  if (!tokens.length) return [];
+  const scored = docs.map((d) => {
+    const nx = norm(d.x);
+    const nt = norm(d.t + ' ' + d.e);
+    let score = 0;
+    for (const w of tokens) {
+      if (nt.includes(w)) score += 3;
+      else if (nx.includes(w)) score += 1;
+    }
+    return { d, score };
+  });
+  return scored
+    .filter((r) => r.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4)
+    .map((r) => r.d);
+}
+
+async function ensureChatTable(env: Env) {
+  if (CHAT_TABLE_READY) return;
+  try {
+    await env.DB.prepare(`CREATE TABLE IF NOT EXISTS chat_hits (ip_hash TEXT, created_at INTEGER)`).run();
+    await env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_chat_hits ON chat_hits(ip_hash, created_at)`).run();
+    CHAT_TABLE_READY = true;
+  } catch {
+    /* لو فشل الإنشاء، منكمل — الطلب رح يفشل بهدوء لاحقاً */
+  }
+}
+
+async function handleChat(req: Request, env: Env) {
+  if (!env.AI) return json({ ok: true, reply: 'المساعد مش متاح حالياً، جرّب بعدين 🙏', sources: [] });
+
+  let payload: { message?: string; page?: string };
+  try {
+    payload = await req.json();
+  } catch {
+    return json({ ok: false, error: 'bad_json' }, 400);
+  }
+
+  const message = String(payload.message ?? '').trim();
+  if (message.length < 2) return json({ ok: false, error: 'empty' }, 400);
+  if (message.length > CHAT_MAX_LEN) return json({ ok: false, error: 'too_long' }, 400);
+
+  // ---------- الحد لكل زائر ----------
+  await ensureChatTable(env);
+  const ip = req.headers.get('cf-connecting-ip') ?? '0.0.0.0';
+  const ipHash = await hashIp(ip, env.ADMIN_PASSWORD);
+  const since = Date.now() - 3600_000;
+
+  const recent = await env.DB.prepare(
+    `SELECT COUNT(*) AS n FROM chat_hits WHERE ip_hash = ?1 AND created_at > ?2`,
+  )
+    .bind(ipHash, since)
+    .first<{ n: number }>();
+
+  if ((recent?.n ?? 0) >= CHAT_PER_HOUR) {
+    return json({ ok: true, reply: CHAT_LIMIT_MSG, sources: [], capped: true });
+  }
+
+  await env.DB.prepare(`INSERT INTO chat_hits (ip_hash, created_at) VALUES (?1, ?2)`)
+    .bind(ipHash, Date.now())
+    .run();
+
+  // ---------- جلب السياق من محتوى المنصة ----------
+  const docs = await loadChatIndex(req, env);
+  const hits = retrieve(message, docs);
+  const context = hits.map((d) => `- ${d.t}${d.e ? ` (${d.e})` : ''}: ${d.s}`).join('\n');
+  const sources = hits.slice(0, 3).map((d) => ({ title: d.t, url: d.u }));
+
+  const system = context
+    ? `${CHAT_SYSTEM}\n\nسياق من محتوى المنصة (استند عليه إن كان مناسباً للسؤال):\n${context}`
+    : CHAT_SYSTEM;
+
+  // ---------- نداء الموديل ----------
+  let reply = '';
+  try {
+    const out = await env.AI.run(CHAT_MODEL, {
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user', content: message },
+      ],
+      max_tokens: 512,
+      temperature: 0.3,
+    });
+    reply =
+      (out &&
+        (out.response ||
+          out.output_text ||
+          (out.choices && out.choices[0] && out.choices[0].message && out.choices[0].message.content))) ||
+      '';
+    if (typeof reply !== 'string') reply = String(reply ?? '');
+    reply = reply.trim();
+  } catch {
+    reply = '';
+  }
+
+  if (!reply) {
+    return json({ ok: true, reply: 'صار في ضغط بسيط على المساعد 🙏 جرّب اسألني مرة تانية بعد شوي.', sources: [] });
+  }
+
+  return json({ ok: true, reply, sources });
+}
+
 /* ===================== واجهة التعليقات العامة ===================== */
 
 async function listComments(env: Env, page: string) {
   const { results } = await env.DB.prepare(
     `SELECT id, name, body, is_owner, parent_id, created_at
        FROM comments
-      WHERE page = ?1 AND status = 'approved'
-      ORDER BY created_at ASC`,
+       WHERE page = ?1 AND status = 'approved'
+       ORDER BY created_at ASC`,
   )
     .bind(page)
     .all<Row>();
@@ -232,7 +405,7 @@ async function createComment(req: Request, env: Env) {
 
   await env.DB.prepare(
     `INSERT INTO comments (id, page, page_title, name, body, status, is_owner, parent_id, ip_hash, created_at)
-     VALUES (?1, ?2, ?3, ?4, ?5, ?6, 0, NULL, ?7, ?8)`,
+       VALUES (?1, ?2, ?3, ?4, ?5, ?6, 0, NULL, ?7, ?8)`,
   )
     .bind(uid(), page, pageTitle || null, name, body, looksAutomated ? 'spam' : 'pending', ipHash, Date.now())
     .run();
@@ -349,11 +522,11 @@ async function adminPage(env: Env, view: string) {
         .filter((r) => r.parent_id === c.id)
         .map(
           (r) => `<div class="rep"><div class="who">ردّك</div><div class="body">${esc(r.body)}</div>
-            <form method="post" action="/admin/comments/action" class="inline">
-              <input type="hidden" name="id" value="${r.id}">
-              <input type="hidden" name="view" value="${status}">
-              <button class="del" name="action" value="delete" type="submit">حذف الرد</button>
-            </form></div>`,
+        <form method="post" action="/admin/comments/action" class="inline">
+          <input type="hidden" name="id" value="${r.id}">
+          <input type="hidden" name="view" value="${status}">
+          <button class="del" name="action" value="delete" type="submit">حذف الرد</button>
+        </form></div>`,
         )
         .join('');
 
@@ -425,7 +598,7 @@ async function adminAction(req: Request, env: Env) {
       if (parent) {
         await env.DB.prepare(
           `INSERT INTO comments (id, page, page_title, name, body, status, is_owner, parent_id, ip_hash, created_at)
-           VALUES (?1, ?2, ?3, ?4, ?5, 'approved', 1, ?6, NULL, ?7)`,
+             VALUES (?1, ?2, ?3, ?4, ?5, 'approved', 1, ?6, NULL, ?7)`,
         )
           .bind(uid(), parent.page, parent.page_title, 'عبدالله', body, id, Date.now())
           .run();
@@ -464,6 +637,12 @@ export default {
         return json({ ok: true, likes: await countLikes(env, page) });
       }
       if (req.method === 'POST') return toggleLike(req, env);
+      return json({ ok: false, error: 'method' }, 405);
+    }
+
+    // ---------- مساعد الموقع ----------
+    if (path === '/api/chat') {
+      if (req.method === 'POST') return handleChat(req, env);
       return json({ ok: false, error: 'method' }, 405);
     }
 

@@ -13,6 +13,7 @@ import Footer from '../components/Footer.astro';
 import CursorFx from '../components/CursorFx.astro';
 import BgFx from '../components/BgFx.astro';
 import VideoFacade from '../components/VideoFacade.astro';
+import ChatBot from '../components/ChatBot.astro';
 
 interface Props {
   title: string;
@@ -53,6 +54,7 @@ const props = Astro.props;
     <CursorFx />
     <BgFx />
     <VideoFacade poster={props.type === 'video.other' ? props.image : undefined} />
+    <ChatBot />
     <!-- نسخة احتياطية من إيميلات المشتركين بقاعدة البيانات عندنا — ما بتلمس مسار الاشتراك نفسه -->
     <script is:inline>
       document.addEventListener(

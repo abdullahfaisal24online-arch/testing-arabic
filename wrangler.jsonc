@@ -8,12 +8,17 @@
   "workers_dev": false,
   "preview_urls": false,
 
+  // مساعد الموقع — Workers AI (الخطة المجانية)
+  "ai": {
+    "binding": "AI"
+  },
+
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
     "not_found_handling": "404-page",
-    // لازم الـ Worker يمسك مسارات التعليقات قبل الملفات الثابتة
-    "run_worker_first": ["/api/comments", "/api/comments/*", "/api/likes", "/api/likes/*", "/admin/comments", "/admin/comments/*"]
+    // لازم الـ Worker يمسك مسارات الـ API قبل الملفات الثابتة
+    "run_worker_first": ["/api/comments", "/api/comments/*", "/api/likes", "/api/likes/*", "/api/chat", "/api/chat/*", "/admin/comments", "/admin/comments/*"]
   },
   "d1_databases": [
     {
