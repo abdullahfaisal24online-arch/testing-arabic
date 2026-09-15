@@ -13,7 +13,11 @@ const { data } = page;
 const { Content } = await render(page);
 const site = await getSite();
 
-const jsonLd = {
+// بطاقة التعريف بتظهر بس لما تنحط صورة من لوحة التحكم
+const hasProfile = Boolean(data.profilePhoto);
+const profileName = data.profileName || site.author;
+
+const jsonLd: Record<string, unknown> = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
   name: data.title,
@@ -21,6 +25,18 @@ const jsonLd = {
   url: `${site.url}/${page.id}/`,
   inLanguage: 'ar',
 };
+
+// لما يكون في بطاقة تعريف، منعرّف الشخص لمحركات البحث كمان
+if (hasProfile) {
+  jsonLd.about = {
+    '@type': 'Person',
+    name: profileName,
+    ...(data.profileRole ? { jobTitle: data.profileRole } : {}),
+    ...(data.profilePhoto ? { image: `${site.url}${data.profilePhoto}` } : {}),
+    ...(data.profileText ? { description: data.profileText } : {}),
+    ...(data.profileLink ? { sameAs: [data.profileLink] } : {}),
+  };
+}
 ---
 <Base title={data.title} description={data.description} jsonLd={jsonLd}>
   <section class="page-head dots">
@@ -32,7 +48,33 @@ const jsonLd = {
 
   <section class="section">
     <div class="wrap">
-      <div class="prose"><Content /></div>
+      <div class={hasProfile ? 'cols' : ''}>
+        {hasProfile && (
+          <aside class="card">
+            <img
+              class="ph"
+              src={data.profilePhoto}
+              alt={profileName}
+              width="900"
+              height="900"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="inner">
+              <p class="nm">{profileName}</p>
+              {data.profileRole && <p class="rl">{data.profileRole}</p>}
+              {data.profileText && <p class="tx">{data.profileText}</p>}
+              {data.profileLink && (
+                <a class="lnk" href={data.profileLink} target="_blank" rel="noopener">
+                  {data.profileLinkLabel || 'لينكدإن'}
+                </a>
+              )}
+            </div>
+          </aside>
+        )}
+
+        <div class="prose"><Content /></div>
+      </div>
     </div>
   </section>
 </Base>
@@ -40,4 +82,71 @@ const jsonLd = {
 <style>
   .page-head { background: var(--navy); border-bottom: 1px solid var(--line); padding-block: 52px 44px; }
   .page-head h1 { margin-bottom: 12px; }
+
+  .cols {
+    display: grid;
+    /* بالعربي: العمود الأول على اليمين (النص) والتاني على الشمال (البطاقة) */
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* البطاقة أول شي بالـ HTML مشان تطلع فوق النص عالموبايل،
+     وبالشاشات الكبيرة منحطها بالعمود الشمالي */
+  .cols .card { grid-column: 2; grid-row: 1; }
+  .cols .prose { grid-column: 1; grid-row: 1; max-width: none; }
+
+  .card {
+    background: var(--navy);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    position: sticky;
+    top: 24px;
+  }
+
+  .card .ph {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .card .inner { padding: 18px 18px 20px; text-align: center; }
+
+  .card .nm { font-size: 19px; font-weight: 700; margin: 0 0 3px; color: var(--ink); }
+
+  .card .rl { font-size: 14px; font-weight: 600; color: var(--cyan); margin: 0; }
+
+  .card .tx {
+    font-size: 14.5px;
+    color: var(--ink-2);
+    line-height: 1.8;
+    margin: 12px 0 0;
+  }
+
+  .card .lnk {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    padding: 9px 16px;
+    text-decoration: none;
+  }
+
+  .card .lnk:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  @media (max-width: 860px) {
+    .cols { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+    .cols .card,
+    .cols .prose { grid-column: auto; grid-row: auto; }
+    .card { position: static; max-width: 330px; margin-inline: auto; }
+  }
 </style>

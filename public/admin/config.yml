@@ -607,6 +607,35 @@ collections:
         label: "مسودّة لا تُنشر"
         widget: boolean
         default: false
+      - name: profilePhoto
+        label: "صورة بطاقة التعريف"
+        widget: image
+        required: false
+        hint: "حطّ صورة لتظهر بطاقة تعريف جنب نص الصفحة. اتركها فاضية والصفحة بتضل بعمود واحد"
+      - name: profileName
+        label: "الاسم تحت الصورة"
+        widget: string
+        required: false
+      - name: profileRole
+        label: "المسمّى الوظيفي"
+        widget: string
+        required: false
+        hint: "مثال: QA Engineer"
+      - name: profileText
+        label: "نبذة تحت الاسم"
+        widget: text
+        required: false
+        hint: "اختياري — سطر أو سطرين. تقدر تضيفه أو تعدّله وقت ما بدك"
+      - name: profileLink
+        label: "رابط بالبطاقة"
+        widget: string
+        required: false
+        hint: "اختياري — مثال: رابط لينكدإن"
+      - name: profileLinkLabel
+        label: "نص الرابط"
+        widget: string
+        required: false
+        default: "لينكدإن"
       - name: body
         label: "محتوى الصفحة"
         widget: markdown

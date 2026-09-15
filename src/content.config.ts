@@ -195,6 +195,13 @@ const pages = defineCollection({
     description: str(''),
     order: num(0),
     draft: bool(false),
+    // بطاقة التعريف — اختيارية، بتظهر بس لما تنحط صورة
+    profilePhoto: optString,
+    profileName: optString,
+    profileRole: optString,
+    profileText: optString,
+    profileLink: optString,
+    profileLinkLabel: optString,
   }),
 });
 
