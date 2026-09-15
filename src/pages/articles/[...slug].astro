@@ -72,9 +72,12 @@ const jsonLd = [
       <header class="head">
         <h1>{data.title}</h1>
         <p class="standfirst">{data.description}</p>
+        <div class="tag-row">
         {data.tags.length > 0 && (
           <div class="tags">{data.tags.map((t) => <a class="tag" href={`/tags/${tagSlug(t)}/`}>{t}</a>)}</div>
         )}
+          <LikeButton page={`/articles/${article.id}/`} />
+        </div>
         <div class="byline">
           <span class="who">{site.author}</span>
           <span>·</span>
@@ -83,8 +86,6 @@ const jsonLd = [
           <span>{minutesLabel(mins)} قراءة</span>
         </div>
       </header>
-
-      <LikeButton page={`/articles/${article.id}/`} />
 
       {data.cover && <img class="cover" src={data.cover} alt="" width="1200" height="630" />}
 
@@ -140,4 +141,12 @@ const jsonLd = [
   .box ul { list-style: none; margin: 0; padding: 0 14px 0 0; border-inline-start: 1px solid var(--line); display: grid; gap: 10px; }
   .box a { font-size: 15px; color: var(--muted); }
   .box a:hover { color: var(--cyan); }
+
+.tag-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.tag-row .tags { flex: 1 1 auto; }
+.tag-row :global(.likebar) { margin-inline-start: auto; border: 0; padding: 0; margin: 0; }
+@media (max-width: 480px) {
+  .tag-row { flex-direction: column; align-items: flex-start; }
+  .tag-row :global(.likebar) { margin-inline-start: 0; }
+}
 </style>
