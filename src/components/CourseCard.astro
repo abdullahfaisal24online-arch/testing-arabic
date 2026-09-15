@@ -1,6 +1,6 @@
 ---
 import Icon from './Icon.astro';
-import { lessonsLabel, toWebp } from '../lib/utils';
+import { lessonsLabel } from '../lib/utils';
 
 interface Props {
   course: {
@@ -19,15 +19,11 @@ interface Props {
 const { course, count } = Astro.props;
 const { data } = course;
 const icon = data.accent === 'orange' ? 'board' : 'list';
-const coverWebp = toWebp(data.cover);
 ---
 <a class="card course" href={`/courses/${course.id}/`} data-accent={data.accent} data-soon={count === 0 ? 'true' : undefined}>
   {data.cover && (
     <div class="thumb">
-      <picture>
-        {coverWebp && <source srcset={coverWebp} type="image/webp" />}
-        <img src={data.cover} alt="" loading="lazy" decoding="async" width="1280" height="720" />
-      </picture>
+      <img src={data.cover} alt="" loading="lazy" decoding="async" width="1280" height="720" />
     </div>
   )}
   <div class="card-body">
@@ -66,6 +62,4 @@ const coverWebp = toWebp(data.cover);
   font-size: 12px; font-weight: 600; color: var(--muted);
   border: 1px solid var(--line); border-radius: 999px; padding: 3px 11px;
 }
-/* <picture> شفّاف في التخطيط حتى تبقى الصورة تملأ .thumb تماماً */
-.thumb picture { display: contents; }
 </style>
