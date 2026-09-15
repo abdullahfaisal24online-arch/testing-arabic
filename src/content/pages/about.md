@@ -4,6 +4,12 @@ slug: about
 description: عن Testing بالعربي — منصة عربية مستقلة لتعليم اختبار البرمجيات.
 order: 1
 draft: false
+profilePhoto: /uploads/ChatGPT Image Sep 13, 2026, 11_57_57 PM.png
+profileName: عبدالله فيصل
+profileRole: QA Engineer
+profileText: ''
+profileLink: ''
+profileLinkLabel: لينكدإن
 ---
 
 أهلاً بك في منصة **Testing بالعربي** — وجهتك الأولى لتعلّم وإتقان مجال اختبار جودة البرمجيات (Software Testing) باللغة العربية.
