@@ -20,17 +20,10 @@
   "commentsTitle": "النقاش 🔻",
   "commentsNote": "",
   "commentsPlaceholder": "",
+  "likesEnabled": true,
+  "likesLabel": "أعجبني",
+  "likesThreshold": 3,
   "footerNote": "الموقع قيد التطوير 🔻",
-  "storeTitle": "",
-  "storeIntro": "قسم خاص بالدورات والملخصات وبنوك الأسئلة المدفوعة ، يتم تحضيره وتجهيزه للإطلاق قريباً 🔻",
-  "storeCoursesTitle": "",
-  "storeCoursesSoon": "",
-  "storeQuestionsTitle": "",
-  "storeQuestionsSoon": "",
-  "storeSummariesTitle": "",
-  "storeSummariesSoon": "",
-  "payInstructions": "",
-  "whatsapp": "",
   "nav": [
     {
       "label": "الرئيسية",
@@ -68,5 +61,15 @@
       "label": "المتجر",
       "href": "/store/"
     }
-  ]
+  ],
+  "payInstructions": "",
+  "storeCoursesSoon": "",
+  "storeCoursesTitle": "",
+  "storeIntro": "قسم خاص بالدورات والملخصات وبنوك الأسئلة المدفوعة ، يتم تحضيره وتجهيزه للإطلاق قريباً 🔻",
+  "storeQuestionsSoon": "",
+  "storeQuestionsTitle": "",
+  "storeSummariesSoon": "",
+  "storeSummariesTitle": "",
+  "storeTitle": "",
+  "whatsapp": ""
 }
