@@ -63,6 +63,8 @@ const site = await getSite();
 
 const embed = data.videoId ? bunnyEmbed(data.videoId, site.bunnyLibraryId) : '';
 const thumb = bunnyThumb(data.videoId, data.thumbnail, site.bunnyCdnHostname);
+// رابط الصورة لازم يكون absolute حتى يقبله Google بالـ structured data
+const thumbAbs = thumb ? new URL(thumb, site.url).href : undefined;
 
 // صور كروت التنقّل (الدرس السابق/التالي) — مع غلاف بديل لو الدرس بلا صورة
 const prevThumb = prev ? bunnyThumb(prev.data.videoId, prev.data.thumbnail, site.bunnyCdnHostname) : null;
@@ -76,7 +78,7 @@ const jsonLd = [
     description: data.description,
     uploadDate: data.publishDate.toISOString(),
     duration: durationToISO(data.duration),
-    thumbnailUrl: thumb ? [thumb] : undefined,
+    thumbnailUrl: thumbAbs ? [thumbAbs] : undefined,
     embedUrl: embed || undefined,
     inLanguage: 'ar',
     publisher: { '@type': 'Organization', name: site.name, url: site.url },
