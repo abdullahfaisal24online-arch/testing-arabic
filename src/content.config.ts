@@ -321,4 +321,32 @@ const home = defineCollection({
   }),
 });
 
-export const collections = { lessons, articles, courses, news, resources, glossary, questions, pages, site, home, start, chat };
+
+const products = defineCollection({
+  loader: glob({ base: './src/content/products', pattern: '**/*.{md,mdx}' }),
+  schema: z.object({
+    title: z.string(),
+    kind: z.preprocess(
+      fallback('بنك أسئلة'),
+      z.enum(['بنك أسئلة', 'ملخصات', 'قوالب', 'دورة', 'حزمة']),
+    ),
+    // سطر واحد بيشرح شو هي المادة
+    pitch: str(''),
+    price: num(0),
+    offerPrice: z.preprocess(blank, z.coerce.number().optional()),
+    offerNote: optString,
+    // شو جواها — نقطة بكل سطر
+    includes: strList,
+    // للدورات المدفوعة: slug الدورة اللي بيفتحها هاد المنتج
+    course: optString,
+    // للحزم: أكواد المنتجات اللي بتفتحها الحزمة
+    bundleOf: strList,
+    sampleHref: optString,
+    cover: optString,
+    order: num(0),
+    featured: bool(false),
+    draft: bool(false),
+  }),
+});
+
+export const collections = { products, lessons, articles, courses, news, resources, glossary, questions, pages, site, home, start, chat };
