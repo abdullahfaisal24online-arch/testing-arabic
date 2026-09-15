@@ -39,8 +39,6 @@ const rows = lessons.map((l) => {
 });
 
 const categories = [...new Set(lessons.map((l) => l.data.category))];
-const inCourse = rows.filter((r) => r.title).length;
-const standalone = rows.length - inCourse;
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -60,15 +58,10 @@ const jsonLd = {
     <div class="wrap">
       <h1>كل الدروس</h1>
       <p class="lead">
-        الأرشيف الكامل — {lessons.length} درس، منها {inCourse} ضمن دورات و{standalone} فيديو متفرّق.
+        الأرشيف الكامل — {lessons.length} درس، كلها مرتّبة ضمن الدورات.
       </p>
 
       <div class="filters">
-        <div class="fgroup" role="group" aria-label="تصفية حسب الانتماء">
-          <button class="chip on" type="button" data-scope="all">الكل</button>
-          <button class="chip" type="button" data-scope="course">ضمن دورة</button>
-          <button class="chip" type="button" data-scope="solo">متفرّقة</button>
-        </div>
         {categories.length > 1 && (
           <div class="fgroup" role="group" aria-label="تصفية حسب التصنيف">
             <button class="chip cat on" type="button" data-cat="all">كل التصنيفات</button>
@@ -118,33 +111,23 @@ const jsonLd = {
 </style>
 
 <script>
-  const scopeChips = document.querySelectorAll<HTMLButtonElement>('.chip[data-scope]');
   const catChips = document.querySelectorAll<HTMLButtonElement>('.chip[data-cat]');
   const cells = document.querySelectorAll<HTMLElement>('#lesson-grid > [data-cat]');
   const empty = document.querySelector<HTMLElement>('.empty');
 
-  let scope = 'all';
   let cat = 'all';
 
   function apply() {
     let shown = 0;
     cells.forEach((cell) => {
-      const okScope = scope === 'all' || cell.dataset.scope === scope;
       const okCat = cat === 'all' || cell.dataset.cat === cat;
-      const match = okScope && okCat;
+      const match = okCat;
       cell.style.display = match ? '' : 'none';
       if (match) shown++;
     });
     if (empty) empty.hidden = shown > 0;
   }
 
-  scopeChips.forEach((chip) =>
-    chip.addEventListener('click', () => {
-      scopeChips.forEach((c) => c.classList.toggle('on', c === chip));
-      scope = chip.dataset.scope ?? 'all';
-      apply();
-    }),
-  );
 
   catChips.forEach((chip) =>
     chip.addEventListener('click', () => {
