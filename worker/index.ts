@@ -5,33 +5,15 @@
  * هذا الخادم بيشتغل فقط على:
  *   POST /api/comments        إرسال تعليق جديد
  *   GET  /api/comments?page=  جلب التعليقات المنشورة لصفحة
- *   GET  /admin/comments        صفحة المراجعة (محمية بـ Cloudflare Access)
- *   GET  /admin/comments/count  عدد التعليقات المنتظرة (للقائمة الجانبية)
- *
- * الحماية: كل مسار تحت /admin محمي ببوابة Cloudflare Access على مستوى الشبكة،
- * قبل ما الطلب يوصل لهذا الخادم أصلاً. ما في كلمة سر يدوية ولا جلسة خاصة هون.
+ *   GET  /api/likes?page=     عدد الإعجابات لصفحة
+ *   POST /api/likes           إضافة/سحب إعجاب
+ *   GET  /admin/comments      صفحة المراجعة (محمية بكلمة سر)
  */
 
-import {
-  proAdminAction,
-  proAdminNew,
-  proAdminPage,
-  proCookie,
-  proGateFor,
-  proOrder,
-  proProducts,
-  proUnlock,
-} from './pro';
-
-export interface Env {
+interface Env {
   DB: D1Database;
   ASSETS: Fetcher;
-  /** سر توقيع كوكي القسم المدفوع */
-  PRO_SECRET?: string;
-  /** ملح بصمة الآي بي. اختياري — إذا مش مضبوط بينستعمل ADMIN_PASSWORD القديمة. */
-  IP_SALT?: string;
-  /** قديمة: كانت كلمة سر صفحة المراجعة. هلأ بتستعمل كملح فقط. */
-  ADMIN_PASSWORD?: string;
+  ADMIN_PASSWORD: string;
 }
 
 type Row = {
@@ -49,31 +31,23 @@ type Row = {
 const MAX_NAME = 40;
 const MAX_BODY = 2000;
 const MIN_BODY = 2;
-const MAX_PER_HOUR = 12;
-const FALLBACK_SALT = 'ta-comments-ip-salt';
+const COOKIE = 'ta_admin';
+const SESSION_DAYS = 14;
 
 /* ===================== أدوات ===================== */
 
-export const json = (data: unknown, status = 200) =>
+const json = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), {
     status,
     headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
   });
 
-export const html = (body: string, status = 200) =>
-  new Response(body, {
-    status,
-    headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
-  });
-
-export const esc = (s: string) =>
+const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-export const uid = () => crypto.randomUUID();
+const uid = () => crypto.randomUUID();
 
-export const ipSalt = (env: Env) => env.IP_SALT || env.ADMIN_PASSWORD || FALLBACK_SALT;
-
-export async function hmac(secret: string, value: string): Promise<string> {
+async function hmac(secret: string, value: string): Promise<string> {
   const key = await crypto.subtle.importKey(
     'raw',
     new TextEncoder().encode(secret),
@@ -85,76 +59,107 @@ export async function hmac(secret: string, value: string): Promise<string> {
   return [...new Uint8Array(sig)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-export async function hashIp(ip: string, secret: string): Promise<string> {
+async function hashIp(ip: string, secret: string): Promise<string> {
   // ما بنخزّن الآي بي نفسه — بس بصمة عشان منع التكرار
   return (await hmac(secret, `ip:${ip}`)).slice(0, 32);
 }
 
-/**
- * التعليق بيحدد صفحته بنفسه، فلازم نتأكد إنه مسار داخلي فعلاً.
- * "//evil.com" بيبدأ بـ "/" بس هو رابط خارجي كامل — لهيك منرفضه.
- */
-const isInternalPath = (p: string) =>
-  p.startsWith('/') && !p.startsWith('//') && !p.startsWith('/\\') && !p.includes('\\') && p.length <= 200;
+const safeEqual = (a: string, b: string) => {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+};
 
-/**
- * الطلبات اللي بتغيّر حالة (نشر/حذف/رد) لازم تكون جاية من الموقع نفسه.
- * بوابة Access بتحمي المسار، بس هذا بيقفل باب التزوير عبر المواقع (CSRF).
- */
-export function sameOrigin(req: Request): boolean {
-  const host = new URL(req.url).host;
-  const origin = req.headers.get('origin');
-  if (origin) {
-    try {
-      return new URL(origin).host === host;
-    } catch {
-      return false;
-    }
-  }
-  const referer = req.headers.get('referer');
-  if (referer) {
-    try {
-      return new URL(referer).host === host;
-    } catch {
-      return false;
-    }
-  }
-  return false;
+/* ===================== جلسة المراجعة ===================== */
+
+async function makeToken(secret: string): Promise<string> {
+  const exp = Date.now() + SESSION_DAYS * 864e5;
+  return `${exp}.${await hmac(secret, String(exp))}`;
 }
 
-export const readCookie = (req: Request, name: string) =>
+async function validToken(token: string | undefined, secret: string): Promise<boolean> {
+  if (!token) return false;
+  const [exp, sig] = token.split('.');
+  if (!exp || !sig) return false;
+  if (Number(exp) < Date.now()) return false;
+  return safeEqual(sig, await hmac(secret, exp));
+}
+
+const readCookie = (req: Request, name: string) =>
   (req.headers.get('cookie') ?? '')
     .split(';')
     .map((c) => c.trim().split('='))
     .find(([k]) => k === name)?.[1];
 
-/* ===================== بوابة Cloudflare Access ===================== */
+/* ===================== الإعجابات ===================== */
 
-/**
- * الطلب اللي بيعدّي من Access بيوصل ومعه ترويسة JWT وإيميل المستخدم.
- * إذا ما وصلت هالترويسات معناها إنو البوابة مش قدّام هذا المسار —
- * وقتها منرفض بدل ما نفتح اللوحة للعالم.
- */
-const accessEmail = (req: Request) =>
-  req.headers.get('cf-access-authenticated-user-email') ?? '';
+/** أقصى عدد إعجابات لنفس الصفحة من نفس المصدر.
+ *  مرفوع عن قصد: بالأردن والخليج كثير ناس بتطلع من نفس الـ IP على شبكات
+ *  الموبايل، فالتضييق هون بيمنع متفاعلين حقيقيين مش سبام. */
+const LIKES_PER_PAGE_PER_IP = 8;
+/** سقف عام للحركة من نفس المصدر بالساعة — لوقف السكربتات. */
+const LIKES_PER_HOUR_PER_IP = 40;
 
-const behindAccess = (req: Request) =>
-  Boolean(
-    req.headers.get('cf-access-jwt-assertion') ||
-      accessEmail(req) ||
-      readCookie(req, 'CF_Authorization'),
-  );
+async function countLikes(env: Env, page: string): Promise<number> {
+  const row = await env.DB.prepare(`SELECT COUNT(*) AS n FROM likes WHERE page = ?1`)
+    .bind(page)
+    .first<{ n: number }>();
+  return row?.n ?? 0;
+}
 
-function accessMissingPage() {
-  return shell(
-    `<div class="wrap">
-      <h1>البوابة مش مفعّلة</h1>
-      <p class="sub">هذه الصفحة لازم تكون خلف Cloudflare Access. الطلب وصل بدون هوية، فانرفض.</p>
-      <p class="sub">افحص: Zero Trust → Access controls → Applications → التطبيق على
-      <code>/admin</code> شغّال ومربوط بهذا الدومين.</p>
-    </div>`,
-    'البوابة مش مفعّلة',
-  );
+async function toggleLike(req: Request, env: Env) {
+  let payload: { page?: string; on?: boolean };
+  try {
+    payload = await req.json();
+  } catch {
+    return json({ ok: false, error: 'bad_json' }, 400);
+  }
+
+  const page = String(payload.page ?? '');
+  if (!page.startsWith('/') || page.length > 300) {
+    return json({ ok: false, error: 'bad_page' }, 400);
+  }
+  const on = payload.on !== false; // الافتراضي: إضافة إعجاب
+
+  const ip = req.headers.get('cf-connecting-ip') ?? '0.0.0.0';
+  const ipHash = await hashIp(ip, env.ADMIN_PASSWORD);
+
+  if (on) {
+    const since = Date.now() - 3600_000;
+    const [perPage, perHour] = await Promise.all([
+      env.DB.prepare(`SELECT COUNT(*) AS n FROM likes WHERE page = ?1 AND ip_hash = ?2`)
+        .bind(page, ipHash)
+        .first<{ n: number }>(),
+      env.DB.prepare(`SELECT COUNT(*) AS n FROM likes WHERE ip_hash = ?1 AND created_at > ?2`)
+        .bind(ipHash, since)
+        .first<{ n: number }>(),
+    ]);
+
+    // بنرجّع العدد الحالي بهدوء بدل رسالة خطأ — الزائر ما إله دخل
+    if ((perPage?.n ?? 0) >= LIKES_PER_PAGE_PER_IP || (perHour?.n ?? 0) >= LIKES_PER_HOUR_PER_IP) {
+      return json({ ok: true, likes: await countLikes(env, page), capped: true });
+    }
+
+    await env.DB.prepare(`INSERT INTO likes (page, ip_hash, created_at) VALUES (?1, ?2, ?3)`)
+      .bind(page, ipHash, Date.now())
+      .run();
+  } else {
+    // بنشيل آخر إعجاب من نفس المصدر لهاي الصفحة
+    await env.DB.prepare(
+      `DELETE FROM likes
+        WHERE rowid = (
+          SELECT rowid FROM likes
+           WHERE page = ?1 AND ip_hash = ?2
+           ORDER BY created_at DESC
+           LIMIT 1
+        )`,
+    )
+      .bind(page, ipHash)
+      .run();
+  }
+
+  return json({ ok: true, likes: await countLikes(env, page) });
 }
 
 /* ===================== واجهة التعليقات العامة ===================== */
@@ -204,7 +209,7 @@ async function createComment(req: Request, env: Env) {
   const honey = (data.website ?? '').trim();
   const openedAt = Number(data.t ?? 0);
 
-  if (!isInternalPath(page)) return json({ ok: false, error: 'bad_page' }, 400);
+  if (!page.startsWith('/') || page.length > 200) return json({ ok: false, error: 'bad_page' }, 400);
   if (name.length < 2 || name.length > MAX_NAME) return json({ ok: false, error: 'bad_name' }, 400);
   if (body.length < MIN_BODY || body.length > MAX_BODY) return json({ ok: false, error: 'bad_body' }, 400);
 
@@ -213,9 +218,9 @@ async function createComment(req: Request, env: Env) {
     honey.length > 0 || (openedAt > 0 && Date.now() - openedAt < 3000) || (body.match(/https?:\/\//g) ?? []).length > 2;
 
   const ip = req.headers.get('cf-connecting-ip') ?? '0.0.0.0';
-  const ipHash = await hashIp(ip, ipSalt(env));
+  const ipHash = await hashIp(ip, env.ADMIN_PASSWORD);
 
-  // منع الإغراق: حد أقصى بالساعة من نفس المصدر
+  // منع الإغراق: 5 تعليقات كحد أقصى بالساعة من نفس المصدر
   const since = Date.now() - 3600_000;
   const recent = await env.DB.prepare(
     `SELECT COUNT(*) AS n FROM comments WHERE ip_hash = ?1 AND created_at > ?2`,
@@ -223,7 +228,7 @@ async function createComment(req: Request, env: Env) {
     .bind(ipHash, since)
     .first<{ n: number }>();
 
-  if ((recent?.n ?? 0) >= MAX_PER_HOUR) return json({ ok: false, error: 'too_many' }, 429);
+  if ((recent?.n ?? 0) >= 12) return json({ ok: false, error: 'too_many' }, 429);
 
   await env.DB.prepare(
     `INSERT INTO comments (id, page, page_title, name, body, status, is_owner, parent_id, ip_hash, created_at)
@@ -246,7 +251,7 @@ const fmtDate = (ms: number) =>
     minute: '2-digit',
   }).format(new Date(ms));
 
-export function shell(inner: string, title = 'مراجعة التعليقات') {
+function shell(inner: string, title = 'مراجعة التعليقات') {
   return `<!doctype html>
 <html lang="ar" dir="rtl"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -262,9 +267,6 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans A
 .wrap{max-width:900px;margin:0 auto;padding:28px 20px 70px}
 h1{font-size:26px;margin:0 0 6px}
 .sub{color:var(--muted);font-size:15px;margin:0 0 24px}
-.sub code{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:14px}
-.who-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px;color:var(--muted);margin:0 0 20px}
-.who-bar .mail{color:var(--cyan)}
 .tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px}
 .tab{font:inherit;font-size:14px;color:var(--muted);background:transparent;border:1px solid var(--line);
 border-radius:999px;padding:8px 16px;text-decoration:none;display:inline-block}
@@ -290,12 +292,28 @@ form.inline{display:contents}
 .rep{background:var(--navy);border-inline-start:3px solid var(--cyan);border-radius:10px;padding:12px 14px;margin-top:12px}
 .rep .who{font-size:14px;color:var(--cyan)}
 .empty{color:var(--muted);text-align:center;padding:50px 0}
+.login{max-width:380px;margin:14vh auto;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:28px}
+.login h1{font-size:20px;margin-bottom:16px}
+.login button{width:100%;margin-top:12px;background:var(--orange);color:#0a1428}
+.err{color:var(--orange);font-size:14px;margin-top:10px}
 .count{background:rgba(246,130,59,.14);color:var(--orange);border-radius:999px;padding:2px 10px;font-size:13px}
 a.back{color:var(--muted);font-size:14px;text-decoration:none}
 </style></head><body>${inner}</body></html>`;
 }
 
-async function adminPage(req: Request, env: Env, view: string) {
+function loginPage(error = '') {
+  return shell(
+    `<form class="login" method="post" action="/admin/comments/login">
+      <h1>مراجعة التعليقات</h1>
+      <input type="password" name="password" placeholder="كلمة السر" autofocus required>
+      <button type="submit">دخول</button>
+      ${error ? `<p class="err">${esc(error)}</p>` : ''}
+    </form>`,
+    'دخول المراجعة',
+  );
+}
+
+async function adminPage(env: Env, view: string) {
   const status = view === 'approved' ? 'approved' : view === 'spam' ? 'spam' : 'pending';
 
   const { results } = await env.DB.prepare(
@@ -331,62 +349,56 @@ async function adminPage(req: Request, env: Env, view: string) {
         .filter((r) => r.parent_id === c.id)
         .map(
           (r) => `<div class="rep"><div class="who">ردّك</div><div class="body">${esc(r.body)}</div>
-<form method="post" action="/admin/comments/action" class="inline">
-<input type="hidden" name="id" value="${r.id}">
-<input type="hidden" name="view" value="${status}">
-<button class="del" name="action" value="delete" type="submit">حذف الرد</button>
-</form></div>`,
+            <form method="post" action="/admin/comments/action" class="inline">
+              <input type="hidden" name="id" value="${r.id}">
+              <input type="hidden" name="view" value="${status}">
+              <button class="del" name="action" value="delete" type="submit">حذف الرد</button>
+            </form></div>`,
         )
         .join('');
 
       return `<article class="c${status === 'spam' ? ' spam' : ''}">
-<div class="meta">
-<span class="who">${esc(c.name)}</span>
-<span>·</span><span>${fmtDate(c.created_at)}</span>
-<span>·</span><a class="page-link" href="${esc(c.page)}" target="_blank" rel="noopener noreferrer">${esc(c.page_title || c.page)}</a>
-</div>
-<p class="body">${esc(c.body)}</p>
-<div class="acts">
-<form method="post" action="/admin/comments/action" class="inline">
-<input type="hidden" name="id" value="${c.id}">
-<input type="hidden" name="view" value="${status}">
-${status !== 'approved' ? '<button class="ok" name="action" value="approve" type="submit">نشر</button>' : ''}
-${status !== 'pending' ? '<button class="no" name="action" value="unapprove" type="submit">إرجاع للانتظار</button>' : ''}
-${status !== 'spam' ? '<button class="no" name="action" value="spam" type="submit">سبام</button>' : ''}
-<button class="del" name="action" value="delete" type="submit">حذف</button>
-</form>
-</div>
-${myReplies}
-<details class="reply">
-<summary>اكتب رد</summary>
-<form method="post" action="/admin/comments/action" style="margin-top:12px">
-<input type="hidden" name="id" value="${c.id}">
-<input type="hidden" name="view" value="${status}">
-<textarea name="reply" placeholder="ردّك على ${esc(c.name)}…" required></textarea>
-<button class="ok" name="action" value="reply" type="submit">انشر الرد</button>
-</form>
-</details>
-</article>`;
+      <div class="meta">
+        <span class="who">${esc(c.name)}</span>
+        <span>·</span><span>${fmtDate(c.created_at)}</span>
+        <span>·</span><a class="page-link" href="${esc(c.page)}" target="_blank">${esc(c.page_title || c.page)}</a>
+      </div>
+      <p class="body">${esc(c.body)}</p>
+      <div class="acts">
+        <form method="post" action="/admin/comments/action" class="inline">
+          <input type="hidden" name="id" value="${c.id}">
+          <input type="hidden" name="view" value="${status}">
+          ${status !== 'approved' ? '<button class="ok" name="action" value="approve" type="submit">نشر</button>' : ''}
+          ${status !== 'pending' ? '<button class="no" name="action" value="unapprove" type="submit">إرجاع للانتظار</button>' : ''}
+          ${status !== 'spam' ? '<button class="no" name="action" value="spam" type="submit">سبام</button>' : ''}
+          <button class="del" name="action" value="delete" type="submit">حذف</button>
+        </form>
+      </div>
+      ${myReplies}
+      <details class="reply">
+        <summary>اكتب رد</summary>
+        <form method="post" action="/admin/comments/action" style="margin-top:12px">
+          <input type="hidden" name="id" value="${c.id}">
+          <input type="hidden" name="view" value="${status}">
+          <textarea name="reply" placeholder="ردّك على ${esc(c.name)}…" required></textarea>
+          <button class="ok" name="action" value="reply" type="submit">انشر الرد</button>
+        </form>
+      </details>
+    </article>`;
     })
     .join('');
 
-  const email = accessEmail(req);
-
   return shell(`<div class="wrap">
-<h1>مراجعة التعليقات</h1>
-<p class="sub">التعليقات ما بتظهر على الموقع إلا بعد ما توافق عليها.</p>
-<div class="who-bar">
-${email ? `<span>داخل باسم <span class="mail">${esc(email)}</span></span><span>·</span>` : ''}
-<a class="back" href="/admin/">لوحة المحتوى</a>
-</div>
-<nav class="tabs">
-${tab('pending', 'بانتظار المراجعة')}
-${tab('approved', 'منشورة')}
-${tab('spam', 'سبام')}
-<a class="tab" href="/cdn-cgi/access/logout">خروج</a>
-</nav>
-${cards || '<p class="empty">ما في تعليقات هون.</p>'}
-</div>`);
+    <h1>مراجعة التعليقات</h1>
+    <p class="sub">التعليقات ما بتظهر على الموقع إلا بعد ما توافق عليها.</p>
+    <nav class="tabs">
+      ${tab('pending', 'بانتظار المراجعة')}
+      ${tab('approved', 'منشورة')}
+      ${tab('spam', 'سبام')}
+      <a class="tab" href="/admin/comments/logout">خروج</a>
+    </nav>
+    ${cards || '<p class="empty">ما في تعليقات هون.</p>'}
+  </div>`);
 }
 
 async function adminAction(req: Request, env: Env) {
@@ -433,122 +445,78 @@ export default {
     const url = new URL(req.url);
     const path = url.pathname;
 
-    // ---------- القسم المدفوع ----------
-    if (path === '/api/pro/unlock') {
-      if (req.method !== 'POST') return json({ ok: false, error: 'method' }, 405);
-      return proUnlock(req, env);
-    }
-    if (path === '/api/pro/status') {
-      const open = await proProducts(req, env);
-      return json({ ok: open.size > 0, products: [...open] });
-    }
-    if (path === '/api/pro/order') {
-      if (req.method !== 'POST') return json({ ok: false, error: 'method' }, 405);
-      return proOrder(req, env);
-    }
-    if (path === '/api/pro/logout') {
-      return new Response(JSON.stringify({ ok: true }), {
-        status: 200,
-        headers: {
-          'content-type': 'application/json; charset=utf-8',
-          'set-cookie': proCookie('', 0),
-        },
-      });
-    }
-
-    if (path.startsWith('/admin/pro')) {
-      if (!behindAccess(req)) return html(accessMissingPage(), 403);
-      if (path === '/admin/pro/new' && req.method === 'POST') return proAdminNew(req, env);
-      if (path === '/admin/pro/action' && req.method === 'POST') return proAdminAction(req, env);
-      return html(shell(await proAdminPage(req, env), 'القسم المدفوع'));
-    }
-
-    // بوابة المحتوى المدفوع: /pro/<المنتج>/… لازمها كود يفتح هاد المنتج بالذات.
-    // /pro/ و /pro/unlock/ مفتوحين للكل، وصفحات البيع كلها تحت /store/ عامة ومفهرسة.
-    const wantProduct = await proGateFor(path, env, url.origin);
-    if (wantProduct) {
-      const open = await proProducts(req, env);
-      if (!open.has(wantProduct)) {
-        const to = new URL('/pro/unlock/', req.url);
-        to.searchParams.set('to', path);
-        to.searchParams.set('p', wantProduct);
-        return Response.redirect(to.toString(), 302);
-      }
-    }
-
     // ---------- واجهة التعليقات ----------
     if (path === '/api/comments') {
       if (req.method === 'GET') {
         const page = url.searchParams.get('page') ?? '';
-        if (!isInternalPath(page)) return json({ ok: false, error: 'bad_page' }, 400);
-        const body = JSON.stringify({ ok: true, comments: await listComments(env, page) });
-        // كاش قصير بمتصفّح الزائر: التعليق الجديد بدّه موافقتك أصلاً، فدقيقة تأخير ما بتضر
-        return new Response(body, {
-          headers: {
-            'content-type': 'application/json; charset=utf-8',
-            'cache-control': 'public, max-age=60',
-          },
-        });
+        if (!page.startsWith('/')) return json({ ok: false, error: 'bad_page' }, 400);
+        return json({ ok: true, comments: await listComments(env, page) });
       }
       if (req.method === 'POST') return createComment(req, env);
       return json({ ok: false, error: 'method' }, 405);
     }
 
-    // ---------- نسخة محلية من مشتركي النشرة ----------
-    // النموذج بيضل يبعت لـ Kit مباشرة؛ هاد الـ endpoint بس بيسجّل الإيميل عندنا كنسخة احتياطية
-    if (path === '/api/subscribe') {
-      if (req.method !== 'POST') return json({ ok: false, error: 'method' }, 405);
-      if (!sameOrigin(req)) return json({ ok: false, error: 'origin' }, 403);
-
-      let email = '';
-      if ((req.headers.get('content-type') ?? '').includes('application/json')) {
-        const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
-        email = String(body.email ?? '');
-      } else {
-        const form = await req.formData().catch(() => null);
-        email = String(form?.get('email') ?? '');
+    // ---------- الإعجابات ----------
+    if (path === '/api/likes') {
+      if (req.method === 'GET') {
+        const page = url.searchParams.get('page') ?? '';
+        if (!page.startsWith('/')) return json({ ok: false, error: 'bad_page' }, 400);
+        return json({ ok: true, likes: await countLikes(env, page) });
       }
-      email = email.trim().toLowerCase();
-
-      if (email.length > 254 || !/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)) {
-        return json({ ok: false, error: 'email' }, 400);
-      }
-
-      const now = Date.now();
-      await env.DB.prepare(
-        `INSERT INTO subscribers (email, source, created_at, last_seen_at)
-         VALUES (?1, ?2, ?3, ?3)
-         ON CONFLICT(email) DO UPDATE SET last_seen_at = ?3`,
-      )
-        .bind(email, (req.headers.get('referer') ?? '').slice(0, 300), now)
-        .run();
-
-      return json({ ok: true });
+      if (req.method === 'POST') return toggleLike(req, env);
+      return json({ ok: false, error: 'method' }, 405);
     }
 
-    // ---------- صفحة المراجعة (خلف Cloudflare Access) ----------
+    // ---------- صفحة المراجعة ----------
     if (path.startsWith('/admin/comments')) {
-      if (!behindAccess(req)) return html(accessMissingPage(), 403);
-
-      if (path === '/admin/comments/action' && req.method === 'POST') {
-        if (!sameOrigin(req)) return html(shell('<div class="wrap"><h1>طلب مرفوض</h1><p class="sub">هذا الطلب مش جاي من الموقع نفسه.</p></div>', 'طلب مرفوض'), 403);
-        return adminAction(req, env);
+      if (!env.ADMIN_PASSWORD) {
+        return new Response('ADMIN_PASSWORD غير مضبوط', { status: 500 });
       }
 
-      // عدّاد التعليقات المنتظرة — بتستعمله القائمة الجانبية بلوحة المحتوى
-      if (path === '/admin/comments/count') {
-        const row = await env.DB.prepare(
-          `SELECT COUNT(*) AS n FROM comments WHERE status = 'pending'`,
-        ).first<{ n: number }>();
-        return json({ ok: true, pending: row?.n ?? 0 });
+      if (path === '/admin/comments/login' && req.method === 'POST') {
+        const form = await req.formData();
+        const pass = String(form.get('password') ?? '');
+        if (!safeEqual(pass, env.ADMIN_PASSWORD)) {
+          return new Response(loginPage('كلمة السر غير صحيحة'), {
+            status: 401,
+            headers: { 'content-type': 'text/html; charset=utf-8' },
+          });
+        }
+        const token = await makeToken(env.ADMIN_PASSWORD);
+        return new Response(null, {
+          status: 303,
+          headers: {
+            location: '/admin/comments',
+            'set-cookie': `${COOKIE}=${token}; HttpOnly; Secure; SameSite=Lax; Path=/admin; Max-Age=${
+              SESSION_DAYS * 86400
+            }`,
+          },
+        });
       }
 
-      // روابط قديمة من نسخة كلمة السر
-      if (path === '/admin/comments/login' || path === '/admin/comments/logout') {
-        return Response.redirect(new URL('/admin/comments', req.url).toString(), 303);
+      if (path === '/admin/comments/logout') {
+        return new Response(null, {
+          status: 303,
+          headers: {
+            location: '/admin/comments',
+            'set-cookie': `${COOKIE}=; HttpOnly; Secure; SameSite=Lax; Path=/admin; Max-Age=0`,
+          },
+        });
       }
 
-      return html(await adminPage(req, env, url.searchParams.get('view') ?? 'pending'));
+      const authed = await validToken(readCookie(req, COOKIE), env.ADMIN_PASSWORD);
+      if (!authed) {
+        return new Response(loginPage(), {
+          status: 401,
+          headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
+        });
+      }
+
+      if (path === '/admin/comments/action' && req.method === 'POST') return adminAction(req, env);
+
+      return new Response(await adminPage(env, url.searchParams.get('view') ?? 'pending'), {
+        headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
+      });
     }
 
     // ---------- كل شي تاني: الملفات الثابتة ----------

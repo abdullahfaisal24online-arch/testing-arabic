@@ -24,6 +24,9 @@ const SITE_DEFAULTS = {
   commentsTitle: 'النقاش',
   commentsNote: 'اكتب سؤالك أو ملاحظتك. التعليقات بتظهر بعد المراجعة.',
   commentsPlaceholder: 'سؤالك أو ملاحظتك…',
+  likesEnabled: false,
+  likesLabel: 'أعجبني',
+  likesThreshold: 3,
   nav: [] as { label: string; href: string }[],
 };
 

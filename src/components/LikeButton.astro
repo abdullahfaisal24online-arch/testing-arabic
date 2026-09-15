@@ -1,0 +1,223 @@
+---
+/**
+ * زر الإعجاب — بدون تسجيل دخول.
+ *
+ * المتصفح بيتذكر إنك دُست (localStorage)، والعدّاد بينحفظ على D1.
+ * العدد ما بيبيّن إلا لما يوصل الحد (افتراضياً 3) — مشان ما يطلع «0»
+ * تحت كل درس بموقع جديد.
+ */
+import { getSite } from '../lib/site';
+
+interface Props {
+  page: string;
+  label?: string;
+}
+
+const { page, label } = Astro.props;
+const site = await getSite();
+
+const enabled = site.likesEnabled;
+const text = label ?? site.likesLabel;
+const threshold = site.likesThreshold;
+---
+
+{enabled && (
+  <div class="likebar" data-page={page} data-threshold={String(threshold)}>
+    <button class="like" type="button" aria-pressed="false" aria-label={text}>
+      <svg class="hi" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 20.5C12 20.5 2.8 15.3 2.8 8.9c0-2.6 2-4.6 4.5-4.6 1.8 0 3.3 1 4.1 2.5.8-1.5 2.3-2.5 4.1-2.5 2.5 0 4.5 2 4.5 4.6 0 6.4-9.2 11.6-9.2 11.6z" />
+      </svg>
+      <span class="lbl">{text}</span>
+      <span class="n" hidden>0</span>
+    </button>
+  </div>
+)}
+
+<style>
+  .likebar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 14px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    margin: 18px 0 4px;
+  }
+
+  .like {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font: inherit;
+    font-size: 14.5px;
+    font-weight: 600;
+    cursor: pointer;
+    background: transparent;
+    color: var(--ink-2);
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    padding: 9px 17px;
+    transition: border-color 0.18s, color 0.18s, background 0.18s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .like:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+  }
+
+  .like:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 2px;
+  }
+
+  .like .hi {
+    width: 20px;
+    height: 20px;
+    flex: none;
+    transition: transform 0.22s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+
+  .like .hi path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linejoin: round;
+    transition: fill 0.18s;
+  }
+
+  .like .n {
+    font-variant-numeric: tabular-nums;
+    font-size: 14px;
+    opacity: 0.9;
+  }
+
+  .like .n[hidden] {
+    display: none;
+  }
+
+  .like.on {
+    color: var(--orange);
+    border-color: var(--orange-line);
+    background: var(--orange-soft);
+  }
+
+  .like.on .hi path {
+    fill: currentColor;
+  }
+
+  .like.pop .hi {
+    animation: ta-like-pop 0.42s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+
+  @keyframes ta-like-pop {
+    0% { transform: scale(1); }
+    35% { transform: scale(1.32); }
+    60% { transform: scale(0.94); }
+    100% { transform: scale(1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .like .hi,
+    .like.pop .hi {
+      transition: none;
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('.likebar');
+  const btn = bar?.querySelector<HTMLButtonElement>('.like');
+  const out = btn?.querySelector<HTMLElement>('.n');
+
+  if (bar && btn && out) {
+    const page = bar.dataset.page ?? '';
+    const threshold = Number(bar.dataset.threshold ?? '3');
+    const key = `ta-like:${page}`;
+
+    let count = 0;
+    let liked = false;
+    let busy = false;
+
+    const readStored = () => {
+      try {
+        return localStorage.getItem(key) === '1';
+      } catch {
+        return false;
+      }
+    };
+
+    const store = (v: boolean) => {
+      try {
+        v ? localStorage.setItem(key, '1') : localStorage.removeItem(key);
+      } catch {
+        /* وضع التصفح الخاص — بنكمّل عادي */
+      }
+    };
+
+    const paint = () => {
+      out.textContent = String(count);
+      out.hidden = count < threshold;
+      btn.classList.toggle('on', liked);
+      btn.setAttribute('aria-pressed', liked ? 'true' : 'false');
+    };
+
+    liked = readStored();
+    paint();
+
+    // جلب العدّاد بعد تحميل الصفحة — ما بيأخّر أي إشي
+    fetch(`/api/likes?page=${encodeURIComponent(page)}`)
+      .then((r) => r.json())
+      .then((d: { ok?: boolean; likes?: number }) => {
+        if (d?.ok && typeof d.likes === 'number') {
+          count = d.likes;
+          paint();
+        }
+      })
+      .catch(() => {
+        /* ما في نت — بنضل نعرض الزر بدون رقم */
+      });
+
+    btn.addEventListener('click', async () => {
+      if (busy) return;
+      busy = true;
+
+      const next = !liked;
+
+      // تحديث فوري بالواجهة، وبنصحّحه من رد السيرفر
+      liked = next;
+      count = Math.max(0, count + (next ? 1 : -1));
+      store(next);
+      paint();
+
+      if (next) {
+        btn.classList.remove('pop');
+        void btn.offsetWidth;
+        btn.classList.add('pop');
+      }
+
+      try {
+        const res = await fetch('/api/likes', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ page, on: next }),
+        });
+        const d = (await res.json()) as { ok?: boolean; likes?: number };
+        if (d?.ok && typeof d.likes === 'number') {
+          count = d.likes;
+          paint();
+        }
+      } catch {
+        /* فشل الإرسال — بنرجّع الحالة زي ما كانت */
+        liked = !next;
+        count = Math.max(0, count + (next ? -1 : 1));
+        store(liked);
+        paint();
+      } finally {
+        busy = false;
+      }
+    });
+  }
+</script>

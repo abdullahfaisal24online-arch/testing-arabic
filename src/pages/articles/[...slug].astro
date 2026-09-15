@@ -5,6 +5,7 @@ import ArticleCard from '../../components/ArticleCard.astro';
 import InlineNewsletter from '../../components/InlineNewsletter.astro';
 import Prose from '../../components/Prose.astro';
 import Comments from '../../components/Comments.astro';
+import LikeButton from '../../components/LikeButton.astro';
 import { getSite } from '../../lib/site';
 import { tagSlug } from '../../lib/tags';
 import { formatDate, readingTime, minutesLabel } from '../../lib/utils';
@@ -83,13 +84,15 @@ const jsonLd = [
         </div>
       </header>
 
+      <LikeButton page={`/articles/${article.id}/`} />
+
       {data.cover && <img class="cover" src={data.cover} alt="" width="1200" height="630" />}
 
       {bodyHtml ? <Prose html={bodyHtml} /> : <div class="prose"><Content /></div>}
 
-      <Comments page={`/articles/${article.id}/`} title={data.title} />
-
       <InlineNewsletter text="اشترك بالنشرة وبيوصلك كل مقال جديد أول ما ينزل." />
+
+      <Comments page={`/articles/${article.id}/`} title={data.title} />
     </article>
 
     <aside class="side">

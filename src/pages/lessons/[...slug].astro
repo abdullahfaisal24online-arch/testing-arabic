@@ -6,6 +6,7 @@ import LessonCard from '../../components/LessonCard.astro';
 import InlineNewsletter from '../../components/InlineNewsletter.astro';
 import Prose from '../../components/Prose.astro';
 import Comments from '../../components/Comments.astro';
+import LikeButton from '../../components/LikeButton.astro';
 import { getSite } from '../../lib/site';
 import { tagSlug } from '../../lib/tags';
 import { formatDate, durationToISO, bunnyEmbed, bunnyThumb } from '../../lib/utils';
@@ -63,37 +64,19 @@ const site = await getSite();
 const embed = data.videoId ? bunnyEmbed(data.videoId, site.bunnyLibraryId) : '';
 const thumb = bunnyThumb(data.videoId, data.thumbnail, site.bunnyCdnHostname);
 
-// بطاقة الفيديو المنظّمة بتنرسل فقط لما يكون في فيديو فعلاً ومعه صورة ورابط تضمين —
-// جوجل بيعتبرها ناقصة وبيسجّل خطأ إذا أرسلناها بدونهم. الدرس بلا فيديو بيتقدّم كمقال.
-const hasVideo = Boolean(embed);
-const videoThumb = thumb ?? `${site.url}/og-default.png`;
-
 const jsonLd = [
-  hasVideo
-    ? {
-        '@context': 'https://schema.org',
-        '@type': 'VideoObject',
-        name: data.title,
-        description: data.description,
-        uploadDate: data.publishDate.toISOString(),
-        duration: durationToISO(data.duration),
-        thumbnailUrl: [videoThumb],
-        embedUrl: embed,
-        inLanguage: 'ar',
-        publisher: { '@type': 'Organization', name: site.name, url: site.url },
-      }
-    : {
-        '@context': 'https://schema.org',
-        '@type': 'Article',
-        headline: data.title,
-        description: data.description,
-        datePublished: data.publishDate.toISOString(),
-        dateModified: (data.updatedDate ?? data.publishDate).toISOString(),
-        inLanguage: 'ar',
-        author: { '@type': 'Person', name: site.author },
-        publisher: { '@type': 'Organization', name: site.name, url: site.url },
-        mainEntityOfPage: `${site.url}/lessons/${lesson.id}/`,
-      },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    name: data.title,
+    description: data.description,
+    uploadDate: data.publishDate.toISOString(),
+    duration: durationToISO(data.duration),
+    thumbnailUrl: thumb ? [thumb] : undefined,
+    embedUrl: embed || undefined,
+    inLanguage: 'ar',
+    publisher: { '@type': 'Organization', name: site.name, url: site.url },
+  },
   {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -108,7 +91,7 @@ const jsonLd = [
 <Base
   title={data.title}
   description={data.description}
-  type={hasVideo ? 'video.other' : 'article'}
+  type="video.other"
   publishDate={data.publishDate}
   updatedDate={data.updatedDate}
   image={thumb ?? undefined}
@@ -134,7 +117,7 @@ const jsonLd = [
         ) : (
           <div class="player-empty">
             <span class="play"><Icon name="play" size={26} /></span>
-            <p>فيديو هذا الدرس قيد التحضير. الشرح المكتوب تحت كامل وبيغنيك لحد ما ينزل.</p>
+            <p>الفيديو لسا ما انربط. أضف معرّف الفيديو للدرس ورقم مكتبة Bunny من إعدادات لوحة التحكم.</p>
           </div>
         )}
       </div>
@@ -160,6 +143,8 @@ const jsonLd = [
           </a>
         )}
       </header>
+
+      <LikeButton page={`/lessons/${lesson.id}/`} />
 
       {data.prerequisites.length > 0 && (
         <section class="pre">
@@ -215,6 +200,8 @@ const jsonLd = [
         <span class="done-hint">التتبّع محفوظ بمتصفّحك فقط — بدون حساب ولا تسجيل.</span>
       </div>
 
+      <InlineNewsletter text="اشترك بالنشرة وبيوصلك كل درس جديد على بريدك، بدون ما تعتمد على خوارزمية." />
+
       <nav class="pager" aria-label="التنقّل بين دروس الدورة">
         {prev ? (
           <a class="pg" href={`/lessons/${prev.id}/`}>
@@ -231,8 +218,6 @@ const jsonLd = [
       </nav>
 
       <Comments page={`/lessons/${lesson.id}/`} title={data.title} />
-
-      <InlineNewsletter text="اشترك بالنشرة وبيوصلك كل درس جديد على بريدك، بدون ما تعتمد على خوارزمية." />
     </article>
 
     <aside class="side">
