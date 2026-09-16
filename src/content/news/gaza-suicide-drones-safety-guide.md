@@ -3,7 +3,7 @@ title: 'خبير أمني لأهل غزة: هكذا تتفادون خطر الط
 slug: gaza-suicide-drones-safety-guide
 description: دليل ميداني عاجل يستعرض أبرز النصائح والإرشادات الأمنية المقدمة لسكّان قطاع غزة للتعامل مع خطر الطائرات المسيرة الانتحارية وكيفية التخفي والهرب منها.
 publishDate: 2026-09-16
-cover: /uploads/gaza-drones.png
+cover: /uploads/drone-safety-16x9-blur.png
 pinned: true
 draft: false
 ---
