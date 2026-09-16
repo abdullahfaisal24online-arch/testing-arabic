@@ -1,193 +1,86 @@
 ---
-import { getCollection } from 'astro:content';
+// المتجر مسكّر مؤقتاً قبل الإطلاق — بيعرض رسالة "قريباً" بدل المنتجات.
+// الضغط على "المتجر" من القائمة بيطلّع Popup (src/components/StoreSoon.astro)،
+// وهاي الصفحة هي البديل لو حدا فتح الرابط مباشرة أو من نتائج البحث (noindex).
+// للرجوع لمتجر شغّال: استرجع النسخة السابقة من git history.
 import Base from '../../layouts/Base.astro';
-import { getSite } from '../../lib/site';
-
-const site = await getSite();
-const products = (await getCollection('products'))
-  .filter((p) => !p.data.draft)
-  .sort((a, b) => a.data.order - b.data.order);
-
-const title = site.storeTitle || 'المتجر';
-const intro =
-  site.storeIntro ||
-  'مواد تحضير مدفوعة صنعتها بنفسي: بنوك أسئلة، ملخّصات، وقوالب جاهزة للشغل. الدفع حوالة أو CliQ، وبتوصلك كود بيفتح اللي اشتريته على أجهزتك.';
-
-// أقسام المتجر — كل قسم بيجمع منتجاته حسب النوع (kind) وبترتيب ثابت.
-// العناوين ونصوص "قريباً" بتتعدّل من لوحة التحكم (إعدادات عامة).
-const categories = [
-  {
-    kind: 'دورة',
-    title: site.storeCoursesTitle || 'الدورات المدفوعة',
-    soon:
-      site.storeCoursesSoon ||
-      'دورات مدفوعة معمّقة قيد التحضير — اشترك بالنشرة عشان تعرف أول ما تنزل.',
-  },
-  {
-    kind: 'بنك أسئلة',
-    title: site.storeQuestionsTitle || 'بنوك الأسئلة',
-    soon: site.storeQuestionsSoon || 'بنوك أسئلة جديدة قيد التحضير.',
-  },
-  {
-    kind: 'ملخصات',
-    title: site.storeSummariesTitle || 'الملخّصات',
-    soon:
-      site.storeSummariesSoon ||
-      'ملخّصات مركّزة قيد التحضير — اشترك بالنشرة عشان تعرف أول ما تنزل.',
-  },
-];
-
-const mainKinds = categories.map((c) => c.kind);
-
-// أي نوع تاني (قوالب، حزمة) بيطلع بقسمه الخاص لحتى ما يختفي منتج
-const extra = [...new Set(products.map((p) => p.data.kind))]
-  .filter((k) => !mainKinds.includes(k))
-  .map((k) => ({ kind: k, title: k, soon: '' }));
-
-const sections = [...categories, ...extra].map((cat) => ({
-  ...cat,
-  items: products.filter((p) => p.data.kind === cat.kind),
-}));
-
-const jsonLd = products.length
-  ? {
-      '@context': 'https://schema.org',
-      '@type': 'ItemList',
-      name: title,
-      itemListElement: products.map((p, i) => ({
-        '@type': 'ListItem',
-        position: i + 1,
-        name: p.data.title,
-        url: `${site.url}/store/${p.id}/`,
-      })),
-    }
-  : undefined;
 ---
 
-<Base title={title} description={intro} jsonLd={jsonLd ? [jsonLd] : undefined}>
-  <section class="hero dots">
+<Base
+  title="المتجر — قريباً"
+  description="القسم المدفوع قيد الإطلاق: دورات متقدمة، بنوك أسئلة وملخّصات احترافية. اشترك بالنشرة عشان تكون متابع معنا."
+  noindex
+>
+  <section class="store-soon dots">
     <div class="wrap">
-      <span class="eyebrow">القسم المدفوع</span>
-      <h1>{title}</h1>
-      <p class="intro">{intro}</p>
-    </div>
-  </section>
-
-  <section class="list">
-    <div class="wrap">
-      <div class="cats">
-        {
-          sections.map((cat) => (
-            <section class="cat">
-              <h2 class="cat-h">{cat.title}</h2>
-              <div class="grid">
-                {cat.items.length ? (
-                  cat.items.map((p) => (
-                    <a class={`item ${p.data.featured ? 'star' : ''}`} href={`/store/${p.id}/`}>
-                      <span class="kind">{p.data.kind}</span>
-                      <h3>{p.data.title}</h3>
-                      {p.data.pitch && <p class="pitch">{p.data.pitch}</p>}
-                      <p class="price">
-                        {p.data.offerPrice ? (
-                          <>
-                            <strong>{p.data.offerPrice} د.أ</strong>
-                            <span class="was">{p.data.price} د.أ</span>
-                          </>
-                        ) : (
-                          <strong>{p.data.price} د.أ</strong>
-                        )}
-                      </p>
-                      {p.data.offerNote && <span class="note">{p.data.offerNote}</span>}
-                    </a>
-                  ))
-                ) : (
-                  <div class="item soon">
-                    <span class="kind">قريباً</span>
-                    <h3>{cat.title}</h3>
-                    {cat.soon && <p class="pitch">{cat.soon}</p>}
-                    <a class="soon-link" href="/newsletter/">اشترك بالنشرة ←</a>
-                  </div>
-                )}
-              </div>
-            </section>
-          ))
-        }
-      </div>
-
-      <p class="have">
-        عندك كود أصلاً؟ <a href="/pro/unlock/">افتح موادك من هون</a>.
-      </p>
+      <span class="badge"><span class="dot"></span>قريباً</span>
+      <h1>المتجر <span class="tri">🔻</span></h1>
+      <p>دورات متقدمة، بنوك أسئلة، ملخّصات احترافية.<br />اشترك بالنشرة عشان تكون متابع معنا.</p>
+      <a class="cta" href="/newsletter/">اشترك بالنشرة ←</a>
     </div>
   </section>
 </Base>
 
 <style>
-  .hero { padding-block: 56px 34px; }
-  .hero h1 { margin-top: 12px; }
-  .intro { max-width: 64ch; color: var(--muted); margin-top: 12px; }
-
-  .list { padding-block: 10px 70px; }
-
-  .cats { display: grid; gap: 46px; }
-  .cat-h {
-    font-size: 22px;
+  .store-soon {
+    min-height: 62vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+  }
+  .store-soon .wrap { width: min(92vw, 560px); }
+  .store-soon .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #f6823b;
+    background: rgba(246, 130, 59, 0.12);
+    border: 1px solid rgba(246, 130, 59, 0.3);
+    padding: 7px 16px;
+    border-radius: 999px;
+    margin-bottom: 22px;
+  }
+  .store-soon .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #f6823b;
+    animation: ssPulse 1.8s infinite;
+  }
+  @keyframes ssPulse {
+    0% { box-shadow: 0 0 0 0 rgba(246, 130, 59, 0.5); }
+    70% { box-shadow: 0 0 0 12px rgba(246, 130, 59, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(246, 130, 59, 0); }
+  }
+  .store-soon h1 {
     margin: 0 0 18px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--line-strong);
+    font-size: clamp(30px, 6vw, 46px);
+    font-weight: 800;
   }
-
-  .grid {
-    display: grid;
-    gap: 16px;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  .store-soon .tri { color: #e5484d; }
+  .store-soon p {
+    margin: 0 0 30px;
+    font-size: 17px;
+    line-height: 2;
+    color: var(--muted, #aeb9cc);
   }
-
-  .item {
-    display: grid;
-    gap: 8px;
-    align-content: start;
-    background: var(--surface);
-    border: 1px solid var(--line-strong);
-    border-radius: var(--r-xl);
-    padding: 22px 20px;
-    text-decoration: none;
-    color: inherit;
-    transition: border-color .15s ease, transform .15s ease;
-  }
-  .item:hover { border-color: var(--orange); transform: translateY(-2px); }
-  .item.star { border-color: var(--orange-line); }
-
-  /* بطاقة "قريباً" — نفس شكل الكارت العادي بس باهتة، والليبل متوهّج برتقالي */
-  .item.soon { opacity: .5; }
-  .item.soon h3 { color: var(--muted); }
-  .item.soon .kind {
-    color: var(--orange);
-    text-shadow: 0 0 8px rgba(246, 130, 59, .75), 0 0 18px rgba(246, 130, 59, .45);
-    animation: soonGlow 2.4s ease-in-out infinite;
-  }
-  @keyframes soonGlow {
-    0%, 100% { opacity: .7; }
-    50% { opacity: 1; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .item.soon .kind { animation: none; text-shadow: 0 0 8px rgba(246, 130, 59, .75); }
-  }
-  .soon-link {
-    font-size: 13px;
-    color: var(--orange);
-    text-decoration: none;
-    margin-top: 4px;
+  .store-soon .cta {
     display: inline-block;
+    background: #f6823b;
+    color: #0a1428;
+    font-weight: 800;
+    font-size: 16px;
+    text-decoration: none;
+    padding: 14px 30px;
+    border-radius: 12px;
+    transition: transform 0.15s, box-shadow 0.15s;
   }
-
-  .kind { font-size: 12px; color: var(--orange); letter-spacing: .5px; }
-  .item h3 { font-size: 19px; margin: 0; }
-  .pitch { color: var(--muted); font-size: 14px; margin: 0; }
-
-  .price { margin: 6px 0 0; font-size: 20px; }
-  .price strong { font-weight: 700; }
-  .was { font-size: 14px; color: var(--faint); text-decoration: line-through; margin-inline-start: 8px; }
-  .note { font-size: 12px; color: var(--faint); }
-
-  .have { margin-top: 40px; font-size: 14px; color: var(--faint); }
+  .store-soon .cta:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(246, 130, 59, 0.35); }
+  @media (prefers-reduced-motion: reduce) {
+    .store-soon .dot { animation: none; }
+  }
 </style>
