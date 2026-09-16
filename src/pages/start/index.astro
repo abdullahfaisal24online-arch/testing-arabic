@@ -1,7 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
-import InlineNewsletter from '../../components/InlineNewsletter.astro';
 import { getSite, getStart } from '../../lib/site';
 
 const site = await getSite();
@@ -70,8 +69,6 @@ const jsonLd = {
           <p>{start.note}</p>
         </aside>
       )}
-
-      <InlineNewsletter text="اشترك بالنشرة وبيوصلك كل درس جديد بالترتيب، بدون ما تدوّر عليه." />
     </div>
   </section>
 </Base>
