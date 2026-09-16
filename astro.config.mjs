@@ -8,7 +8,7 @@ export default defineConfig({
   integrations: [
     sitemap({
       // صفحات /pro/ noindex — ما الها داعي تكون بالـ sitemap
-      filter: (page) => !page.includes('/search') && !page.includes('/pro/'),
+      filter: (page) => !page.includes('/search') && !page.includes('/pro/') && !page.includes('/store'),
     }),
   ],
   markdown: {
