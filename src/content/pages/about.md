@@ -5,7 +5,7 @@ description: عن Testing بالعربي — منصة عربية مستقلة ل
 order: 1
 draft: false
 profilePhoto: /uploads/ChatGPT Image Sep 13, 2026, 11_57_57 PM.png
-profileName: عبدالله فيصل
+profileName: Abdullah Faisal
 profileRole: QA Engineer
 profileText: ''
 profileLink: ''
