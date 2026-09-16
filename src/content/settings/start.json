@@ -9,17 +9,17 @@
       "body": "قبل أي أداة وأي كود،  بنهاية هالمرحلة بتكون قادر تقرأ متطلّب وتطلّع منه حالات اختبار، وتكتب تقرير Bug ينفّذه المطوّر بدون ما يرجع يسألك.",
       "items": [
         {
-          "label": "دورة ISTQB CTFL V4 🔻",
+          "label": "دورة ISTQB CTFL V4",
           "href": "/courses/istqb-ctfl/",
           "kind": "دورة"
         },
         {
-          "label": "دورة أساسيات ومفاهيم جودة البرمجيات 🔻",
+          "label": "دورة أساسيات ومفاهيم جودة البرمجيات",
           "href": "/courses/qa-fundamentals-and-practical-skills/",
           "kind": "دورة"
         },
         {
-          "label": "دليل شامل لاختبار البرمجيات 🔻",
+          "label": "دليل شامل لاختبار البرمجيات",
           "href": "/articles/software-testing-guide/",
           "kind": "مقال"
         }
@@ -31,17 +31,17 @@
       "body": "بعد ما أتقنت الأساسيات، صار وقت تطبّق بإطار عمل حقيقي. بالمرحلة هاي راح تتعلم كيف تدير شغلك داخل فرق Agile باستخدام Jira، وتدير دورة حياة Sprint كاملة، وتنفّذ فحص تطبيقات الموبايل بأسلوب عملي احترافي.",
       "items": [
         {
-          "label": "دورة ISTQB CT-MAT 🔻",
+          "label": "دورة ISTQB CT-MAT",
           "href": "/courses/istqb-ct-mat/",
           "kind": "دورة"
         },
         {
-          "label": "أساسيات Scrum 🔻",
+          "label": "أساسيات Scrum",
           "href": "/courses/scrum/",
           "kind": "دورة"
         },
         {
-          "label": "Jira من الصفر للاحتراف 🔻",
+          "label": "Jira من الصفر للاحتراف",
           "href": "/courses/jira/",
           "kind": "دورة"
         }
@@ -53,17 +53,17 @@
       "body": "هون بس، وبعد ما تكون فاهم شو بتختبر وليش. الأتمتة أداة لتوفير وقت متكرر، مش هدف بحد ذاته — وأكتر السويتات الفاشلة انبنت قبل هالفهم.",
       "items": [
         {
-          "label": "متى وكيف نلجأ لأتمتة اختبار البرمجيات؟ 🔻",
+          "label": "متى وكيف نلجأ لأتمتة اختبار البرمجيات؟",
           "href": "/articles/automation-testing-guide-for-beginners/",
           "kind": "مقال"
         },
         {
-          "label": "اختبـار الـ APIs بـاستخدام Postman 🔻",
+          "label": "اختبـار الـ APIs بـاستخدام Postman",
           "href": "/courses/postman-course/",
           "kind": "دورة"
         },
         {
-          "label": "أتمتة اختبار تطبيقات الموبايل باستخدام Maestro 🔻",
+          "label": "أتمتة اختبار تطبيقات الموبايل باستخدام Maestro",
           "href": "/courses/maestro-mobile-automation/",
           "kind": "دورة"
         }
