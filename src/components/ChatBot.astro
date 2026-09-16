@@ -123,6 +123,14 @@ const WELCOME =
       @media (prefers-reduced-motion:reduce){
         .tachat-launcher,.tachat-eye,.tachat-typing i{animation:none}
       }
+      .tachat-bub strong{font-weight:700}
+      .tachat-bub p{margin:.35em 0}
+      .tachat-bub p:first-child{margin-top:0}
+      .tachat-bub p:last-child{margin-bottom:0}
+      .tachat-bub ul,.tachat-bub ol{margin:.35em 0;padding-inline-start:1.3em}
+      .tachat-bub li{margin:.15em 0}
+      .tachat-bub code{background:rgba(255,255,255,.08);padding:.05em .35em;border-radius:4px;font-size:.9em}
+      .tachat-bub a{color:#38bdf8;text-decoration:underline}
     </style>
 
     <script>
@@ -213,6 +221,30 @@ const WELCOME =
           scroll();
         }
 
+        function renderMd(src){
+          var esc = function(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+          var inline = function(s){ return esc(s)
+            .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+            .replace(/`([^`]+)`/g,'<code>$1</code>')
+            .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>'); };
+          var lines = String(src).replace(/\r\n/g,'\n').split('\n');
+          var html = '', list = null;
+          function closeList(){ if(list){ html += '</'+list+'>'; list=null; } }
+          for (var i=0;i<lines.length;i++){
+            var t = lines[i].trim(), m;
+            if ((m = t.match(/^[-*\u2022]\s+(.*)/))){
+              if (list!=='ul'){ closeList(); html+='<ul>'; list='ul'; }
+              html += '<li>'+inline(m[1])+'</li>';
+            } else if ((m = t.match(/^\d+[.)]\s+(.*)/))){
+              if (list!=='ol'){ closeList(); html+='<ol>'; list='ol'; }
+              html += '<li>'+inline(m[1])+'</li>';
+            } else if (t===''){ closeList(); }
+            else { closeList(); html += '<p>'+inline(t)+'</p>'; }
+          }
+          closeList();
+          return html;
+        }
+
         function botBubble(text, sources) {
           var row = document.createElement('div');
           row.className = 'tachat-row bot';
@@ -221,7 +253,7 @@ const WELCOME =
           mini.innerHTML = ROBOT;
           var b = document.createElement('div');
           b.className = 'tachat-bub';
-          b.textContent = text;
+          b.innerHTML = renderMd(text);
           if (sources && sources.length) {
             var box = document.createElement('div');
             box.className = 'tachat-src';
