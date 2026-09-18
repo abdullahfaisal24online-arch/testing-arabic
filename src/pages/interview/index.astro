@@ -1,0 +1,264 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { getSite } from '../../lib/site';
+
+const site = await getSite();
+
+const questions = (await getCollection('questions')).filter((q) => !q.data.draft);
+
+const domainCounts = questions.reduce<Record<string, number>>((acc, q) => {
+  acc[q.data.domain] = (acc[q.data.domain] ?? 0) + 1;
+  return acc;
+}, {});
+const domains = Object.entries(domainCounts).sort((a, b) => b[1] - a[1]);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: questions.map((q) => ({
+    '@type': 'Question',
+    name: q.data.title,
+    acceptedAnswer: { '@type': 'Answer', text: q.data.shortAnswer },
+    url: `${site.url}/questions/${q.id}/`,
+  })),
+};
+---
+<Base
+  title="مقابلة عمل — QA"
+  description={`محاكي مقابلة عمل اختبار برمجيات — ${questions.length} سؤال حقيقي موزّعة على أساسيات الاختبار والأتمتة وAPI وأسئلة سلوكية، مع جواب نموذجي لكل سؤال.`}
+  jsonLd={jsonLd}
+>
+  <!-- ============ 1) صفحة الشرح ============ -->
+  <section class="page-head dots" id="intro">
+    <div class="wrap">
+      <h1>مقابلة عمل — QA</h1>
+      <p class="lead">
+        مجموعة أسئلة حقيقية بتتسأل بمقابلات اختبار البرمجيات، موزّعة على أساسيات الاختبار وأسئلة سلوكية وأتمتة وAPI. جاوب بنفسك الأول قبل ما تشوف الإجابة النموذجية.
+      </p>
+
+      <div class="breakdown">
+        {domains.map(([d, n]) => (
+          <span class="bpill"><b>{n}</b> {d}</span>
+        ))}
+      </div>
+
+      <button class="btn btn-primary start-btn" type="button" id="start-btn">
+        <Icon name="play" size={17} /> ابدأ مقابلة
+      </button>
+
+      <div class="stat-strip">
+        <div class="s"><b>{questions.length}</b><span>سؤال بالبنك</span></div>
+        <div class="s"><b>عشوائي</b><span>ترتيب الأسئلة</span></div>
+        <div class="s"><b>بلا وقت</b><span>جاوب على راحتك</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="below-hero">
+      <b>كيف تشتغل المقابلة؟</b> بتشوف سؤال واحد بكل مرة. جاوب بصوت عالي أو براسك متل مقابلة حقيقية، وبعدين اضغط «اعرف الجواب» — الإجابة النموذجية بتطلع تحت نفس السؤال، بدون ما تنقلك لمكان تاني. بعدها اضغط «السؤال التالي» للمتابعة، وتقدر تضغط «إنهاء المقابلة» بأي لحظة.
+    </div>
+  </div>
+
+  <!-- ============ 2) وضع المقابلة ============ -->
+  <section class="wrap interview-wrap" id="interview" hidden>
+    <div class="interview-top">
+      <span class="qnum" id="q-num">1 / {questions.length}</span>
+      <div class="progtrack"><i id="prog-fill" style="width:0%"></i></div>
+      <button class="btn btn-ghost btn-sm end-btn" type="button" id="end-btn">إنهاء المقابلة</button>
+    </div>
+
+    <div class="qcard">
+      <span class="badge badge-outline" id="q-cat"></span>
+      <p class="qtext" id="q-text"></p>
+    </div>
+
+    <div class="answer-zone">
+      <button class="reveal-btn" type="button" id="reveal-btn">
+        اعرف الجواب <Icon name="check" size={16} />
+      </button>
+      <div class="answer-box" id="answer-box" hidden>
+        <div class="lbl">✓ الإجابة النموذجية</div>
+        <p id="answer-text"></p>
+      </div>
+      <button class="btn btn-primary next-btn" type="button" id="next-btn" hidden>
+        السؤال التالي <Icon name="arrow" size={16} class="flip" />
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ 3) شاشة انتهاء المقابلة ============ -->
+  <section class="wrap done-wrap" id="finished" hidden>
+    <div class="done">
+      <div class="ic">🎉</div>
+      <h2>خلصت المقابلة!</h2>
+      <p id="done-sub"></p>
+      <button class="btn btn-primary" type="button" id="restart-btn">ابدأ مقابلة جديدة</button>
+    </div>
+  </section>
+
+  <script type="application/json" id="interview-data" set:html={JSON.stringify(
+    questions.map((q) => ({ t: q.data.title, a: q.data.shortAnswer, d: q.data.domain })),
+  )} />
+</Base>
+
+<style>
+  .page-head { background: var(--navy); border-bottom: 1px solid var(--line); padding-block: 52px 40px; text-align: center; }
+  .page-head h1 { margin-bottom: 12px; }
+  .page-head .lead { max-width: 60ch; margin-inline: auto; }
+
+  .breakdown { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 24px 0; }
+  .bpill {
+    display: flex; align-items: center; gap: 7px; font-size: 14px; color: var(--ink-2);
+    background: rgba(255,255,255,.06); border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px;
+  }
+  .bpill b { color: var(--orange); font-family: inherit; }
+
+  .start-btn { margin: 6px auto 28px; display: inline-flex; }
+
+  .stat-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 480px; margin-inline: auto; }
+  .stat-strip .s { background: rgba(255,255,255,.05); border: 1px solid var(--line); border-radius: 10px; padding: 12px 8px; }
+  .stat-strip .s b { display: block; font-size: 18px; font-weight: 700; color: #fff; }
+  .stat-strip .s span { font-size: 12px; color: var(--muted); }
+
+  .below-hero {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg);
+    padding: 20px 22px; font-size: 15px; color: var(--ink-2); line-height: 1.9; margin-block: 26px;
+  }
+  .below-hero b { color: var(--ink); }
+
+  .interview-wrap { padding-bottom: 40px; }
+  .interview-top { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+  .qnum {
+    font-size: 14px; font-weight: 600; color: var(--muted); background: var(--surface-2, var(--surface));
+    border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; flex: none;
+    font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate;
+  }
+  .progtrack { flex: 1; min-width: 120px; height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; }
+  .progtrack i { display: block; height: 100%; background: var(--orange); border-radius: 99px; transition: width .3s; }
+  .end-btn { flex: none; }
+
+  .qcard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 28px 26px; margin-bottom: 16px; }
+  .qcard .badge { margin-bottom: 14px; }
+  .qtext { font-size: 20px; font-weight: 700; margin: 0; line-height: 1.7; }
+
+  .reveal-btn {
+    width: 100%; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--surface); color: var(--orange); border: 1.5px dashed var(--line-strong);
+    border-radius: var(--r-md); padding: 15px; margin-bottom: 14px;
+  }
+  .reveal-btn:hover { background: var(--orange-soft, rgba(246,130,59,.08)); }
+
+  .answer-box {
+    background: var(--surface); border: 1px solid var(--line); border-inline-start: 3px solid var(--cyan);
+    border-radius: var(--r-md); padding: 20px 22px; margin-bottom: 14px;
+  }
+  .answer-box .lbl { font-size: 12.5px; font-weight: 700; color: var(--cyan); margin-bottom: 8px; }
+  .answer-box p { margin: 0; font-size: 16px; line-height: 1.9; color: var(--ink-2); }
+
+  .next-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .next-btn :global(.flip) { transform: scaleX(-1); }
+
+  .done-wrap { padding-bottom: 50px; }
+  .done { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 44px 26px; text-align: center; }
+  .done .ic { font-size: 40px; margin-bottom: 10px; }
+  .done h2 { margin: 0 0 8px; }
+  .done p { color: var(--muted); margin: 0 0 22px; }
+
+  @media (max-width: 480px) { .stat-strip { grid-template-columns: 1fr 1fr; } }
+</style>
+
+<script>
+  type Q = { t: string; a: string; d: string };
+
+  const raw = document.getElementById('interview-data')?.textContent ?? '[]';
+  const ALL: Q[] = JSON.parse(raw);
+
+  let order: Q[] = [];
+  let idx = 0;
+  let answered = 0;
+
+  const $ = (id: string) => document.getElementById(id);
+  const introEl = document.getElementById('intro');
+  const belowHero = document.querySelector<HTMLElement>('.below-hero')?.closest('.wrap') ?? null;
+  const interviewEl = $('interview');
+  const finishedEl = $('finished');
+
+  function shuffle<T>(arr: T[]): T[] {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function renderQuestion() {
+    const q = order[idx];
+    const qNum = $('q-num');
+    const progFill = $('prog-fill') as HTMLElement | null;
+    if (qNum) qNum.textContent = `${idx + 1} / ${order.length}`;
+    if (progFill) progFill.style.width = `${Math.round(((idx + 1) / order.length) * 100)}%`;
+    const qCat = $('q-cat'); if (qCat) qCat.textContent = q.d;
+    const qText = $('q-text'); if (qText) qText.textContent = q.t;
+    const aText = $('answer-text'); if (aText) aText.textContent = q.a;
+    const answerBox = $('answer-box') as HTMLElement | null; if (answerBox) answerBox.hidden = true;
+    const revealBtn = $('reveal-btn') as HTMLElement | null; if (revealBtn) revealBtn.hidden = false;
+    const nextBtn = $('next-btn') as HTMLElement | null; if (nextBtn) nextBtn.hidden = true;
+  }
+
+  function startInterview() {
+    if (ALL.length === 0) return;
+    order = shuffle(ALL);
+    idx = 0;
+    answered = 0;
+    if (introEl) introEl.hidden = true;
+    if (belowHero) (belowHero as HTMLElement).hidden = true;
+    if (finishedEl) finishedEl.hidden = true;
+    if (interviewEl) interviewEl.hidden = false;
+    renderQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function finishInterview() {
+    if (interviewEl) interviewEl.hidden = true;
+    if (introEl) introEl.hidden = true;
+    if (finishedEl) finishedEl.hidden = false;
+    const sub = $('done-sub');
+    if (sub) sub.textContent = `جاوبت على ${answered} من ${order.length} سؤال. جاهز لمحاولة تانية؟`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  $('start-btn')?.addEventListener('click', startInterview);
+
+  $('reveal-btn')?.addEventListener('click', () => {
+    const answerBox = $('answer-box') as HTMLElement | null;
+    const revealBtn = $('reveal-btn') as HTMLElement | null;
+    const nextBtn = $('next-btn') as HTMLElement | null;
+    if (answerBox) answerBox.hidden = false;
+    if (revealBtn) revealBtn.hidden = true;
+    if (nextBtn) nextBtn.hidden = false;
+  });
+
+  $('next-btn')?.addEventListener('click', () => {
+    answered++;
+    if (idx < order.length - 1) {
+      idx++;
+      renderQuestion();
+    } else {
+      finishInterview();
+    }
+  });
+
+  $('end-btn')?.addEventListener('click', finishInterview);
+
+  $('restart-btn')?.addEventListener('click', () => {
+    if (finishedEl) finishedEl.hidden = true;
+    if (introEl) introEl.hidden = false;
+    if (belowHero) (belowHero as HTMLElement).hidden = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
