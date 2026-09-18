@@ -150,8 +150,9 @@ const jsonLd = {
       <div class="score-row">
         <div class="score-pill ok"><b id="score-known">0</b><span>عرفتها</span></div>
         <div class="score-pill miss"><b id="score-missed">0</b><span>محتاج مراجعة</span></div>
-        <div class="score-pill"><b id="score-pct">0%</b><span>نسبة الإجابة</span></div>
+        <div class="score-pill"><b id="score-pct">0%</b><span>من كل بنك الأسئلة</span></div>
       </div>
+      <p class="scope-note">* النسبة محسوبة من إجمالي عدد الأسئلة بالمقابلة، مش من اللي جاوبته بس</p>
 
       <div class="done-actions">
         <button class="btn btn-primary" type="button" id="share-btn">📤 شارك نتيجتك</button>
@@ -289,6 +290,7 @@ const jsonLd = {
   .score-pill span { font-size: 12.5px; color: var(--muted); }
   .score-pill.ok b { color: var(--ok, #34d399); }
   .score-pill.miss b { color: var(--danger, #f65b5b); }
+  .scope-note { font-size: 12.5px; color: var(--muted); margin: -14px 0 26px; }
 
   .done-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 
@@ -422,7 +424,9 @@ const jsonLd = {
     const scoreKnown = $('score-known'); if (scoreKnown) scoreKnown.textContent = String(known);
     const scoreMissed = $('score-missed'); if (scoreMissed) scoreMissed.textContent = String(missed);
     const scorePct = $('score-pct');
-    if (scorePct) scorePct.textContent = answered > 0 ? `${Math.round((known / answered) * 100)}%` : '0%';
+    // النسبة% دايمًا من إجمالي بنك الأسئلة (ORDERED.length)، مش من عدد الأسئلة اللي جاوبها فقط —
+    // هيك لو خلّص المستخدم بدري (مثلاً 3 من 50) ما تظهر نسبة مضلّلة زي 100%
+    if (scorePct) scorePct.textContent = ORDERED.length > 0 ? `${Math.round((known / ORDERED.length) * 100)}%` : '0%';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -454,6 +458,74 @@ const jsonLd = {
   });
 
   // ===== مشاركة النتيجة كصورة =====
+  function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  // يرسم شعار المنصة الحقيقي (الدرع الدائري + شاشة + علامة صح)، نفس تصميم favicon.svg
+  function drawBadge(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
+    ctx.save();
+    const glow = ctx.createRadialGradient(cx, cy, r * 0.3, cx, cy, r * 1.8);
+    glow.addColorStop(0, 'rgba(56,189,248,.35)');
+    glow.addColorStop(1, 'rgba(56,189,248,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r * 1.8, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = '#0d1b33';
+    ctx.fill();
+    ctx.lineWidth = r * 0.067;
+    ctx.strokeStyle = '#38bdf8';
+    ctx.stroke();
+
+    const s = r / 30;
+    const ox = cx - 32 * s;
+    const oy = cy - 32 * s;
+    const X = (v: number) => ox + v * s;
+    const Y = (v: number) => oy + v * s;
+
+    ctx.lineWidth = 3.4 * s;
+    ctx.strokeStyle = '#e8eef9';
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    const rx0 = X(16), ry0 = Y(20), rw = 32 * s, rh = 22 * s, rr = 3 * s;
+    ctx.beginPath();
+    ctx.moveTo(rx0 + rr, ry0);
+    ctx.lineTo(rx0 + rw - rr, ry0);
+    ctx.arcTo(rx0 + rw, ry0, rx0 + rw, ry0 + rr, rr);
+    ctx.lineTo(rx0 + rw, ry0 + rh - rr);
+    ctx.arcTo(rx0 + rw, ry0 + rh, rx0 + rw - rr, ry0 + rh, rr);
+    ctx.lineTo(rx0 + rr, ry0 + rh);
+    ctx.arcTo(rx0, ry0 + rh, rx0, ry0 + rh - rr, rr);
+    ctx.lineTo(rx0, ry0 + rr);
+    ctx.arcTo(rx0, ry0, rx0 + rr, ry0, rr);
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.beginPath(); ctx.moveTo(X(26), Y(50)); ctx.lineTo(X(38), Y(50)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(32), Y(42)); ctx.lineTo(X(32), Y(50)); ctx.stroke();
+
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 3.6 * s;
+    ctx.beginPath();
+    ctx.moveTo(X(26), Y(31));
+    ctx.lineTo(X(30), Y(35));
+    ctx.lineTo(X(38), Y(27));
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
   function drawShareCard(): HTMLCanvasElement | null {
     const canvas = document.getElementById('share-canvas') as HTMLCanvasElement | null;
     if (!canvas) return null;
@@ -461,16 +533,20 @@ const jsonLd = {
     if (!ctx) return null;
     ctx.direction = 'rtl';
     const W = canvas.width, H = canvas.height;
+    const cx = W / 2;
+    const arFont = (weight: string, size: number) => `${weight} ${size}px "IBM Plex Sans Arabic", Tahoma, sans-serif`;
+    const logoTop = SITE.logoTop || 'Testing';
+    const logoBottom = SITE.logoBottom || 'بالعربي';
 
     // خلفية متدرّجة
     const grad = ctx.createLinearGradient(0, 0, W, H);
-    grad.addColorStop(0, '#0d1b33');
-    grad.addColorStop(1, '#16274a');
+    grad.addColorStop(0, '#0a1628');
+    grad.addColorStop(1, '#182c52');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
 
     // نقاط خفيفة بالخلفية
-    ctx.fillStyle = 'rgba(56,189,248,.12)';
+    ctx.fillStyle = 'rgba(56,189,248,.10)';
     for (let y = 40; y < H; y += 44) {
       for (let x = 40; x < W; x += 44) {
         ctx.beginPath();
@@ -479,74 +555,99 @@ const jsonLd = {
       }
     }
 
-    const cx = W / 2;
-    const arFont = (weight: string, size: number) => `${weight} ${size}px "IBM Plex Sans Arabic", Tahoma, sans-serif`;
+    // Border خارجي يلفّ الكرت كامل
+    ctx.strokeStyle = 'rgba(56,189,248,.35)';
+    ctx.lineWidth = 6;
+    ctx.strokeRect(3, 3, W - 6, H - 6);
 
-    // الشعار
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#38bdf8';
-    ctx.font = arFont('800', 34);
-    ctx.fillText(`${SITE.logoTop || 'Testing'} ${SITE.logoBottom || 'بالعربي'}`, cx, 120);
-
-    // النتيجة الكبيرة: "known/answered" — تُرسم دايماً من اليسار لليمين (أرقام لاتينية)
-    const scoreText = `${known}`;
-    const totalText = `/${answered}`;
-    ctx.font = arFont('800', 150);
-    const scoreWidth = ctx.measureText(scoreText).width;
-    ctx.font = arFont('700', 70);
-    const totalWidth = ctx.measureText(totalText).width;
-    const totalCombined = scoreWidth + totalWidth;
-    const leftX = cx - totalCombined / 2;
+    // الشعار: الدرع الحقيقي + النص تحته
+    drawBadge(ctx, cx, 150, 72);
 
     ctx.direction = 'ltr';
     ctx.textAlign = 'left';
-    ctx.font = arFont('800', 150);
+    ctx.font = arFont('800', 30);
     ctx.fillStyle = '#e8eef9';
-    ctx.fillText(scoreText, leftX, 400);
-    ctx.font = arFont('700', 70);
+    const w1 = ctx.measureText(logoTop).width;
+    ctx.font = arFont('600', 24);
+    const w2 = ctx.measureText(logoBottom).width;
+    const gapWord = 12;
+    const logoStartX = cx - (w1 + gapWord + w2) / 2;
+    ctx.font = arFont('800', 30);
+    ctx.fillStyle = '#e8eef9';
+    ctx.fillText(logoTop, logoStartX, 268);
+    ctx.font = arFont('600', 24);
     ctx.fillStyle = '#93a4c0';
-    ctx.fillText(totalText, leftX + scoreWidth, 400);
+    ctx.fillText(logoBottom, logoStartX + w1 + gapWord, 265);
     ctx.direction = 'rtl';
-
     ctx.textAlign = 'center';
-    ctx.fillStyle = '#93a4c0';
-    ctx.font = arFont('600', 34);
-    ctx.fillText('خلصت مقابلة QA التجريبية 🎯', cx, 460);
 
-    // إحصائيات
-    const statY = 610;
-    const gap = 220;
+    // النتيجة الكبيرة: known/TOTAL (من إجمالي بنك الأسئلة، مش من اللي جاوبه بس)
+    const TOTAL = ORDERED.length || answered;
+    const scoreText = `${known}`;
+    const totalText = `/${TOTAL}`;
+    ctx.font = arFont('800', 145);
+    const scoreWidth = ctx.measureText(scoreText).width;
+    ctx.font = arFont('700', 68);
+    const totalWidth = ctx.measureText(totalText).width;
+    const leftX = cx - (scoreWidth + totalWidth) / 2;
+
+    ctx.direction = 'ltr';
+    ctx.textAlign = 'left';
+    ctx.font = arFont('800', 145);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(scoreText, leftX, 460);
+    ctx.font = arFont('700', 68);
+    ctx.fillStyle = '#8fa3c4';
+    ctx.fillText(totalText, leftX + scoreWidth, 460);
+    ctx.direction = 'rtl';
+    ctx.textAlign = 'center';
+
+    ctx.fillStyle = '#9fb2ce';
+    ctx.font = arFont('600', 33);
+    ctx.fillText('خلصت مقابلة QA التجريبية 🎯', cx, 515);
+
+    // إحصائيات داخل كبسولات — النسبة% من إجمالي بنك الأسئلة
+    const pct = TOTAL > 0 ? Math.round((known / TOTAL) * 100) : 0;
+    const statY = 630, pillW = 250, pillH = 110, gapX = 30;
     const stats: [string, string, string][] = [
       [String(known), 'عرفتها ✓', '#34d399'],
       [String(missed), 'محتاج مراجعة', '#f65b5b'],
-      [answered > 0 ? `${Math.round((known / answered) * 100)}%` : '0%', 'النسبة', '#e8eef9'],
+      [`${pct}%`, 'من كل البنك', '#38bdf8'],
     ];
+    const totalW = pillW * 3 + gapX * 2;
+    const startX = cx - totalW / 2;
     stats.forEach(([val, lbl, color], i) => {
-      const x = cx + gap - i * gap;
+      const px = startX + i * (pillW + gapX);
+      ctx.fillStyle = 'rgba(255,255,255,.05)';
+      ctx.strokeStyle = 'rgba(56,189,248,.22)';
+      ctx.lineWidth = 2;
+      roundRect(ctx, px, statY, pillW, pillH, 18);
+      ctx.fill();
+      ctx.stroke();
+      ctx.textAlign = 'center';
       ctx.fillStyle = color;
-      ctx.font = arFont('800', 52);
-      ctx.fillText(val, x, statY);
+      ctx.font = arFont('800', 46);
+      ctx.fillText(val, px + pillW / 2, statY + 52);
       ctx.fillStyle = '#93a4c0';
-      ctx.font = arFont('600', 26);
-      ctx.fillText(lbl, x, statY + 40);
+      ctx.font = arFont('600', 22);
+      ctx.fillText(lbl, px + pillW / 2, statY + 85);
     });
 
-    // خط فاصل
-    ctx.strokeStyle = 'rgba(56,189,248,.25)';
-    ctx.setLineDash([8, 8]);
-    ctx.beginPath();
-    ctx.moveTo(140, 760);
-    ctx.lineTo(W - 140, 760);
-    ctx.stroke();
-    ctx.setLineDash([]);
+    // زر الدعوة للعمل متدرّج
+    const btnW = 480, btnH = 92, btnX = cx - btnW / 2, btnY = 800;
+    const btnGrad = ctx.createLinearGradient(btnX, 0, btnX + btnW, 0);
+    btnGrad.addColorStop(0, '#38bdf8');
+    btnGrad.addColorStop(1, '#6366f1');
+    ctx.fillStyle = btnGrad;
+    roundRect(ctx, btnX, btnY, btnW, btnH, 20);
+    ctx.fill();
+    ctx.fillStyle = '#0a1628';
+    ctx.font = arFont('800', 32);
+    ctx.fillText('جرّب مقابلتك أنت 🎯', cx, btnY + 58);
 
-    // دعوة للعمل
-    ctx.fillStyle = '#38bdf8';
-    ctx.font = arFont('700', 30);
-    ctx.fillText('جرّب مقابلتك أنت', cx, 830);
-    ctx.fillStyle = '#93a4c0';
-    ctx.font = arFont('500', 26);
-    ctx.fillText((SITE.url || 'testing-arabic.com').replace(/^https?:\/\//, '') + '/interview', cx, 875);
+    ctx.fillStyle = '#7d93b8';
+    ctx.font = arFont('600', 26);
+    ctx.fillText((SITE.url || 'testing-arabic.com').replace(/^https?:\/\//, '') + '/interview', cx, 940);
 
     return canvas;
   }
