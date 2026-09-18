@@ -126,7 +126,6 @@ const jsonLd = {
     </div>
 
     <div class="answer-zone">
-      <div class="timeout-note" id="timeout-note" hidden>⏱ خلص الوقت — هاي بتتحسب "محتاج مراجعة"، بس تقدر تراجع الجواب:</div>
       <button class="reveal-btn" type="button" id="reveal-btn">
         اعرف الجواب <Icon name="check" size={16} />
       </button>
@@ -162,6 +161,8 @@ const jsonLd = {
   </section>
 
   <canvas id="share-canvas" width="1080" height="1080" hidden></canvas>
+
+  <div class="toast-layer" id="toast-layer" aria-live="polite"></div>
 
   <script type="application/json" id="interview-data" set:html={JSON.stringify(questions)} />
   <script type="application/json" id="site-data" set:html={JSON.stringify({ url: site.url, logoTop: 'Testing', logoBottom: 'بالعربي' })} />
@@ -217,11 +218,33 @@ const jsonLd = {
     direction: ltr; unicode-bidi: isolate;
   }
 
-  .timeout-note {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--danger-soft, rgba(246,91,91,.12)); color: var(--danger, #f65b5b);
-    border: 1px solid var(--danger, #f65b5b); border-radius: var(--r-md); padding: 12px 16px;
-    font-size: 14px; font-weight: 600; margin-bottom: 14px;
+  .toast-layer {
+    position: fixed; top: 20px; right: 20px; left: 20px; display: flex; justify-content: center;
+    z-index: 200; pointer-events: none;
+  }
+  :global(.toast) {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface); border: 1px solid var(--danger, #f65b5b);
+    border-inline-start: 4px solid var(--danger, #f65b5b);
+    border-radius: var(--r-md); padding: 14px 18px; box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    font-size: 14px; font-weight: 600; color: var(--ink);
+    max-width: 420px; pointer-events: auto;
+    animation: toast-in .35s ease-out, toast-out .35s ease-in 2.65s forwards;
+  }
+  :global(.toast .ic) { flex: none; font-size: 18px; }
+  :global(.toast b) { color: var(--danger, #f65b5b); }
+
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(-16px) scale(.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes toast-out {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0; transform: translateY(-10px) scale(.98); }
+  }
+
+  @media (max-width: 480px) {
+    .toast-layer { top: 12px; }
   }
 
   .qcard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 32px 30px; margin-bottom: 18px; }
@@ -332,8 +355,20 @@ const jsonLd = {
         stopTimer();
         revealedByTimeout = true;
         revealAnswer();
+        showTimeoutToast();
       }
     }, 1000);
+  }
+
+  function showTimeoutToast() {
+    const layer = $('toast-layer');
+    if (!layer) return;
+    layer.innerHTML = '';
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.innerHTML = '<span class="ic">⏱</span><span>خلص الوقت — هاي بتتحسب <b>"محتاج مراجعة"</b>، بس تقدر تراجع الجواب.</span>';
+    layer.appendChild(t);
+    setTimeout(() => { t.remove(); }, 3200);
   }
 
   function revealAnswer() {
@@ -341,11 +376,9 @@ const jsonLd = {
     const answerBox = $('answer-box') as HTMLElement | null;
     const revealBtn = $('reveal-btn') as HTMLElement | null;
     const nextBtn = $('next-btn') as HTMLElement | null;
-    const timeoutNote = $('timeout-note') as HTMLElement | null;
     if (answerBox) answerBox.hidden = false;
     if (revealBtn) revealBtn.hidden = true;
     if (nextBtn) nextBtn.hidden = false;
-    if (timeoutNote) timeoutNote.hidden = !revealedByTimeout;
   }
 
   function renderQuestion() {
@@ -362,7 +395,6 @@ const jsonLd = {
     const answerBox = $('answer-box') as HTMLElement | null; if (answerBox) answerBox.hidden = true;
     const revealBtn = $('reveal-btn') as HTMLElement | null; if (revealBtn) revealBtn.hidden = false;
     const nextBtn = $('next-btn') as HTMLElement | null; if (nextBtn) nextBtn.hidden = true;
-    const timeoutNote = $('timeout-note') as HTMLElement | null; if (timeoutNote) timeoutNote.hidden = true;
     startTimer();
   }
 
