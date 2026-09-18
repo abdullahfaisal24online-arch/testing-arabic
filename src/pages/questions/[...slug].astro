@@ -50,7 +50,7 @@ const jsonLd = [
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: site.url },
-      { '@type': 'ListItem', position: 2, name: 'بنك الأسئلة', item: `${site.url}/questions/` },
+      { '@type': 'ListItem', position: 2, name: 'مقابلة عمل', item: `${site.url}/interview/` },
       { '@type': 'ListItem', position: 3, name: data.title, item: `${site.url}/questions/${question.id}/` },
     ],
   },
@@ -58,7 +58,7 @@ const jsonLd = [
 ---
 <Base title={data.title} description={data.shortAnswer} jsonLd={jsonLd}>
   <div class="wrap crumbs">
-    <a href="/">الرئيسية</a><span>›</span><a href="/questions/">بنك الأسئلة</a><span>›</span>
+    <a href="/">الرئيسية</a><span>›</span><a href="/interview/">مقابلة عمل</a><span>›</span>
     <span class="now">{data.domain}</span>
   </div>
 
@@ -124,8 +124,8 @@ const jsonLd = [
         </section>
       )}
 
-      <a class="btn btn-ghost btn-sm all" href="/questions/">
-        <Icon name="arrow" size={16} /> كل الأسئلة
+      <a class="btn btn-ghost btn-sm all" href="/interview/">
+        <Icon name="arrow" size={16} /> رجوع لمقابلة عمل
       </a>
     </aside>
   </div>
