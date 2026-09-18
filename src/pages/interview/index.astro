@@ -85,7 +85,7 @@ const jsonLd = {
       </div>
 
       <button class="btn btn-primary start-btn" type="button" id="start-btn">
-        <Icon name="play" size={17} /> ابدأ مقابلة
+        <Icon name="play" size={17} class="flip" /> ابدأ مقابلة
       </button>
 
       <div class="stat-strip">
@@ -128,7 +128,7 @@ const jsonLd = {
         <div class="full-answer" id="full-answer"></div>
       </div>
       <button class="btn btn-primary next-btn" type="button" id="next-btn" hidden>
-        السؤال التالي <Icon name="arrow" size={16} class="flip" />
+        السؤال التالي <Icon name="arrow" size={16} />
       </button>
     </div>
   </section>
@@ -211,7 +211,7 @@ const jsonLd = {
   .full-answer :global(code) { font-family: 'IBM Plex Mono', monospace; font-size: .9em; background: rgba(255,255,255,.06); padding: 1px 6px; border-radius: 5px; }
 
   .next-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .next-btn :global(.flip) { transform: scaleX(-1); }
+  :global(.flip) { transform: scaleX(-1); }
 
   .done-wrap { max-width: 640px; padding-block: 40px 64px; }
   .done { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 48px 30px; text-align: center; }
