@@ -14,5 +14,5 @@ draft: false
 ---
 
 - **ليش بينسأل؟** لضمان أن الـ QA لا يكتفي بفحص الـ UI أو الـ API Response، بل بيتحقق من صحة وحفظ البيانات في الطبقة الخلفية (Persistence Layer).
-- **الجواب النموذجي:****Data Mapping & Integrity:** التأكد إن البيانات المكتوبة بالـ Frontend انحفظت بالأعمدة (Columns) الصحيحة وبنفس نوع البيانات (Data Types).**Security & Encryption:** فحص إن كلمات السر والـ Credit Cards مش محفوظة بـ Plain Text بالـ Database.**ACID Properties & Transactions:** التأكد إنه لو فشلت العملية بمنتصف الطريق (مثل فشل عملية الدفع) بيتم عمل Rollback وما بتسجل داتا ناقصة.
+- **الجواب النموذجي:** **Data Mapping & Integrity:** التأكد إن البيانات المكتوبة بالـ Frontend انحفظت بالأعمدة (Columns) الصحيحة وبنفس نوع البيانات (Data Types).**Security & Encryption:** فحص إن كلمات السر والـ Credit Cards مش محفوظة بـ Plain Text بالـ Database.**ACID Properties & Transactions:** التأكد إنه لو فشلت العملية بمنتصف الطريق (مثل فشل عملية الدفع) بيتم عمل Rollback وما بتسجل داتا ناقصة.
 - **الفخ الشائع:** الاعتماد الكلي على الـ UI لإغلاق الفحص دون فتح الـ Database والتحقق المباشر عبر استعلامات SQL.

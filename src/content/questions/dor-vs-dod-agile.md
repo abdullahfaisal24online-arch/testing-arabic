@@ -16,5 +16,5 @@ draft: false
 ---
 
 - **ليش بينسأل؟** للتأكد من استيعابك لمعايير ضبط الجودة داخل منهجية الـ Scrum.
-- **الجواب النموذجي:****DoR:** وضوح المتطلبات، وجود الـ Wireframes، وتحديد الـ Acceptance Criteria.**DoD:** كتابة الكود، الـ Code Review، إنجاز الـ Testing (Manual/Auto)، وتجهيز الـ Documentation.
+- **الجواب النموذجي:** **DoR:** وضوح المتطلبات، وجود الـ Wireframes، وتحديد الـ Acceptance Criteria.**DoD:** كتابة الكود، الـ Code Review، إنجاز الـ Testing (Manual/Auto)، وتجهيز الـ Documentation.
 - **الفخ الشائع:** خلط المفاهيم واتبار الـ DoD خاص فقط بعملية الـ Testing دون باقي الفريق.

@@ -13,5 +13,5 @@ draft: false
 ---
 
 - **ليش بينسأل؟** أساسي جداً بالـ Selenium لمعرفة كيف المتقدم بيحل مشكلة مزامنة عناصر الصفحة (Synchronization).
-- **الجواب النموذجي:****Implicit Wait:** يُعرّف مرة واحدة بحد أقصى للانتظار يطبق على كامل الـ Driver.**Explicit Wait:** ينتظر تحقق شرط محدد (مثل `visibilityOfElementLocated`) لعنصر معين قبل الاستمرار.**Fluent Wait:** بيمتاز بإمكانية تحديد الـ Polling Frequency (مثلاً افحص كل نصف ثانية) واستثناء أخطاء معينة مثل `NoSuchElementException`.
+- **الجواب النموذجي:** **Implicit Wait:** يُعرّف مرة واحدة بحد أقصى للانتظار يطبق على كامل الـ Driver.**Explicit Wait:** ينتظر تحقق شرط محدد (مثل `visibilityOfElementLocated`) لعنصر معين قبل الاستمرار.**Fluent Wait:** بيمتاز بإمكانية تحديد الـ Polling Frequency (مثلاً افحص كل نصف ثانية) واستثناء أخطاء معينة مثل `NoSuchElementException`.
 - **الفخ الشائع:** الخلط بين الـ Implicit والـ Explicit معاً بنفس المشروع، لأن ذلك يسبب أوقات انتظار غير متوقعة (Unpredictable Wait Times).

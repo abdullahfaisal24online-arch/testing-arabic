@@ -16,5 +16,5 @@ draft: false
 ---
 
 - **ليش بينسأل؟** للتأكد من فهم المهندس لأساسيات الـ Backend testing والخطوات المنهجية لاختبار الخدمات قبل ربطها بالواجهات.
-- **الجواب النموذجي:****Documentation Review:** قراءة Swagger/Postman Collection لفهم الـ Endpoints، الـ HTTP Methods (GET, POST, PUT, DELETE)، والـ Authentication.**Happy Path Testing:** إرسال Request ببيانات صحيحة والتحقق من الـ Status Code (مثل 200 OK أو 201 Created) والداتا المرجعة.**Negative & Edge Cases:** إرسال داتا ناقصة أو خاطئة للتحقق من الـ Error Handling (مثل 400 Bad Request أو 401 Unauthorized).**Data Validation & Headers:** التأكد من نوع الـ Response (JSON/XML) والأداء وتشفير البيانات الحساسة.
+- **الجواب النموذجي:** **Documentation Review:** قراءة Swagger/Postman Collection لفهم الـ Endpoints، الـ HTTP Methods (GET, POST, PUT, DELETE)، والـ Authentication.**Happy Path Testing:** إرسال Request ببيانات صحيحة والتحقق من الـ Status Code (مثل 200 OK أو 201 Created) والداتا المرجعة.**Negative & Edge Cases:** إرسال داتا ناقصة أو خاطئة للتحقق من الـ Error Handling (مثل 400 Bad Request أو 401 Unauthorized).**Data Validation & Headers:** التأكد من نوع الـ Response (JSON/XML) والأداء وتشفير البيانات الحساسة.
 - **الفخ الشائع:** التركيز فقط على الـ Status Code وإهمال فحص جسم الاستجابة (Response Body) والاستجابة للأخطاء.
