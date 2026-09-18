@@ -8,6 +8,7 @@
  *   GET  /api/likes?page=     عدد الإعجابات لصفحة
  *   POST /api/likes           إضافة/سحب إعجاب
  *   POST /api/chat            مساعد الموقع (Workers AI) — أسئلة QA/testing فقط
+ *   POST /api/subscribe       نسخة احتياطية محلية لمشتركي النشرة (جدول subscribers)
  *   GET  /admin/comments      صفحة المراجعة (محمية بكلمة سر)
  */
 
@@ -368,6 +369,65 @@ async function handleChat(req: Request, env: Env) {
   return json({ ok: true, reply, sources });
 }
 
+/* ===================== النشرة (نسخة احتياطية محلية) ===================== */
+
+/** فحص بسيط لشكل الإيميل — مو تحقق كامل حسب المعيار، بس كافي لرفض القيم الفاسدة. */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_EMAIL = 254;
+let SUBSCRIBE_TABLE_READY = false;
+
+/** نفس نمط ensureChatTable — بينشئ جدول تحديد المعدّل تلقائياً بدون خطوة D1 يدوية. */
+async function ensureSubscribeTable(env: Env) {
+  if (SUBSCRIBE_TABLE_READY) return;
+  await env.DB.prepare(`CREATE TABLE IF NOT EXISTS subscribe_hits (ip_hash TEXT, created_at INTEGER)`).run();
+  await env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_subscribe_hits ON subscribe_hits(ip_hash, created_at)`).run();
+  SUBSCRIBE_TABLE_READY = true;
+}
+
+async function handleSubscribe(req: Request, env: Env) {
+  let payload: { email?: string };
+  try {
+    payload = await req.json();
+  } catch {
+    return json({ ok: false, error: 'bad_json' }, 400);
+  }
+
+  const email = String(payload.email ?? '').trim().toLowerCase();
+  if (!email || email.length > MAX_EMAIL || !EMAIL_RE.test(email)) {
+    return json({ ok: false, error: 'bad_email' }, 400);
+  }
+
+  // منع الإغراق: نفس سقف التعليقات تقريباً — 20 محاولة بالساعة من نفس المصدر
+  await ensureSubscribeTable(env);
+  const ip = req.headers.get('cf-connecting-ip') ?? '0.0.0.0';
+  const ipHash = await hashIp(ip, env.ADMIN_PASSWORD);
+  const since = Date.now() - 3600_000;
+
+  const recent = await env.DB.prepare(
+    `SELECT COUNT(*) AS n FROM subscribe_hits WHERE ip_hash = ?1 AND created_at > ?2`,
+  )
+    .bind(ipHash, since)
+    .first<{ n: number }>();
+
+  if ((recent?.n ?? 0) >= 20) return json({ ok: false, error: 'too_many' }, 429);
+
+  await env.DB.prepare(`INSERT INTO subscribe_hits (ip_hash, created_at) VALUES (?1, ?2)`)
+    .bind(ipHash, Date.now())
+    .run();
+
+  const now = Date.now();
+  // upsert: إيميل موجود؟ حدّث last_seen_at بس. جديد؟ أضفه pending.
+  await env.DB.prepare(
+    `INSERT INTO subscribers (email, source, status, created_at, last_seen_at)
+       VALUES (?1, 'kit-form', 'pending', ?2, ?2)
+       ON CONFLICT(email) DO UPDATE SET last_seen_at = ?2`,
+  )
+    .bind(email, now)
+    .run();
+
+  return json({ ok: true });
+}
+
 /* ===================== واجهة التعليقات العامة ===================== */
 
 async function listComments(env: Env, page: string) {
@@ -646,92 +706,124 @@ async function adminAction(req: Request, env: Env) {
 
 /* ===================== الموجّه ===================== */
 
-export default {
-  async fetch(req: Request, env: Env): Promise<Response> {
-    const url = new URL(req.url);
-    const path = url.pathname;
+/**
+ * الموجّه الفعلي. ملفوف بـ try/catch من fetch() تحت — أي خطأ غير متوقع
+ * (D1، شبكة، إلخ) بيرجع رسالة عامة للزائر بدل ما تنكشف تفاصيله.
+ */
+async function router(req: Request, env: Env): Promise<Response> {
+  const url = new URL(req.url);
+  const path = url.pathname;
 
-    // ---------- واجهة التعليقات ----------
-    if (path === '/api/comments') {
-      if (req.method === 'GET') {
-        const page = url.searchParams.get('page') ?? '';
-        if (!page.startsWith('/')) return json({ ok: false, error: 'bad_page' }, 400);
-        return json({ ok: true, comments: await listComments(env, page) });
-      }
-      if (req.method === 'POST') return createComment(req, env);
-      return json({ ok: false, error: 'method' }, 405);
+  // ---------- واجهة التعليقات ----------
+  if (path === '/api/comments') {
+    if (req.method === 'GET') {
+      const page = url.searchParams.get('page') ?? '';
+      if (!page.startsWith('/')) return json({ ok: false, error: 'bad_page' }, 400);
+      return json({ ok: true, comments: await listComments(env, page) });
+    }
+    if (req.method === 'POST') return createComment(req, env);
+    return json({ ok: false, error: 'method' }, 405);
+  }
+
+  // ---------- الإعجابات ----------
+  if (path === '/api/likes') {
+    if (req.method === 'GET') {
+      const page = url.searchParams.get('page') ?? '';
+      if (!page.startsWith('/')) return json({ ok: false, error: 'bad_page' }, 400);
+      return json({ ok: true, likes: await countLikes(env, page) });
+    }
+    if (req.method === 'POST') return toggleLike(req, env);
+    return json({ ok: false, error: 'method' }, 405);
+  }
+
+  // ---------- مساعد الموقع ----------
+  if (path === '/api/chat') {
+    if (req.method === 'POST') return handleChat(req, env);
+    return json({ ok: false, error: 'method' }, 405);
+  }
+
+  // ---------- النشرة (نسخة احتياطية محلية) ----------
+  if (path === '/api/subscribe') {
+    if (req.method === 'POST') return handleSubscribe(req, env);
+    return json({ ok: false, error: 'method' }, 405);
+  }
+
+  // ---------- صفحة المراجعة ----------
+  if (path.startsWith('/admin/comments')) {
+    if (!env.ADMIN_PASSWORD) {
+      return new Response('ADMIN_PASSWORD غير مضبوط', { status: 500 });
     }
 
-    // ---------- الإعجابات ----------
-    if (path === '/api/likes') {
-      if (req.method === 'GET') {
-        const page = url.searchParams.get('page') ?? '';
-        if (!page.startsWith('/')) return json({ ok: false, error: 'bad_page' }, 400);
-        return json({ ok: true, likes: await countLikes(env, page) });
-      }
-      if (req.method === 'POST') return toggleLike(req, env);
-      return json({ ok: false, error: 'method' }, 405);
-    }
-
-    // ---------- مساعد الموقع ----------
-    if (path === '/api/chat') {
-      if (req.method === 'POST') return handleChat(req, env);
-      return json({ ok: false, error: 'method' }, 405);
-    }
-
-    // ---------- صفحة المراجعة ----------
-    if (path.startsWith('/admin/comments')) {
-      if (!env.ADMIN_PASSWORD) {
-        return new Response('ADMIN_PASSWORD غير مضبوط', { status: 500 });
-      }
-
-      if (path === '/admin/comments/login' && req.method === 'POST') {
-        const form = await req.formData();
-        const pass = String(form.get('password') ?? '');
-        if (!safeEqual(pass, env.ADMIN_PASSWORD)) {
-          return new Response(loginPage('كلمة السر غير صحيحة'), {
-            status: 401,
-            headers: { 'content-type': 'text/html; charset=utf-8' },
-          });
-        }
-        const token = await makeToken(env.ADMIN_PASSWORD);
-        return new Response(null, {
-          status: 303,
-          headers: {
-            location: '/admin/comments',
-            'set-cookie': `${COOKIE}=${token}; HttpOnly; Secure; SameSite=Lax; Path=/admin; Max-Age=${
-              SESSION_DAYS * 86400
-            }`,
-          },
-        });
-      }
-
-      if (path === '/admin/comments/logout') {
-        return new Response(null, {
-          status: 303,
-          headers: {
-            location: '/admin/comments',
-            'set-cookie': `${COOKIE}=; HttpOnly; Secure; SameSite=Lax; Path=/admin; Max-Age=0`,
-          },
-        });
-      }
-
-      const authed = await validToken(readCookie(req, COOKIE), env.ADMIN_PASSWORD);
-      if (!authed) {
-        return new Response(loginPage(), {
+    if (path === '/admin/comments/login' && req.method === 'POST') {
+      const form = await req.formData();
+      const pass = String(form.get('password') ?? '');
+      if (!safeEqual(pass, env.ADMIN_PASSWORD)) {
+        return new Response(loginPage('كلمة السر غير صحيحة'), {
           status: 401,
-          headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
+          headers: { 'content-type': 'text/html; charset=utf-8' },
         });
       }
+      const token = await makeToken(env.ADMIN_PASSWORD);
+      return new Response(null, {
+        status: 303,
+        headers: {
+          location: '/admin/comments',
+          'set-cookie': `${COOKIE}=${token}; HttpOnly; Secure; SameSite=Lax; Path=/admin; Max-Age=${
+            SESSION_DAYS * 86400
+          }`,
+        },
+      });
+    }
 
-      if (path === '/admin/comments/action' && req.method === 'POST') return adminAction(req, env);
+    if (path === '/admin/comments/logout') {
+      return new Response(null, {
+        status: 303,
+        headers: {
+          location: '/admin/comments',
+          'set-cookie': `${COOKIE}=; HttpOnly; Secure; SameSite=Lax; Path=/admin; Max-Age=0`,
+        },
+      });
+    }
 
-      return new Response(await adminPage(env, url.searchParams.get('view') ?? 'pending'), {
+    const authed = await validToken(readCookie(req, COOKIE), env.ADMIN_PASSWORD);
+    if (!authed) {
+      return new Response(loginPage(), {
+        status: 401,
         headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
       });
     }
 
-    // ---------- كل شي تاني: الملفات الثابتة ----------
-    return env.ASSETS.fetch(req);
+    if (path === '/admin/comments/action' && req.method === 'POST') return adminAction(req, env);
+
+    return new Response(await adminPage(env, url.searchParams.get('view') ?? 'pending'), {
+      headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
+    });
+  }
+
+  // ---------- كل شي تاني: الملفات الثابتة ----------
+  return env.ASSETS.fetch(req);
+}
+
+export default {
+  async fetch(req: Request, env: Env): Promise<Response> {
+    try {
+      return await router(req, env);
+    } catch (err) {
+      // ما بنكشف تفاصيل الخطأ (رسالة D1، stack trace...) للزائر —
+      // بس بنسجّله بالـ observability عشان نقدر نشخّصه لاحقاً من لوحة Cloudflare.
+      console.error('unhandled_error', err instanceof Error ? err.stack ?? err.message : err);
+
+      const url = new URL(req.url);
+      if (url.pathname.startsWith('/api/')) {
+        return json({ ok: false, error: 'server_error' }, 500);
+      }
+      if (url.pathname.startsWith('/admin/comments')) {
+        return new Response('صار خطأ غير متوقع. جرّب مرة تانية.', {
+          status: 500,
+          headers: { 'content-type': 'text/plain; charset=utf-8' },
+        });
+      }
+      return new Response('صار خطأ غير متوقع.', { status: 500 });
+    }
   },
 } satisfies ExportedHandler<Env>;
