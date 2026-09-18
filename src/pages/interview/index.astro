@@ -91,14 +91,14 @@ const jsonLd = {
       <div class="stat-strip">
         <div class="s"><b>{questions.length}</b><span>سؤال بالبنك</span></div>
         <div class="s"><b>بالتدريج</b><span>مبتدئ ← متقدّم</span></div>
-        <div class="s"><b>بلا وقت</b><span>جاوب على راحتك</span></div>
+        <div class="s"><b>45 ثانية</b><span>لكل سؤال</span></div>
       </div>
     </div>
   </section>
 
   <div class="wrap">
     <div class="below-hero">
-      <b>كيف تشتغل المقابلة؟</b> بتشوف سؤال واحد بكل مرة، بترتيب متدرّج من الأساسيات للمتقدّم. جاوب بصوت عالي أو براسك متل مقابلة حقيقية، وبعدين اضغط «اعرف الجواب» — الإجابة بتطلع تحت نفس السؤال، بدون ما تنقلك لمكان تاني. بعدها اضغط «السؤال التالي» للمتابعة، وتقدر تضغط «إنهاء المقابلة» بأي لحظة.
+      <b>كيف تشتغل المقابلة؟</b> بتشوف سؤال واحد بكل مرة، بترتيب متدرّج من الأساسيات للمتقدّم، وعندك 45 ثانية تفكّر فيها متل مقابلة حقيقية. جاوب بصوت عالي أو براسك، وبعدين اضغط «اعرف الجواب» — الإجابة بتطلع تحت نفس السؤال، بدون ما تنقلك لمكان تاني. لو خلص الوقت قبل ما تضغط، الجواب بيطلع تلقائياً وبتترصد كسؤال محتاج مراجعة. بعدها اضغط «السؤال التالي» للمتابعة، وتقدر تضغط «إنهاء المقابلة» بأي لحظة، وبالنهاية فيك تشارك نتيجتك.
     </div>
   </div>
 
@@ -107,6 +107,13 @@ const jsonLd = {
     <div class="interview-top">
       <span class="qnum" id="q-num">1 / {questions.length}</span>
       <div class="progtrack"><i id="prog-fill" style="width:0%"></i></div>
+      <div class="timer-ring" id="timer-ring">
+        <svg viewBox="0 0 40 40">
+          <circle class="track" cx="20" cy="20" r="16"></circle>
+          <circle class="fill" id="timer-fill" cx="20" cy="20" r="16" stroke-dasharray="100.5" stroke-dashoffset="0"></circle>
+        </svg>
+        <div class="timer-num" id="timer-num">45</div>
+      </div>
       <button class="btn btn-ghost btn-sm end-btn" type="button" id="end-btn">إنهاء المقابلة</button>
     </div>
 
@@ -119,6 +126,7 @@ const jsonLd = {
     </div>
 
     <div class="answer-zone">
+      <div class="timeout-note" id="timeout-note" hidden>⏱ خلص الوقت — هاي بتتحسب "محتاج مراجعة"، بس تقدر تراجع الجواب:</div>
       <button class="reveal-btn" type="button" id="reveal-btn">
         اعرف الجواب <Icon name="check" size={16} />
       </button>
@@ -139,11 +147,24 @@ const jsonLd = {
       <div class="ic">🎉</div>
       <h2>خلصت المقابلة!</h2>
       <p id="done-sub"></p>
-      <button class="btn btn-primary" type="button" id="restart-btn">ابدأ مقابلة جديدة</button>
+
+      <div class="score-row">
+        <div class="score-pill ok"><b id="score-known">0</b><span>عرفتها</span></div>
+        <div class="score-pill miss"><b id="score-missed">0</b><span>محتاج مراجعة</span></div>
+        <div class="score-pill"><b id="score-pct">0%</b><span>نسبة الإجابة</span></div>
+      </div>
+
+      <div class="done-actions">
+        <button class="btn btn-primary" type="button" id="share-btn">📤 شارك نتيجتك</button>
+        <button class="btn btn-ghost" type="button" id="restart-btn">↻ ابدأ مقابلة جديدة</button>
+      </div>
     </div>
   </section>
 
+  <canvas id="share-canvas" width="1080" height="1080" hidden></canvas>
+
   <script type="application/json" id="interview-data" set:html={JSON.stringify(questions)} />
+  <script type="application/json" id="site-data" set:html={JSON.stringify({ url: site.url, logoTop: 'Testing', logoBottom: 'بالعربي' })} />
 </Base>
 
 <style>
@@ -183,6 +204,26 @@ const jsonLd = {
   .progtrack i { display: block; height: 100%; background: var(--orange); border-radius: 99px; transition: width .3s; }
   .end-btn { flex: none; }
 
+  .timer-ring { position: relative; width: 38px; height: 38px; flex: none; }
+  .timer-ring svg { transform: rotate(-90deg); width: 38px; height: 38px; }
+  .timer-ring circle { fill: none; stroke-width: 4; }
+  .timer-ring .track { stroke: var(--line); }
+  .timer-ring .fill { stroke: var(--cyan); stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke .3s; }
+  .timer-ring.warn .fill { stroke: var(--orange); }
+  .timer-ring.danger .fill { stroke: var(--danger, #f65b5b); }
+  .timer-num {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; font-family: 'IBM Plex Mono', monospace; color: var(--ink);
+    direction: ltr; unicode-bidi: isolate;
+  }
+
+  .timeout-note {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--danger-soft, rgba(246,91,91,.12)); color: var(--danger, #f65b5b);
+    border: 1px solid var(--danger, #f65b5b); border-radius: var(--r-md); padding: 12px 16px;
+    font-size: 14px; font-weight: 600; margin-bottom: 14px;
+  }
+
   .qcard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 32px 30px; margin-bottom: 18px; }
   .qmeta { display: flex; gap: 8px; margin-bottom: 16px; }
   .qtext { font-size: 21px; font-weight: 700; margin: 0; line-height: 1.75; }
@@ -219,6 +260,15 @@ const jsonLd = {
   .done h2 { margin: 0 0 8px; }
   .done p { color: var(--muted); margin: 0 0 24px; }
 
+  .score-row { display: flex; justify-content: center; gap: 10px; margin: 4px 0 28px; flex-wrap: wrap; }
+  .score-pill { background: rgba(255,255,255,.05); border: 1px solid var(--line); border-radius: 12px; padding: 14px 20px; min-width: 100px; }
+  .score-pill b { display: block; font-size: 22px; font-weight: 800; direction: ltr; unicode-bidi: isolate; }
+  .score-pill span { font-size: 12.5px; color: var(--muted); }
+  .score-pill.ok b { color: var(--ok, #34d399); }
+  .score-pill.miss b { color: var(--danger, #f65b5b); }
+
+  .done-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
   @media (max-width: 480px) {
     .stat-strip { grid-template-columns: 1fr 1fr; }
     .qcard { padding: 24px 20px; }
@@ -228,18 +278,75 @@ const jsonLd = {
 
 <script>
   type Q = { t: string; a: string; full: string; d: string; lvl: string };
+  type SiteInfo = { url: string; logoTop: string; logoBottom: string };
 
   const raw = document.getElementById('interview-data')?.textContent ?? '[]';
   const ORDERED: Q[] = JSON.parse(raw);
+  const SITE: SiteInfo = JSON.parse(document.getElementById('site-data')?.textContent ?? '{}');
+
+  const TIME_PER_Q = 45;
+  const CIRC = 2 * Math.PI * 16; // r=16
 
   let idx = 0;
   let answered = 0;
+  let known = 0;
+  let missed = 0;
+  let timeLeft = TIME_PER_Q;
+  let timerId: ReturnType<typeof setInterval> | null = null;
+  let revealedByTimeout = false;
 
   const $ = (id: string) => document.getElementById(id);
   const introEl = document.getElementById('intro');
   const belowHero = document.querySelector<HTMLElement>('.below-hero')?.closest('.wrap') ?? null;
   const interviewEl = $('interview');
   const finishedEl = $('finished');
+
+  function stopTimer() {
+    if (timerId !== null) {
+      clearInterval(timerId);
+      timerId = null;
+    }
+  }
+
+  function updateTimerVisual() {
+    const ring = $('timer-ring');
+    const fill = $('timer-fill');
+    const num = $('timer-num');
+    if (num) num.textContent = String(timeLeft);
+    if (fill) fill.setAttribute('stroke-dashoffset', String(CIRC - (timeLeft / TIME_PER_Q) * CIRC));
+    if (ring) {
+      ring.classList.toggle('warn', timeLeft <= 15 && timeLeft > 5);
+      ring.classList.toggle('danger', timeLeft <= 5);
+    }
+  }
+
+  function startTimer() {
+    stopTimer();
+    timeLeft = TIME_PER_Q;
+    revealedByTimeout = false;
+    updateTimerVisual();
+    timerId = setInterval(() => {
+      timeLeft--;
+      updateTimerVisual();
+      if (timeLeft <= 0) {
+        stopTimer();
+        revealedByTimeout = true;
+        revealAnswer();
+      }
+    }, 1000);
+  }
+
+  function revealAnswer() {
+    stopTimer();
+    const answerBox = $('answer-box') as HTMLElement | null;
+    const revealBtn = $('reveal-btn') as HTMLElement | null;
+    const nextBtn = $('next-btn') as HTMLElement | null;
+    const timeoutNote = $('timeout-note') as HTMLElement | null;
+    if (answerBox) answerBox.hidden = false;
+    if (revealBtn) revealBtn.hidden = true;
+    if (nextBtn) nextBtn.hidden = false;
+    if (timeoutNote) timeoutNote.hidden = !revealedByTimeout;
+  }
 
   function renderQuestion() {
     const q = ORDERED[idx];
@@ -255,12 +362,16 @@ const jsonLd = {
     const answerBox = $('answer-box') as HTMLElement | null; if (answerBox) answerBox.hidden = true;
     const revealBtn = $('reveal-btn') as HTMLElement | null; if (revealBtn) revealBtn.hidden = false;
     const nextBtn = $('next-btn') as HTMLElement | null; if (nextBtn) nextBtn.hidden = true;
+    const timeoutNote = $('timeout-note') as HTMLElement | null; if (timeoutNote) timeoutNote.hidden = true;
+    startTimer();
   }
 
   function startInterview() {
     if (ORDERED.length === 0) return;
     idx = 0;
     answered = 0;
+    known = 0;
+    missed = 0;
     if (introEl) introEl.hidden = true;
     if (belowHero) (belowHero as HTMLElement).hidden = true;
     if (finishedEl) finishedEl.hidden = true;
@@ -270,27 +381,29 @@ const jsonLd = {
   }
 
   function finishInterview() {
+    stopTimer();
     if (interviewEl) interviewEl.hidden = true;
     if (introEl) introEl.hidden = true;
     if (finishedEl) finishedEl.hidden = false;
     const sub = $('done-sub');
     if (sub) sub.textContent = `جاوبت على ${answered} من ${ORDERED.length} سؤال. جاهز لمحاولة تانية؟`;
+    const scoreKnown = $('score-known'); if (scoreKnown) scoreKnown.textContent = String(known);
+    const scoreMissed = $('score-missed'); if (scoreMissed) scoreMissed.textContent = String(missed);
+    const scorePct = $('score-pct');
+    if (scorePct) scorePct.textContent = answered > 0 ? `${Math.round((known / answered) * 100)}%` : '0%';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   $('start-btn')?.addEventListener('click', startInterview);
 
   $('reveal-btn')?.addEventListener('click', () => {
-    const answerBox = $('answer-box') as HTMLElement | null;
-    const revealBtn = $('reveal-btn') as HTMLElement | null;
-    const nextBtn = $('next-btn') as HTMLElement | null;
-    if (answerBox) answerBox.hidden = false;
-    if (revealBtn) revealBtn.hidden = true;
-    if (nextBtn) nextBtn.hidden = false;
+    revealedByTimeout = false;
+    revealAnswer();
   });
 
   $('next-btn')?.addEventListener('click', () => {
     answered++;
+    if (revealedByTimeout) missed++; else known++;
     if (idx < ORDERED.length - 1) {
       idx++;
       renderQuestion();
@@ -306,5 +419,131 @@ const jsonLd = {
     if (introEl) introEl.hidden = false;
     if (belowHero) (belowHero as HTMLElement).hidden = false;
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // ===== مشاركة النتيجة كصورة =====
+  function drawShareCard(): HTMLCanvasElement | null {
+    const canvas = document.getElementById('share-canvas') as HTMLCanvasElement | null;
+    if (!canvas) return null;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    ctx.direction = 'rtl';
+    const W = canvas.width, H = canvas.height;
+
+    // خلفية متدرّجة
+    const grad = ctx.createLinearGradient(0, 0, W, H);
+    grad.addColorStop(0, '#0d1b33');
+    grad.addColorStop(1, '#16274a');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // نقاط خفيفة بالخلفية
+    ctx.fillStyle = 'rgba(56,189,248,.12)';
+    for (let y = 40; y < H; y += 44) {
+      for (let x = 40; x < W; x += 44) {
+        ctx.beginPath();
+        ctx.arc(x, y, 1.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    const cx = W / 2;
+    const arFont = (weight: string, size: number) => `${weight} ${size}px "IBM Plex Sans Arabic", Tahoma, sans-serif`;
+
+    // الشعار
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = arFont('800', 34);
+    ctx.fillText(`${SITE.logoTop || 'Testing'} ${SITE.logoBottom || 'بالعربي'}`, cx, 120);
+
+    // النتيجة الكبيرة: "known/answered" — تُرسم دايماً من اليسار لليمين (أرقام لاتينية)
+    const scoreText = `${known}`;
+    const totalText = `/${answered}`;
+    ctx.font = arFont('800', 150);
+    const scoreWidth = ctx.measureText(scoreText).width;
+    ctx.font = arFont('700', 70);
+    const totalWidth = ctx.measureText(totalText).width;
+    const totalCombined = scoreWidth + totalWidth;
+    const leftX = cx - totalCombined / 2;
+
+    ctx.direction = 'ltr';
+    ctx.textAlign = 'left';
+    ctx.font = arFont('800', 150);
+    ctx.fillStyle = '#e8eef9';
+    ctx.fillText(scoreText, leftX, 400);
+    ctx.font = arFont('700', 70);
+    ctx.fillStyle = '#93a4c0';
+    ctx.fillText(totalText, leftX + scoreWidth, 400);
+    ctx.direction = 'rtl';
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#93a4c0';
+    ctx.font = arFont('600', 34);
+    ctx.fillText('خلصت مقابلة QA التجريبية 🎯', cx, 460);
+
+    // إحصائيات
+    const statY = 610;
+    const gap = 220;
+    const stats: [string, string, string][] = [
+      [String(known), 'عرفتها ✓', '#34d399'],
+      [String(missed), 'محتاج مراجعة', '#f65b5b'],
+      [answered > 0 ? `${Math.round((known / answered) * 100)}%` : '0%', 'النسبة', '#e8eef9'],
+    ];
+    stats.forEach(([val, lbl, color], i) => {
+      const x = cx + gap - i * gap;
+      ctx.fillStyle = color;
+      ctx.font = arFont('800', 52);
+      ctx.fillText(val, x, statY);
+      ctx.fillStyle = '#93a4c0';
+      ctx.font = arFont('600', 26);
+      ctx.fillText(lbl, x, statY + 40);
+    });
+
+    // خط فاصل
+    ctx.strokeStyle = 'rgba(56,189,248,.25)';
+    ctx.setLineDash([8, 8]);
+    ctx.beginPath();
+    ctx.moveTo(140, 760);
+    ctx.lineTo(W - 140, 760);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // دعوة للعمل
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = arFont('700', 30);
+    ctx.fillText('جرّب مقابلتك أنت', cx, 830);
+    ctx.fillStyle = '#93a4c0';
+    ctx.font = arFont('500', 26);
+    ctx.fillText((SITE.url || 'testing-arabic.com').replace(/^https?:\/\//, '') + '/interview', cx, 875);
+
+    return canvas;
+  }
+
+  $('share-btn')?.addEventListener('click', async () => {
+    const canvas = drawShareCard();
+    if (!canvas) return;
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      const file = new File([blob], 'my-qa-interview-result.png', { type: 'image/png' });
+      const shareData = {
+        files: [file],
+        title: 'نتيجتي بمقابلة QA التجريبية',
+        text: `جاوبت على ${known} من ${answered} سؤال بمقابلة QA التجريبية على ${SITE.logoTop || 'Testing'} ${SITE.logoBottom || 'بالعربي'} 🎯`,
+      };
+      const nav = navigator as Navigator & { canShare?: (data: any) => boolean; share?: (data: any) => Promise<void> };
+      if (nav.canShare && nav.canShare(shareData) && nav.share) {
+        try {
+          await nav.share(shareData);
+          return;
+        } catch {
+          // المستخدم ألغى المشاركة أو صار خطأ — بننزل لخيار التحميل
+        }
+      }
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'my-qa-interview-result.png';
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }, 'image/png');
   });
 </script>
