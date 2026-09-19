@@ -8,13 +8,19 @@ import { linkGlossary } from '../../lib/glossary';
 const site = await getSite();
 
 const levelOrder: Record<string, number> = { 'مبتدئ': 0, 'متوسط': 1, 'متقدّم': 2 };
+// ترتيب المجالات: كل مجال كتلة كاملة (بمستوياتها الثلاثة: مبتدئ ← متوسط ← متقدّم) قبل الانتقال للمجال يلي بعده
 const domainOrder: Record<string, number> = {
   'أساسيات': 0,
   'سلوكي': 1,
-  'أتمتة': 2,
+  'إدارة الاختبار': 2,
   'API': 3,
+  'أتمتة': 4,
 };
 const domainRank = (d: string) => domainOrder[d] ?? 99;
+
+// سؤال "عندك أسئلة إلنا؟" ثابت دايمًا آخر سؤال بالمقابلة، بغض النظر عن ترتيب/فلترة المواضيع
+// (لأنه خاتمة طبيعية لأي مقابلة عمل، مش سؤال تقني عادي)
+const CLOSING_QUESTION_ID = 'questions-for-interviewer';
 
 const allQuestions = (await getCollection('questions')).filter((q) => !q.data.draft);
 
@@ -26,10 +32,15 @@ const questions = await Promise.all(
   allQuestions
     .slice()
     .sort((a, b) => {
-      const lv = levelOrder[a.data.level] - levelOrder[b.data.level];
-      if (lv !== 0) return lv;
+      // السؤال الختامي دايمًا بالآخر
+      const aClosing = a.id === CLOSING_QUESTION_ID;
+      const bClosing = b.id === CLOSING_QUESTION_ID;
+      if (aClosing !== bClosing) return aClosing ? 1 : -1;
+      // المجال أولًا (كل مجال كتلة كاملة)، وبعدين المستوى داخل نفس المجال
       const dv = domainRank(a.data.domain) - domainRank(b.data.domain);
       if (dv !== 0) return dv;
+      const lv = levelOrder[a.data.level] - levelOrder[b.data.level];
+      if (lv !== 0) return lv;
       return a.data.title.localeCompare(b.data.title, 'ar');
     })
     .map(async (q) => {
@@ -37,6 +48,7 @@ const questions = await Promise.all(
       void Content;
       const fullHtml = (q as any).rendered?.html ?? '';
       return {
+        id: q.id,
         t: q.data.title,
         a: q.data.shortAnswer,
         full: linkGlossary(fullHtml, glossaryTerms, q.id),
@@ -78,14 +90,22 @@ const jsonLd = {
         مجموعة أسئلة حقيقية بتتسأل بمقابلات اختبار البرمجيات، موزّعة على أساسيات الاختبار وأسئلة سلوكية وأتمتة وAPI. جاوب بنفسك الأول قبل ما تشوف الإجابة النموذجية.
       </p>
 
-      <div class="breakdown">
+      <p class="topics-lead">اختَر المواضيع اللي بدك تتدرّب عليها (كلها مفعّلة افتراضيًا):</p>
+      <div class="topics-grid" id="topics-grid">
         {domains.map(([d, n]) => (
-          <span class="bpill"><b>{n}</b> {d}</span>
+          <button type="button" class="topic-chip active" data-topic={d} data-count={n}>
+            <span class="box">✓</span><span>{d}</span><span class="cnt">({n})</span>
+          </button>
         ))}
       </div>
+      <div class="quick-actions">
+        <button type="button" id="topics-all">✓ اختر الكل</button>
+        <button type="button" id="topics-manual">👤 مانيوال بس (بدون أتمتة/API)</button>
+      </div>
+      <p class="topics-warn" id="topics-warn" hidden>لازم تختار موضوع واحد على الأقل</p>
 
       <button class="btn btn-primary start-btn" type="button" id="start-btn">
-        <Icon name="play" size={17} class="flip" /> ابدأ مقابلة
+        <Icon name="play" size={17} class="flip" /> ابدأ مقابلة (<span id="start-count">{questions.length}</span> سؤال)
       </button>
 
       <div class="stat-strip">
@@ -174,14 +194,32 @@ const jsonLd = {
   .page-head h1 { margin-bottom: 14px; }
   .page-head .lead { max-width: 60ch; margin-inline: auto; line-height: 1.9; }
 
-  .breakdown { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 28px 0; }
-  .bpill {
-    display: flex; align-items: center; gap: 7px; font-size: 14px; color: var(--ink-2);
-    background: rgba(255,255,255,.06); border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px;
+  .topics-lead { color: var(--muted); font-size: 14px; margin: 22px 0 14px; }
+  .topics-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 14px; }
+  .topic-chip {
+    display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;
+    font: inherit; color: var(--ink-2);
+    background: rgba(255,255,255,.05); border: 1.5px solid var(--line-strong); border-radius: 12px;
+    padding: 10px 16px; font-size: 14px; font-weight: 600; transition: all .15s ease;
   }
-  .bpill b { color: var(--orange); font-family: inherit; }
+  .topic-chip.active { background: rgba(56,189,248,.14); border-color: var(--cyan); color: var(--ink); }
+  .topic-chip .box {
+    width: 17px; height: 17px; border-radius: 5px; border: 2px solid var(--line-strong);
+    display: flex; align-items: center; justify-content: center; flex: none; font-size: 11px;
+  }
+  .topic-chip.active .box { background: var(--cyan); border-color: var(--cyan); color: #0a1628; }
+  .topic-chip .cnt { font-size: 12px; color: var(--muted); }
+  .topic-chip.active .cnt { color: var(--ink-2); }
+
+  .quick-actions { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .quick-actions button {
+    font: inherit; font-size: 12.5px; font-weight: 600; color: var(--cyan); background: transparent;
+    border: 1px solid var(--line-strong); border-radius: 8px; padding: 6px 14px; cursor: pointer;
+  }
+  .topics-warn { font-size: 12.5px; color: #f65b5b; margin: 0 0 14px; }
 
   .start-btn { margin: 10px auto 32px; display: inline-flex; }
+  .start-btn:disabled { opacity: .45; cursor: not-allowed; }
 
   .stat-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 480px; margin-inline: auto; }
   .stat-strip .s { background: rgba(255,255,255,.05); border: 1px solid var(--line); border-radius: 10px; padding: 14px 8px; }
@@ -302,12 +340,17 @@ const jsonLd = {
 </style>
 
 <script>
-  type Q = { t: string; a: string; full: string; d: string; lvl: string };
+  type Q = { id: string; t: string; a: string; full: string; d: string; lvl: string };
   type SiteInfo = { url: string; logoTop: string; logoBottom: string };
 
+  const CLOSING_QUESTION_ID = 'questions-for-interviewer';
+
   const raw = document.getElementById('interview-data')?.textContent ?? '[]';
-  const ORDERED: Q[] = JSON.parse(raw);
+  const ALL: Q[] = JSON.parse(raw);
   const SITE: SiteInfo = JSON.parse(document.getElementById('site-data')?.textContent ?? '{}');
+
+  // ORDERED = مجموعة الأسئلة الفعّالة بعد فلترة المواضيع المختارة (يُعاد حسابها كل ما المستخدم يغيّر الاختيار)
+  let ORDERED: Q[] = ALL.slice();
 
   const TIME_PER_Q = 45;
   const CIRC = 2 * Math.PI * 16; // r=16
@@ -325,6 +368,67 @@ const jsonLd = {
   const belowHero = document.querySelector<HTMLElement>('.below-hero')?.closest('.wrap') ?? null;
   const interviewEl = $('interview');
   const finishedEl = $('finished');
+
+  // ===== اختيار المواضيع قبل بدء المقابلة =====
+  const topicChips = Array.from(document.querySelectorAll<HTMLButtonElement>('.topic-chip'));
+  const startBtn = $('start-btn') as HTMLButtonElement | null;
+  const startCountEl = $('start-count');
+  const topicsWarnEl = $('topics-warn');
+
+  function getSelectedTopics(): Set<string> {
+    const set = new Set<string>();
+    topicChips.forEach((chip) => {
+      if (chip.classList.contains('active') && chip.dataset.topic) set.add(chip.dataset.topic);
+    });
+    return set;
+  }
+
+  function recomputeOrdered() {
+    const selected = getSelectedTopics();
+    // السؤال الختامي "عندك أسئلة إلنا؟" يظل دايمًا ضمن المقابلة كآخر سؤال، بغض النظر عن اختيار المواضيع
+    const filtered = ALL.filter((q) => q.id === CLOSING_QUESTION_ID || selected.has(q.d));
+    // نضمن إن السؤال الختامي (إذا موجود بالبيانات) يضل بالآخر تمامًا بعد الفلترة
+    const closingIdx = filtered.findIndex((q) => q.id === CLOSING_QUESTION_ID);
+    if (closingIdx !== -1 && closingIdx !== filtered.length - 1) {
+      const [closing] = filtered.splice(closingIdx, 1);
+      filtered.push(closing);
+    }
+    ORDERED = filtered;
+    if (startCountEl) startCountEl.textContent = String(ORDERED.length);
+    const anySelected = selected.size > 0;
+    if (startBtn) startBtn.disabled = !anySelected;
+    if (topicsWarnEl) topicsWarnEl.hidden = anySelected;
+  }
+
+  topicChips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      chip.classList.toggle('active');
+      const box = chip.querySelector('.box');
+      if (box) box.textContent = chip.classList.contains('active') ? '✓' : '';
+      recomputeOrdered();
+    });
+  });
+
+  $('topics-all')?.addEventListener('click', () => {
+    topicChips.forEach((chip) => {
+      chip.classList.add('active');
+      const box = chip.querySelector('.box');
+      if (box) box.textContent = '✓';
+    });
+    recomputeOrdered();
+  });
+
+  $('topics-manual')?.addEventListener('click', () => {
+    topicChips.forEach((chip) => {
+      const isAuto = chip.dataset.topic === 'أتمتة' || chip.dataset.topic === 'API';
+      chip.classList.toggle('active', !isAuto);
+      const box = chip.querySelector('.box');
+      if (box) box.textContent = !isAuto ? '✓' : '';
+    });
+    recomputeOrdered();
+  });
+
+  recomputeOrdered();
 
   function stopTimer() {
     if (timerId !== null) {
