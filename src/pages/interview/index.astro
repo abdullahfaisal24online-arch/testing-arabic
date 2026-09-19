@@ -398,9 +398,9 @@ const jsonLd = {
     const revealBtn = $('reveal-btn') as HTMLElement | null; if (revealBtn) revealBtn.hidden = false;
     const nextBtn = $('next-btn') as HTMLElement | null; if (nextBtn) nextBtn.hidden = true;
     startTimer();
-    // نضمن إن السؤال الجديد يبلّش من فوق دايمًا، حتى لو صفحة السؤال السابق كانت طويلة
+    // نضمن إن السؤال الجديد يبلّش من أعلى الصفحة تمامًا دايمًا، حتى لو صفحة السؤال السابق كانت طويلة
     // (الجواب المفصّل بيطوّل الصفحة وينزل بها المستخدم لتحت وقت ما يفتحه)
-    if (interviewEl) interviewEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function startInterview() {
