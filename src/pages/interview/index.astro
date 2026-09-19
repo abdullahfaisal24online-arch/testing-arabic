@@ -664,7 +664,7 @@ const jsonLd = {
       const shareData = {
         files: [file],
         title: 'نتيجتي بمقابلة QA التجريبية',
-        text: `جاوبت على ${known} من ${answered} سؤال بمقابلة QA التجريبية على ${SITE.logoTop || 'Testing'} ${SITE.logoBottom || 'بالعربي'} 🎯`,
+        text: `جاوبت على ${known} من ${ORDERED.length || answered} سؤال بمقابلة QA التجريبية على ${SITE.logoTop || 'Testing'} ${SITE.logoBottom || 'بالعربي'} 🎯`,
       };
       const nav = navigator as Navigator & { canShare?: (data: any) => boolean; share?: (data: any) => Promise<void> };
       if (nav.canShare && nav.canShare(shareData) && nav.share) {
