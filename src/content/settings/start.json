@@ -66,6 +66,11 @@
           "label": "أتمتة اختبار تطبيقات الموبايل باستخدام Maestro",
           "href": "/courses/maestro-mobile-automation/",
           "kind": "دورة"
+        },
+        {
+          "label": "جهز حالك لمقابلة عمل",
+          "href": "/interview/",
+          "kind": "مقابلة"
         }
       ]
     }
