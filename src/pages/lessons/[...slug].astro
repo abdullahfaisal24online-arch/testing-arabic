@@ -63,6 +63,7 @@ const bodyHtml = (lesson as any).rendered?.html ?? '';
 const site = await getSite();
 
 const embed = data.videoId ? bunnyEmbed(data.videoId, site.bunnyLibraryId) : '';
+const certificateWatchRequired = Boolean(course?.data.certificateEnabled && data.videoId);
 const thumb = bunnyThumb(data.videoId, data.thumbnail, site.bunnyCdnHostname);
 // رابط الصورة لازم يكون absolute حتى يقبله Google بالـ structured data
 const thumbAbs = thumb ? new URL(thumb, site.url).href : undefined;
@@ -120,6 +121,8 @@ const jsonLd = [
             loading="lazy"
             allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
             allowfullscreen
+            data-lesson-id={lesson.id}
+            data-track-watch={certificateWatchRequired ? 'true' : 'false'}
           ></iframe>
         ) : (
           <div class="player-empty">
@@ -205,12 +208,23 @@ const jsonLd = [
         </section>
       )}
 
-      <div class="progress-row">
-        <button class="btn btn-ghost btn-sm done-btn" type="button" id="done-btn" data-lesson={lesson.id} aria-pressed="false">
-          <Icon name="check" size={16} /> <span class="done-label">علّم كمنتهي</span>
-        </button>
-        <span class="done-hint">التتبّع محفوظ بمتصفّحك فقط — بدون حساب ولا تسجيل.</span>
-      </div>
+      {certificateWatchRequired ? (
+        <div class="watch-progress" id="watch-progress" data-lesson={lesson.id} aria-live="polite">
+          <div class="watch-copy">
+            <span class="watch-title"><Icon name="certificate" size={17} /> تقدّم الشهادة</span>
+            <strong id="watch-percent">0%</strong>
+          </div>
+          <div class="watch-meter"><span id="watch-fill"></span></div>
+          <p id="watch-hint">شاهد 90% من الفيديو حتى ينحسب هذا الدرس مكتمل.</p>
+        </div>
+      ) : (
+        <div class="progress-row">
+          <button class="btn btn-ghost btn-sm done-btn" type="button" id="done-btn" data-lesson={lesson.id} aria-pressed="false">
+            <Icon name="check" size={16} /> <span class="done-label">علّم كمنتهي</span>
+          </button>
+          <span class="done-hint">التتبّع محفوظ بمتصفّحك فقط — بدون حساب ولا تسجيل.</span>
+        </div>
+      )}
 
       <nav class="pager" aria-label="التنقّل بين دروس الدورة">
         {prev ? (
@@ -401,6 +415,19 @@ const jsonLd = [
   .progress-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 30px; }
   .done-btn.on { background: var(--cyan-soft); border-color: var(--cyan); color: var(--cyan); }
   .done-hint { font-size: 13px; color: var(--faint); }
+  .watch-progress {
+    max-width: var(--read); margin-top: 30px; padding: 17px 18px;
+    background: var(--surface); border: 1px solid var(--line-strong);
+    border-radius: var(--r-md);
+  }
+  .watch-copy { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .watch-title { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--cyan); }
+  .watch-copy strong { font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .watch-meter { height: 7px; margin-top: 11px; overflow: hidden; border-radius: 999px; background: var(--surface-2); }
+  .watch-meter span { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--cyan); transition: width .25s ease; }
+  .watch-progress p { margin: 9px 0 0; font-size: 12.5px; color: var(--faint); }
+  .watch-progress.complete { border-color: var(--cyan); background: var(--cyan-soft); }
+  .watch-progress.complete p { color: var(--cyan); font-weight: 600; }
 
   .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 44px; }
   .pg {
@@ -510,6 +537,41 @@ const jsonLd = [
       else list.splice(i, 1);
       writeDone(list);
       paint(list.includes(id));
+    });
+  }
+
+  const watchBox = document.getElementById('watch-progress') as HTMLElement | null;
+  const watchId = watchBox?.dataset.lesson ?? '';
+  const watchFill = document.getElementById('watch-fill') as HTMLElement | null;
+  const watchPercent = document.getElementById('watch-percent');
+  const watchHint = document.getElementById('watch-hint');
+
+  const paintWatch = (progress?: number, completed?: boolean) => {
+    if (!watchBox || !watchId) return;
+    let savedProgress = progress;
+    let savedComplete = completed;
+    if (savedProgress === undefined) {
+      savedProgress = Number(localStorage.getItem(`ta-video-progress:${watchId}`) ?? '0');
+    }
+    if (savedComplete === undefined) {
+      try {
+        savedComplete = JSON.parse(localStorage.getItem('ta-video-complete') ?? '[]').includes(watchId);
+      } catch {
+        savedComplete = false;
+      }
+    }
+    const value = savedComplete ? Math.max(90, savedProgress || 0) : Math.max(0, Math.min(100, savedProgress || 0));
+    if (watchFill) watchFill.style.width = `${value}%`;
+    if (watchPercent) watchPercent.textContent = savedComplete ? 'مكتمل' : `${Math.floor(value)}%`;
+    if (watchHint) watchHint.textContent = savedComplete ? 'اكتمل هذا الدرس وانحسب ضمن متطلبات الشهادة.' : 'شاهد 90% من الفيديو حتى ينحسب هذا الدرس مكتمل.';
+    watchBox.classList.toggle('complete', Boolean(savedComplete));
+  };
+
+  if (watchBox && watchId) {
+    paintWatch();
+    window.addEventListener('ta:video-progress', (event) => {
+      const detail = (event as CustomEvent<{ lessonId?: string; percent?: number; complete?: boolean }>).detail;
+      if (detail?.lessonId === watchId) paintWatch(detail.percent, detail.complete);
     });
   }
 

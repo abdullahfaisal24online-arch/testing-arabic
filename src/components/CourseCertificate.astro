@@ -1,0 +1,196 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  courseId: string;
+  courseTitleEn?: string;
+  lessonIds: string[];
+}
+
+const { courseId, courseTitleEn, lessonIds } = Astro.props;
+const configReady = Boolean(courseTitleEn && lessonIds.length > 0);
+---
+
+<section
+  class="certificate-panel"
+  id="course-certificate"
+  data-course={courseId}
+  data-title={courseTitleEn}
+  data-lessons={JSON.stringify(lessonIds)}
+  data-ready={configReady ? 'true' : 'false'}
+>
+  <div class="certificate-icon"><Icon name="certificate" size={27} /></div>
+  <div class="certificate-copy">
+    <span class="eyebrow">شهادة إتمام</span>
+    <h2>كمّل الدورة وخذ شهادتك</h2>
+    {configReady ? (
+      <>
+        <p>شاهد 90% على الأقل من كل فيديو. بعدها اكتب اسمك بالإنجليزي وحمّل الشهادة بصيغة PDF.</p>
+        <div class="certificate-status" aria-live="polite">
+          <div class="certificate-meter"><span id="certificate-fill"></span></div>
+          <strong id="certificate-count">0 من {lessonIds.length} فيديو</strong>
+        </div>
+        <form class="certificate-form" id="certificate-form" hidden>
+          <label for="participant-name">اسمك بالإنجليزي كما سيظهر على الشهادة</label>
+          <div class="certificate-action">
+            <input
+              id="participant-name"
+              name="participantName"
+              type="text"
+              required
+              minlength="2"
+              maxlength="70"
+              autocomplete="name"
+              dir="ltr"
+              placeholder="e.g. Ahmad Ali"
+            />
+            <button class="btn btn-primary" type="submit" id="certificate-download">
+              <Icon name="download" size={17} /> Download PDF
+            </button>
+          </div>
+          <p class="certificate-error" id="certificate-error" role="alert"></p>
+        </form>
+        <p class="certificate-locked" id="certificate-locked">بتنفتح الشهادة تلقائياً بعد إكمال كل الفيديوهات.</p>
+      </>
+    ) : (
+      <p>إعدادات الشهادة لسه ناقصة. أضف اسم الدورة بالإنجليزي وتأكد إن الدورة فيها فيديو واحد على الأقل.</p>
+    )}
+  </div>
+</section>
+
+<style>
+  .certificate-panel {
+    display: grid; grid-template-columns: auto 1fr; gap: 18px;
+    margin-top: 28px; padding: 24px;
+    background: linear-gradient(145deg, var(--surface), var(--navy));
+    border: 1px solid var(--line-strong); border-radius: var(--r-lg);
+    box-shadow: inset 3px 0 0 var(--cyan);
+  }
+  .certificate-icon {
+    display: grid; place-items: center; width: 52px; height: 52px;
+    border-radius: var(--r-md); background: var(--cyan-soft); color: var(--cyan);
+  }
+  .certificate-copy { min-width: 0; }
+  .certificate-copy h2 { margin: 5px 0 8px; font-size: 21px; }
+  .certificate-copy > p { margin: 0; color: var(--muted); line-height: 1.75; font-size: 14px; }
+  .certificate-status { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
+  .certificate-meter { flex: 1; max-width: 330px; height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+  .certificate-meter span { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--cyan); transition: width .25s ease; }
+  .certificate-status strong { font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .certificate-form { margin-top: 20px; }
+  .certificate-form label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+  .certificate-action { display: flex; gap: 10px; align-items: stretch; }
+  .certificate-action input {
+    flex: 1; min-width: 0; min-height: 44px; padding: 10px 13px;
+    border: 1px solid var(--line-strong); border-radius: var(--r-sm);
+    background: var(--bg); color: var(--ink); font: inherit; text-align: left;
+  }
+  .certificate-action input:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+  .certificate-error { min-height: 20px; margin: 7px 0 0; color: var(--orange); font-size: 13px; }
+  .certificate-locked { margin-top: 11px !important; font-size: 12.5px !important; color: var(--faint) !important; }
+  @media (max-width: 620px) {
+    .certificate-panel { grid-template-columns: 1fr; padding: 20px; }
+    .certificate-action { flex-direction: column; }
+  }
+</style>
+
+<script>
+  import { buildCertificatePdf } from '../lib/certificate-pdf';
+
+  const COMPLETE_KEY = 'ta-video-complete';
+  const panel = document.getElementById('course-certificate') as HTMLElement | null;
+
+  const readComplete = (): string[] => {
+    try {
+      const value = JSON.parse(localStorage.getItem(COMPLETE_KEY) ?? '[]');
+      return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+    } catch {
+      return [];
+    }
+  };
+
+  if (panel?.dataset.ready === 'true') {
+    const lessons: string[] = JSON.parse(panel.dataset.lessons ?? '[]');
+    const form = document.getElementById('certificate-form') as HTMLFormElement | null;
+    const locked = document.getElementById('certificate-locked');
+    const fill = document.getElementById('certificate-fill') as HTMLElement | null;
+    const count = document.getElementById('certificate-count');
+    const input = document.getElementById('participant-name') as HTMLInputElement | null;
+    const button = document.getElementById('certificate-download') as HTMLButtonElement | null;
+    const error = document.getElementById('certificate-error');
+
+    const paint = () => {
+      const complete = readComplete();
+      const done = lessons.filter((id) => complete.includes(id)).length;
+      const unlocked = lessons.length > 0 && done === lessons.length;
+      if (fill) fill.style.width = `${Math.round((done / lessons.length) * 100)}%`;
+      if (count) count.textContent = unlocked ? 'اكتملت الدورة' : `${done} من ${lessons.length} فيديو`;
+      if (form) form.hidden = !unlocked;
+      if (locked) locked.hidden = unlocked;
+    };
+
+    paint();
+    window.addEventListener('ta:video-progress', paint);
+    window.addEventListener('storage', paint);
+
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const name = input?.value.trim() ?? '';
+      const englishName = /^[A-Za-z][A-Za-z .'-]{1,69}$/;
+      if (!englishName.test(name)) {
+        if (error) error.textContent = 'اكتب الاسم بالإنجليزي فقط، من حرفين إلى 70 حرف.';
+        input?.focus();
+        return;
+      }
+
+      if (!lessons.every((id) => readComplete().includes(id))) {
+        if (error) error.textContent = 'لسه ما اكتملت كل فيديوهات الدورة.';
+        paint();
+        return;
+      }
+
+      if (error) error.textContent = '';
+      if (button) {
+        button.disabled = true;
+        button.textContent = 'Preparing...';
+      }
+
+      try {
+        const [logoResponse, regularResponse, boldResponse] = await Promise.all([
+          fetch('/brand/testing-arabic-logo.jpg'),
+          fetch('/brand/certificate-regular.ttf'),
+          fetch('/brand/certificate-bold.ttf'),
+        ]);
+        if (!logoResponse.ok || !regularResponse.ok || !boldResponse.ok) {
+          throw new Error('Certificate assets could not be loaded');
+        }
+        const bytes = await buildCertificatePdf({
+          participantName: name,
+          courseTitle: panel.dataset.title ?? '',
+          issueDate: new Intl.DateTimeFormat('en-US', {
+            month: 'long', day: 'numeric', year: 'numeric',
+          }).format(new Date()),
+          logoBytes: await logoResponse.arrayBuffer(),
+          fontRegularBytes: await regularResponse.arrayBuffer(),
+          fontBoldBytes: await boldResponse.arrayBuffer(),
+        });
+        const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${panel.dataset.course ?? 'course'}-certificate.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      } catch {
+        if (error) error.textContent = 'تعذّر تجهيز الشهادة. جرّب مرة ثانية.';
+      } finally {
+        if (button) {
+          button.disabled = false;
+          button.innerHTML = 'Download PDF';
+        }
+      }
+    });
+  }
+</script>

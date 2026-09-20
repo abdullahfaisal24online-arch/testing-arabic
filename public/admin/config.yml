@@ -143,6 +143,16 @@ collections:
         label: "موصى فيها للبداية"
         widget: boolean
         default: false
+      - name: certificateEnabled
+        label: "تمنح شهادة إتمام"
+        widget: boolean
+        default: false
+        hint: "فعّلها فقط للدورات اللي بدك تمنح عليها شهادة بعد مشاهدة 90% من كل فيديو."
+      - name: certificateTitleEn
+        label: "اسم الدورة بالإنجليزي على الشهادة"
+        widget: string
+        required: false
+        hint: "مطلوب عند تفعيل الشهادة، مثال: Software Testing Fundamentals"
       - name: outcomes
         label: "شو رح يتعلّم"
         widget: list

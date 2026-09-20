@@ -79,6 +79,8 @@ const { poster } = Astro.props;
 <script>
   const PLAYER_ORIGIN = 'https://iframe.mediadelivery.net';
   const QUALIFIED_VIEW_SECONDS = 10;
+  const COMPLETE_AT_PERCENT = 90;
+  const COMPLETE_KEY = 'ta-video-complete';
   const PLAY_ICON =
     '<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.3-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14Z"/></svg>';
 
@@ -96,6 +98,70 @@ const { poster } = Astro.props;
     let watchedSeconds = 0;
     let lastVideoTime: number | null = null;
     let qualified = false;
+    const lessonId = player.dataset.trackWatch === 'true' ? (player.dataset.lessonId ?? '') : '';
+    type WatchedRange = [number, number];
+
+    const readRanges = (): WatchedRange[] => {
+      if (!lessonId) return [];
+      try {
+        const value = JSON.parse(localStorage.getItem(`ta-watch:${lessonId}`) ?? '[]');
+        if (!Array.isArray(value)) return [];
+        return value.filter(
+          (range): range is WatchedRange =>
+            Array.isArray(range) &&
+            range.length === 2 &&
+            Number.isFinite(range[0]) &&
+            Number.isFinite(range[1]) &&
+            range[1] > range[0],
+        );
+      } catch {
+        return [];
+      }
+    };
+
+    let watchedRanges = readRanges();
+    let lastProgress = -1;
+
+    const addWatchedRange = (start: number, end: number) => {
+      const sorted = [...watchedRanges, [start, end] as WatchedRange].sort((a, b) => a[0] - b[0]);
+      const merged: WatchedRange[] = [];
+      sorted.forEach((range) => {
+        const previous = merged[merged.length - 1];
+        if (!previous || range[0] > previous[1] + 0.25) merged.push([...range]);
+        else previous[1] = Math.max(previous[1], range[1]);
+      });
+      watchedRanges = merged;
+    };
+
+    const saveCertificateProgress = (duration: number) => {
+      if (!lessonId || !Number.isFinite(duration) || duration <= 0) return;
+      const watched = watchedRanges.reduce((sum, range) => sum + (range[1] - range[0]), 0);
+      const exactPercent = Math.min(100, (watched / duration) * 100);
+      const percent = Math.floor(exactPercent);
+      const complete = exactPercent >= COMPLETE_AT_PERCENT;
+
+      try {
+        localStorage.setItem(`ta-watch:${lessonId}`, JSON.stringify(watchedRanges));
+        localStorage.setItem(`ta-video-progress:${lessonId}`, String(percent));
+        if (complete) {
+          const stored = JSON.parse(localStorage.getItem(COMPLETE_KEY) ?? '[]');
+          const completed: string[] = Array.isArray(stored) ? stored : [];
+          if (!completed.includes(lessonId)) {
+            completed.push(lessonId);
+            localStorage.setItem(COMPLETE_KEY, JSON.stringify(completed));
+          }
+        }
+      } catch {
+        /* المتصفّح مانع التخزين */
+      }
+
+      if (percent !== lastProgress || complete) {
+        lastProgress = percent;
+        window.dispatchEvent(
+          new CustomEvent('ta:video-progress', { detail: { lessonId, percent, complete } }),
+        );
+      }
+    };
 
     const hideCover = () => {
       if (coverGone) return;
@@ -158,7 +224,7 @@ const { poster } = Astro.props;
         channel?: string;
         video?: string;
         event?: string;
-        status?: { currentTime?: number };
+        status?: { currentTime?: number; duration?: number };
       };
       if (data?.channel !== 'bunnystream' || !data.video) return;
 
@@ -173,7 +239,7 @@ const { poster } = Astro.props;
         return;
       }
 
-      if (data.event !== 'timeupdate' || qualified) return;
+      if (data.event !== 'timeupdate') return;
 
       const currentTime = Number(data.status?.currentTime);
       if (!Number.isFinite(currentTime)) return;
@@ -181,11 +247,16 @@ const { poster } = Astro.props;
       if (lastVideoTime !== null) {
         const delta = currentTime - lastVideoTime;
         // Bunny يرسل timeupdate دورياً. الفروقات الكبيرة تعني Seek ولا تُحسب.
-        if (delta > 0 && delta <= 2) watchedSeconds += delta;
+        if (delta > 0 && delta <= 3) {
+          if (!qualified) watchedSeconds += delta;
+          if (lessonId) addWatchedRange(lastVideoTime, currentTime);
+        }
       }
       lastVideoTime = currentTime;
 
-      if (watchedSeconds >= QUALIFIED_VIEW_SECONDS) {
+      if (lessonId) saveCertificateProgress(Number(data.status?.duration));
+
+      if (!qualified && watchedSeconds >= QUALIFIED_VIEW_SECONDS) {
         qualified = true;
         window.dispatchEvent(
           new CustomEvent('ta:video-view-qualified', { detail: { videoId: data.video } }),

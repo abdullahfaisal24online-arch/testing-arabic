@@ -11,6 +11,7 @@ interface Props {
       level: string;
       accent: 'cyan' | 'orange';
       recommended: boolean;
+      certificateEnabled: boolean;
       cover?: string;
     };
   };
@@ -36,6 +37,9 @@ const icon = data.accent === 'orange' ? 'board' : 'list';
     <span class="meta">
       {count === 0 ? <span class="soon">قريباً</span> : lessonsLabel(count)}
     </span>
+    {data.certificateEnabled && (
+      <span class="cert"><Icon name="certificate" size={15} /> شهادة إتمام</span>
+    )}
     {data.recommended && count > 0 && <span class="rec">موصى فيها للبداية</span>}
   </div>
 </a>
@@ -53,6 +57,12 @@ const icon = data.accent === 'orange' ? 'board' : 'list';
 .ttl { font-size: 20px; font-weight: 700; line-height: 1.55; }
 .desc { font-size: 15px; color: var(--ink-3); line-height: 1.85; }
 .meta { font-size: 14px; color: var(--muted); }
+.cert {
+  display: inline-flex; align-items: center; gap: 7px; justify-self: start;
+  width: fit-content; padding: 5px 11px; border-radius: 999px;
+  background: var(--cyan-soft); border: 1px solid var(--line-strong);
+  color: var(--cyan); font-size: 12px; font-weight: 700;
+}
 .rec { font-size: 12px; font-weight: 600; color: var(--orange); }
 
 /* دورة بدون دروس بعد: أهدأ بصرياً حتى ما تنافس الجاهزة */
