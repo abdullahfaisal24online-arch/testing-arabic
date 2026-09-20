@@ -18,7 +18,7 @@
     "binding": "ASSETS",
     "not_found_handling": "404-page",
     // لازم الـ Worker يمسك مسارات الـ API قبل الملفات الثابتة
-    "run_worker_first": ["/api/comments", "/api/comments/*", "/api/likes", "/api/likes/*", "/api/chat", "/api/chat/*", "/api/subscribe", "/api/subscribe/*", "/admin/comments", "/admin/comments/*"]
+    "run_worker_first": ["/api/comments", "/api/comments/*", "/api/likes", "/api/likes/*", "/api/views", "/api/views/*", "/api/chat", "/api/chat/*", "/api/subscribe", "/api/subscribe/*", "/admin/comments", "/admin/comments/*"]
   },
   "d1_databases": [
     {

@@ -7,6 +7,7 @@ import InlineNewsletter from '../../components/InlineNewsletter.astro';
 import Prose from '../../components/Prose.astro';
 import Comments from '../../components/Comments.astro';
 import LikeButton from '../../components/LikeButton.astro';
+import ViewCount from '../../components/ViewCount.astro';
 import { getSite } from '../../lib/site';
 import { tagSlug } from '../../lib/tags';
 import { formatDate, durationToISO, bunnyEmbed, bunnyThumb } from '../../lib/utils';
@@ -128,6 +129,11 @@ const jsonLd = [
         )}
       </div>
 
+      <div class="engagement-row">
+        {data.videoId && <ViewCount videoId={data.videoId} />}
+        <LikeButton page={`/lessons/${lesson.id}/`} />
+      </div>
+
       <header class="head">
         <h1>{data.title}</h1>
         <div class="meta">
@@ -138,14 +144,13 @@ const jsonLd = [
           <span class="badge badge-outline">{data.lessonType}</span>
         </div>
         <p class="lead">{data.description}</p>
-        <div class="tag-row">
         {data.tags.length > 0 && (
-          <div class="tags">
-            {data.tags.map((t) => <a class="tag" href={`/tags/${tagSlug(t)}/`}>{t}</a>)}
+          <div class="tag-row">
+            <div class="tags">
+              {data.tags.map((t) => <a class="tag" href={`/tags/${tagSlug(t)}/`}>{t}</a>)}
+            </div>
           </div>
         )}
-          <LikeButton page={`/lessons/${lesson.id}/`} />
-        </div>
         {data.youtubeUrl && (
           <a class="yt" href={data.youtubeUrl} target="_blank" rel="noopener">
             <Icon name="youtube" size={17} /> شاهد نفس الدرس على يوتيوب
@@ -332,6 +337,15 @@ const jsonLd = [
   .player-empty code { background: var(--cyan-soft); color: var(--cyan-bright); padding: 2px 6px; border-radius: 5px; }
 
   .head { display: grid; gap: 14px; margin-block: 26px 30px; }
+  .engagement-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+  }
+  .engagement-row :global(.likebar) { border: 0; padding: 0; margin: 0; }
   .tags { display: flex; flex-wrap: wrap; gap: 8px; }
   .tag {
     font-size: 12.5px; color: var(--muted);
@@ -450,10 +464,9 @@ const jsonLd = [
 
 .tag-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .tag-row .tags { flex: 1 1 auto; }
-.tag-row :global(.likebar) { margin-inline-start: auto; border: 0; padding: 0; margin: 0; }
 @media (max-width: 480px) {
   .tag-row { flex-direction: column; align-items: flex-start; }
-  .tag-row :global(.likebar) { margin-inline-start: 0; }
+  .engagement-row { justify-content: flex-start; }
 }
 </style>
 
