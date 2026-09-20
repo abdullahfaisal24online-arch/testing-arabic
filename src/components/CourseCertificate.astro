@@ -50,6 +50,18 @@ const configReady = Boolean(courseTitleEn && lessonIds.length > 0);
           </div>
           <p class="certificate-error" id="certificate-error" role="alert"></p>
         </form>
+        <div class="certificate-issued" id="certificate-issued" hidden>
+          <p>تم إصدار شهادتك باسم</p>
+          <strong id="certificate-issued-name"></strong>
+          <small>تاريخ الإصدار: <span id="certificate-issued-date"></span></small>
+          <div class="certificate-issued-actions">
+            <button class="btn btn-primary" type="button" id="certificate-redownload">
+              <Icon name="download" size={17} /> تحميل الشهادة مرة أخرى
+            </button>
+            <button class="btn btn-ghost" type="button" id="certificate-edit-name">تعديل الاسم</button>
+          </div>
+          <p class="certificate-error" id="certificate-issued-error" role="alert"></p>
+        </div>
         <p class="certificate-locked" id="certificate-locked">بتنفتح الشهادة تلقائياً بعد إكمال كل الفيديوهات.</p>
       </>
     ) : (
@@ -87,6 +99,12 @@ const configReady = Boolean(courseTitleEn && lessonIds.length > 0);
   }
   .certificate-action input:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
   .certificate-error { min-height: 20px; margin: 7px 0 0; color: var(--orange); font-size: 13px; }
+  .certificate-issued { margin-top: 20px; padding: 16px; border: 1px solid var(--line-strong); border-radius: var(--r-md); background: color-mix(in srgb, var(--cyan-soft) 45%, transparent); }
+  .certificate-issued p { margin: 0 0 5px; color: var(--muted); font-size: 13px; }
+  .certificate-issued strong { display: block; color: var(--ink); font-size: 18px; direction: ltr; text-align: right; }
+  .certificate-issued small { display: block; margin-top: 5px; color: var(--faint); }
+  .certificate-issued-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+  .certificate-issued .certificate-error { margin-bottom: -10px; }
   .certificate-locked { margin-top: 11px !important; font-size: 12.5px !important; color: var(--faint) !important; }
   @media (max-width: 620px) {
     .certificate-panel { grid-template-columns: 1fr; padding: 20px; }
@@ -98,7 +116,13 @@ const configReady = Boolean(courseTitleEn && lessonIds.length > 0);
   import { buildCertificatePdf } from '../lib/certificate-pdf';
 
   const COMPLETE_KEY = 'ta-video-complete';
+  const CERTIFICATE_KEY_PREFIX = 'ta-certificate:';
   const panel = document.getElementById('course-certificate') as HTMLElement | null;
+
+  interface IssuedCertificate {
+    participantName: string;
+    issueDate: string;
+  }
 
   const readComplete = (): string[] => {
     try {
@@ -119,15 +143,78 @@ const configReady = Boolean(courseTitleEn && lessonIds.length > 0);
     const button = document.getElementById('certificate-download') as HTMLButtonElement | null;
     const buttonHtml = button?.innerHTML ?? 'Download PDF';
     const error = document.getElementById('certificate-error');
+    const issued = document.getElementById('certificate-issued');
+    const issuedName = document.getElementById('certificate-issued-name');
+    const issuedDate = document.getElementById('certificate-issued-date');
+    const issuedError = document.getElementById('certificate-issued-error');
+    const redownload = document.getElementById('certificate-redownload') as HTMLButtonElement | null;
+    const redownloadHtml = redownload?.innerHTML ?? 'تحميل الشهادة مرة أخرى';
+    const editName = document.getElementById('certificate-edit-name') as HTMLButtonElement | null;
+    const certificateKey = `${CERTIFICATE_KEY_PREFIX}${panel.dataset.course ?? 'course'}`;
+    let editing = false;
+
+    const readCertificate = (): IssuedCertificate | null => {
+      try {
+        const value = JSON.parse(localStorage.getItem(certificateKey) ?? 'null');
+        return value
+          && typeof value.participantName === 'string'
+          && typeof value.issueDate === 'string'
+          ? value as IssuedCertificate
+          : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const saveCertificate = (certificate: IssuedCertificate) => {
+      localStorage.setItem(certificateKey, JSON.stringify(certificate));
+    };
 
     const paint = () => {
       const complete = readComplete();
       const done = lessons.filter((id) => complete.includes(id)).length;
       const unlocked = lessons.length > 0 && done === lessons.length;
+      const certificate = readCertificate();
       if (fill) fill.style.width = `${Math.round((done / lessons.length) * 100)}%`;
       if (count) count.textContent = unlocked ? 'اكتملت الدورة' : `${done} من ${lessons.length} فيديو`;
-      if (form) form.hidden = !unlocked;
-      if (locked) locked.hidden = unlocked;
+      if (form) form.hidden = !(unlocked && (!certificate || editing));
+      if (issued) issued.hidden = !certificate || editing;
+      if (locked) locked.hidden = unlocked || Boolean(certificate);
+      if (certificate) {
+        if (issuedName) issuedName.textContent = certificate.participantName;
+        if (issuedDate) issuedDate.textContent = certificate.issueDate;
+      }
+    };
+
+    const createAndDownload = async (certificate: IssuedCertificate, persist: boolean) => {
+      const [logoResponse, signatureResponse, regularResponse, boldResponse] = await Promise.all([
+        fetch('/brand/testing-arabic-logo.jpg'),
+        fetch('/brand/certificate-signature.png'),
+        fetch('/brand/certificate-regular.ttf'),
+        fetch('/brand/certificate-bold.ttf'),
+      ]);
+      if (!logoResponse.ok || !signatureResponse.ok || !regularResponse.ok || !boldResponse.ok) {
+        throw new Error('Certificate assets could not be loaded');
+      }
+      const bytes = await buildCertificatePdf({
+        participantName: certificate.participantName,
+        courseTitle: panel.dataset.title ?? '',
+        issueDate: certificate.issueDate,
+        logoBytes: await logoResponse.arrayBuffer(),
+        signatureBytes: await signatureResponse.arrayBuffer(),
+        fontRegularBytes: await regularResponse.arrayBuffer(),
+        fontBoldBytes: await boldResponse.arrayBuffer(),
+      });
+      const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${panel.dataset.course ?? 'course'}-certificate.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      if (persist) saveCertificate(certificate);
     };
 
     paint();
@@ -157,35 +244,15 @@ const configReady = Boolean(courseTitleEn && lessonIds.length > 0);
       }
 
       try {
-        const [logoResponse, signatureResponse, regularResponse, boldResponse] = await Promise.all([
-          fetch('/brand/testing-arabic-logo.jpg'),
-          fetch('/brand/certificate-signature.png'),
-          fetch('/brand/certificate-regular.ttf'),
-          fetch('/brand/certificate-bold.ttf'),
-        ]);
-        if (!logoResponse.ok || !signatureResponse.ok || !regularResponse.ok || !boldResponse.ok) {
-          throw new Error('Certificate assets could not be loaded');
-        }
-        const bytes = await buildCertificatePdf({
+        const previous = readCertificate();
+        await createAndDownload({
           participantName: name,
-          courseTitle: panel.dataset.title ?? '',
-          issueDate: new Intl.DateTimeFormat('en-US', {
+          issueDate: previous?.issueDate ?? new Intl.DateTimeFormat('en-US', {
             month: 'long', day: 'numeric', year: 'numeric',
           }).format(new Date()),
-          logoBytes: await logoResponse.arrayBuffer(),
-          signatureBytes: await signatureResponse.arrayBuffer(),
-          fontRegularBytes: await regularResponse.arrayBuffer(),
-          fontBoldBytes: await boldResponse.arrayBuffer(),
-        });
-        const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${panel.dataset.course ?? 'course'}-certificate.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }, true);
+        editing = false;
+        paint();
       } catch {
         if (error) error.textContent = 'تعذّر تجهيز الشهادة. جرّب مرة ثانية.';
       } finally {
@@ -194,6 +261,36 @@ const configReady = Boolean(courseTitleEn && lessonIds.length > 0);
           button.innerHTML = buttonHtml;
         }
       }
+    });
+
+    redownload?.addEventListener('click', async () => {
+      const certificate = readCertificate();
+      if (!certificate) {
+        paint();
+        return;
+      }
+      if (issuedError) issuedError.textContent = '';
+      redownload.disabled = true;
+      redownload.textContent = 'Preparing...';
+      try {
+        await createAndDownload(certificate, false);
+      } catch {
+        if (issuedError) issuedError.textContent = 'تعذّر تجهيز الشهادة. جرّب مرة ثانية.';
+      } finally {
+        redownload.disabled = false;
+        redownload.innerHTML = redownloadHtml;
+      }
+    });
+
+    editName?.addEventListener('click', () => {
+      const certificate = readCertificate();
+      if (!certificate) return;
+      editing = true;
+      if (input) input.value = certificate.participantName;
+      if (error) error.textContent = '';
+      paint();
+      input?.focus();
+      input?.select();
     });
   }
 </script>
