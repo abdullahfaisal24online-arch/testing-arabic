@@ -88,6 +88,8 @@ const courses = defineCollection({
     order: num(0),
     accent: z.preprocess(fallback('cyan'), z.enum(['cyan', 'orange'])),
     recommended: bool(false),
+    certificateEnabled: bool(false),
+    certificateTitleEn: optString,
     cover: optString,
     // شو رح يتعلّمه المتدرّب من الدورة
     outcomes: strList,
