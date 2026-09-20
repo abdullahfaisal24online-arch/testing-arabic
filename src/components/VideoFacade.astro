@@ -140,6 +140,17 @@ const { poster } = Astro.props;
     player.addEventListener('load', activateEvents);
     activateEvents();
 
+    // بعض إعدادات Bunny لا ترسل حدث play للصفحة الأم بشكل ثابت.
+    // انتقال التركيز للـ iframe يحصل فور ضغط زر التشغيل، فنستخدمه فقط
+    // كـ fallback لإخفاء الغلاف. احتساب المشاهدة يبقى مع timeupdate أدناه.
+    const hideWhenPlayerFocused = () => {
+      window.requestAnimationFrame(() => {
+        if (document.activeElement === player) hideCover();
+      });
+    };
+    player.addEventListener('focus', hideCover);
+    window.addEventListener('blur', hideWhenPlayerFocused);
+
     window.addEventListener('message', (event) => {
       if (event.origin !== PLAYER_ORIGIN || event.source !== player.contentWindow) return;
 
