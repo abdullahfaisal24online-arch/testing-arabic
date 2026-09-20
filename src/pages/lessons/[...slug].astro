@@ -130,7 +130,7 @@ const jsonLd = [
       </div>
 
       <div class="engagement-row">
-        {data.videoId && <ViewCount videoId={data.videoId} />}
+        {data.videoId && <ViewCount videoId={data.videoId} threshold={site.viewsThreshold} />}
         <LikeButton page={`/lessons/${lesson.id}/`} />
       </div>
 

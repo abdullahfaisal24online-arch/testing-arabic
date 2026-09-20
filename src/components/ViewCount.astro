@@ -1,12 +1,19 @@
 ---
 interface Props {
   videoId: string;
+  threshold?: number;
 }
 
-const { videoId } = Astro.props;
+const { videoId, threshold = 10 } = Astro.props;
 ---
 
-<div class="view-count" data-video-id={videoId} aria-label="عدد المشاهدات">
+<div
+  class="view-count"
+  data-video-id={videoId}
+  data-threshold={String(threshold)}
+  aria-label="عدد المشاهدات"
+  hidden
+>
   <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
     <path d="M2.4 12s3.5-6.1 9.6-6.1 9.6 6.1 9.6 6.1-3.5 6.1-9.6 6.1S2.4 12 2.4 12Z" />
     <circle cx="12" cy="12" r="2.7" />
@@ -27,6 +34,10 @@ const { videoId } = Astro.props;
     border-radius: 999px;
     font-size: 14.5px;
     font-weight: 600;
+  }
+
+  .view-count[hidden] {
+    display: none;
   }
 
   svg {
@@ -52,10 +63,12 @@ const { videoId } = Astro.props;
 
   if (root && output) {
     const videoId = root.dataset.videoId ?? '';
+    const threshold = Math.max(0, Number(root.dataset.threshold ?? '10'));
     let submitted = false;
 
     const paint = (views: number) => {
       output.textContent = new Intl.NumberFormat('ar-JO-u-nu-latn').format(views);
+      root.hidden = views < threshold;
     };
 
     fetch(`/api/views?video=${encodeURIComponent(videoId)}`)
@@ -65,6 +78,7 @@ const { videoId } = Astro.props;
       })
       .catch(() => {
         output.textContent = '—';
+        root.hidden = true;
       });
 
     window.addEventListener('ta:video-view-qualified', async (event) => {

@@ -849,6 +849,14 @@ collections:
             value_type: int
             min: 0
             hint: "0 يعني أظهر الرقم دائماً حتى لو صفر"
+          - name: viewsThreshold
+            label: "أظهر العدد بعد كم مشاهدة"
+            widget: number
+            required: false
+            default: 10
+            value_type: int
+            min: 0
+            hint: "العداد يجمع من البداية، لكنه يظل مخفياً حتى يصل لهذا الرقم. 0 يعني إظهاره دائماً."
           - name: footerNote
             label: "جملة أسفل الموقع"
             widget: string
