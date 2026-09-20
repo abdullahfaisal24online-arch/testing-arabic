@@ -6,6 +6,8 @@ level: متوسط
 order: 4
 accent: orange
 recommended: false
+certificateEnabled: true
+certificateTitleEn: Scrum Fundamentals
 outcomes:
   - 'تفهم إطار Scrum كامل : الأدوار والأحداث والمخرجات'
   - تعرف مسؤوليات Product Owner و Scrum Master والمطوّرين — ووين بيوقع المختبر
