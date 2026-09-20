@@ -27,6 +27,7 @@ const SITE_DEFAULTS = {
   likesEnabled: false,
   likesLabel: 'أعجبني',
   likesThreshold: 3,
+  viewsThreshold: 10,
   nav: [] as { label: string; href: string }[],
 };
 

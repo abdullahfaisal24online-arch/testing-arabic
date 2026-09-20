@@ -239,6 +239,8 @@ const site = defineCollection({
     likesEnabled: bool(false),
     likesLabel: optString,
     likesThreshold: num(3),
+    // المشاهدات
+    viewsThreshold: num(10),
     nav: z.preprocess(
       fallback([]),
       z.array(z.object({ label: str(''), href: str('/') })),

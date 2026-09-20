@@ -23,6 +23,7 @@
   "likesEnabled": true,
   "likesLabel": "أعجبني",
   "likesThreshold": 3,
+  "viewsThreshold": 10,
   "footerNote": "الموقع قيد التطوير 🔻",
   "nav": [
     {
