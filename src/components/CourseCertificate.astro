@@ -157,12 +157,13 @@ const configReady = Boolean(courseTitleEn && lessonIds.length > 0);
       }
 
       try {
-        const [logoResponse, regularResponse, boldResponse] = await Promise.all([
+        const [logoResponse, signatureResponse, regularResponse, boldResponse] = await Promise.all([
           fetch('/brand/testing-arabic-logo.jpg'),
+          fetch('/brand/certificate-signature.png'),
           fetch('/brand/certificate-regular.ttf'),
           fetch('/brand/certificate-bold.ttf'),
         ]);
-        if (!logoResponse.ok || !regularResponse.ok || !boldResponse.ok) {
+        if (!logoResponse.ok || !signatureResponse.ok || !regularResponse.ok || !boldResponse.ok) {
           throw new Error('Certificate assets could not be loaded');
         }
         const bytes = await buildCertificatePdf({
@@ -172,6 +173,7 @@ const configReady = Boolean(courseTitleEn && lessonIds.length > 0);
             month: 'long', day: 'numeric', year: 'numeric',
           }).format(new Date()),
           logoBytes: await logoResponse.arrayBuffer(),
+          signatureBytes: await signatureResponse.arrayBuffer(),
           fontRegularBytes: await regularResponse.arrayBuffer(),
           fontBoldBytes: await boldResponse.arrayBuffer(),
         });
