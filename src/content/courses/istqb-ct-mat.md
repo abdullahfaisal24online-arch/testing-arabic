@@ -6,6 +6,8 @@ level: مبتدئ
 order: 3
 accent: cyan
 recommended: false
+certificateEnabled: true
+certificateTitleEn: ISTQB CT-MAT
 outcomes:
   - تفهم فصول منهج CT-MAT الخمسة بالعربي وتربطها بشغلك اليومي
   - تميّز بين أنواع تطبيقات الموبايل (Native و Web و Hybrid) وشو يعني كل نوع للاختبار
@@ -21,8 +23,8 @@ tags:
   - اختبار الموبايل
   - شهادات
 cover: /uploads/ChatGPT Image Sep 13, 2026, 04_11_44 PM.png
-product: ''
 draft: false
+product: ''
 ---
 
 ## لمين هاي الدورة؟
