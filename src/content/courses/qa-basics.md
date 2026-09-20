@@ -6,6 +6,8 @@ level: مبتدئ
 order: 1
 accent: cyan
 recommended: true
+certificateEnabled: true
+certificateTitleEn: ISTQB CTFL V4
 outcomes:
   - تفهم فصول منهج CTFL V4 الستة بالعربي بالفهم مش بالحفظ
   - 'تطبّق تقنيات تصميم الاختبار: Equivalence Partitioning و Boundary Value و Decision Table'
@@ -20,8 +22,8 @@ tags:
   - CTFL
   - شهادات
 cover: /uploads/ctfl-v4.png
-product: ''
 draft: false
+product: ''
 ---
 
 ## لمين هاي الدورة؟
