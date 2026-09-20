@@ -3,8 +3,9 @@
 // الفيديو) بدل الصورة اللي ترفعها من لوحة التحكّم.
 //
 // الفكرة: بنحطّ صورة الغلاف كطبقة فوق مشغّل Bunny مع زر تشغيل، والطبقة
-// pointer-events: none — يعني ضغطة الزائر بتمرّ من خلالها لزر التشغيل الحقيقي
-// جوّا المشغّل. ضغطة واحدة وبيشتغل الفيديو، وبنفس اللحظة الطبقة بتختفي.
+// pointer-events: none — يعني ضغطة الزائر بتمرّ من خلالها لزر التشغيل الحقيقي.
+// بنسمع أحداث Bunny الرسمية عبر postMessage حتى نخفي الغلاف عند التشغيل
+// ونعلن عن مشاهدة مؤهلة بعد 10 ثوانٍ تشغيل فعلية.
 //
 // بتنستدعى من Base.astro وبتاخد الصورة من نفس القيمة اللي بتروح لـ og:image،
 // فما في داعي لأي تعديل على صفحات الدروس.
@@ -76,6 +77,8 @@ const { poster } = Astro.props;
 </style>
 
 <script>
+  const PLAYER_ORIGIN = 'https://iframe.mediadelivery.net';
+  const QUALIFIED_VIEW_SECONDS = 10;
   const PLAY_ICON =
     '<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.3-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14Z"/></svg>';
 
@@ -86,47 +89,97 @@ const { poster } = Astro.props;
   );
   const box = frame?.parentElement;
 
-  if (poster && frame && box) {
+  if (frame && box) {
     const player = frame;
-    const img = document.createElement('img');
-    img.alt = '';
-    img.decoding = 'async';
+    let cover: HTMLElement | null = null;
+    let coverGone = false;
+    let watchedSeconds = 0;
+    let lastVideoTime: number | null = null;
+    let qualified = false;
 
-    img.addEventListener(
-      'load',
-      () => {
-        const cover = document.createElement('div');
-        cover.className = 'vf-cover';
-        cover.setAttribute('aria-hidden', 'true');
+    const hideCover = () => {
+      if (coverGone) return;
+      coverGone = true;
+      if (!cover) return;
+      cover.style.opacity = '0';
+      window.setTimeout(() => cover?.remove(), 320);
+    };
 
-        const play = document.createElement('span');
-        play.className = 'vf-play';
-        play.innerHTML = PLAY_ICON;
+    if (poster) {
+      const img = document.createElement('img');
+      img.alt = '';
+      img.decoding = 'async';
 
-        cover.append(img, play);
-        box.appendChild(cover);
+      img.addEventListener(
+        'load',
+        () => {
+          if (coverGone) return;
+          cover = document.createElement('div');
+          cover.className = 'vf-cover';
+          cover.setAttribute('aria-hidden', 'true');
 
-        let gone = false;
-        const hide = () => {
-          if (gone) return;
-          gone = true;
-          cover.style.opacity = '0';
-          window.setTimeout(() => cover.remove(), 320);
-        };
+          const play = document.createElement('span');
+          play.className = 'vf-play';
+          play.innerHTML = PLAY_ICON;
 
-        // أول ما الزائر يضغط جوّا المشغّل، الـ iframe بياخد التركيز والصفحة
-        // بتفقده — هذا أضبط مؤشّر متوفّر إنّ التشغيل بدأ (المشغّل من نطاق تاني
-        // فما فينا نسمع نقراته مباشرة)
-        window.addEventListener('blur', () => {
-          if (document.activeElement === player) hide();
-        });
-      },
-      { once: true },
-    );
+          cover.append(img, play);
+          box.appendChild(cover);
+        },
+        { once: true },
+      );
 
-    // ما زبطت الصورة؟ ما بنحطّ ولا شي — المشغّل بيضلّ زي ما هو
-    img.addEventListener('error', () => {}, { once: true });
+      // ما زبطت الصورة؟ ما بنحطّ ولا شي — المشغّل بيضلّ زي ما هو
+      img.addEventListener('error', () => {}, { once: true });
+      img.src = poster;
+    }
 
-    img.src = poster;
+    const activateEvents = () => {
+      player.contentWindow?.postMessage({ command: 'activate' }, PLAYER_ORIGIN);
+    };
+
+    player.addEventListener('load', activateEvents);
+    activateEvents();
+
+    window.addEventListener('message', (event) => {
+      if (event.origin !== PLAYER_ORIGIN || event.source !== player.contentWindow) return;
+
+      const data = event.data as {
+        channel?: string;
+        video?: string;
+        event?: string;
+        status?: { currentTime?: number };
+      };
+      if (data?.channel !== 'bunnystream' || !data.video) return;
+
+      if (data.event === 'play') {
+        hideCover();
+        lastVideoTime = null;
+        return;
+      }
+
+      if (data.event === 'pause' || data.event === 'seeking' || data.event === 'seeked') {
+        lastVideoTime = null;
+        return;
+      }
+
+      if (data.event !== 'timeupdate' || qualified) return;
+
+      const currentTime = Number(data.status?.currentTime);
+      if (!Number.isFinite(currentTime)) return;
+
+      if (lastVideoTime !== null) {
+        const delta = currentTime - lastVideoTime;
+        // Bunny يرسل timeupdate دورياً. الفروقات الكبيرة تعني Seek ولا تُحسب.
+        if (delta > 0 && delta <= 2) watchedSeconds += delta;
+      }
+      lastVideoTime = currentTime;
+
+      if (watchedSeconds >= QUALIFIED_VIEW_SECONDS) {
+        qualified = true;
+        window.dispatchEvent(
+          new CustomEvent('ta:video-view-qualified', { detail: { videoId: data.video } }),
+        );
+      }
+    });
   }
 </script>

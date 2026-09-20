@@ -7,6 +7,8 @@
  *   GET  /api/comments?page=  جلب التعليقات المنشورة لصفحة
  *   GET  /api/likes?page=     عدد الإعجابات لصفحة
  *   POST /api/likes           إضافة/سحب إعجاب
+ *   GET  /api/views?video=    عدد مشاهدات فيديو
+ *   POST /api/views           تسجيل مشاهدة مؤهلة (10 ثوانٍ تشغيل)
  *   POST /api/chat            مساعد الموقع (Workers AI) — أسئلة QA/testing فقط
  *   POST /api/subscribe       نسخة احتياطية محلية لمشتركي النشرة (جدول subscribers)
  *   GET  /admin/comments      صفحة المراجعة (محمية بكلمة سر)
@@ -164,6 +166,100 @@ async function toggleLike(req: Request, env: Env) {
   }
 
   return json({ ok: true, likes: await countLikes(env, page) });
+}
+
+/* ===================== مشاهدات الفيديو ===================== */
+
+const VIEW_WINDOW_MS = 24 * 60 * 60 * 1000;
+const VIEWS_PER_HOUR_PER_IP = 60;
+let VIEWS_TABLE_READY = false;
+
+async function ensureViewsTable(env: Env) {
+  if (VIEWS_TABLE_READY) return;
+
+  await env.DB.batch([
+    env.DB.prepare(`
+      CREATE TABLE IF NOT EXISTS video_views (
+        video_id  TEXT NOT NULL,
+        ip_hash   TEXT NOT NULL,
+        created_at INTEGER NOT NULL
+      )
+    `),
+    env.DB.prepare(`
+      CREATE INDEX IF NOT EXISTS idx_video_views_video
+      ON video_views (video_id, created_at)
+    `),
+    env.DB.prepare(`
+      CREATE INDEX IF NOT EXISTS idx_video_views_video_ip_time
+      ON video_views (video_id, ip_hash, created_at)
+    `),
+    env.DB.prepare(`
+      CREATE INDEX IF NOT EXISTS idx_video_views_ip_time
+      ON video_views (ip_hash, created_at)
+    `),
+  ]);
+
+  VIEWS_TABLE_READY = true;
+}
+
+function validVideoId(videoId: string): boolean {
+  return /^[a-zA-Z0-9_-]{8,128}$/.test(videoId);
+}
+
+async function countViews(env: Env, videoId: string): Promise<number> {
+  await ensureViewsTable(env);
+  const row = await env.DB.prepare(`SELECT COUNT(*) AS n FROM video_views WHERE video_id = ?1`)
+    .bind(videoId)
+    .first<{ n: number }>();
+  return row?.n ?? 0;
+}
+
+async function recordView(req: Request, env: Env) {
+  let payload: { videoId?: string };
+  try {
+    payload = await req.json();
+  } catch {
+    return json({ ok: false, error: 'bad_json' }, 400);
+  }
+
+  const videoId = String(payload.videoId ?? '').trim();
+  if (!validVideoId(videoId)) {
+    return json({ ok: false, error: 'bad_video' }, 400);
+  }
+
+  await ensureViewsTable(env);
+
+  const ip = req.headers.get('cf-connecting-ip') ?? '0.0.0.0';
+  const ipHash = await hashIp(ip, env.ADMIN_PASSWORD);
+  const now = Date.now();
+
+  const recent = await env.DB.prepare(
+    `SELECT COUNT(*) AS n FROM video_views WHERE ip_hash = ?1 AND created_at > ?2`,
+  )
+    .bind(ipHash, now - 3600_000)
+    .first<{ n: number }>();
+
+  if ((recent?.n ?? 0) >= VIEWS_PER_HOUR_PER_IP) {
+    return json({ ok: true, views: await countViews(env, videoId), counted: false, capped: true });
+  }
+
+  // الفحص والإضافة بنفس جملة SQL حتى ما تنحسب مشاهدتان لو وصل طلبان معاً.
+  const result = await env.DB.prepare(
+    `INSERT INTO video_views (video_id, ip_hash, created_at)
+       SELECT ?1, ?2, ?3
+       WHERE NOT EXISTS (
+         SELECT 1 FROM video_views
+         WHERE video_id = ?1 AND ip_hash = ?2 AND created_at > ?4
+       )`,
+  )
+    .bind(videoId, ipHash, now, now - VIEW_WINDOW_MS)
+    .run();
+
+  return json({
+    ok: true,
+    views: await countViews(env, videoId),
+    counted: (result.meta.changes ?? 0) > 0,
+  });
 }
 
 /* ===================== مساعد الموقع (Workers AI) ===================== */
@@ -733,6 +829,17 @@ async function router(req: Request, env: Env): Promise<Response> {
       return json({ ok: true, likes: await countLikes(env, page) });
     }
     if (req.method === 'POST') return toggleLike(req, env);
+    return json({ ok: false, error: 'method' }, 405);
+  }
+
+  // ---------- مشاهدات الفيديو ----------
+  if (path === '/api/views') {
+    if (req.method === 'GET') {
+      const videoId = (url.searchParams.get('video') ?? '').trim();
+      if (!validVideoId(videoId)) return json({ ok: false, error: 'bad_video' }, 400);
+      return json({ ok: true, views: await countViews(env, videoId) });
+    }
+    if (req.method === 'POST') return recordView(req, env);
     return json({ ok: false, error: 'method' }, 405);
   }
 
