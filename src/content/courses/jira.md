@@ -6,6 +6,8 @@ level: متوسط
 order: 5
 accent: orange
 recommended: false
+certificateEnabled: true
+certificateTitleEn: Working with JIRA
 outcomes:
   - تنشئ أول Project على Jira وتضبطه من الصفر
   - تفرّق بين Story و Task و Bug وتعرف إيمتى تستخدم كل واحد
@@ -22,8 +24,8 @@ tags:
   - Scrum
   - إدارة المشاريع
 cover: /uploads/jira.png
-product: ''
 draft: false
+product: ''
 ---
 
 Jira أشهر أداة لإدارة المهام ومتابعة التقدّم، وبتلاقيها بمعظم فرق التطوير — وأي مختبر لازم يكون مرتاح فيها.
