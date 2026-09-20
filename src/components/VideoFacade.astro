@@ -155,7 +155,7 @@ const { poster } = Astro.props;
         /* المتصفّح مانع التخزين */
       }
 
-      if (percent !== lastProgress || complete) {
+      if (percent !== lastProgress) {
         lastProgress = percent;
         window.dispatchEvent(
           new CustomEvent('ta:video-progress', { detail: { lessonId, percent, complete } }),
