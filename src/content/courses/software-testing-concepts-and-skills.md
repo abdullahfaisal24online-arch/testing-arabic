@@ -6,6 +6,8 @@ level: مبتدئ
 order: 2
 accent: cyan
 recommended: true
+certificateEnabled: true
+certificateTitleEn: Software Testing Concepts
 outcomes:
   - التمييز بين مفاهيم الـ QA و الـ QC، واختبارات Functional و Non-Functional.
   - كتابة حالات الاختبار (Test Cases) وتقارير الأخطاء (Bug Reports) بأسلوب احترافي ومباشر.
@@ -21,8 +23,8 @@ tags:
   - QA Fundamentals
   - Bug Life Cycle
 cover: /uploads/ChatGPT Image Sep 13, 2026, 03_42_37 PM.png
-product: ''
 draft: false
+product: ''
 ---
 
 تغطي هذه الدورة الجانب المفاهيمي والعملي لمهندس اختبار البرمجيات من الخطة وحتى التسليم. ستتعلم من خلالها كيفية التمييز بين أنواع الاختبارات المختلفة (Functional, Non-Functional, Usability, Smoke)، إدارة الأخطاء وحساب أولوية وخطورة المشاكل (Severity vs Priority)، بالإضافة إلى آلية توثيق الاختبارات وتصميم خطط الاختبار (Test Plan) والـ Test Cases باحترافية.
