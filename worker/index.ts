@@ -601,7 +601,7 @@ async function handleContact(req: Request, env: Env) {
   if (!email || email.length > MAX_EMAIL || !EMAIL_RE.test(email)) {
     return json({ ok: false, error: 'bad_email' }, 400);
   }
-  if (message.length < 2 || message.length > CONTACT_MAX_MESSAGE) {
+  if (message.length < 100 || message.length > CONTACT_MAX_MESSAGE) {
     return json({ ok: false, error: 'bad_message' }, 400);
   }
 
