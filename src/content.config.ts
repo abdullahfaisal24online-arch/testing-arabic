@@ -325,6 +325,50 @@ const home = defineCollection({
   }),
 });
 
+/* ===== لعبة Bug Hunter ===== */
+const bugHunter = defineCollection({
+  loader: glob({ base: './src/content/settings', pattern: 'bug-hunter.json' }),
+  schema: z.object({
+    enabled: bool(true),
+    showHomeCard: bool(true),
+    homeBadge: str('تحدٍ مجاني جديد'),
+    homeTitle: str('هل عينك عين فاحص جودة؟'),
+    homeText: str('اصطد الأخطاء داخل متجر تجريبي واختبر مهاراتك قبل انتهاء الوقت.'),
+    homeCta: str('ابدأ تحدي Bug Hunter'),
+    caseLabel: str('BUG HUNTER • CASE 01'),
+    caseTitle: str('The Broken Shop'),
+    caseText: str('متجر جديد على وشك الإطلاق، لكن فريق التطوير ترك خلفه مجموعة من الأخطاء.'),
+    durationSeconds: num(90),
+    challengeLabel: str('Challenge Mode'),
+    practiceLabel: str('Practice Mode'),
+    oneAttemptNote: str('لديك محاولة واحدة فقط لكل Bug.'),
+    resultTitle: str('Mission Completed!'),
+    resultText: str('شوف نتيجتك والمهارات التي تحتاج إلى تقويتها.'),
+    ranks: z.preprocess(
+      fallback([]),
+      z.array(z.object({ min: num(0), label: str('QA Intern') })),
+    ),
+    bugs: z.preprocess(
+      fallback([]),
+      z.array(z.object({
+        id: str(''),
+        title: str(''),
+        sceneLabel: str(''),
+        question: str(''),
+        answers: strList,
+        correctAnswer: str(''),
+        explanation: str(''),
+        expectedResult: optString,
+        correctMessage: str('Correct! +100'),
+        resources: z.preprocess(
+          fallback([]),
+          z.array(z.object({ label: str(''), href: str('/'), kind: str('محتوى') })),
+        ),
+      })),
+    ),
+  }),
+});
+
 
 const products = defineCollection({
   loader: glob({ base: './src/content/products', pattern: '**/*.{md,mdx}' }),
@@ -353,4 +397,4 @@ const products = defineCollection({
   }),
 });
 
-export const collections = { products, lessons, articles, courses, news, resources, glossary, questions, pages, site, home, start, chat };
+export const collections = { products, lessons, articles, courses, news, resources, glossary, questions, pages, site, home, start, chat, bugHunter };

@@ -1,0 +1,624 @@
+---
+import { getEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { getSite } from '../../lib/site';
+
+const site = await getSite();
+const entry = await getEntry('bugHunter', 'bug-hunter');
+const game = entry?.data;
+
+if (!game?.enabled) return Astro.redirect('/');
+
+const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
+---
+
+<Base title={`${game.caseTitle} | ${site.name}`} description={game.caseText}>
+  <main class="hunter-page dots" id="bug-hunter-app">
+    <section class="mission-screen" id="mission-screen">
+      <div class="mission-card">
+        <span class="case-label"><span aria-hidden="true">●</span> {game.caseLabel}</span>
+        <div class="mission-icon" aria-hidden="true"><Icon name="bug" size={42} /></div>
+        <h1>{game.caseTitle}</h1>
+        <p class="mission-copy">{game.caseText}</p>
+
+        <div class="mission-facts">
+          <span><Icon name="bug" size={18} /><b>{game.bugs.length}</b> أخطاء مخفية</span>
+          <span><Icon name="clock" size={18} /><b>{game.durationSeconds}</b> ثانية بالتحدي</span>
+          <span><Icon name="check" size={18} /> محاولة واحدة لكل Bug</span>
+        </div>
+
+        <div class="mode-grid">
+          <button class="mode-card mode-challenge" type="button" data-start-mode="challenge">
+            <span class="mode-tag">اختبر نفسك</span>
+            <strong>{game.challengeLabel}</strong>
+            <small>اصطد أكبر عدد قبل انتهاء الوقت</small>
+            <span class="mode-action">ابدأ العد التنازلي <Icon name="arrow" size={17} /></span>
+          </button>
+          <button class="mode-card" type="button" data-start-mode="practice">
+            <span class="mode-tag cyan">تعلّم بهدوء</span>
+            <strong>{game.practiceLabel}</strong>
+            <small>نفس الأسئلة بدون مؤقّت</small>
+            <span class="mode-action">ابدأ التدريب <Icon name="arrow" size={17} /></span>
+          </button>
+        </div>
+        <p class="attempt-note">{game.oneAttemptNote}</p>
+      </div>
+    </section>
+
+    <section class="game-screen" id="game-screen" hidden aria-label="متجر The Broken Shop">
+      <div class="game-toolbar">
+        <div class="toolbar-brand"><Icon name="bug" size={22} /><span>BUG HUNTER</span><small>CASE 01</small></div>
+        <div class="toolbar-stats">
+          <span class="stat"><small>SCORE</small><b id="score-value">0000</b></span>
+          <span class="stat"><small>FOUND</small><b><i id="found-value">0</i>/{game.bugs.length}</b></span>
+          <span class="stat timer-stat" id="timer-stat"><small>TIME</small><b id="time-value">01:30</b></span>
+          <button class="sound-toggle" id="sound-toggle" type="button" aria-label="إيقاف الصوت" aria-pressed="false">♪</button>
+        </div>
+      </div>
+
+      <div class="progress-track" aria-hidden="true"><span id="game-progress"></span></div>
+
+      <div class="shop-window">
+        <header class="shop-header">
+          <a href="#" tabindex="-1" class="shop-logo">BROKEN<span>SHOP</span></a>
+          <label class="shop-search">⌕ <input tabindex="-1" value="Search products..." readonly /></label>
+          <span class="shop-cart">CART <b>0</b></span>
+        </header>
+
+        <div class="shop-notice">FREE SHIPPING ON ORDERS OVER $50</div>
+
+        <div class="shop-layout">
+          <section class="catalog" aria-label="المنتجات">
+            <div class="shop-heading"><div><small>NEW ARRIVALS</small><h2>Featured products</h2></div><span>12 products</span></div>
+            <div class="product-grid">
+              <article class="product-card issue-box">
+                <div class="broken-image"><span>▧</span><small>IMG_404.JPG</small></div>
+                <div class="product-copy"><small>AUDIO</small><h3>Wireless Headphones</h3><b>$29.00</b></div>
+                <button class="fake-cart low-contrast" tabindex="-1">ADD TO CART</button>
+                <button class="bug-marker marker-image" type="button" data-bug="broken-image" aria-label="افحص الصورة المكسورة"><span>🐞</span></button>
+                <button class="bug-marker marker-contrast" type="button" data-bug="low-contrast" aria-label="افحص تباين الزر"><span>🐞</span></button>
+              </article>
+
+              <article class="product-card issue-box">
+                <div class="product-art keyboard">⌨</div>
+                <div class="product-copy"><small>ACCESSORIES</small><h3>Mechanical Keyboard</h3><b>$49.00</b></div>
+                <button class="fake-cart dead-button" tabindex="-1">ADD TO CART</button>
+                <button class="bug-marker marker-cart" type="button" data-bug="add-to-cart" aria-label="افحص زر الإضافة"><span>🐞</span></button>
+              </article>
+
+              <article class="product-card faded-card">
+                <div class="product-art">▱</div>
+                <div class="product-copy"><small>DESK</small><h3>Minimal Desk Lamp</h3><b>$36.00</b></div>
+                <button class="fake-cart" tabindex="-1">ADD TO CART</button>
+              </article>
+            </div>
+
+            <div class="mobile-preview issue-box">
+              <span class="device-label">360 PX VIEWPORT</span>
+              <div><b>Ready to checkout?</b><small>Your cart has 1 item</small></div>
+              <button tabindex="-1">PROCEED TO CHECKOUT →</button>
+              <button class="bug-marker marker-mobile" type="button" data-bug="mobile-overflow" aria-label="افحص عرض الموبايل"><span>🐞</span></button>
+            </div>
+          </section>
+
+          <aside class="checkout-panel" aria-label="Checkout">
+            <div class="panel-title"><div><small>SECURE CHECKOUT</small><h2>Your order</h2></div><span>🔒</span></div>
+
+            <div class="order-line"><span>Wireless Headphones</span><b>$29.00</b></div>
+            <div class="order-line"><span>Shipping</span><b>$4.00</b></div>
+            <div class="order-line"><span>Discount</span><b>−$5.80</b></div>
+            <div class="order-line order-total issue-box"><span>Total</span><b>$42.80</b>
+              <button class="bug-marker marker-total" type="button" data-bug="wrong-total" aria-label="افحص إجمالي السلة"><span>🐞</span></button>
+            </div>
+
+            <label class="field issue-box"><span>Email address</span><input tabindex="-1" value="ahmad@" readonly />
+              <small class="accepted">✓ Looks good</small>
+              <button class="bug-marker marker-email" type="button" data-bug="invalid-email" aria-label="افحص البريد الإلكتروني"><span>🐞</span></button>
+            </label>
+
+            <div class="coupon issue-box"><input tabindex="-1" value="EXPIRED20" readonly /><button tabindex="-1">APPLY</button>
+              <small>✓ Coupon applied successfully!</small>
+              <button class="bug-marker marker-coupon" type="button" data-bug="expired-coupon" aria-label="افحص الكوبون"><span>🐞</span></button>
+            </div>
+
+            <div class="payment-status issue-box"><span>✓</span><div><b>Payment successful</b><small>POST /payments → 500</small></div>
+              <button class="bug-marker marker-api" type="button" data-bug="false-payment-success" aria-label="افحص حالة الدفع"><span>🐞</span></button>
+            </div>
+
+            <div class="place-wrap issue-box">
+              <button class="place-order" tabindex="-1">PLACE ORDER</button>
+              <span class="double-click">Double-click registered: 2 orders</span>
+              <button class="bug-marker marker-duplicate" type="button" data-bug="duplicate-order" aria-label="افحص تكرار الطلب"><span>🐞</span></button>
+              <button class="bug-marker marker-keyboard" type="button" data-bug="keyboard-skip" aria-label="افحص الوصول بالكيبورد"><span>🐞</span></button>
+            </div>
+          </aside>
+        </div>
+      </div>
+      <p class="game-tip">دور على علامات الـBug الحمراء واضغط عليها. كل إجابة صحيحة = 100 نقطة.</p>
+    </section>
+
+    <section class="result-screen" id="result-screen" hidden>
+      <div class="result-card">
+        <span class="result-kicker">CASE 01 • CLOSED</span>
+        <div class="result-trophy" aria-hidden="true">🏆</div>
+        <h1>{game.resultTitle}</h1>
+        <p>{game.resultText}</p>
+        <strong class="result-rank" id="result-rank">QA Intern</strong>
+        <div class="result-grid">
+          <div><small>SCORE</small><b><span id="result-score">0</span><i>/1000</i></b></div>
+          <div><small>CORRECT</small><b><span id="result-correct">0</span><i>/{game.bugs.length}</i></b></div>
+          <div><small>BEST</small><b><span id="result-best">0</span><i>/1000</i></b></div>
+        </div>
+        <div class="result-actions">
+          <button class="btn btn-primary" id="play-again" type="button">العب مرة ثانية <Icon name="arrow" size={18} /></button>
+          <button class="btn btn-ghost" id="share-result" type="button">شارك نتيجتك</button>
+        </div>
+        <p class="share-status" id="share-status" aria-live="polite"></p>
+        <div class="learning-list" id="learning-list">
+          <div class="learning-head"><span>خطوتك التالية</span><h2>قوّي النقاط اللي فاتتك</h2></div>
+          <div id="resource-links"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="question-layer" id="question-layer" hidden>
+      <div class="question-modal" role="dialog" aria-modal="true" aria-labelledby="question-title">
+        <button class="modal-close" id="modal-close" type="button" aria-label="إغلاق السؤال">×</button>
+        <span class="question-count" id="question-count">BUG 01 / 10</span>
+        <div class="question-icon" aria-hidden="true">🐞</div>
+        <p class="question-bug" id="question-bug"></p>
+        <h2 id="question-title"></h2>
+        <div class="answer-list" id="answer-list"></div>
+        <div class="answer-feedback" id="answer-feedback" hidden>
+          <strong id="feedback-title"></strong>
+          <p id="feedback-copy"></p>
+          <div id="expected-result" hidden><small>EXPECTED RESULT</small><span></span></div>
+          <button class="btn btn-primary" id="continue-game" type="button">كمّل الصيد <Icon name="arrow" size={17} /></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="swarm-layer" id="swarm-layer" aria-hidden="true"></div>
+    <div class="game-toast" id="game-toast" role="status" aria-live="polite"></div>
+  </main>
+
+  <script type="application/json" id="bug-hunter-data" set:html={serializedGame}></script>
+</Base>
+
+<script is:inline>
+  (() => {
+    const dataNode = document.getElementById('bug-hunter-data');
+    if (!dataNode) return;
+    const settings = JSON.parse(dataNode.textContent || '{}');
+    const byId = (id) => document.getElementById(id);
+    const mission = byId('mission-screen');
+    const gameScreen = byId('game-screen');
+    const results = byId('result-screen');
+    const layer = byId('question-layer');
+    const answersEl = byId('answer-list');
+    const feedback = byId('answer-feedback');
+    const swarm = byId('swarm-layer');
+    const toast = byId('game-toast');
+    const markers = [...document.querySelectorAll('.bug-marker')];
+    const storageKey = 'testing-arabic:bug-hunter:best';
+    let mode = 'challenge';
+    let active = false;
+    let remaining = Number(settings.durationSeconds) || 90;
+    let timer = null;
+    let currentBug = null;
+    let score = 0;
+    let correct = 0;
+    let answered = new Map();
+    let muted = false;
+    let audioContext = null;
+
+    const shuffle = (items) => {
+      const copy = [...items];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    };
+
+    const playTone = (kind) => {
+      if (muted) return;
+      try {
+        audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+        const now = audioContext.currentTime;
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.type = kind === 'correct' ? 'sine' : 'sawtooth';
+        osc.frequency.setValueAtTime(kind === 'correct' ? 520 : 170, now);
+        if (kind === 'correct') osc.frequency.exponentialRampToValueAtTime(780, now + .22);
+        gain.gain.setValueAtTime(.0001, now);
+        gain.gain.exponentialRampToValueAtTime(.1, now + .015);
+        gain.gain.exponentialRampToValueAtTime(.0001, now + .28);
+        osc.connect(gain).connect(audioContext.destination);
+        osc.start(now); osc.stop(now + .3);
+      } catch (_) {}
+    };
+
+    const formatTime = (seconds) => `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
+
+    const updateHud = () => {
+      byId('score-value').textContent = String(score).padStart(4, '0');
+      byId('found-value').textContent = String(answered.size);
+      byId('time-value').textContent = formatTime(Math.max(0, remaining));
+      byId('game-progress').style.width = `${(answered.size / settings.bugs.length) * 100}%`;
+      byId('timer-stat').classList.toggle('urgent', mode === 'challenge' && remaining <= 15);
+    };
+
+    const resetGame = () => {
+      score = 0; correct = 0; answered = new Map(); currentBug = null;
+      remaining = Number(settings.durationSeconds) || 90;
+      markers.forEach((marker) => {
+        marker.disabled = false;
+        marker.classList.remove('is-correct', 'is-wrong');
+        marker.querySelector('span').textContent = '🐞';
+      });
+      feedback.hidden = true;
+      answersEl.hidden = false;
+      updateHud();
+    };
+
+    const startGame = (selectedMode) => {
+      mode = selectedMode;
+      resetGame();
+      active = true;
+      mission.hidden = true; results.hidden = true; gameScreen.hidden = false;
+      byId('timer-stat').hidden = mode !== 'challenge';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      clearInterval(timer);
+      if (mode === 'challenge') {
+        timer = setInterval(() => {
+          remaining -= 1; updateHud();
+          if (remaining <= 0) finishGame();
+        }, 1000);
+      }
+    };
+
+    const openQuestion = (bugId) => {
+      if (!active || answered.has(bugId)) return;
+      currentBug = settings.bugs.find((bug) => bug.id === bugId);
+      if (!currentBug) return;
+      const bugNumber = settings.bugs.findIndex((bug) => bug.id === bugId) + 1;
+      byId('question-count').textContent = `BUG ${String(bugNumber).padStart(2, '0')} / ${settings.bugs.length}`;
+      byId('question-bug').textContent = currentBug.title;
+      byId('question-title').textContent = currentBug.question;
+      answersEl.innerHTML = '';
+      shuffle(currentBug.answers).forEach((answer, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'answer-option';
+        button.innerHTML = `<span>${String.fromCharCode(65 + index)}</span><b></b>`;
+        button.querySelector('b').textContent = answer;
+        button.addEventListener('click', () => answerBug(answer, button));
+        answersEl.append(button);
+      });
+      answersEl.hidden = false; feedback.hidden = true; layer.hidden = false;
+      document.body.classList.add('modal-open');
+      setTimeout(() => answersEl.querySelector('button')?.focus(), 30);
+    };
+
+    const localBurst = (marker) => {
+      const rect = marker.getBoundingClientRect();
+      for (let i = 0; i < 8; i++) {
+        const bug = document.createElement('span');
+        bug.className = 'falling-bug'; bug.textContent = '🐞';
+        bug.style.left = `${rect.left + rect.width / 2 + (Math.random() * 30 - 15)}px`;
+        bug.style.top = `${rect.top + rect.height / 2}px`;
+        bug.style.setProperty('--drift', `${Math.random() * 100 - 50}px`);
+        bug.style.animationDelay = `${Math.random() * .16}s`;
+        document.body.append(bug);
+        setTimeout(() => bug.remove(), 1300);
+      }
+    };
+
+    const wrongSwarm = () => {
+      swarm.innerHTML = '';
+      for (let i = 0; i < 46; i++) {
+        const bug = document.createElement('span');
+        bug.textContent = '🐞';
+        bug.style.left = `${Math.random() * 96}%`;
+        bug.style.top = `${-15 - Math.random() * 80}px`;
+        bug.style.animationDelay = `${Math.random() * .45}s`;
+        bug.style.animationDuration = `${1.1 + Math.random() * .75}s`;
+        bug.style.fontSize = `${18 + Math.random() * 26}px`;
+        swarm.append(bug);
+      }
+      swarm.classList.add('show');
+      setTimeout(() => swarm.classList.remove('show'), 2050);
+    };
+
+    const answerBug = (choice, button) => {
+      if (!currentBug || answered.has(currentBug.id)) return;
+      const isCorrect = choice === currentBug.correctAnswer;
+      answered.set(currentBug.id, isCorrect);
+      const marker = document.querySelector(`[data-bug="${CSS.escape(currentBug.id)}"]`);
+      [...answersEl.children].forEach((option) => {
+        option.disabled = true;
+        const text = option.querySelector('b')?.textContent;
+        if (text === currentBug.correctAnswer) option.classList.add('answer-correct');
+      });
+      if (isCorrect) {
+        score += 100; correct += 1;
+        button.classList.add('answer-correct');
+        marker?.classList.add('is-correct');
+        if (marker) { marker.querySelector('span').textContent = '✓'; localBurst(marker); }
+        byId('feedback-title').textContent = currentBug.correctMessage;
+        byId('feedback-title').className = 'correct-title';
+        playTone('correct');
+      } else {
+        button.classList.add('answer-wrong');
+        marker?.classList.add('is-wrong');
+        if (marker) marker.querySelector('span').textContent = '×';
+        byId('feedback-title').textContent = `مش هاي — الجواب الصحيح: ${currentBug.correctAnswer}`;
+        byId('feedback-title').className = 'wrong-title';
+        wrongSwarm(); playTone('wrong');
+      }
+      marker.disabled = true;
+      byId('feedback-copy').textContent = currentBug.explanation;
+      const expected = byId('expected-result');
+      expected.hidden = !currentBug.expectedResult;
+      expected.querySelector('span').textContent = currentBug.expectedResult || '';
+      feedback.hidden = false;
+      updateHud();
+    };
+
+    const closeQuestion = () => {
+      if (layer.hidden) return;
+      layer.hidden = true; document.body.classList.remove('modal-open');
+      if (answered.size === settings.bugs.length) finishGame();
+      else currentBug = null;
+    };
+
+    const finishGame = () => {
+      if (!active) return;
+      active = false; clearInterval(timer); layer.hidden = true;
+      document.body.classList.remove('modal-open');
+      const previousBest = Number(localStorage.getItem(storageKey) || 0);
+      const best = Math.max(previousBest, score);
+      localStorage.setItem(storageKey, String(best));
+      const ranks = [...settings.ranks].sort((a, b) => a.min - b.min);
+      const rank = ranks.filter((item) => correct >= item.min).at(-1)?.label || 'QA Intern';
+      byId('result-rank').textContent = rank;
+      byId('result-score').textContent = String(score);
+      byId('result-correct').textContent = String(correct);
+      byId('result-best').textContent = String(best);
+      const missedIds = settings.bugs.filter((bug) => answered.get(bug.id) !== true).map((bug) => bug.id);
+      const learningBugs = missedIds.length ? settings.bugs.filter((bug) => missedIds.includes(bug.id)) : settings.bugs.slice(0, 2);
+      const resourceMap = new Map();
+      learningBugs.flatMap((bug) => bug.resources || []).forEach((resource) => resourceMap.set(resource.href, resource));
+      const resources = [...resourceMap.values()].slice(0, 6);
+      byId('resource-links').innerHTML = '';
+      resources.forEach((resource) => {
+        const link = document.createElement('a');
+        link.href = resource.href; link.target = '_blank'; link.rel = 'noopener';
+        link.innerHTML = `<span><small></small><b></b></span><i>←</i>`;
+        link.querySelector('small').textContent = resource.kind;
+        link.querySelector('b').textContent = resource.label;
+        byId('resource-links').append(link);
+      });
+      gameScreen.hidden = true; results.hidden = false;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    document.querySelectorAll('[data-start-mode]').forEach((button) => button.addEventListener('click', () => startGame(button.dataset.startMode)));
+    markers.forEach((marker) => marker.addEventListener('click', () => openQuestion(marker.dataset.bug)));
+    byId('continue-game').addEventListener('click', closeQuestion);
+    byId('modal-close').addEventListener('click', closeQuestion);
+    layer.addEventListener('click', (event) => { if (event.target === layer) closeQuestion(); });
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !layer.hidden) closeQuestion(); });
+    byId('play-again').addEventListener('click', () => { results.hidden = true; mission.hidden = false; window.scrollTo({top: 0, behavior: 'smooth'}); });
+    byId('sound-toggle').addEventListener('click', (event) => {
+      muted = !muted; event.currentTarget.setAttribute('aria-pressed', String(muted));
+      event.currentTarget.setAttribute('aria-label', muted ? 'تشغيل الصوت' : 'إيقاف الصوت');
+      event.currentTarget.textContent = muted ? '×♪' : '♪';
+    });
+    byId('share-result').addEventListener('click', async () => {
+      const rank = byId('result-rank').textContent;
+      const text = `اصطدت ${correct}/${settings.bugs.length} Bugs وجبت ${score}/1000 في Bug Hunter — رتبتي ${rank}! جرّب تتفوق عليّ:`;
+      try {
+        if (navigator.share) await navigator.share({ title: settings.caseTitle, text, url: location.href });
+        else { await navigator.clipboard.writeText(`${text} ${location.href}`); byId('share-status').textContent = 'تم نسخ النتيجة والرابط ✓'; }
+      } catch (_) {}
+    });
+  })();
+</script>
+
+<style>
+  :global(body.modal-open) { overflow: hidden; }
+  .hunter-page { min-height: calc(100vh - 80px); padding: 38px 24px 80px; background-color: var(--bg); }
+  .mission-screen, .result-screen { max-width: 980px; margin: 0 auto; }
+  .mission-card, .result-card { position: relative; overflow: hidden; padding: clamp(34px, 6vw, 66px); border: 1px solid var(--line-strong); border-radius: 24px; background: linear-gradient(145deg, var(--surface), color-mix(in srgb, var(--surface) 86%, #061022)); box-shadow: var(--shadow-lg); text-align: center; }
+  .mission-card::after, .result-card::after { content: ''; position: absolute; width: 330px; height: 330px; top: -180px; left: -150px; border-radius: 50%; background: rgba(56,189,248,.12); filter: blur(8px); pointer-events: none; }
+  .case-label, .result-kicker { display: inline-flex; align-items: center; gap: 9px; color: var(--orange); font: 600 13px 'IBM Plex Mono', monospace; letter-spacing: .8px; }
+  .case-label span { color: #ef4444; text-shadow: 0 0 10px #ef4444; }
+  .mission-icon { width: 86px; height: 86px; margin: 25px auto 16px; display: grid; place-items: center; border: 1px solid rgba(56,189,248,.4); border-radius: 22px; color: var(--cyan); background: var(--cyan-soft); box-shadow: var(--glow); transform: rotate(-5deg); }
+  .mission-card h1, .result-card h1 { font-size: clamp(35px, 6vw, 60px); direction: ltr; }
+  .mission-copy, .result-card > p { max-width: 720px; margin: 12px auto 0; color: var(--ink-3); font-size: 18px; }
+  .mission-facts { display: flex; justify-content: center; flex-wrap: wrap; gap: 14px 26px; margin-top: 28px; color: var(--ink-2); }
+  .mission-facts span { display: flex; align-items: center; gap: 7px; }
+  .mission-facts :global(svg) { color: var(--cyan); }
+  .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 36px; text-align: right; }
+  .mode-card { position: relative; min-height: 190px; padding: 25px; display: flex; flex-direction: column; align-items: flex-start; border: 1px solid var(--line-strong); border-radius: 17px; background: color-mix(in srgb, var(--surface-2) 72%, transparent); color: var(--ink); cursor: pointer; transition: .18s ease; }
+  .mode-card:hover { transform: translateY(-3px); border-color: var(--cyan); box-shadow: 0 18px 35px rgba(3,10,24,.25); }
+  .mode-challenge { border-color: var(--orange-line); background: linear-gradient(145deg, var(--orange-soft), transparent); }
+  .mode-challenge:hover { border-color: var(--orange); }
+  .mode-tag { padding: 4px 9px; border-radius: 999px; background: var(--orange-soft); color: var(--orange); font-size: 12px; }
+  .mode-tag.cyan { background: var(--cyan-soft); color: var(--cyan); }
+  .mode-card strong { margin-top: 12px; font: 700 23px 'IBM Plex Mono', monospace; direction: ltr; }
+  .mode-card small { color: var(--muted); font-size: 14px; }
+  .mode-action { margin-top: auto; display: flex; align-items: center; gap: 8px; color: var(--cyan); font-weight: 700; }
+  .mode-challenge .mode-action { color: var(--orange); }
+  .attempt-note { margin-top: 20px; color: var(--faint); font-size: 13px; }
+  .game-screen { max-width: 1320px; margin: 0 auto; }
+  .game-toolbar { min-height: 76px; padding: 12px 20px; display: flex; align-items: center; gap: 20px; border: 1px solid var(--line); border-radius: 16px 16px 0 0; background: #0d1a30; color: #eaf3ff; }
+  .toolbar-brand { display: flex; align-items: center; gap: 9px; color: #38bdf8; font: 700 16px 'IBM Plex Mono', monospace; }
+  .toolbar-brand small { padding: 3px 7px; border-radius: 4px; background: rgba(246,130,59,.13); color: #f6823b; font-size: 9px; }
+  .toolbar-stats { margin-inline-start: auto; display: flex; align-items: center; gap: 10px; }
+  .stat { min-width: 83px; padding: 7px 12px; display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(56,189,248,.16); border-radius: 9px; background: rgba(255,255,255,.025); line-height: 1.25; }
+  .stat small { color: #7890af; font: 8px 'IBM Plex Mono', monospace; letter-spacing: 1px; }
+  .stat b { color: white; font: 700 16px 'IBM Plex Mono', monospace; }
+  .stat i { font-style: normal; }
+  .timer-stat.urgent b { color: #fb5a5a; animation: urgent-pulse .7s infinite alternate; }
+  .sound-toggle { width: 39px; height: 39px; border: 1px solid rgba(56,189,248,.22); border-radius: 9px; background: transparent; color: #a9bad0; cursor: pointer; font-weight: 700; }
+  .progress-track { height: 4px; background: #17233a; }
+  .progress-track span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, #f6823b, #38bdf8); transition: width .35s ease; }
+  .shop-window { overflow: hidden; border: 1px solid var(--line); border-top: 0; border-radius: 0 0 18px 18px; background: #f5f7fa; color: #152039; direction: ltr; box-shadow: var(--shadow-lg); }
+  .shop-header { min-height: 70px; padding: 14px 28px; display: flex; align-items: center; gap: 25px; border-bottom: 1px solid #dde4ed; background: #fff; }
+  .shop-logo { color: #0e1c34; font: 800 18px 'IBM Plex Mono', monospace; }
+  .shop-logo span { color: #ec5b33; }
+  .shop-search { max-width: 430px; flex: 1; margin: 0 auto; padding: 8px 13px; display: flex; gap: 7px; align-items: center; border: 1px solid #dce4ee; border-radius: 7px; color: #78869a; }
+  .shop-search input { width: 100%; border: 0; outline: 0; background: transparent; color: #8490a0; }
+  .shop-cart { font: 700 11px 'IBM Plex Mono', monospace; }
+  .shop-cart b { margin-left: 5px; padding: 4px 7px; border-radius: 50%; background: #17233a; color: white; }
+  .shop-notice { padding: 4px; background: #15243f; color: #a7bad3; text-align: center; font: 8px 'IBM Plex Mono', monospace; letter-spacing: 2px; }
+  .shop-layout { display: grid; grid-template-columns: minmax(0, 1fr) 350px; }
+  .catalog { padding: clamp(22px, 3vw, 38px); }
+  .shop-heading { margin-bottom: 19px; display: flex; align-items: end; justify-content: space-between; }
+  .shop-heading small, .panel-title small { color: #ed5b34; font: 700 8px 'IBM Plex Mono', monospace; letter-spacing: 1px; }
+  .shop-heading h2, .panel-title h2 { font: 800 22px system-ui, sans-serif; }
+  .shop-heading > span { color: #8490a0; font-size: 11px; }
+  .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+  .product-card { position: relative; min-height: 305px; padding: 12px; display: flex; flex-direction: column; border: 1px solid #dfe5ee; border-radius: 9px; background: white; box-shadow: 0 7px 16px rgba(23,37,61,.05); }
+  .broken-image, .product-art { height: 140px; display: grid; place-items: center; align-content: center; background: #eef2f6; color: #738096; font-size: 45px; }
+  .broken-image { color: #dc4141; }
+  .broken-image small { font: 7px 'IBM Plex Mono', monospace; }
+  .product-art.keyboard { color: #17233a; }
+  .product-copy { padding: 10px 3px; display: flex; flex-direction: column; }
+  .product-copy small { color: #8190a5; font: 7px 'IBM Plex Mono', monospace; }
+  .product-copy h3 { margin: 3px 0; font-size: 13px; }
+  .product-copy b { color: #137fa8; font: 700 14px 'IBM Plex Mono', monospace; }
+  .fake-cart { margin-top: auto; padding: 10px; border: 0; border-radius: 5px; background: #15243f; color: white; font: 700 9px 'IBM Plex Mono', monospace; }
+  .low-contrast { background: #bad6df; color: #a9c5cf; }
+  .dead-button { box-shadow: inset 0 0 0 2px #ef4444; }
+  .faded-card { opacity: .58; }
+  .bug-marker { position: absolute; z-index: 6; width: 36px; height: 36px; display: grid; place-items: center; border: 2px solid #ef4444; border-radius: 50%; background: #fee2e2; box-shadow: 0 0 0 7px rgba(239,68,68,.11), 0 7px 12px rgba(127,29,29,.2); cursor: pointer; animation: marker-pulse 1.7s infinite; }
+  .bug-marker span { font-size: 18px; line-height: 1; }
+  .bug-marker:hover { transform: scale(1.13); }
+  .bug-marker.is-correct { border-color: #22c55e; background: #dcfce7; color: #15803d; box-shadow: 0 0 0 7px rgba(34,197,94,.13); animation: none; }
+  .bug-marker.is-wrong { border-color: #9f1239; background: #e11d48; color: #fff; animation: none; }
+  .marker-image { top: 57px; left: 45%; }
+  .marker-contrast { bottom: 8px; right: 5px; animation-delay: -.4s; }
+  .marker-cart { bottom: 8px; left: 44%; animation-delay: -.8s; }
+  .mobile-preview { position: relative; margin-top: 18px; padding: 18px; display: flex; align-items: center; gap: 20px; overflow: hidden; border: 1px dashed #aab6c6; border-radius: 9px; background: white; }
+  .mobile-preview .device-label { padding: 5px 7px; background: #ecf0f5; color: #526176; font: 7px 'IBM Plex Mono', monospace; }
+  .mobile-preview div { display: flex; flex-direction: column; font-size: 12px; }
+  .mobile-preview div small { color: #8793a3; }
+  .mobile-preview > button:not(.bug-marker) { width: 250px; margin-left: auto; margin-right: -105px; padding: 12px; border: 0; background: #17233a; color: white; font: 8px 'IBM Plex Mono', monospace; }
+  .marker-mobile { top: 7px; right: 5px; }
+  .checkout-panel { padding: 28px 24px; border-left: 1px solid #dce3ec; background: #fff; }
+  .panel-title { display: flex; justify-content: space-between; margin-bottom: 22px; }
+  .order-line { position: relative; padding: 8px 0; display: flex; justify-content: space-between; color: #627087; font-size: 12px; }
+  .order-line b { color: #17233a; }
+  .order-total { margin: 7px 0 17px; padding: 13px 0; border-block: 1px solid #dde4ed; font-size: 15px; }
+  .order-total b { color: #dc2626; font: 800 18px 'IBM Plex Mono', monospace; }
+  .marker-total { top: -4px; right: -17px; }
+  .field { position: relative; display: flex; flex-direction: column; margin-top: 13px; }
+  .field > span { margin-bottom: 5px; font-size: 10px; font-weight: 700; }
+  .field input, .coupon input { padding: 11px; border: 1px solid #22c55e; border-radius: 5px; background: #fff; color: #152039; }
+  .field .accepted, .coupon small { color: #16a34a; font-size: 9px; }
+  .marker-email { top: 20px; right: -16px; }
+  .coupon { position: relative; margin-top: 16px; display: grid; grid-template-columns: 1fr auto; }
+  .coupon input { border-color: #d5dde8; border-radius: 5px 0 0 5px; }
+  .coupon > button:not(.bug-marker) { border: 0; background: #17233a; color: white; font-size: 9px; }
+  .coupon small { grid-column: 1 / -1; }
+  .marker-coupon { top: -10px; left: -16px; }
+  .payment-status { position: relative; margin-top: 19px; padding: 11px; display: flex; align-items: center; gap: 10px; border: 1px solid #86efac; border-radius: 6px; background: #f0fdf4; color: #15803d; }
+  .payment-status > span { font-size: 20px; }
+  .payment-status div { display: flex; flex-direction: column; font-size: 11px; }
+  .payment-status small { color: #dc2626; font: 8px 'IBM Plex Mono', monospace; }
+  .marker-api { top: 8px; right: -16px; }
+  .place-wrap { position: relative; margin-top: 16px; }
+  .place-order { width: 100%; padding: 14px; border: 0; border-radius: 5px; background: #f06e37; color: white; font: 800 10px 'IBM Plex Mono', monospace; }
+  .double-click { display: block; color: #dc2626; font: 7px 'IBM Plex Mono', monospace; text-align: center; }
+  .marker-duplicate { top: -13px; left: -15px; }
+  .marker-keyboard { top: -13px; right: -15px; animation-delay: -.65s; }
+  .game-tip { margin: 14px 0 0; color: var(--muted); text-align: center; font-size: 14px; }
+  .question-layer { position: fixed; z-index: 1000; inset: 0; padding: 24px; display: grid; place-items: center; background: rgba(3,9,22,.82); backdrop-filter: blur(9px); }
+  .question-layer[hidden] { display: none; }
+  .question-modal { position: relative; width: min(690px, 100%); max-height: calc(100vh - 48px); overflow-y: auto; padding: clamp(27px, 4.5vw, 44px); border: 1px solid rgba(56,189,248,.4); border-radius: 22px; background: #101e37; color: #e8eef9; box-shadow: 0 30px 90px rgba(0,0,0,.55); text-align: right; }
+  .modal-close { position: absolute; top: 15px; left: 16px; width: 36px; height: 36px; border: 1px solid rgba(255,255,255,.12); border-radius: 50%; background: transparent; color: #9eb0c8; font-size: 22px; cursor: pointer; }
+  .question-count { color: #f6823b; font: 600 11px 'IBM Plex Mono', monospace; letter-spacing: 1px; }
+  .question-icon { width: 52px; height: 52px; margin-top: 15px; display: grid; place-items: center; border: 1px solid rgba(239,68,68,.4); border-radius: 13px; background: rgba(239,68,68,.1); font-size: 25px; }
+  .question-bug { margin-top: 14px; color: #38bdf8; font-size: 14px; font-weight: 700; }
+  .question-modal h2 { margin-top: 4px; padding-inline-end: 8px; font-size: clamp(21px, 3vw, 28px); }
+  .answer-list { margin-top: 25px; display: grid; gap: 10px; }
+  :global(.answer-option) { width: 100%; min-height: 56px; padding: 11px 13px; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(56,189,248,.16); border-radius: 10px; background: rgba(255,255,255,.025); color: #dbe7f7; text-align: right; cursor: pointer; transition: .15s ease; }
+  :global(.answer-option:hover:not(:disabled)) { border-color: #38bdf8; background: rgba(56,189,248,.08); transform: translateX(-3px); }
+  :global(.answer-option > span) { flex: 0 0 32px; height: 32px; display: grid; place-items: center; border-radius: 7px; background: rgba(56,189,248,.09); color: #7dd3fc; font: 700 12px 'IBM Plex Mono', monospace; }
+  :global(.answer-option b) { font-size: 14px; line-height: 1.6; }
+  :global(.answer-option.answer-correct) { border-color: #22c55e; background: rgba(34,197,94,.13); }
+  :global(.answer-option.answer-wrong) { border-color: #ef4444; background: rgba(239,68,68,.14); }
+  .answer-feedback { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.1); }
+  .answer-feedback > strong { display: block; font-size: 18px; }
+  .correct-title { color: #4ade80; }
+  .wrong-title { color: #fb7185; }
+  .answer-feedback > p { margin-top: 7px; color: #b8c7db; font-size: 14px; }
+  #expected-result { margin-top: 13px; padding: 11px 13px; display: flex; flex-direction: column; border-right: 3px solid #38bdf8; background: rgba(56,189,248,.07); }
+  #expected-result[hidden] { display: none; }
+  #expected-result small { color: #38bdf8; font: 8px 'IBM Plex Mono', monospace; }
+  #expected-result span { color: #cfdaea; font-size: 13px; }
+  .answer-feedback .btn { margin-top: 18px; }
+  .swarm-layer { position: fixed; z-index: 1200; inset: 0; overflow: hidden; pointer-events: none; visibility: hidden; background: rgba(190,18,60,0); transition: background .2s; }
+  .swarm-layer.show { visibility: visible; background: rgba(190,18,60,.18); }
+  .swarm-layer :global(span) { position: absolute; animation: swarm-fall 1.5s cubic-bezier(.18,.7,.3,1) forwards; filter: saturate(1.8) hue-rotate(-15deg) drop-shadow(0 5px 3px rgba(80,0,0,.25)); }
+  :global(.falling-bug) { position: fixed; z-index: 1400; pointer-events: none; font-size: 21px; animation: local-fall 1.15s ease-in forwards; }
+  .game-toast { position: fixed; z-index: 1500; left: 50%; bottom: 28px; translate: -50% 20px; opacity: 0; pointer-events: none; }
+  .result-card { max-width: 900px; margin: 0 auto; }
+  .result-trophy { margin: 20px 0 4px; font-size: 67px; filter: drop-shadow(0 13px 20px rgba(246,130,59,.24)); }
+  .result-rank { display: inline-block; margin-top: 16px; padding: 7px 17px; border: 1px solid rgba(56,189,248,.35); border-radius: 999px; background: var(--cyan-soft); color: var(--cyan); font: 700 15px 'IBM Plex Mono', monospace; }
+  .result-grid { max-width: 650px; margin: 30px auto 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .result-grid > div { padding: 18px 10px; border: 1px solid var(--line); border-radius: 13px; background: color-mix(in srgb, var(--surface-2) 65%, transparent); }
+  .result-grid small { display: block; color: var(--muted); font: 9px 'IBM Plex Mono', monospace; }
+  .result-grid b { color: var(--ink); font: 700 28px 'IBM Plex Mono', monospace; }
+  .result-grid i { color: var(--faint); font-size: 12px; font-style: normal; }
+  .result-actions { margin-top: 25px; display: flex; justify-content: center; flex-wrap: wrap; gap: 11px; }
+  .share-status { min-height: 24px; margin-top: 5px; color: #4ade80; font-size: 13px; }
+  .learning-list { margin-top: 30px; padding-top: 28px; border-top: 1px solid var(--line); text-align: right; }
+  .learning-head span { color: var(--orange); font-size: 12px; }
+  .learning-head h2 { font-size: 24px; }
+  #resource-links { margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  #resource-links :global(a) { padding: 13px 15px; display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: color-mix(in srgb, var(--surface-2) 55%, transparent); }
+  #resource-links :global(a:hover) { border-color: var(--cyan); }
+  #resource-links :global(a span) { display: flex; flex-direction: column; }
+  #resource-links :global(a small) { color: var(--cyan); font-size: 10px; }
+  #resource-links :global(a b) { font-size: 13px; }
+  #resource-links :global(a i) { color: var(--orange); font-style: normal; }
+  @keyframes marker-pulse { 50% { transform: scale(1.1); box-shadow: 0 0 0 11px rgba(239,68,68,0), 0 8px 14px rgba(127,29,29,.25); } }
+  @keyframes urgent-pulse { to { opacity: .45; } }
+  @keyframes swarm-fall { to { transform: translate3d(calc(var(--drift, 0px)), 115vh, 0) rotate(720deg); } }
+  @keyframes local-fall { to { transform: translate3d(var(--drift), 180px, 0) rotate(450deg); opacity: 0; } }
+  @media (max-width: 1000px) {
+    .shop-layout { grid-template-columns: 1fr; }
+    .checkout-panel { border: 0; border-top: 1px solid #dce3ec; }
+  }
+  @media (max-width: 720px) {
+    .hunter-page { padding: 18px 12px 55px; }
+    .mode-grid { grid-template-columns: 1fr; }
+    .game-toolbar { align-items: flex-start; flex-direction: column; }
+    .toolbar-stats { width: 100%; margin: 0; }
+    .stat { min-width: 0; flex: 1; padding-inline: 5px; }
+    .product-grid { grid-template-columns: 1fr 1fr; }
+    .product-grid .faded-card { display: none; }
+    .shop-search { display: none; }
+    .shop-header { padding-inline: 16px; }
+    .shop-cart { margin-left: auto; }
+    .mobile-preview { align-items: flex-start; flex-direction: column; }
+    .mobile-preview > button:not(.bug-marker) { width: calc(100% + 95px); margin: 0 -95px 0 0; }
+    .result-grid { grid-template-columns: 1fr; }
+    #resource-links { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 460px) {
+    .mission-card, .result-card { padding: 28px 18px; }
+    .mission-facts { align-items: flex-start; flex-direction: column; }
+    .product-grid { grid-template-columns: 1fr; }
+    .toolbar-brand small { display: none; }
+    .stat { padding-block: 6px; }
+    .question-layer { padding: 10px; }
+    .question-modal { max-height: calc(100vh - 20px); padding: 25px 18px; }
+  }
+</style>

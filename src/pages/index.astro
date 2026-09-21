@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import LessonCard from '../components/LessonCard.astro';
@@ -8,11 +8,14 @@ import CourseCard from '../components/CourseCard.astro';
 import NewsCard from '../components/NewsCard.astro';
 import ResourceCard from '../components/ResourceCard.astro';
 import Newsletter from '../components/Newsletter.astro';
+import BugHunterCard from '../components/BugHunterCard.astro';
 import { getSite, getHome, splitHighlight } from '../lib/site';
 import { bunnyThumb, bunnyEmbed } from '../lib/utils';
 
 const site = await getSite();
 const home = await getHome();
+const bugHunterEntry = await getEntry('bugHunter', 'bug-hunter');
+const bugHunter = bugHunterEntry?.data;
 const heading = splitHighlight(home.heroTitle, home.heroHighlight);
 
 const live = <T extends { data: { draft: boolean } }>(e: T) => !e.data.draft;
@@ -194,6 +197,9 @@ const jsonLd = [
       </a>
     </div>
   </section>
+
+  <!-- ===== لعبة Bug Hunter ===== -->
+  {bugHunter?.enabled && bugHunter.showHomeCard && <BugHunterCard settings={bugHunter} />}
 
   <!-- ===== الدورات ===== -->
   {home.showCourses && courses.length > 0 && (
