@@ -27,15 +27,27 @@ const {
 const base = Astro.site ?? new URL(site.url);
 const canonical = new URL(Astro.url.pathname, base);
 const ogImage = new URL(image, base);
-const fullTitle = title === site.name ? `${site.name} — ${site.tagline}` : `${title} | ${site.name}`;
+const cleanText = (value: string) => value.replace(/\s+/g, ' ').trim();
+const shorten = (value: string, max: number) =>
+  value.length <= max ? value : `${value.slice(0, max - 1).trimEnd()}…`;
+const cleanTitle = cleanText(title);
+const titleWithBrand = cleanTitle === site.name
+  ? `${site.name} | تعلّم اختبار البرمجيات`
+  : cleanTitle.includes(site.name) ? cleanTitle : `${cleanTitle} | ${site.name}`;
+const fullTitle = shorten(titleWithBrand, 65);
+const cleanDescription = cleanText(description);
+const usefulDescription = cleanDescription.length < 70
+  ? `${cleanDescription} شرح مبسّط وعملي بالعربي من منصة ${site.name}.`
+  : cleanDescription;
+const metaDescription = shorten(usefulDescription, 160);
 const blocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>{fullTitle}</title>
-<meta name="description" content={description} />
+<meta name="description" content={metaDescription} />
 <link rel="canonical" href={canonical} />
-{noindex && <meta name="robots" content="noindex, nofollow" />}
+{noindex && <meta name="robots" content="noindex, follow" />}
 
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="alternate" type="application/rss+xml" title={site.name} href="/rss.xml" />
@@ -45,7 +57,7 @@ const blocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 <meta property="og:site_name" content={site.name} />
 <meta property="og:locale" content="ar_JO" />
 <meta property="og:title" content={title} />
-<meta property="og:description" content={description} />
+<meta property="og:description" content={metaDescription} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={ogImage} />
 {publishDate && <meta property="article:published_time" content={publishDate.toISOString()} />}
@@ -53,7 +65,7 @@ const blocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={title} />
-<meta name="twitter:description" content={description} />
+<meta name="twitter:description" content={metaDescription} />
 <meta name="twitter:image" content={ogImage} />
 
 <meta name="theme-color" content="#0a1428" />

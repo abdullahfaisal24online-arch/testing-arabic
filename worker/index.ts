@@ -923,6 +923,11 @@ async function router(req: Request, env: Env): Promise<Response> {
   const url = new URL(req.url);
   const path = url.pathname;
 
+  // رابط بنك الأسئلة القديم تحوّل نهائياً إلى تجربة المقابلة التفاعلية.
+  if ((path === '/questions' || path === '/questions/') && (req.method === 'GET' || req.method === 'HEAD')) {
+    return Response.redirect(new URL('/interview/', req.url).toString(), 301);
+  }
+
   // ---------- واجهة التعليقات ----------
   if (path === '/api/comments') {
     if (req.method === 'GET') {

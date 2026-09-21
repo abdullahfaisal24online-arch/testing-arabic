@@ -11,9 +11,20 @@ const game = entry?.data;
 if (!game?.enabled) return Astro.redirect('/');
 
 const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: game.caseTitle,
+  description: game.caseText,
+  url: `${site.url}/bug-hunter/`,
+  inLanguage: 'ar',
+  applicationCategory: 'EducationalApplication',
+  operatingSystem: 'Any',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
 ---
 
-<Base title={`${game.caseTitle} | ${site.name}`} description={game.caseText}>
+<Base title={game.caseTitle} description={game.caseText} jsonLd={jsonLd}>
   <main class="hunter-page dots" id="bug-hunter-app">
     <section class="mission-screen" id="mission-screen">
       <div class="mission-card">
@@ -146,7 +157,7 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
       <div class="result-card">
         <span class="result-kicker">CASE 01 • CLOSED</span>
         <div class="result-trophy" aria-hidden="true">🏆</div>
-        <h1>{game.resultTitle}</h1>
+        <h2>{game.resultTitle}</h2>
         <p>{game.resultText}</p>
         <strong class="result-rank" id="result-rank">QA Intern</strong>
         <div class="result-grid">
@@ -532,7 +543,7 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
   .case-label, .result-kicker { display: inline-flex; align-items: center; gap: 9px; color: var(--orange); font: 600 13px 'IBM Plex Mono', monospace; letter-spacing: .8px; }
   .case-label span { color: #ef4444; text-shadow: 0 0 10px #ef4444; }
   .mission-icon { width: 86px; height: 86px; margin: 25px auto 16px; display: grid; place-items: center; border: 1px solid rgba(56,189,248,.4); border-radius: 22px; color: var(--cyan); background: var(--cyan-soft); box-shadow: var(--glow); transform: rotate(-5deg); }
-  .mission-card h1, .result-card h1 { font-size: clamp(35px, 6vw, 60px); direction: ltr; }
+  .mission-card h1, .result-card h2 { font-size: clamp(35px, 6vw, 60px); direction: ltr; }
   .mission-copy, .result-card > p { max-width: 720px; margin: 12px auto 0; color: var(--ink-3); font-size: 18px; }
   .mission-facts { display: flex; justify-content: center; flex-wrap: wrap; gap: 14px 26px; margin-top: 28px; color: var(--ink-2); }
   .mission-facts span { display: flex; align-items: center; gap: 7px; }

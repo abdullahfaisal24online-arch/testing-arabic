@@ -50,6 +50,7 @@ const jsonLd = {
 <Base
   title={`وسم: ${tag}`}
   description={`كل الدروس والمقالات والقوالب المرتبطة بـ«${tag}» على منصة ${site.name}.`}
+  noindex={total < 3}
   jsonLd={jsonLd}
 >
   <div class="wrap crumbs">

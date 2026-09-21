@@ -7,8 +7,18 @@ export default defineConfig({
   trailingSlash: 'always',
   integrations: [
     sitemap({
-      // صفحات /pro/ noindex — ما الها داعي تكون بالـ sitemap
-      filter: (page) => !page.includes('/search') && !page.includes('/pro/') && !page.includes('/store'),
+      // ما بنضيف صفحات noindex أو صفحات الوسوم التفصيلية إلى الـ sitemap.
+      // صفحات الوسوم القوية بتظل قابلة للاكتشاف من /tags/ والروابط الداخلية.
+      filter: (page) => {
+        const path = new URL(page).pathname;
+        const isTagDetail = path.startsWith('/tags/') && path !== '/tags/';
+        return !path.startsWith('/search')
+          && !path.startsWith('/pro/')
+          && !path.startsWith('/store')
+          && path !== '/questions/'
+          && path !== '/newsletter/thanks/'
+          && !isTagDetail;
+      },
     }),
   ],
   markdown: {

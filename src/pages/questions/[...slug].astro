@@ -8,8 +8,17 @@ import { getSite } from '../../lib/site';
 import { tagSlug } from '../../lib/tags';
 
 export async function getStaticPaths() {
-  const questions = (await getCollection('questions')).filter((q) => !q.data.draft);
-  const lessons = (await getCollection('lessons')).filter((l) => !l.data.draft);
+  const [questionEntries, lessonEntries, articleEntries, resourceEntries] = await Promise.all([
+    getCollection('questions'),
+    getCollection('lessons'),
+    getCollection('articles'),
+    getCollection('resources'),
+  ]);
+  const questions = questionEntries.filter((q) => !q.data.draft);
+  const lessons = lessonEntries.filter((l) => !l.data.draft);
+  const availableTagSlugs = new Set<string>();
+  [...lessons, ...articleEntries.filter((a) => !a.data.draft), ...resourceEntries.filter((r) => !r.data.draft)]
+    .forEach((entry) => entry.data.tags.forEach((tag) => availableTagSlugs.add(tagSlug(tag))));
 
   return questions.map((question, i) => ({
     params: { slug: question.id },
@@ -23,11 +32,13 @@ export async function getStaticPaths() {
       sameDomain: questions
         .filter((q) => q.id !== question.id && q.data.domain === question.data.domain)
         .slice(0, 5),
+      availableTagSlugs: [...availableTagSlugs],
     },
   }));
 }
 
-const { question, prev, next, related, sameDomain } = Astro.props;
+const { question, prev, next, related, sameDomain, availableTagSlugs } = Astro.props;
+const linkedTags = new Set(availableTagSlugs);
 const { data } = question;
 const { Content } = await render(question);
 const bodyHtml = (question as any).rendered?.html ?? '';
@@ -81,7 +92,10 @@ const jsonLd = [
 
       {data.tags.length > 0 && (
         <div class="tags">
-          {data.tags.map((t) => <a class="tag" href={`/tags/${tagSlug(t)}/`}>{t}</a>)}
+          {data.tags.map((t) => linkedTags.has(tagSlug(t))
+            ? <a class="tag" href={`/tags/${tagSlug(t)}/`}>{t}</a>
+            : <span class="tag">{t}</span>
+          )}
         </div>
       )}
 

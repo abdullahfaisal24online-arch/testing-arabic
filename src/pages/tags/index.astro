@@ -24,7 +24,11 @@ lessons.filter((l) => !l.data.draft).forEach((l) => bump(l.data.tags));
 articles.filter((a) => !a.data.draft).forEach((a) => bump(a.data.tags));
 resources.filter((r) => !r.data.draft).forEach((r) => bump(r.data.tags));
 
-const tags = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ar'));
+// صفحات الوسوم ذات المحتوى القليل تبقى متاحة من صفحات المحتوى نفسها، لكن ما
+// بنعرضها كصفحات هبوط رئيسية حتى نتجنب تضخيم الفهرس بمئات الصفحات الضعيفة.
+const tags = [...counts.entries()]
+  .filter(([, count]) => count >= 3)
+  .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ar'));
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -42,7 +46,7 @@ const jsonLd = {
   <section class="page-head dots">
     <div class="wrap">
       <h1>الوسوم</h1>
-      <p class="lead">كل وسم بيجمع الدروس والمقالات والقوالب اللي بتخصّه بمكان واحد.</p>
+      <p class="lead">أبرز الوسوم اللي بتجمع أكثر من درس أو مقال أو قالب بمكان واحد.</p>
     </div>
   </section>
 
