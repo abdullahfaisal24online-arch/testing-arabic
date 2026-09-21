@@ -47,17 +47,18 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
     </section>
 
     <section class="game-screen" id="game-screen" hidden aria-label="متجر The Broken Shop">
-      <div class="game-toolbar">
-        <div class="toolbar-brand"><Icon name="bug" size={22} /><span>BUG HUNTER</span><small>CASE 01</small></div>
-        <div class="toolbar-stats">
-          <span class="stat"><small>SCORE</small><b id="score-value">0000</b></span>
-          <span class="stat"><small>FOUND</small><b><i id="found-value">0</i>/{game.bugs.length}</b></span>
-          <span class="stat timer-stat" id="timer-stat"><small>TIME</small><b id="time-value">01:30</b></span>
-          <button class="sound-toggle" id="sound-toggle" type="button" aria-label="إيقاف الصوت" aria-pressed="false">♪</button>
+      <div class="game-hud">
+        <div class="game-toolbar">
+          <div class="toolbar-brand"><Icon name="bug" size={22} /><span>BUG HUNTER</span><small>CASE 01</small></div>
+          <div class="toolbar-stats">
+            <span class="stat"><small>SCORE</small><b id="score-value">0000</b></span>
+            <span class="stat"><small>FOUND</small><b><i id="found-value">0</i>/{game.bugs.length}</b></span>
+            <span class="stat timer-stat" id="timer-stat"><small>TIME</small><b id="time-value">01:30</b></span>
+            <button class="sound-toggle" id="sound-toggle" type="button" aria-label="إيقاف الصوت والموسيقى" aria-pressed="false" title="كتم الصوت والموسيقى">♪</button>
+          </div>
         </div>
+        <div class="progress-track" aria-hidden="true"><span id="game-progress"></span></div>
       </div>
-
-      <div class="progress-track" aria-hidden="true"><span id="game-progress"></span></div>
 
       <div class="shop-window">
         <header class="shop-header">
@@ -202,6 +203,7 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
     const toast = byId('game-toast');
     const markers = [...document.querySelectorAll('.bug-marker')];
     const storageKey = 'testing-arabic:bug-hunter:best';
+    const soundStorageKey = 'testing-arabic:bug-hunter:muted';
     let mode = 'challenge';
     let active = false;
     let remaining = Number(settings.durationSeconds) || 90;
@@ -211,7 +213,11 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
     let correct = 0;
     let answered = new Map();
     let muted = false;
+    try { muted = localStorage.getItem(soundStorageKey) === '1'; } catch (_) {}
     let audioContext = null;
+    let musicTimer = null;
+    let musicStep = 0;
+    let musicGain = null;
 
     const shuffle = (items) => {
       const copy = [...items];
@@ -222,22 +228,82 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
       return copy;
     };
 
+    const ensureAudio = () => {
+      audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+      if (audioContext.state === 'suspended') audioContext.resume();
+      return audioContext;
+    };
+
     const playTone = (kind) => {
       if (muted) return;
       try {
-        audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
-        const now = audioContext.currentTime;
-        const osc = audioContext.createOscillator();
-        const gain = audioContext.createGain();
+        const context = ensureAudio();
+        const now = context.currentTime;
+        const osc = context.createOscillator();
+        const gain = context.createGain();
         osc.type = kind === 'correct' ? 'sine' : 'sawtooth';
         osc.frequency.setValueAtTime(kind === 'correct' ? 520 : 170, now);
         if (kind === 'correct') osc.frequency.exponentialRampToValueAtTime(780, now + .22);
         gain.gain.setValueAtTime(.0001, now);
         gain.gain.exponentialRampToValueAtTime(.1, now + .015);
         gain.gain.exponentialRampToValueAtTime(.0001, now + .28);
-        osc.connect(gain).connect(audioContext.destination);
+        osc.connect(gain).connect(context.destination);
         osc.start(now); osc.stop(now + .3);
       } catch (_) {}
+    };
+
+    const stopMusic = () => {
+      clearInterval(musicTimer);
+      musicTimer = null;
+      if (musicGain && audioContext) {
+        const now = audioContext.currentTime;
+        musicGain.gain.cancelScheduledValues(now);
+        musicGain.gain.setTargetAtTime(0, now, .035);
+      }
+      musicGain = null;
+    };
+
+    // مقطوعة Spy Jazz أصلية ومولّدة مباشرة داخل المتصفح — بدون ملف صوت خارجي.
+    const startMusic = () => {
+      if (muted || mode !== 'challenge' || !active || musicTimer) return;
+      try {
+        const context = ensureAudio();
+        musicGain = context.createGain();
+        musicGain.gain.setValueAtTime(.045, context.currentTime);
+        musicGain.connect(context.destination);
+        musicStep = 0;
+        const bass = [82.41, 0, 98, 0, 87.31, 0, 110, 0, 82.41, 0, 116.54, 0, 98, 0, 73.42, 0];
+        const lead = [0, 329.63, 0, 392, 349.23, 0, 293.66, 0, 0, 440, 0, 369.99, 0, 311.13, 0, 261.63];
+        const scheduleNote = (frequency, type, volume, duration) => {
+          if (!frequency || !musicGain) return;
+          const now = context.currentTime;
+          const osc = context.createOscillator();
+          const gain = context.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(frequency, now);
+          gain.gain.setValueAtTime(.0001, now);
+          gain.gain.exponentialRampToValueAtTime(volume, now + .012);
+          gain.gain.exponentialRampToValueAtTime(.0001, now + duration);
+          osc.connect(gain).connect(musicGain);
+          osc.start(now); osc.stop(now + duration + .02);
+        };
+        const tick = () => {
+          scheduleNote(bass[musicStep], 'triangle', .72, .19);
+          scheduleNote(lead[musicStep], 'sine', .34, .12);
+          if (musicStep % 4 === 2) scheduleNote(880, 'square', .055, .035);
+          musicStep = (musicStep + 1) % bass.length;
+        };
+        tick();
+        musicTimer = setInterval(tick, 245);
+      } catch (_) {}
+    };
+
+    const updateSoundButton = () => {
+      const button = byId('sound-toggle');
+      button.setAttribute('aria-pressed', String(muted));
+      button.setAttribute('aria-label', muted ? 'تشغيل الصوت والموسيقى' : 'إيقاف الصوت والموسيقى');
+      button.setAttribute('title', muted ? 'تشغيل الصوت والموسيقى' : 'كتم الصوت والموسيقى');
+      button.textContent = muted ? '×♪' : '♪';
     };
 
     const formatTime = (seconds) => `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
@@ -264,6 +330,7 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
     };
 
     const startGame = (selectedMode) => {
+      stopMusic();
       mode = selectedMode;
       resetGame();
       active = true;
@@ -272,6 +339,7 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       clearInterval(timer);
       if (mode === 'challenge') {
+        startMusic();
         timer = setInterval(() => {
           remaining -= 1; updateHud();
           if (remaining <= 0) finishGame();
@@ -378,7 +446,7 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
 
     const finishGame = () => {
       if (!active) return;
-      active = false; clearInterval(timer); layer.hidden = true;
+      active = false; clearInterval(timer); stopMusic(); layer.hidden = true;
       document.body.classList.remove('modal-open');
       const previousBest = Number(localStorage.getItem(storageKey) || 0);
       const best = Math.max(previousBest, score);
@@ -414,10 +482,13 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
     layer.addEventListener('click', (event) => { if (event.target === layer) closeQuestion(); });
     document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !layer.hidden) closeQuestion(); });
     byId('play-again').addEventListener('click', () => { results.hidden = true; mission.hidden = false; window.scrollTo({top: 0, behavior: 'smooth'}); });
-    byId('sound-toggle').addEventListener('click', (event) => {
-      muted = !muted; event.currentTarget.setAttribute('aria-pressed', String(muted));
-      event.currentTarget.setAttribute('aria-label', muted ? 'تشغيل الصوت' : 'إيقاف الصوت');
-      event.currentTarget.textContent = muted ? '×♪' : '♪';
+    updateSoundButton();
+    byId('sound-toggle').addEventListener('click', () => {
+      muted = !muted;
+      try { localStorage.setItem(soundStorageKey, muted ? '1' : '0'); } catch (_) {}
+      updateSoundButton();
+      if (muted) stopMusic();
+      else if (active && mode === 'challenge') startMusic();
     });
     byId('share-result').addEventListener('click', async () => {
       const rank = byId('result-rank').textContent;
@@ -457,6 +528,7 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
   .mode-challenge .mode-action { color: var(--orange); }
   .attempt-note { margin-top: 20px; color: var(--faint); font-size: 13px; }
   .game-screen { max-width: 1320px; margin: 0 auto; }
+  .game-hud { position: sticky; top: 67px; z-index: 35; box-shadow: 0 12px 28px rgba(2,8,20,.2); }
   .game-toolbar { min-height: 76px; padding: 12px 20px; display: flex; align-items: center; gap: 20px; border: 1px solid var(--line); border-radius: 16px 16px 0 0; background: #0d1a30; color: #eaf3ff; }
   .toolbar-brand { display: flex; align-items: center; gap: 9px; color: #38bdf8; font: 700 16px 'IBM Plex Mono', monospace; }
   .toolbar-brand small { padding: 3px 7px; border-radius: 4px; background: rgba(246,130,59,.13); color: #f6823b; font-size: 9px; }
@@ -602,9 +674,13 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
   @media (max-width: 720px) {
     .hunter-page { padding: 18px 12px 55px; }
     .mode-grid { grid-template-columns: 1fr; }
-    .game-toolbar { align-items: flex-start; flex-direction: column; }
+    .game-hud { top: 67px; }
+    .game-toolbar { min-height: 58px; padding: 8px 9px; gap: 8px; border-radius: 12px 12px 0 0; }
+    .toolbar-brand { display: none; }
     .toolbar-stats { width: 100%; margin: 0; }
-    .stat { min-width: 0; flex: 1; padding-inline: 5px; }
+    .stat { min-width: 0; min-height: 40px; flex: 1; padding: 5px 3px; }
+    .stat b { font-size: 14px; }
+    .sound-toggle { flex: 0 0 38px; width: 38px; height: 38px; }
     .product-grid { grid-template-columns: 1fr 1fr; }
     .product-grid .faded-card { display: none; }
     .shop-search { display: none; }
