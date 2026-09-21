@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { getSite } from '../lib/site';
+import ContactForm from '../components/ContactForm.astro';
 
 export async function getStaticPaths() {
   const pages = (await getCollection('pages')).filter((p) => !p.data.draft);
@@ -74,6 +75,7 @@ if (hasProfile) {
         )}
 
         <div class="prose"><Content /></div>
+        {page.id === 'contact' && <ContactForm />}
       </div>
     </div>
   </section>
