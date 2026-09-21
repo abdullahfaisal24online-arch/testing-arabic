@@ -22,14 +22,14 @@ const contactEmail = 'abdullahqafaisal@gmail.com';
 
     <label class="message-field">
       <span>الرسالة</span>
-      <textarea name="message" rows="6" maxlength="5000" required placeholder="اكتب رسالتك هون…"></textarea>
+      <textarea name="message" rows="6" minlength="100" maxlength="5000" required placeholder="اكتب رسالتك هون (100 حرف على الأقل)…"></textarea>
     </label>
 
     <!-- حقل مخفي ضد الرسائل الآلية؛ الزائر الحقيقي لا يراه -->
     <input class="contact-honeypot" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
     <div class="contact-actions">
-      <button class="btn primary" type="submit">إرسال الرسالة</button>
+      <button class="btn btn-primary" type="submit" disabled>إرسال الرسالة</button>
       <span class="contact-status" data-contact-status role="status" aria-live="polite"></span>
     </div>
   </form>
@@ -42,6 +42,17 @@ const contactEmail = 'abdullahqafaisal@gmail.com';
   const status = document.querySelector('[data-contact-status]');
 
   if (form instanceof HTMLFormElement && status instanceof HTMLElement) {
+    const message = form.elements.namedItem('message');
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    const updateSubmitState = () => {
+      if (!(message instanceof HTMLTextAreaElement) || !(submitButton instanceof HTMLButtonElement)) return;
+      submitButton.disabled = message.value.trim().length < 100;
+    };
+
+    message?.addEventListener('input', updateSubmitState);
+    updateSubmitState();
+
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       const button = form.querySelector('button[type="submit"]');
@@ -69,14 +80,15 @@ const contactEmail = 'abdullahqafaisal@gmail.com';
         }
 
         form.reset();
+        updateSubmitState();
         status.textContent = 'وصلت رسالتك بنجاح. شكراً لتواصلك معنا.';
         status.classList.add('success');
       } catch {
         status.textContent = 'تعذّر إرسال الرسالة حالياً. جرّب مرة ثانية أو راسلنا مباشرة على البريد.';
         status.classList.add('error');
       } finally {
-        button.disabled = false;
         button.textContent = button.dataset.label || 'إرسال الرسالة';
+        updateSubmitState();
       }
     });
   }
@@ -120,7 +132,20 @@ const contactEmail = 'abdullahqafaisal@gmail.com';
   .contact-honeypot { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
   .contact-actions { grid-column: 1 / -1; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
   .contact-actions .btn { min-width: 160px; }
-  .contact-actions button:disabled { opacity: .65; cursor: wait; }
+  .contact-actions .btn-primary {
+    background: var(--orange);
+    color: var(--on-orange);
+    box-shadow: 0 10px 24px var(--orange-soft);
+  }
+  .contact-actions .btn-primary:hover:not(:disabled) { background: var(--orange-hover); }
+  .contact-actions button:disabled {
+    background: #6f7175;
+    color: #fff;
+    box-shadow: none;
+    opacity: .72;
+    cursor: not-allowed;
+    transform: none;
+  }
   .contact-status { color: var(--muted); font-size: 14px; }
   .contact-status.success { color: var(--cyan-bright); }
   .contact-status.error { color: var(--orange-hover); }
