@@ -30,6 +30,10 @@ const year = new Date().getFullYear();
       <a href="/interview/">مقابلة عمل — أسئلة</a>
       <a href="/tags/">الوسوم</a>
       <a href="/search/">بحث</a>
+      <div class="subttl">معلومات</div>
+      <a href="/privacy/">سياسة الخصوصية</a>
+      <a href="/terms/">الشروط والأحكام</a>
+      <a href="/contact/">تواصل معنا</a>
     </div>
 
     <div class="col">
@@ -60,6 +64,15 @@ const year = new Date().getFullYear();
   .col a { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 15px; }
   .col a:hover { color: var(--cyan); }
   .ttl { font-size: 14px; color: var(--ink); margin-bottom: 2px; }
+  .subttl {
+    width: 100%;
+    margin-top: 10px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-3);
+    font-size: 13px;
+    font-weight: 600;
+  }
   .tag { color: var(--muted); font-size: 15px; max-width: 42ch; }
   .bottom {
     display: flex;

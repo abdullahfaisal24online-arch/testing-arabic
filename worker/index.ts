@@ -11,13 +11,18 @@
  *   POST /api/views           تسجيل مشاهدة مؤهلة (10 ثوانٍ تشغيل)
  *   POST /api/chat            مساعد الموقع (Workers AI) — أسئلة QA/testing فقط
  *   POST /api/subscribe       نسخة احتياطية محلية لمشتركي النشرة (جدول subscribers)
+ *   POST /api/contact         نموذج التواصل وإرسال الرسالة إلى بريد المنصة
  *   GET  /admin/comments      صفحة المراجعة (محمية بكلمة سر)
  */
+
+import { EmailMessage } from 'cloudflare:email';
 
 interface Env {
   DB: D1Database;
   ASSETS: Fetcher;
   ADMIN_PASSWORD: string;
+  // Cloudflare Email Sending binding — يوصل رسائل نموذج التواصل إلى بريد المنصة.
+  EMAIL: { send(message: EmailMessage): Promise<void> };
   // Workers AI — الخطة المجانية
   AI: { run(model: string, input: unknown): Promise<any> };
 }
@@ -524,6 +529,114 @@ async function handleSubscribe(req: Request, env: Env) {
   return json({ ok: true });
 }
 
+/* ===================== نموذج التواصل ===================== */
+
+const CONTACT_TO = 'abdullahqafaisal@gmail.com';
+const CONTACT_FROM = 'contact@testing-arabic.com';
+const CONTACT_MAX_NAME = 100;
+const CONTACT_MAX_MESSAGE = 5000;
+const CONTACT_RATE_LIMIT = 5;
+let CONTACT_TABLE_READY = false;
+
+async function ensureContactTable(env: Env) {
+  if (CONTACT_TABLE_READY) return;
+  await env.DB.batch([
+    env.DB.prepare(`
+      CREATE TABLE IF NOT EXISTS contact_messages (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        message TEXT NOT NULL,
+        ip_hash TEXT NOT NULL,
+        delivery_status TEXT NOT NULL DEFAULT 'pending',
+        created_at INTEGER NOT NULL
+      )
+    `),
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_contact_messages_ip_time ON contact_messages(ip_hash, created_at)`),
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_contact_messages_created ON contact_messages(created_at)`),
+  ]);
+  CONTACT_TABLE_READY = true;
+}
+
+const cleanHeader = (value: string) => value.replace(/[\r\n]+/g, ' ').trim();
+
+async function deliverContactEmail(env: Env, name: string, email: string, message: string) {
+  const subject = `رسالة جديدة من نموذج التواصل — ${cleanHeader(name)}`;
+  const raw = [
+    `From: Testing بالعربي <${CONTACT_FROM}>`,
+    `To: ${CONTACT_TO}`,
+    `Reply-To: ${cleanHeader(email)}`,
+    `Subject: ${subject}`,
+    'MIME-Version: 1.0',
+    'Content-Type: text/plain; charset=UTF-8',
+    '',
+    `الاسم: ${name}`,
+    `البريد: ${email}`,
+    '',
+    'الرسالة:',
+    message,
+    '',
+    `المصدر: ${new URL('https://testing-arabic.com/contact/').toString()}`,
+  ].join('\r\n');
+
+  await env.EMAIL.send(new EmailMessage(CONTACT_FROM, CONTACT_TO, raw));
+}
+
+async function handleContact(req: Request, env: Env) {
+  let payload: { name?: string; email?: string; message?: string; website?: string };
+  try {
+    payload = await req.json();
+  } catch {
+    return json({ ok: false, error: 'bad_json' }, 400);
+  }
+
+  const name = String(payload.name ?? '').trim();
+  const email = String(payload.email ?? '').trim().toLowerCase();
+  const message = String(payload.message ?? '').trim();
+  const honey = String(payload.website ?? '').trim();
+
+  // الطلبات الآلية لا تحصل على إشارة تساعدها على تحسين المحاولة التالية.
+  if (honey) return json({ ok: true });
+  if (name.length < 2 || name.length > CONTACT_MAX_NAME) return json({ ok: false, error: 'bad_name' }, 400);
+  if (!email || email.length > MAX_EMAIL || !EMAIL_RE.test(email)) {
+    return json({ ok: false, error: 'bad_email' }, 400);
+  }
+  if (message.length < 2 || message.length > CONTACT_MAX_MESSAGE) {
+    return json({ ok: false, error: 'bad_message' }, 400);
+  }
+
+  await ensureContactTable(env);
+  const ip = req.headers.get('cf-connecting-ip') ?? '0.0.0.0';
+  const ipHash = await hashIp(ip, env.ADMIN_PASSWORD);
+  const since = Date.now() - 3600_000;
+  const recent = await env.DB.prepare(
+    `SELECT COUNT(*) AS n FROM contact_messages WHERE ip_hash = ?1 AND created_at > ?2`,
+  )
+    .bind(ipHash, since)
+    .first<{ n: number }>();
+
+  if ((recent?.n ?? 0) >= CONTACT_RATE_LIMIT) return json({ ok: false, error: 'too_many' }, 429);
+
+  const id = uid();
+  const now = Date.now();
+  await env.DB.prepare(
+    `INSERT INTO contact_messages (id, name, email, message, ip_hash, delivery_status, created_at)
+       VALUES (?1, ?2, ?3, ?4, ?5, 'pending', ?6)`,
+  )
+    .bind(id, name, email, message, ipHash, now)
+    .run();
+
+  try {
+    await deliverContactEmail(env, name, email, message);
+    await env.DB.prepare(`UPDATE contact_messages SET delivery_status = 'sent' WHERE id = ?1`).bind(id).run();
+    return json({ ok: true });
+  } catch (error) {
+    console.error('contact_delivery_failed', error);
+    await env.DB.prepare(`UPDATE contact_messages SET delivery_status = 'failed' WHERE id = ?1`).bind(id).run();
+    return json({ ok: false, error: 'delivery_failed' }, 502);
+  }
+}
+
 /* ===================== واجهة التعليقات العامة ===================== */
 
 async function listComments(env: Env, page: string) {
@@ -852,6 +965,12 @@ async function router(req: Request, env: Env): Promise<Response> {
   // ---------- النشرة (نسخة احتياطية محلية) ----------
   if (path === '/api/subscribe') {
     if (req.method === 'POST') return handleSubscribe(req, env);
+    return json({ ok: false, error: 'method' }, 405);
+  }
+
+  // ---------- نموذج التواصل ----------
+  if (path === '/api/contact') {
+    if (req.method === 'POST') return handleContact(req, env);
     return json({ ok: false, error: 'method' }, 405);
   }
 
