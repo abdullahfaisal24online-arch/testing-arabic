@@ -57,7 +57,10 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
             <button class="sound-toggle" id="sound-toggle" type="button" aria-label="إيقاف الصوت والموسيقى" aria-pressed="false" title="كتم الصوت والموسيقى">♪</button>
           </div>
         </div>
-        <div class="progress-track" aria-hidden="true"><span id="game-progress"></span></div>
+        <div class="progress-track">
+          <span id="game-progress" aria-hidden="true"></span>
+          <button class="end-game" id="end-game" type="button" aria-label="إنهاء اللعبة">إنهاء اللعبة</button>
+        </div>
       </div>
 
       <div class="shop-window">
@@ -154,6 +157,7 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
         <div class="result-actions">
           <button class="btn btn-primary" id="play-again" type="button">العب مرة ثانية <Icon name="arrow" size={18} /></button>
           <button class="btn btn-ghost" id="share-result" type="button">شارك نتيجتك</button>
+          <a class="btn btn-ghost" href="/">العودة للرئيسية</a>
         </div>
         <p class="share-status" id="share-status" aria-live="polite"></p>
         <div class="learning-list" id="learning-list">
@@ -232,6 +236,18 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
       audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
       if (audioContext.state === 'suspended') audioContext.resume();
       return audioContext;
+    };
+
+    // بعض متصفحات الموبايل تحتاج صوتًا قصيرًا من نفس ضغطة المستخدم حتى تسمح بالموسيقى.
+    const unlockAudio = () => {
+      try {
+        const context = ensureAudio();
+        const buffer = context.createBuffer(1, 1, 22050);
+        const source = context.createBufferSource();
+        source.buffer = buffer;
+        source.connect(context.destination);
+        source.start(0);
+      } catch (_) {}
     };
 
     const playTone = (kind) => {
@@ -332,6 +348,7 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
     const startGame = (selectedMode) => {
       stopMusic();
       mode = selectedMode;
+      if (mode === 'challenge' && !muted) unlockAudio();
       resetGame();
       active = true;
       mission.hidden = true; results.hidden = true; gameScreen.hidden = false;
@@ -477,6 +494,7 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
 
     document.querySelectorAll('[data-start-mode]').forEach((button) => button.addEventListener('click', () => startGame(button.dataset.startMode)));
     markers.forEach((marker) => marker.addEventListener('click', () => openQuestion(marker.dataset.bug)));
+    byId('end-game').addEventListener('click', finishGame);
     byId('continue-game').addEventListener('click', closeQuestion);
     byId('modal-close').addEventListener('click', closeQuestion);
     layer.addEventListener('click', (event) => { if (event.target === layer) closeQuestion(); });
@@ -540,8 +558,10 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
   .stat i { font-style: normal; }
   .timer-stat.urgent b { color: #fb5a5a; animation: urgent-pulse .7s infinite alternate; }
   .sound-toggle { width: 39px; height: 39px; border: 1px solid rgba(56,189,248,.22); border-radius: 9px; background: transparent; color: #a9bad0; cursor: pointer; font-weight: 700; }
-  .progress-track { height: 4px; background: #17233a; }
-  .progress-track span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, #f6823b, #38bdf8); transition: width .35s ease; }
+  .progress-track { position: relative; height: 34px; background: #17233a; direction: rtl; }
+  .progress-track span { position: absolute; inset-inline-start: 0; top: 15px; display: block; width: 0; height: 4px; background: linear-gradient(90deg, #f6823b, #38bdf8); transition: width .35s ease; }
+  .end-game { position: absolute; z-index: 1; inset-inline-start: 8px; top: 5px; min-height: 24px; padding: 2px 9px; border: 1px solid rgba(246,130,59,.35); border-radius: 6px; background: rgba(246,130,59,.13); color: #ffad79; font: 700 10px 'IBM Plex Mono', monospace; cursor: pointer; }
+  .end-game:hover { border-color: #f6823b; background: rgba(246,130,59,.25); color: white; }
   .shop-window { overflow: hidden; border: 1px solid var(--line); border-top: 0; border-radius: 0 0 18px 18px; background: #f5f7fa; color: #152039; direction: ltr; box-shadow: var(--shadow-lg); }
   .shop-header { min-height: 70px; padding: 14px 28px; display: flex; align-items: center; gap: 25px; border-bottom: 1px solid #dde4ed; background: #fff; }
   .shop-logo { color: #0e1c34; font: 800 18px 'IBM Plex Mono', monospace; }
@@ -682,6 +702,7 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
     .stat { min-width: 0; min-height: 40px; flex: 1; padding: 5px 3px; }
     .stat b { font-size: 14px; }
     .sound-toggle { flex: 0 0 38px; width: 38px; height: 38px; }
+    .end-game { inset-inline-start: 6px; font-size: 9px; padding-inline: 7px; }
     .product-grid { grid-template-columns: 1fr 1fr; }
     .product-grid .faded-card { display: none; }
     .shop-search { display: none; }
