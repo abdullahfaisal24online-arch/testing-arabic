@@ -359,6 +359,8 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
         wrongSwarm(); playTone('wrong');
       }
       marker.disabled = true;
+      // بعد اختيار الإجابة منعرض النتيجة لحالها حتى يظل الصندوق كامل داخل الشاشة.
+      answersEl.hidden = true;
       byId('feedback-copy').textContent = currentBug.explanation;
       const expected = byId('expected-result');
       expected.hidden = !currentBug.expectedResult;
@@ -538,31 +540,31 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
   .marker-duplicate { top: -13px; left: -15px; }
   .marker-keyboard { top: -13px; right: -15px; animation-delay: -.65s; }
   .game-tip { margin: 14px 0 0; color: var(--muted); text-align: center; font-size: 14px; }
-  .question-layer { position: fixed; z-index: 1000; inset: 0; padding: 24px; display: grid; place-items: center; background: rgba(3,9,22,.82); backdrop-filter: blur(9px); }
+  .question-layer { position: fixed; z-index: 1000; inset: 0; width: 100%; height: 100dvh; padding: 16px; display: grid; place-items: center; overflow: hidden; background: rgba(3,9,22,.82); backdrop-filter: blur(9px); }
   .question-layer[hidden] { display: none; }
-  .question-modal { position: relative; width: min(690px, 100%); max-height: calc(100vh - 48px); overflow-y: auto; padding: clamp(27px, 4.5vw, 44px); border: 1px solid rgba(56,189,248,.4); border-radius: 22px; background: #101e37; color: #e8eef9; box-shadow: 0 30px 90px rgba(0,0,0,.55); text-align: right; }
-  .modal-close { position: absolute; top: 15px; left: 16px; width: 36px; height: 36px; border: 1px solid rgba(255,255,255,.12); border-radius: 50%; background: transparent; color: #9eb0c8; font-size: 22px; cursor: pointer; }
+  .question-modal { position: relative; width: min(720px, 100%); max-height: calc(100dvh - 32px); overflow: hidden; padding: clamp(22px, 3vw, 32px); border: 1px solid rgba(56,189,248,.4); border-radius: 19px; background: #101e37; color: #e8eef9; box-shadow: 0 30px 90px rgba(0,0,0,.55); text-align: right; }
+  .modal-close { position: absolute; top: 13px; left: 14px; width: 34px; height: 34px; border: 1px solid rgba(255,255,255,.12); border-radius: 50%; background: transparent; color: #9eb0c8; font-size: 21px; cursor: pointer; }
   .question-count { color: #f6823b; font: 600 11px 'IBM Plex Mono', monospace; letter-spacing: 1px; }
-  .question-icon { width: 52px; height: 52px; margin-top: 15px; display: grid; place-items: center; border: 1px solid rgba(239,68,68,.4); border-radius: 13px; background: rgba(239,68,68,.1); font-size: 25px; }
-  .question-bug { margin-top: 14px; color: #38bdf8; font-size: 14px; font-weight: 700; }
-  .question-modal h2 { margin-top: 4px; padding-inline-end: 8px; font-size: clamp(21px, 3vw, 28px); }
-  .answer-list { margin-top: 25px; display: grid; gap: 10px; }
-  :global(.answer-option) { width: 100%; min-height: 56px; padding: 11px 13px; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(56,189,248,.16); border-radius: 10px; background: rgba(255,255,255,.025); color: #dbe7f7; text-align: right; cursor: pointer; transition: .15s ease; }
+  .question-icon { width: 44px; height: 44px; margin-top: 11px; display: grid; place-items: center; border: 1px solid rgba(239,68,68,.4); border-radius: 11px; background: rgba(239,68,68,.1); font-size: 21px; }
+  .question-bug { margin-top: 10px; color: #38bdf8; font-size: 13px; font-weight: 700; }
+  .question-modal h2 { margin-top: 2px; padding-inline-end: 6px; font-size: clamp(19px, 2.6vw, 24px); line-height: 1.55; }
+  .answer-list { margin-top: 17px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  :global(.answer-option) { width: 100%; min-height: 54px; padding: 9px 11px; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(56,189,248,.16); border-radius: 9px; background: rgba(255,255,255,.025); color: #dbe7f7; text-align: right; cursor: pointer; transition: .15s ease; }
   :global(.answer-option:hover:not(:disabled)) { border-color: #38bdf8; background: rgba(56,189,248,.08); transform: translateX(-3px); }
   :global(.answer-option > span) { flex: 0 0 32px; height: 32px; display: grid; place-items: center; border-radius: 7px; background: rgba(56,189,248,.09); color: #7dd3fc; font: 700 12px 'IBM Plex Mono', monospace; }
-  :global(.answer-option b) { font-size: 14px; line-height: 1.6; }
+  :global(.answer-option b) { font-size: 13px; line-height: 1.5; }
   :global(.answer-option.answer-correct) { border-color: #22c55e; background: rgba(34,197,94,.13); }
   :global(.answer-option.answer-wrong) { border-color: #ef4444; background: rgba(239,68,68,.14); }
-  .answer-feedback { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.1); }
+  .answer-feedback { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.1); }
   .answer-feedback > strong { display: block; font-size: 18px; }
   .correct-title { color: #4ade80; }
   .wrong-title { color: #fb7185; }
-  .answer-feedback > p { margin-top: 7px; color: #b8c7db; font-size: 14px; }
+  .answer-feedback > p { margin-top: 6px; color: #b8c7db; font-size: 13px; line-height: 1.75; }
   #expected-result { margin-top: 13px; padding: 11px 13px; display: flex; flex-direction: column; border-right: 3px solid #38bdf8; background: rgba(56,189,248,.07); }
   #expected-result[hidden] { display: none; }
   #expected-result small { color: #38bdf8; font: 8px 'IBM Plex Mono', monospace; }
   #expected-result span { color: #cfdaea; font-size: 13px; }
-  .answer-feedback .btn { margin-top: 18px; }
+  .answer-feedback .btn { margin-top: 14px; min-height: 43px; padding-block: 9px; }
   .swarm-layer { position: fixed; z-index: 1200; inset: 0; overflow: hidden; pointer-events: none; visibility: hidden; background: rgba(190,18,60,0); transition: background .2s; }
   .swarm-layer.show { visibility: visible; background: rgba(190,18,60,.18); }
   .swarm-layer :global(span) { position: absolute; animation: swarm-fall 1.5s cubic-bezier(.18,.7,.3,1) forwards; filter: saturate(1.8) hue-rotate(-15deg) drop-shadow(0 5px 3px rgba(80,0,0,.25)); }
@@ -612,13 +614,35 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
     .result-grid { grid-template-columns: 1fr; }
     #resource-links { grid-template-columns: 1fr; }
   }
+  @media (max-width: 640px) {
+    .question-layer { padding: 10px; }
+    .question-modal { width: 100%; max-height: calc(100dvh - 20px); padding: 20px 16px 16px; border-radius: 15px; }
+    .question-icon { width: 38px; height: 38px; margin-top: 8px; font-size: 18px; }
+    .question-bug { margin-top: 7px; font-size: 12px; }
+    .question-modal h2 { font-size: clamp(17px, 5vw, 21px); line-height: 1.45; }
+    .answer-list { grid-template-columns: 1fr; margin-top: 12px; gap: 7px; }
+    :global(.answer-option) { min-height: 46px; padding: 7px 9px; }
+    :global(.answer-option > span) { flex-basis: 28px; width: 28px; height: 28px; }
+    :global(.answer-option b) { font-size: 12.5px; line-height: 1.4; }
+    .answer-feedback { margin-top: 11px; padding-top: 11px; }
+    #expected-result { margin-top: 9px; padding: 8px 10px; }
+    .answer-feedback .btn { width: 100%; margin-top: 11px; }
+  }
+  @media (max-height: 720px) and (min-width: 641px) {
+    .question-layer { padding: 10px; }
+    .question-modal { max-height: calc(100dvh - 20px); padding: 19px 25px; }
+    .question-icon { width: 36px; height: 36px; margin-top: 6px; font-size: 17px; }
+    .question-bug { margin-top: 6px; }
+    .question-modal h2 { font-size: 20px; line-height: 1.4; }
+    .answer-list { margin-top: 10px; gap: 7px; }
+    :global(.answer-option) { min-height: 46px; padding-block: 7px; }
+  }
   @media (max-width: 460px) {
     .mission-card, .result-card { padding: 28px 18px; }
     .mission-facts { align-items: flex-start; flex-direction: column; }
     .product-grid { grid-template-columns: 1fr; }
     .toolbar-brand small { display: none; }
     .stat { padding-block: 6px; }
-    .question-layer { padding: 10px; }
-    .question-modal { max-height: calc(100vh - 20px); padding: 25px 18px; }
+    .question-modal { padding-inline: 14px; }
   }
 </style>
