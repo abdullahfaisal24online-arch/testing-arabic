@@ -59,7 +59,7 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
         </div>
         <div class="progress-track">
           <span id="game-progress" aria-hidden="true"></span>
-          <button class="end-game" id="end-game" type="button" aria-label="إنهاء اللعبة">إنهاء اللعبة</button>
+          <button class="end-game" id="end-game" type="button" aria-label="إنهاء اللعبة" title="إنهاء اللعبة وعرض النتيجة">إنهاء</button>
         </div>
       </div>
 
@@ -351,6 +351,7 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
       if (mode === 'challenge' && !muted) unlockAudio();
       resetGame();
       active = true;
+      document.body.classList.add('bug-hunter-active');
       mission.hidden = true; results.hidden = true; gameScreen.hidden = false;
       byId('timer-stat').hidden = mode !== 'challenge';
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -464,7 +465,7 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
     const finishGame = () => {
       if (!active) return;
       active = false; clearInterval(timer); stopMusic(); layer.hidden = true;
-      document.body.classList.remove('modal-open');
+      document.body.classList.remove('modal-open', 'bug-hunter-active');
       const previousBest = Number(localStorage.getItem(storageKey) || 0);
       const best = Math.max(previousBest, score);
       localStorage.setItem(storageKey, String(best));
@@ -521,6 +522,8 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
 
 <style>
   :global(body.modal-open) { overflow: hidden; }
+  :global(body.bug-hunter-active) .tachat-launcher,
+  :global(body.bug-hunter-active) .tachat-panel { display: none !important; }
   .hunter-page { min-height: calc(100vh - 80px); padding: 38px 24px 80px; overflow-x: clip; overflow-y: visible; background-color: var(--bg); }
   #bug-hunter-app.hunter-page.dots.bgfx-band { overflow-x: clip; overflow-y: visible; }
   .mission-screen, .result-screen { max-width: 980px; margin: 0 auto; }
@@ -559,8 +562,8 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
   .timer-stat.urgent b { color: #fb5a5a; animation: urgent-pulse .7s infinite alternate; }
   .sound-toggle { width: 39px; height: 39px; border: 1px solid rgba(56,189,248,.22); border-radius: 9px; background: transparent; color: #a9bad0; cursor: pointer; font-weight: 700; }
   .progress-track { position: relative; height: 34px; background: #17233a; direction: rtl; }
-  .progress-track span { position: absolute; inset-inline-start: 0; top: 15px; display: block; width: 0; height: 4px; background: linear-gradient(90deg, #f6823b, #38bdf8); transition: width .35s ease; }
-  .end-game { position: absolute; z-index: 1; inset-inline-start: 8px; top: 5px; min-height: 24px; padding: 2px 9px; border: 1px solid rgba(246,130,59,.35); border-radius: 6px; background: rgba(246,130,59,.13); color: #ffad79; font: 700 10px 'IBM Plex Mono', monospace; cursor: pointer; }
+  .progress-track span { position: absolute; z-index: 0; inset-inline-start: 0; top: 15px; display: block; width: 0; height: 4px; background: linear-gradient(90deg, #f6823b, #38bdf8); transition: width .35s ease; }
+  .end-game { position: absolute; z-index: 2; inset-inline-end: 8px; top: 5px; min-width: 70px; min-height: 24px; padding: 2px 9px; border: 1px solid rgba(246,130,59,.45); border-radius: 6px; background: #17233a; color: #ffad79; font: 700 10px 'IBM Plex Mono', monospace; white-space: nowrap; cursor: pointer; }
   .end-game:hover { border-color: #f6823b; background: rgba(246,130,59,.25); color: white; }
   .shop-window { overflow: hidden; border: 1px solid var(--line); border-top: 0; border-radius: 0 0 18px 18px; background: #f5f7fa; color: #152039; direction: ltr; box-shadow: var(--shadow-lg); }
   .shop-header { min-height: 70px; padding: 14px 28px; display: flex; align-items: center; gap: 25px; border-bottom: 1px solid #dde4ed; background: #fff; }
@@ -702,7 +705,7 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
     .stat { min-width: 0; min-height: 40px; flex: 1; padding: 5px 3px; }
     .stat b { font-size: 14px; }
     .sound-toggle { flex: 0 0 38px; width: 38px; height: 38px; }
-    .end-game { inset-inline-start: 6px; font-size: 9px; padding-inline: 7px; }
+    .end-game { inset-inline-end: 6px; min-width: 64px; font-size: 9px; padding-inline: 7px; }
     .product-grid { grid-template-columns: 1fr 1fr; }
     .product-grid .faded-card { display: none; }
     .shop-search { display: none; }
