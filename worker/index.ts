@@ -923,6 +923,19 @@ async function router(req: Request, env: Env): Promise<Response> {
   const url = new URL(req.url);
   const path = url.pathname;
 
+  const legacyRedirects: Record<string, string> = {
+    '/lessons/bug-report-that-works/': '/lessons/how-to-write-a-bug-report/',
+    '/articles/manual-vs-automation/': '/articles/roadmap-manual-to-automation-testing-guide/',
+    '/lessons/what-is-software-testing/': '/lessons/fundamentals-of-testing/',
+    '/courses/jira-agile/': '/courses/jira/',
+    '/lessons/maestro-setup/': '/lessons/install-maestro-and-setup-workspace/',
+    '/courses/maestro-automation/': '/courses/maestro-mobile-automation/',
+  };
+  const legacyTarget = legacyRedirects[path];
+  if (legacyTarget && (req.method === 'GET' || req.method === 'HEAD')) {
+    return Response.redirect(new URL(legacyTarget, req.url).toString(), 301);
+  }
+
   // رابط بنك الأسئلة القديم تحوّل نهائياً إلى تجربة المقابلة التفاعلية.
   if ((path === '/questions' || path === '/questions/') && (req.method === 'GET' || req.method === 'HEAD')) {
     return Response.redirect(new URL('/interview/', req.url).toString(), 301);

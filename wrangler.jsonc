@@ -18,7 +18,7 @@
     "binding": "ASSETS",
     "not_found_handling": "404-page",
     // لازم الـ Worker يمسك مسارات الـ API قبل الملفات الثابتة
-    "run_worker_first": ["/questions", "/questions/", "/api/comments", "/api/comments/*", "/api/likes", "/api/likes/*", "/api/views", "/api/views/*", "/api/chat", "/api/chat/*", "/api/subscribe", "/api/subscribe/*", "/api/contact", "/api/contact/*", "/admin/comments", "/admin/comments/*"]
+    "run_worker_first": ["/questions", "/questions/", "/lessons/bug-report-that-works/", "/articles/manual-vs-automation/", "/lessons/what-is-software-testing/", "/courses/jira-agile/", "/lessons/maestro-setup/", "/courses/maestro-automation/", "/api/comments", "/api/comments/*", "/api/likes", "/api/likes/*", "/api/views", "/api/views/*", "/api/chat", "/api/chat/*", "/api/subscribe", "/api/subscribe/*", "/api/contact", "/api/contact/*", "/admin/comments", "/admin/comments/*"]
   },
   // إرسال رسائل نموذج التواصل عبر Cloudflare Email Routing إلى بريد صاحب المنصة.
   "send_email": [
