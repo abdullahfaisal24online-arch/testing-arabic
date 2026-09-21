@@ -549,6 +549,7 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
   .question-bug { margin-top: 10px; color: #38bdf8; font-size: 13px; font-weight: 700; }
   .question-modal h2 { margin-top: 2px; padding-inline-end: 6px; font-size: clamp(19px, 2.6vw, 24px); line-height: 1.55; }
   .answer-list { margin-top: 17px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .answer-list[hidden] { display: none; }
   :global(.answer-option) { width: 100%; min-height: 54px; padding: 9px 11px; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(56,189,248,.16); border-radius: 9px; background: rgba(255,255,255,.025); color: #dbe7f7; text-align: right; cursor: pointer; transition: .15s ease; }
   :global(.answer-option:hover:not(:disabled)) { border-color: #38bdf8; background: rgba(56,189,248,.08); transform: translateX(-3px); }
   :global(.answer-option > span) { flex: 0 0 32px; height: 32px; display: grid; place-items: center; border-radius: 7px; background: rgba(56,189,248,.09); color: #7dd3fc; font: 700 12px 'IBM Plex Mono', monospace; }
