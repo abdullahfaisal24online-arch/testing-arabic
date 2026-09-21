@@ -1,0 +1,133 @@
+---
+const contactEmail = 'abdullahqafaisal@gmail.com';
+---
+
+<section class="contact-card" aria-labelledby="contact-form-title">
+  <div class="contact-card-head">
+    <span class="eyebrow">CONTACT</span>
+    <h2 id="contact-form-title">ابعث رسالتك</h2>
+    <p>إذا عندك سؤال، اقتراح، أو لاحظت خطأ بالمنصة، اكتب لنا وسنرجع لك على بريدك.</p>
+  </div>
+
+  <form class="contact-form" data-contact-form>
+    <label>
+      <span>الاسم</span>
+      <input name="name" type="text" autocomplete="name" maxlength="100" required placeholder="اكتب اسمك" />
+    </label>
+
+    <label>
+      <span>البريد الإلكتروني</span>
+      <input name="email" type="email" autocomplete="email" maxlength="254" required placeholder="name@example.com" dir="ltr" />
+    </label>
+
+    <label class="message-field">
+      <span>الرسالة</span>
+      <textarea name="message" rows="6" maxlength="5000" required placeholder="اكتب رسالتك هون…"></textarea>
+    </label>
+
+    <!-- حقل مخفي ضد الرسائل الآلية؛ الزائر الحقيقي لا يراه -->
+    <input class="contact-honeypot" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+    <div class="contact-actions">
+      <button class="btn primary" type="submit">إرسال الرسالة</button>
+      <span class="contact-status" data-contact-status role="status" aria-live="polite"></span>
+    </div>
+  </form>
+
+  <p class="contact-direct">أو راسلنا مباشرة على <a href={`mailto:${contactEmail}`}>{contactEmail}</a></p>
+</section>
+
+<script>
+  const form = document.querySelector('[data-contact-form]');
+  const status = document.querySelector('[data-contact-status]');
+
+  if (form instanceof HTMLFormElement && status instanceof HTMLElement) {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const button = form.querySelector('button[type="submit"]');
+      if (!(button instanceof HTMLButtonElement)) return;
+
+      button.disabled = true;
+      button.dataset.label = button.textContent || '';
+      button.textContent = 'جارِ الإرسال…';
+      status.textContent = '';
+      status.className = 'contact-status';
+
+      const formData = new FormData(form);
+      const payload = Object.fromEntries(formData.entries());
+
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok || !result.ok) {
+          throw new Error(result.error || 'send_failed');
+        }
+
+        form.reset();
+        status.textContent = 'وصلت رسالتك بنجاح. شكراً لتواصلك معنا.';
+        status.classList.add('success');
+      } catch {
+        status.textContent = 'تعذّر إرسال الرسالة حالياً. جرّب مرة ثانية أو راسلنا مباشرة على البريد.';
+        status.classList.add('error');
+      } finally {
+        button.disabled = false;
+        button.textContent = button.dataset.label || 'إرسال الرسالة';
+      }
+    });
+  }
+</script>
+
+<style>
+  .contact-card {
+    max-width: 760px;
+    margin-top: 38px;
+    padding: clamp(22px, 4vw, 38px);
+    background: linear-gradient(145deg, var(--surface), var(--navy));
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-xl);
+    box-shadow: var(--shadow-lg);
+  }
+  .contact-card-head { margin-bottom: 26px; }
+  .contact-card h2 { margin: 8px 0 8px; font-size: clamp(24px, 3vw, 32px); }
+  .contact-card-head p { color: var(--ink-3); max-width: 56ch; }
+  .contact-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+  .contact-form label { display: grid; gap: 8px; }
+  .contact-form label span { color: var(--ink-2); font-size: 14px; font-weight: 600; }
+  .contact-form input,
+  .contact-form textarea {
+    width: 100%;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-md);
+    background: var(--bg);
+    color: var(--ink);
+    font: inherit;
+    font-size: 16px;
+    padding: 12px 14px;
+    transition: border-color .2s ease, box-shadow .2s ease;
+  }
+  .contact-form textarea { resize: vertical; min-height: 150px; line-height: 1.8; }
+  .contact-form input:focus, .contact-form textarea:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 3px var(--cyan-soft);
+    outline: none;
+  }
+  .message-field { grid-column: 1 / -1; }
+  .contact-honeypot { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+  .contact-actions { grid-column: 1 / -1; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .contact-actions .btn { min-width: 160px; }
+  .contact-actions button:disabled { opacity: .65; cursor: wait; }
+  .contact-status { color: var(--muted); font-size: 14px; }
+  .contact-status.success { color: var(--cyan-bright); }
+  .contact-status.error { color: var(--orange-hover); }
+  .contact-direct { margin-top: 24px; color: var(--muted); font-size: 14px; }
+  .contact-direct a { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+  @media (max-width: 620px) {
+    .contact-form { grid-template-columns: 1fr; }
+    .message-field, .contact-actions { grid-column: auto; }
+  }
+</style>
