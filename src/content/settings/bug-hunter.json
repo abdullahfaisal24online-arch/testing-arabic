@@ -1,0 +1,202 @@
+{
+  "enabled": true,
+  "showHomeCard": true,
+  "homeBadge": "تحدٍ مجاني جديد",
+  "homeTitle": "هل عينك عين فاحص جودة؟ 🐞",
+  "homeText": "ادخل متجرًا مليئًا بالأخطاء، اصطد الحشرات وجاوب على أسئلة QA عملية. أمامك محاولة واحدة لكل Bug!",
+  "homeCta": "ابدأ تحدي Bug Hunter",
+  "caseLabel": "BUG HUNTER • CASE 01",
+  "caseTitle": "The Broken Shop",
+  "caseText": "متجر جديد على وشك الإطلاق، لكن فريق التطوير ترك خلفه أخطاء قد تفسد تجربة العملاء. مهمتك العثور عليها والتعامل معها كفاحص جودة حقيقي.",
+  "durationSeconds": 90,
+  "challengeLabel": "Challenge Mode",
+  "practiceLabel": "Practice Mode",
+  "oneAttemptNote": "لديك محاولة واحدة فقط لكل Bug. الإجابة الخاطئة تكشف الجواب الصحيح ولا تمنح نقاطًا.",
+  "resultTitle": "Mission Completed!",
+  "resultText": "شوف نتيجتك والمهارات التي تحتاج إلى تقويتها، ثم جرّب تحطّم أفضل رقم إلك.",
+  "ranks": [
+    { "min": 0, "label": "QA Intern" },
+    { "min": 3, "label": "Bug Spotter" },
+    { "min": 5, "label": "QA Detective" },
+    { "min": 7, "label": "Senior Bug Hunter" },
+    { "min": 9, "label": "QA Expert" },
+    { "min": 10, "label": "Testing Legend 🏆" }
+  ],
+  "bugs": [
+    {
+      "id": "broken-image",
+      "title": "الصورة المكسورة",
+      "sceneLabel": "صورة منتج Wireless Headphones لا تظهر",
+      "question": "أي عنوان هو الأفضل لتسجيل هذا الـBug؟",
+      "answers": [
+        "The product is broken",
+        "Product image is not displayed on the Wireless Headphones card",
+        "There is a UI issue on the shop page",
+        "Image problem"
+      ],
+      "correctAnswer": "Product image is not displayed on the Wireless Headphones card",
+      "explanation": "العنوان الجيد يحدد ما المشكلة وأين ظهرت وعلى أي منتج، بدل وصف عام لا يساعد المطور على الوصول إليها.",
+      "expectedResult": "يجب أن تظهر صورة المنتج داخل بطاقة Wireless Headphones بدون رمز صورة مكسورة.",
+      "correctMessage": "Excellent Bug Report! +100",
+      "resources": [
+        { "label": "شاهد: كيف تكتب Bug Report باحتراف", "href": "/lessons/how-to-write-a-bug-report/", "kind": "فيديو • 11:42" },
+        { "label": "حمّل قالب Bug Report", "href": "/resources/bug-report-template/", "kind": "Word + PDF" },
+        { "label": "اقرأ: كيف تكتب Bug Report ما يرجعلك", "href": "/articles/how-to-write-bug-report/", "kind": "مقال" }
+      ]
+    },
+    {
+      "id": "add-to-cart",
+      "title": "زر Add to Cart لا يستجيب",
+      "sceneLabel": "زر الإضافة لا يغير محتوى السلة",
+      "question": "أي خيار يصف الـActual Result والـExpected Result بشكل صحيح؟",
+      "answers": [
+        "Actual: تمت إضافة المنتج — Expected: ألا يحدث شيء",
+        "Actual: لا يستجيب الزر ويبقى العداد 0 — Expected: يُضاف المنتج ويتغير العداد إلى 1",
+        "Actual: لون الزر أزرق — Expected: تغيير تصميم المتجر",
+        "Actual: المتجر يحتوي منتجات — Expected: إعادة تحميل الصفحة"
+      ],
+      "correctAnswer": "Actual: لا يستجيب الزر ويبقى العداد 0 — Expected: يُضاف المنتج ويتغير العداد إلى 1",
+      "explanation": "Actual Result يصف ما حدث فعلًا، بينما Expected Result يصف السلوك الذي كان يجب أن يحدث وفق وظيفة الزر.",
+      "expectedResult": "عند الضغط يجب إضافة المنتج وتغيير عداد السلة من 0 إلى 1.",
+      "correctMessage": "Great Observation! +100",
+      "resources": [
+        { "label": "Functional vs Non-Functional Testing", "href": "/lessons/functional-vs-non-functional-testing/", "kind": "درس" }
+      ]
+    },
+    {
+      "id": "wrong-total",
+      "title": "إجمالي السلة خاطئ",
+      "sceneLabel": "المجموع الظاهر لا يساوي السعر والشحن ناقص الخصم",
+      "question": "سعر المنتج $29 والشحن $4 والخصم $5.80. ما قيمة Total الصحيحة؟",
+      "answers": ["$42.80", "$33.00", "$27.20", "$38.80"],
+      "correctAnswer": "$27.20",
+      "explanation": "$29.00 + $4.00 - $5.80 = $27.20. لا يكفي وجود رقم في Total؛ يجب التحقق من تطبيق قواعد الحساب بشكل صحيح.",
+      "expectedResult": "يجب أن يظهر Total بقيمة $27.20.",
+      "correctMessage": "Excellent Check! +100",
+      "resources": [
+        { "label": "دليل اختبار E-commerce Checkout", "href": "/articles/E-commerce-Checkout-Testing/", "kind": "مقال" },
+        { "label": "تقنيات تصميم الاختبار", "href": "/articles/test-design-techniques/", "kind": "مقال" }
+      ]
+    },
+    {
+      "id": "expired-coupon",
+      "title": "كوبون منتهي يظهر كناجح",
+      "sceneLabel": "EXPIRED20 يعرض رسالة نجاح رغم انتهاء صلاحيته",
+      "question": "تجربة كوبون منتهي الصلاحية تعتبر مثالًا على أي نوع من الاختبار؟",
+      "answers": ["Positive Testing", "Negative Testing", "Performance Testing", "Accessibility Testing"],
+      "correctAnswer": "Negative Testing",
+      "explanation": "Negative Testing يتحقق من تعامل النظام مع البيانات غير الصالحة أو الحالات غير المتوقعة، مثل كوبون منتهي الصلاحية.",
+      "expectedResult": "يجب رفض الكوبون برسالة واضحة وألا يتغير الخصم أو إجمالي الطلب.",
+      "correctMessage": "Great Negative Test! +100",
+      "resources": [
+        { "label": "دليل اختبار E-commerce Checkout", "href": "/articles/E-commerce-Checkout-Testing/", "kind": "مقال" },
+        { "label": "اختبار النماذج والتحقق من المدخلات", "href": "/articles/Form-Validation/", "kind": "مقال" }
+      ]
+    },
+    {
+      "id": "invalid-email",
+      "title": "حقل Email يقبل قيمة غير صالحة",
+      "sceneLabel": "القيمة ahmad@ تسمح بالمتابعة للدفع",
+      "question": "تقسيم بيانات البريد إلى قيم صالحة وغير صالحة واختيار عينة من كل مجموعة يعتبر أي تقنية؟",
+      "answers": ["Boundary Value Analysis", "Equivalence Partitioning", "State Transition Testing", "Load Testing"],
+      "correctAnswer": "Equivalence Partitioning",
+      "explanation": "في Equivalence Partitioning نقسم المدخلات إلى مجموعات يُتوقع أن يتعامل النظام مع عناصر كل مجموعة بالطريقة نفسها.",
+      "expectedResult": "يجب منع الانتقال وإظهار Enter a valid email address.",
+      "correctMessage": "Smart Test Design! +100",
+      "resources": [
+        { "label": "تقنيات تصميم الاختبار", "href": "/articles/test-design-techniques/", "kind": "مقال" },
+        { "label": "اختبار النماذج والتحقق من المدخلات", "href": "/articles/Form-Validation/", "kind": "مقال" }
+      ]
+    },
+    {
+      "id": "low-contrast",
+      "title": "نص الزر غير مقروء",
+      "sceneLabel": "لون النص قريب من خلفية زر Add to Cart",
+      "question": "ما مشكلة الـAccessibility الأساسية في هذا الزر؟",
+      "answers": ["حجم الزر كبير جدًا", "التباين بين النص والخلفية غير كافٍ", "الزر يحتاج Animation", "الصفحة تحتاج تحميل أسرع"],
+      "correctAnswer": "التباين بين النص والخلفية غير كافٍ",
+      "explanation": "يجب أن يكون النص قابلًا للإدراك والقراءة، مع تباين واضح بينه وبين الخلفية في الحالات العادية والتفاعلية.",
+      "expectedResult": "يجب تغيير ألوان الزر حتى يصبح النص واضحًا في الوضعين الفاتح والداكن.",
+      "correctMessage": "Accessibility Matters! +100",
+      "resources": [
+        { "label": "قائمة فحص Usability وAccessibility", "href": "/resources/usability-accessibility-checklist/", "kind": "Checklist" },
+        { "label": "الفرق بين Usability وAccessibility", "href": "/questions/usability-vs-accessibility-testing/", "kind": "سؤال مقابلة" }
+      ]
+    },
+    {
+      "id": "duplicate-order",
+      "title": "الضغط المكرر ينشئ طلبين",
+      "sceneLabel": "الضغط مرتين على Place Order ينشئ طلبين متطابقين",
+      "question": "ما المبدأ الذي يمنع تكرار عملية الدفع عند إرسال نفس الطلب أكثر من مرة؟",
+      "answers": ["Localization", "Scalability", "Idempotency", "Accessibility"],
+      "correctAnswer": "Idempotency",
+      "explanation": "Idempotency تضمن أن تكرار نفس الطلب لا ينفذ العملية الحساسة أكثر من مرة. تعطيل الزر مفيد لكنه لا يغني عن حماية الـBackend.",
+      "expectedResult": "يجب قبول العملية الأولى فقط وإعادة نتيجتها لأي Request مكرر.",
+      "correctMessage": "Duplicate Defeated! +100",
+      "resources": [
+        { "label": "دليل اختبار E-commerce Checkout", "href": "/articles/E-commerce-Checkout-Testing/", "kind": "مقال" },
+        { "label": "Idempotency في API Testing", "href": "/questions/idempotency-in-api-testing/", "kind": "سؤال مقابلة" }
+      ]
+    },
+    {
+      "id": "false-payment-success",
+      "title": "رسالة نجاح بعد فشل الدفع",
+      "sceneLabel": "الواجهة تعرض نجاحًا رغم رجوع API برمز 500",
+      "question": "ما الدليل الأقوى الذي يجب إرفاقه مع تقرير هذا الـBug؟",
+      "answers": [
+        "لقطة شاشة لرسالة النجاح فقط",
+        "كتابة أن الدفع لا يعمل بدون تفاصيل",
+        "استجابة API برمز 500 مع عدم وجود Order ID وسجل Network",
+        "اسم المتصفح فقط"
+      ],
+      "correctAnswer": "استجابة API برمز 500 مع عدم وجود Order ID وسجل Network",
+      "explanation": "سجل الـNetwork واستجابة الـAPI يثبتان أن العملية فشلت رغم ما عرضته الواجهة، بينما لقطة الشاشة وحدها لا تشرح ما حدث خلفها.",
+      "expectedResult": "عند فشل الدفع يجب ألا يتأكد الطلب وأن تظهر رسالة خطأ مفهومة مع إمكانية إعادة المحاولة بأمان.",
+      "correctMessage": "Evidence Collected! +100",
+      "resources": [
+        { "label": "دورة Postman وAPI Testing", "href": "/courses/postman-course/", "kind": "دورة" },
+        { "label": "دليل اختبار E-commerce Checkout", "href": "/articles/E-commerce-Checkout-Testing/", "kind": "مقال" }
+      ]
+    },
+    {
+      "id": "mobile-overflow",
+      "title": "زر Checkout يخرج خارج الشاشة",
+      "sceneLabel": "على عرض 360px جزء من زر الدفع مخفي",
+      "question": "ما السلوك المتوقع الصحيح على شاشة موبايل ضيقة؟",
+      "answers": [
+        "تصغير الصفحة كاملة حتى يصبح النص صغيرًا",
+        "إخفاء زر Checkout على الموبايل",
+        "إعادة ترتيب المحتوى بدون تمرير أفقي أو عناصر مقصوصة",
+        "إجبار المستخدم على تدوير الجهاز"
+      ],
+      "correctAnswer": "إعادة ترتيب المحتوى بدون تمرير أفقي أو عناصر مقصوصة",
+      "explanation": "التصميم المتجاوب يعيد ترتيب العناصر حسب مساحة الشاشة ويحافظ على وضوح المحتوى وإمكانية الوصول للإجراءات الأساسية.",
+      "expectedResult": "يجب أن يظهر زر Checkout كاملًا بدون Horizontal Scroll غير ضروري.",
+      "correctMessage": "Responsive Rescue! +100",
+      "resources": [
+        { "label": "Mobile Testing Checklist", "href": "/resources/mobile-testing-checklist/", "kind": "Checklist" },
+        { "label": "قائمة فحص Usability وAccessibility", "href": "/resources/usability-accessibility-checklist/", "kind": "Checklist" }
+      ]
+    },
+    {
+      "id": "keyboard-skip",
+      "title": "زر الدفع لا يعمل بالكيبورد",
+      "sceneLabel": "Tab يتجاوز Place Order ولا يمكن تشغيله بـEnter",
+      "question": "ما الطريقة الصحيحة لاختبار صفحة Checkout بدون ماوس؟",
+      "answers": [
+        "Tab وShift + Tab للتنقل وEnter أو Space للتشغيل",
+        "تحريك الماوس بسرعة فوق العناصر",
+        "تصغير حجم المتصفح",
+        "تحديث الصفحة عدة مرات"
+      ],
+      "correctAnswer": "Tab وShift + Tab للتنقل وEnter أو Space للتشغيل",
+      "explanation": "يجب أن يصل المستخدم لكل العناصر التفاعلية بترتيب منطقي، مع Focus واضح وإمكانية تشغيل الأزرار من لوحة المفاتيح.",
+      "expectedResult": "يصل Focus إلى Place Order ويعمل الزر باستخدام Enter أو Space.",
+      "correctMessage": "Keyboard Champion! +100",
+      "resources": [
+        { "label": "قائمة فحص Usability وAccessibility", "href": "/resources/usability-accessibility-checklist/", "kind": "Checklist" },
+        { "label": "الفرق بين Usability وAccessibility", "href": "/questions/usability-vs-accessibility-testing/", "kind": "سؤال مقابلة" }
+      ]
+    }
+  ]
+}

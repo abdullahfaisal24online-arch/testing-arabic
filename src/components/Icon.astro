@@ -16,6 +16,7 @@ interface Props {
     | 'monitor'
     | 'download'
     | 'certificate'
+    | 'bug'
     | 'sun'
     | 'moon';
   size?: number;
@@ -45,6 +46,8 @@ const paths: Record<string, string> = {
     '<path d="M12 3v12"></path><path d="m7 11 5 5 5-5"></path><path d="M4 20h16"></path>',
   certificate:
     '<path d="M6 3h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"></path><path d="M8 8h8"></path><path d="M8 12h5"></path><path d="m14 17 2 4 2-2 2 1-1.5-3"></path>',
+  bug:
+    '<ellipse cx="12" cy="13" rx="5" ry="7"></ellipse><path d="M9 6 7.5 3.5"></path><path d="M15 6l1.5-2.5"></path><path d="M7 10H3"></path><path d="M21 10h-4"></path><path d="M7 15H3"></path><path d="M21 15h-4"></path><path d="m8 19-3 2"></path><path d="m16 19 3 2"></path><path d="M12 6v14"></path>',
   monitor:
     '<rect x="2" y="4" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 18v3"></path>',
 };

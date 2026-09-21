@@ -1076,6 +1076,130 @@ collections:
             widget: text
             required: false
 
+      - name: bugHunter
+        label: "لعبة Bug Hunter"
+        file: src/content/settings/bug-hunter.json
+        fields:
+          - name: enabled
+            label: "تشغيل اللعبة"
+            widget: boolean
+            default: true
+          - name: showHomeCard
+            label: "إظهار بطاقة اللعبة بالرئيسية"
+            widget: boolean
+            default: true
+          - name: homeBadge
+            label: "شارة البطاقة"
+            widget: string
+          - name: homeTitle
+            label: "عنوان البطاقة"
+            widget: string
+          - name: homeText
+            label: "وصف البطاقة"
+            widget: text
+          - name: homeCta
+            label: "نص زر البطاقة"
+            widget: string
+          - name: caseLabel
+            label: "رقم القضية"
+            widget: string
+            hint: "مثال: BUG HUNTER • CASE 01"
+          - name: caseTitle
+            label: "اسم القضية"
+            widget: string
+          - name: caseText
+            label: "رسالة المهمة قبل اللعب"
+            widget: text
+          - name: durationSeconds
+            label: "مدة Challenge Mode بالثواني"
+            widget: number
+            value_type: int
+            min: 15
+          - name: challengeLabel
+            label: "اسم وضع التحدي"
+            widget: string
+          - name: practiceLabel
+            label: "اسم وضع التدريب"
+            widget: string
+          - name: oneAttemptNote
+            label: "ملاحظة المحاولة الواحدة"
+            widget: text
+          - name: resultTitle
+            label: "عنوان شاشة النتيجة"
+            widget: string
+          - name: resultText
+            label: "نص شاشة النتيجة"
+            widget: text
+          - name: ranks
+            label: "الرتب"
+            widget: list
+            summary: "{{fields.min}} إجابات — {{fields.label}}"
+            fields:
+              - name: min
+                label: "الحد الأدنى من الإجابات الصحيحة"
+                widget: number
+                value_type: int
+                min: 0
+                max: 10
+              - name: label
+                label: "اسم الرتبة"
+                widget: string
+          - name: bugs
+            label: "الأخطاء والأسئلة"
+            widget: list
+            summary: "{{fields.title}}"
+            hint: "ترتيب العناصر هون هو ترتيب عداد اللعبة، أما مكان كل حشرة داخل المتجر فثابت بالتصميم."
+            fields:
+              - name: id
+                label: "المعرّف البرمجي"
+                widget: string
+                hint: "لا تغيّره حتى يبقى موقع الحشرة مربوطًا بالمشكلة الصحيحة."
+              - name: title
+                label: "اسم الـBug"
+                widget: string
+              - name: sceneLabel
+                label: "وصف مكان المشكلة"
+                widget: string
+              - name: question
+                label: "السؤال"
+                widget: text
+              - name: answers
+                label: "خيارات الإجابة"
+                widget: list
+                field:
+                  name: answer
+                  label: "الخيار"
+                  widget: string
+              - name: correctAnswer
+                label: "الإجابة الصحيحة"
+                widget: string
+                hint: "لازم تطابق أحد الخيارات حرفيًا."
+              - name: explanation
+                label: "شرح الإجابة"
+                widget: text
+              - name: expectedResult
+                label: "السلوك المتوقع"
+                widget: text
+                required: false
+              - name: correctMessage
+                label: "رسالة الإجابة الصحيحة"
+                widget: string
+              - name: resources
+                label: "محتوى تعليمي مرتبط"
+                widget: list
+                required: false
+                summary: "{{fields.label}}"
+                fields:
+                  - name: label
+                    label: "العنوان"
+                    widget: string
+                  - name: href
+                    label: "الرابط"
+                    widget: string
+                  - name: kind
+                    label: "النوع أو المدة"
+                    widget: string
+
       - name: start
         label: "صفحة ابدأ من هنا"
         file: src/content/settings/start.json
