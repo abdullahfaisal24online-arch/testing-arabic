@@ -4,6 +4,7 @@ import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import Prose from '../../components/Prose.astro';
 import CourseCertificate from '../../components/CourseCertificate.astro';
+import OptimizedImage from '../../components/OptimizedImage.astro';
 import { getSite } from '../../lib/site';
 
 export async function getStaticPaths() {
@@ -95,12 +96,14 @@ const jsonLd = [
       </div>
       {data.cover && (
         <figure class="cover">
-          <img
+          <OptimizedImage
             src={data.cover}
             alt={`غلاف دورة ${data.title}`}
             width="1280"
             height="720"
-            decoding="async"
+            loading="eager"
+            fetchpriority="high"
+            sizes="(max-width: 940px) 100vw, 50vw"
           />
         </figure>
       )}

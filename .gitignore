@@ -1,0 +1,6 @@
+node_modules/
+.astro/
+dist/
+public/uploads-optimized/
+public/chat-index.json
+public/chat-config.json

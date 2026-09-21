@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { getSite } from '../lib/site';
 import ContactForm from '../components/ContactForm.astro';
+import OptimizedImage from '../components/OptimizedImage.astro';
 
 export async function getStaticPaths() {
   const pages = (await getCollection('pages')).filter((p) => !p.data.draft);
@@ -52,7 +53,7 @@ if (hasProfile) {
       <div class={hasProfile ? 'cols' : ''}>
         {hasProfile && (
           <aside class="card">
-            <img
+            <OptimizedImage
               class="ph"
               src={data.profilePhoto}
               alt={profileName}

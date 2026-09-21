@@ -5,6 +5,10 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://testing-arabic.com',
   trailingSlash: 'always',
+  build: {
+    // CSS الصفحة الأولى صغير نسبيًا؛ تضمينه يلغي طلبات render-blocking ويحسن FCP/LCP على الموبايل.
+    inlineStylesheets: 'always',
+  },
   integrations: [
     sitemap({
       // ما بنضيف صفحات noindex أو صفحات الوسوم التفصيلية إلى الـ sitemap.

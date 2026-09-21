@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import OptimizedImage from './OptimizedImage.astro';
 import { bunnyThumb } from '../lib/utils';
 import { getSite } from '../lib/site';
 
@@ -27,7 +28,7 @@ const thumb = bunnyThumb(data.videoId, data.thumbnail, site.bunnyCdnHostname);
 <a class="card lesson-card" href={`/lessons/${lesson.id}/`}>
   <div class:list={['thumb', { 'thumb--ph': !thumb }]}>
     {thumb ? (
-      <img src={thumb} alt="" loading="lazy" decoding="async" width="640" height="360" />
+      <OptimizedImage src={thumb} alt="" loading="lazy" width="640" height="360" sizes="(max-width: 720px) 100vw, 50vw" />
     ) : (
       <span class="thumb-ph" aria-hidden="true">
         <span class="ph-mark">🔻</span>

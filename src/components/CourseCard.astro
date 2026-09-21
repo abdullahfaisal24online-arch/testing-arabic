@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import OptimizedImage from './OptimizedImage.astro';
 import { lessonsLabel } from '../lib/utils';
 
 interface Props {
@@ -24,7 +25,7 @@ const icon = data.accent === 'orange' ? 'board' : 'list';
 <a class="card course" href={`/courses/${course.id}/`} data-accent={data.accent} data-soon={count === 0 ? 'true' : undefined}>
   {data.cover && (
     <div class="thumb">
-      <img src={data.cover} alt="" loading="lazy" decoding="async" width="1280" height="720" />
+      <OptimizedImage src={data.cover} alt="" loading="lazy" width="1280" height="720" sizes="(max-width: 720px) 100vw, 50vw" />
     </div>
   )}
   <div class="card-body">

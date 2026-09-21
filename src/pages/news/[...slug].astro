@@ -4,6 +4,7 @@ import Base from '../../layouts/Base.astro';
 import NewsCard from '../../components/NewsCard.astro';
 import InlineNewsletter from '../../components/InlineNewsletter.astro';
 import Prose from '../../components/Prose.astro';
+import OptimizedImage from '../../components/OptimizedImage.astro';
 import { getSite } from '../../lib/site';
 import { formatDate } from '../../lib/utils';
 
@@ -72,7 +73,18 @@ const jsonLd = [
       </div>
     </header>
 
-    {data.cover && <img class="cover" src={data.cover} alt="" width="1200" height="630" />}
+    {data.cover && (
+      <OptimizedImage
+        class="cover"
+        src={data.cover}
+        alt=""
+        width="1200"
+        height="630"
+        loading="eager"
+        fetchpriority="high"
+        sizes="(max-width: 900px) 100vw, 900px"
+      />
+    )}
 
     {bodyHtml ? <Prose html={bodyHtml} /> : <div class="prose"><Content /></div>}
   </article>

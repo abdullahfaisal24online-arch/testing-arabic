@@ -6,6 +6,7 @@ import InlineNewsletter from '../../components/InlineNewsletter.astro';
 import Prose from '../../components/Prose.astro';
 import Comments from '../../components/Comments.astro';
 import LikeButton from '../../components/LikeButton.astro';
+import OptimizedImage from '../../components/OptimizedImage.astro';
 import { getSite } from '../../lib/site';
 import { tagSlug } from '../../lib/tags';
 import { formatDate, readingTime, minutesLabel } from '../../lib/utils';
@@ -87,7 +88,18 @@ const jsonLd = [
         </div>
       </header>
 
-      {data.cover && <img class="cover" src={data.cover} alt="" width="1200" height="630" />}
+      {data.cover && (
+        <OptimizedImage
+          class="cover"
+          src={data.cover}
+          alt=""
+          width="1200"
+          height="630"
+          loading="eager"
+          fetchpriority="high"
+          sizes="(max-width: 900px) 100vw, 820px"
+        />
+      )}
 
       {bodyHtml ? <Prose html={bodyHtml} /> : <div class="prose"><Content /></div>}
 

@@ -4,8 +4,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "astro dev",
-    "build": "node scripts/build-chat-index.mjs && astro build && node scripts/check-glossary.mjs",
+    "optimize:images": "node scripts/optimize-images.mjs",
+    "dev": "npm run optimize:images && astro dev",
+    "build": "npm run optimize:images && node scripts/build-chat-index.mjs && astro build && node scripts/check-glossary.mjs",
     "preview": "astro preview"
   },
   "dependencies": {
@@ -16,5 +17,8 @@
     "@pdf-lib/fontkit": "^1.1.1",
     "astro": "^7.2.10",
     "pdf-lib": "^1.17.1"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.5"
   }
 }

@@ -1,0 +1,52 @@
+---
+interface Props {
+  src: string;
+  alt?: string;
+  width: number | string;
+  height: number | string;
+  class?: string;
+  loading?: 'eager' | 'lazy';
+  decoding?: 'sync' | 'async' | 'auto';
+  fetchpriority?: 'high' | 'low' | 'auto';
+  sizes?: string;
+}
+
+const {
+  src,
+  alt = '',
+  width,
+  height,
+  class: className,
+  loading,
+  decoding = 'async',
+  fetchpriority,
+  sizes = '(max-width: 720px) 100vw, 640px',
+} = Astro.props;
+
+const cleanSrc = src.split(/[?#]/, 1)[0];
+const optimizable = /^\/uploads\/.+\.(?:png|jpe?g|webp)$/i.test(cleanSrc);
+const optimizedBaseRaw = optimizable
+  ? cleanSrc.replace(/^\/uploads\//, '/uploads-optimized/').replace(/\.(?:png|jpe?g|webp)$/i, '')
+  : '';
+// srcset يفصل على المسافات، لذلك أسماء الملفات القادمة من الـCMS لازم تكون URL-encoded.
+const optimizedBase = optimizedBaseRaw
+  .split('/')
+  .map((segment) => encodeURIComponent(segment))
+  .join('/');
+const optimizedSrc = optimizable ? `${optimizedBase}.1280.webp` : src;
+const srcset = optimizable
+  ? [320, 640, 1280].map((size) => `${optimizedBase}.${size}.webp ${size}w`).join(', ')
+  : undefined;
+---
+<img
+  src={optimizedSrc}
+  srcset={srcset}
+  sizes={srcset ? sizes : undefined}
+  alt={alt}
+  width={width}
+  height={height}
+  class={className}
+  loading={loading}
+  decoding={decoding}
+  fetchpriority={fetchpriority}
+/>

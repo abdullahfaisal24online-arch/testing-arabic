@@ -1,5 +1,6 @@
 ---
 import { formatDate } from '../lib/utils';
+import OptimizedImage from './OptimizedImage.astro';
 
 interface Props {
   item: {
@@ -13,7 +14,7 @@ const cover = item.data.cover;
 <a class="card news" href={`/news/${item.id}/`}>
   {cover && (
     <div class="thumb">
-      <img src={cover} alt="" loading="lazy" decoding="async" width="640" height="360" />
+      <OptimizedImage src={cover} alt="" loading="lazy" width="640" height="360" sizes="(max-width: 720px) 100vw, 50vw" />
       {item.data.pinned && <span class="pin-float">مثبّت</span>}
     </div>
   )}
