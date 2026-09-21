@@ -504,6 +504,7 @@ const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
 <style>
   :global(body.modal-open) { overflow: hidden; }
   .hunter-page { min-height: calc(100vh - 80px); padding: 38px 24px 80px; overflow-x: clip; overflow-y: visible; background-color: var(--bg); }
+  #bug-hunter-app.hunter-page.dots.bgfx-band { overflow-x: clip; overflow-y: visible; }
   .mission-screen, .result-screen { max-width: 980px; margin: 0 auto; }
   .mission-card, .result-card { position: relative; overflow: hidden; padding: clamp(34px, 6vw, 66px); border: 1px solid var(--line-strong); border-radius: 24px; background: linear-gradient(145deg, var(--surface), color-mix(in srgb, var(--surface) 86%, #061022)); box-shadow: var(--shadow-lg); text-align: center; }
   .mission-card::after, .result-card::after { content: ''; position: absolute; width: 330px; height: 330px; top: -180px; left: -150px; border-radius: 50%; background: rgba(56,189,248,.12); filter: blur(8px); pointer-events: none; }
