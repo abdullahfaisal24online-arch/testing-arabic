@@ -217,6 +217,10 @@ const configReady = Boolean(courseTitleEn && lessonIds.length > 0);
       link.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
       if (persist) saveCertificate(certificate);
+      (window as any).taTrack?.('certificate_download', {
+        course_id: panel.dataset.course ?? 'course',
+        download_type: persist ? 'issue' : 'redownload',
+      });
     };
 
     paint();
