@@ -32,6 +32,7 @@ const year = new Date().getFullYear();
       <a href="/search/">بحث</a>
       <div class="subttl">معلومات</div>
       <a href="/privacy/">سياسة الخصوصية</a>
+      <button class="footer-link" type="button" data-analytics-settings>إعدادات التحليلات</button>
       <a href="/terms/">الشروط والأحكام</a>
       <a href="/contact/">تواصل معنا</a>
     </div>
@@ -63,6 +64,11 @@ const year = new Date().getFullYear();
   .col { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
   .col a { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 15px; }
   .col a:hover { color: var(--cyan); }
+  .footer-link {
+    border: 0; padding: 0; background: transparent; color: var(--muted);
+    font: inherit; font-size: 15px; cursor: pointer;
+  }
+  .footer-link:hover { color: var(--cyan); }
   .ttl { font-size: 14px; color: var(--ink); margin-bottom: 2px; }
   .subttl {
     width: 100%;
