@@ -83,6 +83,7 @@ const contactEmail = 'abdullahqafaisal@gmail.com';
         updateSubmitState();
         status.textContent = 'وصلت رسالتك بنجاح. شكراً لتواصلك معنا.';
         status.classList.add('success');
+        (window as any).taTrack?.('contact_submit', { form_name: 'contact' });
       } catch {
         status.textContent = 'تعذّر إرسال الرسالة حالياً. جرّب مرة ثانية أو راسلنا مباشرة على البريد.';
         status.classList.add('error');
