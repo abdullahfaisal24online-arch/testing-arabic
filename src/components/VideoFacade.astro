@@ -98,11 +98,14 @@ const { poster } = Astro.props;
     let watchedSeconds = 0;
     let lastVideoTime: number | null = null;
     let qualified = false;
-    const lessonId = player.dataset.trackWatch === 'true' ? (player.dataset.lessonId ?? '') : '';
+    const lessonId = player.dataset.lessonId ?? '';
+    const trackWatch = player.dataset.trackWatch === 'true';
+    let analyticsStarted = false;
+    const analyticsMilestones = new Set<number>();
     type WatchedRange = [number, number];
 
     const readRanges = (): WatchedRange[] => {
-      if (!lessonId) return [];
+      if (!lessonId || !trackWatch) return [];
       try {
         const value = JSON.parse(localStorage.getItem(`ta-watch:${lessonId}`) ?? '[]');
         if (!Array.isArray(value)) return [];
@@ -134,7 +137,7 @@ const { poster } = Astro.props;
     };
 
     const saveCertificateProgress = (duration: number) => {
-      if (!lessonId || !Number.isFinite(duration) || duration <= 0) return;
+      if (!lessonId || !trackWatch || !Number.isFinite(duration) || duration <= 0) return;
       const watched = watchedRanges.reduce((sum, range) => sum + (range[1] - range[0]), 0);
       const exactPercent = Math.min(100, (watched / duration) * 100);
       const percent = Math.floor(exactPercent);
@@ -231,6 +234,10 @@ const { poster } = Astro.props;
       if (data.event === 'play') {
         hideCover();
         lastVideoTime = null;
+        if (!analyticsStarted) {
+          analyticsStarted = true;
+          (window as any).taTrack?.('video_start', { lesson_id: lessonId, video_id: data.video });
+        }
         return;
       }
 
@@ -249,12 +256,25 @@ const { poster } = Astro.props;
         // Bunny يرسل timeupdate دورياً. الفروقات الكبيرة تعني Seek ولا تُحسب.
         if (delta > 0 && delta <= 3) {
           if (!qualified) watchedSeconds += delta;
-          if (lessonId) addWatchedRange(lastVideoTime, currentTime);
+          if (lessonId && trackWatch) addWatchedRange(lastVideoTime, currentTime);
         }
       }
       lastVideoTime = currentTime;
 
-      if (lessonId) saveCertificateProgress(Number(data.status?.duration));
+      const duration = Number(data.status?.duration);
+      if (lessonId && trackWatch) saveCertificateProgress(duration);
+
+      if (Number.isFinite(duration) && duration > 0) {
+        const position = Math.min(100, Math.floor((currentTime / duration) * 100));
+        [25, 50, 75, 90].forEach((milestone) => {
+          if (position >= milestone && !analyticsMilestones.has(milestone)) {
+            analyticsMilestones.add(milestone);
+            (window as any).taTrack?.(milestone === 90 ? 'video_complete' : 'video_progress', {
+              lesson_id: lessonId, video_id: data.video, percent: milestone,
+            });
+          }
+        });
+      }
 
       if (!qualified && watchedSeconds >= QUALIFIED_VIEW_SECONDS) {
         qualified = true;
