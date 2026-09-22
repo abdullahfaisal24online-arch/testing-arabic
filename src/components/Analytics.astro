@@ -1,0 +1,130 @@
+---
+const measurementId = 'G-PQF8VX7WJ4';
+---
+
+<div class="analytics-consent" id="analytics-consent" hidden role="region" aria-label="إعدادات التحليلات">
+  <div>
+    <strong>نستخدم تحليلات بسيطة لتحسين المنصة</strong>
+    <p>بتساعدنا نعرف شو المحتوى المفيد ونحسّن التجربة. ما بنرسل اسمك أو بريدك أو نص رسائلك.</p>
+    <a href="/privacy/">سياسة الخصوصية</a>
+  </div>
+  <div class="analytics-consent-actions">
+    <button class="btn btn-primary" type="button" data-analytics-accept>السماح</button>
+    <button class="btn btn-ghost" type="button" data-analytics-decline>رفض</button>
+  </div>
+</div>
+
+<script define:vars={{ measurementId }} is:inline>
+  (function () {
+    var CONSENT_KEY = 'ta-analytics-consent';
+    var initialized = false;
+    var consent;
+    try { consent = localStorage.getItem(CONSENT_KEY); } catch (e) {}
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+    window.gtag('consent', 'default', {
+      analytics_storage: consent === 'granted' ? 'granted' : 'denied',
+      ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', wait_for_update: 500
+    });
+
+    window.taTrack = function (eventName, parameters) {
+      var saved;
+      try { saved = localStorage.getItem(CONSENT_KEY); } catch (e) {}
+      if (saved !== 'granted' || !initialized) return;
+      window.gtag('event', eventName, parameters || {});
+    };
+
+    function pageContextEvent() {
+      var lesson = location.pathname.match(/^\/lessons\/([^/]+)\/?$/);
+      if (lesson) window.taTrack('lesson_open', { lesson_id: decodeURIComponent(lesson[1]) });
+    }
+
+    function loadAnalytics() {
+      if (initialized || document.querySelector('script[data-google-analytics]')) return;
+      var script = document.createElement('script');
+      script.async = true;
+      script.dataset.googleAnalytics = 'true';
+      script.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(measurementId);
+      script.onload = function () {
+        initialized = true;
+        window.gtag('js', new Date());
+        window.gtag('config', measurementId, {
+          anonymize_ip: true, allow_google_signals: false, allow_ad_personalization_signals: false
+        });
+        pageContextEvent();
+      };
+      document.head.appendChild(script);
+    }
+
+    function saveConsent(value) {
+      try { localStorage.setItem(CONSENT_KEY, value); } catch (e) {}
+      window.gtag('consent', 'update', { analytics_storage: value });
+      var banner = document.getElementById('analytics-consent');
+      if (banner) banner.hidden = true;
+      if (value === 'granted') loadAnalytics();
+    }
+
+    function ready() {
+      var banner = document.getElementById('analytics-consent');
+      if (consent === 'granted') loadAnalytics();
+      else if (consent !== 'denied' && banner) banner.hidden = false;
+
+      banner && banner.querySelector('[data-analytics-accept]')?.addEventListener('click', function () { saveConsent('granted'); });
+      banner && banner.querySelector('[data-analytics-decline]')?.addEventListener('click', function () { saveConsent('denied'); });
+      document.querySelectorAll('[data-analytics-settings]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          if (banner) banner.hidden = false;
+        });
+      });
+
+      document.addEventListener('click', function (event) {
+        var target = event.target instanceof Element ? event.target.closest('[data-analytics-event]') : null;
+        if (!target) return;
+        var params = {};
+        Object.keys(target.dataset).forEach(function (key) {
+          if (key !== 'analyticsEvent' && key.indexOf('analytics') === 0) {
+            var name = key.slice(9);
+            name = name.charAt(0).toLowerCase() + name.slice(1);
+            params[name.replace(/[A-Z]/g, function (m) { return '_' + m.toLowerCase(); })] = target.dataset[key];
+          }
+        });
+        window.taTrack(target.dataset.analyticsEvent, params);
+      });
+
+      document.addEventListener('submit', function (event) {
+        var form = event.target;
+        if (!(form instanceof HTMLFormElement)) return;
+        try {
+          if (/(^|\.)(kit|convertkit)\.com$/.test(new URL(form.action, location.href).hostname)) {
+            window.taTrack('newsletter_signup', { form_location: location.pathname });
+          }
+        } catch (e) {}
+      }, true);
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready, { once: true });
+    else ready();
+  })();
+</script>
+
+<style is:global>
+  .analytics-consent {
+    position: fixed; z-index: 10020; inset-inline: 18px; bottom: 18px;
+    max-width: 760px; margin-inline: auto; padding: 18px 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    border: 1px solid var(--line-strong); border-radius: var(--r-lg);
+    background: color-mix(in srgb, var(--surface) 96%, transparent);
+    box-shadow: 0 20px 55px rgba(0,0,0,.35); backdrop-filter: blur(12px);
+  }
+  .analytics-consent[hidden] { display: none; }
+  .analytics-consent strong { display: block; margin-bottom: 4px; color: var(--ink); font-size: 15px; }
+  .analytics-consent p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+  .analytics-consent a { color: var(--cyan); font-size: 12px; }
+  .analytics-consent-actions { display: flex; flex-shrink: 0; gap: 8px; }
+  .analytics-consent-actions .btn { min-height: 40px; padding: 8px 16px; }
+  @media (max-width: 640px) {
+    .analytics-consent { align-items: stretch; flex-direction: column; gap: 13px; padding: 16px; }
+    .analytics-consent-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  }
+</style>
