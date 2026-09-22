@@ -13,7 +13,7 @@ tags:
   - Boundary Value Analysis
   - Security Testing
   - Testing بالعربي
-cover: /uploads/ChatGPT Image Sep 12, 2026, 06_40_32 PM.png
+cover: /uploads/chatgpt-image-sep-12-2026-06-40-32-pm.png
 featured: false
 draft: false
 ---

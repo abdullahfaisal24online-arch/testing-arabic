@@ -22,7 +22,7 @@ tags:
   - CT-MAT
   - اختبار الموبايل
   - شهادات
-cover: /uploads/ChatGPT Image Sep 13, 2026, 04_11_44 PM.png
+cover: /uploads/chatgpt-image-sep-13-2026-04-11-44-pm.png
 draft: false
 product: ''
 ---

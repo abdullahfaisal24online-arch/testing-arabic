@@ -9,9 +9,9 @@ audience: مالكو المنتجات (Product Owners)، مهندسو ضمان �
 format: Word, PDF
 files:
   - label: User Story & Acceptance Criteria Template
-    url: /uploads/User Story & Acceptance Criteria Template.docx
+    url: /uploads/user-story-acceptance-criteria-template.docx
   - label: User Story & Acceptance Criteria Template
-    url: /uploads/User Story & Acceptance Criteria Template.pdf
+    url: /uploads/user-story-acceptance-criteria-template.pdf
 tags:
   - Agile
   - User Story

@@ -12,7 +12,7 @@ tags:
   - QA Scenarios
   - Functional Testing
   - Edge Cases
-cover: /uploads/ChatGPT Image Sep 12, 2026, 06_36_33 PM.png
+cover: /uploads/chatgpt-image-sep-12-2026-06-36-33-pm.png
 featured: false
 draft: false
 ---

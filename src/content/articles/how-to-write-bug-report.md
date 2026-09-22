@@ -11,7 +11,7 @@ tags:
   - Jira
   - الشدة والأولوية
   - مهارات المختبر
-cover: /uploads/ChatGPT Image Sep 12, 2026, 06_22_02 PM.png
+cover: /uploads/chatgpt-image-sep-12-2026-06-22-02-pm.png
 featured: false
 draft: false
 ---

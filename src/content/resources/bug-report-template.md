@@ -9,11 +9,11 @@ audience: أي مختبر بيكتب تذاكر Bug على Jira أو غيرها
 format: Word + PDF
 files:
   - label: نسخة Word بالعربي — للتعبئة والتعديل
-    url: /uploads/bug-report-template (1).docx
+    url: /uploads/bug-report-template-1.docx
   - label: نسخة Word بالانجليزي — للتعبئة والتعديل
-    url: /uploads/Bug Report Template (English Version).docx
+    url: /uploads/bug-report-template-english-version.docx
   - label: نسخة PDF - للقراءة والطباعة
-    url: /uploads/Bug Report Template (English Version).pdf
+    url: /uploads/bug-report-template-english-version.pdf
 tags:
   - تقرير Bug
   - Jira

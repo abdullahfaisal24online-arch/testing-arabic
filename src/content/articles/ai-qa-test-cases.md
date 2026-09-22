@@ -13,7 +13,7 @@ tags:
   - Prompts for QA
   - Software Testing
   - Testing بالعربي
-cover: /uploads/ChatGPT Image Sep 12, 2026, 06_50_59 PM.png
+cover: /uploads/chatgpt-image-sep-12-2026-06-50-59-pm.png
 featured: true
 draft: false
 ---

@@ -11,7 +11,7 @@ tags:
   - Regression
   - أساسيات الاختبار
   - ISTQB
-cover: /uploads/ChatGPT Image Sep 12, 2026, 06_05_10 PM.png
+cover: /uploads/chatgpt-image-sep-12-2026-06-05-10-pm.png
 featured: false
 draft: false
 ---

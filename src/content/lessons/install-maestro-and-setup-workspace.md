@@ -9,7 +9,7 @@ level: متقدّم
 duration: 16:40
 videoId: 03a7f26e-6445-469c-9dad-3093829c75aa
 youtubeUrl: ''
-thumbnail: /uploads/ep02_A_install (1).jpg
+thumbnail: /uploads/ep02-a-install-1.jpg
 course: maestro-mobile-automation
 order: 2
 lessonType: أدوات

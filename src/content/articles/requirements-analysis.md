@@ -13,7 +13,7 @@ tags:
   - Static Testing
   - Test Cases Creation
   - Testing بالعربي
-cover: /uploads/ChatGPT Image Sep 12, 2026, 06_45_43 PM.png
+cover: /uploads/chatgpt-image-sep-12-2026-06-45-43-pm.png
 featured: false
 draft: false
 ---

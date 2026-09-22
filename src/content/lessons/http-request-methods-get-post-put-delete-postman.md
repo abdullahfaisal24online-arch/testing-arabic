@@ -9,7 +9,7 @@ level: متقدّم
 duration: 19:30
 videoId: 76122f90-28c7-4cd8-abcb-805f1130d868
 youtubeUrl: ''
-thumbnail: /uploads/تعلم (3).png
+thumbnail: /uploads/http-request-methods-get-post-put-delete-postman-3.png
 course: postman-course
 order: 3
 lessonType: شرح

@@ -19,7 +19,7 @@ tags:
   - Mobile Automation
   - UI Testing
   - QA
-cover: /uploads/Untitled design.png
+cover: /uploads/untitled-design.png
 product: ''
 draft: false
 ---

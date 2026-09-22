@@ -3,7 +3,7 @@ title: جماعة الحوثي في اليمن حاولت استخدام Claude 
 slug: anthropic-claude-yemen-guided-missiles
 description: كشفت Anthropic عن محاولة جهة مسلحة مقرها شمال اليمن استخدام Claude Code لتطوير برمجيات مرتبطة بتوجيه وملاحة والتحكم في صواريخ، مع رصد محاولات أخرى لاستغلال الذكاء الاصطناعي في أنشطة عسكرية وأمنية حساسة.
 publishDate: 2026-09-15
-cover: /uploads/ChatGPT Image Sep 14, 2026, 02_43_39 PM.png
+cover: /uploads/chatgpt-image-sep-14-2026-02-43-39-pm.png
 pinned: false
 draft: false
 ---

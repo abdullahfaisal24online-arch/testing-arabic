@@ -11,7 +11,7 @@ tags:
   - Test Plan
   - أساسيات الاختبار
   - ISTQB
-cover: /uploads/ChatGPT Image Sep 12, 2026, 06_10_34 PM.png
+cover: /uploads/chatgpt-image-sep-12-2026-06-10-34-pm.png
 featured: false
 draft: false
 ---

@@ -3,7 +3,7 @@ title: 'سباق الجيل الجديد: إطلاق نماذج AI متخصصة 
 slug: next-gen-ai-models-coding-research-advancements
 description: إطلاق سلسلة من النماذج المتقدمة بالذكاء الاصطناعي والمصممة خصيصاً للمهام البرمجية والبحثية المعقدة لتجاوز حدود المحادثات التقليدية.
 publishDate: 2026-09-16
-cover: /uploads/ChatGPT Image Sep 16, 2026, 11_33_02 PM.png
+cover: /uploads/chatgpt-image-sep-16-2026-11-33-02-pm.png
 pinned: false
 draft: false
 ---

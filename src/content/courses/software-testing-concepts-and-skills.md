@@ -22,7 +22,7 @@ tags:
   - Software Quality
   - QA Fundamentals
   - Bug Life Cycle
-cover: /uploads/ChatGPT Image Sep 13, 2026, 03_42_37 PM.png
+cover: /uploads/chatgpt-image-sep-13-2026-03-42-37-pm.png
 draft: false
 product: ''
 ---

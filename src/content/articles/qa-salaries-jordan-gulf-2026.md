@@ -11,7 +11,7 @@ tags:
   - الأردن
   - الخليج
   - تفاوض الراتب
-cover: /uploads/ChatGPT Image Sep 12, 2026, 06_25_59 PM.png
+cover: /uploads/chatgpt-image-sep-12-2026-06-25-59-pm.png
 featured: false
 draft: false
 ---

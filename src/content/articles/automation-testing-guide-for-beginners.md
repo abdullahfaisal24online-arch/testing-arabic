@@ -9,7 +9,7 @@ tags:
   - Automation Testing
   - Manual Testing
   - أتمتة
-cover: /uploads/ChatGPT Image Sep 16, 2026, 10_11_54 AM.png
+cover: /uploads/chatgpt-image-sep-16-2026-10-11-54-am.png
 featured: false
 draft: false
 ---

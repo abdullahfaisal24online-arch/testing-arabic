@@ -9,7 +9,7 @@ level: مبتدئ
 duration: 08:15
 videoId: db1e7f49-8d4e-4007-a937-ac41c10e1f05
 youtubeUrl: ''
-thumbnail: /uploads/ChatGPT Image Sep 14, 2026, 03_54_28 PM.png
+thumbnail: /uploads/chatgpt-image-sep-14-2026-03-54-28-pm.png
 course: qa-fundamentals-and-practical-skills
 order: 1
 lessonType: شرح

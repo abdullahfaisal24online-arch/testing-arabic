@@ -9,7 +9,7 @@ level: متقدّم
 duration: 13:26
 videoId: db7fd413-7bc1-43d2-b09c-56e7922fbe45
 youtubeUrl: ''
-thumbnail: /uploads/تعلم (2).png
+thumbnail: /uploads/create-mock-api-using-json-server-postman-2.png
 course: postman-course
 order: 2
 lessonType: عملي

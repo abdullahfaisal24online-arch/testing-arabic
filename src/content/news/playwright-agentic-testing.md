@@ -3,7 +3,7 @@ title: 'Playwright صار Agentic: وكلاء اختبار جاهزين وأدو
 slug: playwright-agentic-testing
 description: Playwright أضافت Test Agents (planner و generator و healer) وأدوات موجّهة للوكلاء مثل Screencast API و debug=cli وأوامر trace — وشو يعني هذا لشغل المختبر.
 publishDate: 2026-09-07
-cover: /uploads/ChatGPT Image Sep 12, 2026, 07_03_14 PM.png
+cover: /uploads/chatgpt-image-sep-12-2026-07-03-14-pm.png
 pinned: false
 draft: false
 ---

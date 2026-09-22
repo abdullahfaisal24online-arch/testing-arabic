@@ -11,7 +11,7 @@ tags:
   - Test Design
   - مهارات الاختبار
   - ISTQB
-cover: /uploads/ChatGPT Image Sep 12, 2026, 06_18_26 PM.png
+cover: /uploads/chatgpt-image-sep-12-2026-06-18-26-pm.png
 featured: false
 draft: false
 ---

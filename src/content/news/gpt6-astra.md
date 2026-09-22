@@ -3,7 +3,7 @@ title: GPT-6 Astra / العصر الجديد
 slug: GPT6-Astra
 description: 'أوبن إيه آي تطلق "GPT-6 Astra": قفزة تاريخية في الذكاء الاصطناعي والاستدلال البرمجي'
 publishDate: 2026-09-10
-cover: /uploads/ChatGPT Image Sep 12, 2026, 07_06_47 PM.png
+cover: /uploads/chatgpt-image-sep-12-2026-07-06-47-pm.png
 pinned: false
 draft: false
 ---

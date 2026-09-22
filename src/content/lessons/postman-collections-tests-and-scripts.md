@@ -9,7 +9,7 @@ level: متقدّم
 duration: 24:01
 videoId: ddcabda2-55ae-4600-8738-5ddfe16e3b1f
 youtubeUrl: ''
-thumbnail: /uploads/تعلم (4).png
+thumbnail: /uploads/postman-collections-tests-and-scripts-4.png
 course: postman-course
 order: 4
 lessonType: عملي

@@ -11,7 +11,7 @@ tags:
   - بداية المسار
   - خطة تعلّم
   - ISTQB
-cover: /uploads/ChatGPT Image Sep 12, 2026, 06_20_10 PM.png
+cover: /uploads/chatgpt-image-sep-12-2026-06-20-10-pm.png
 featured: true
 draft: false
 ---

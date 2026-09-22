@@ -11,7 +11,7 @@ tags:
   - Boundary Value Analysis
   - Decision Table
   - ISTQB
-cover: /uploads/ChatGPT Image Sep 12, 2026, 06_13_25 PM.png
+cover: /uploads/chatgpt-image-sep-12-2026-06-13-25-pm.png
 featured: false
 draft: false
 ---

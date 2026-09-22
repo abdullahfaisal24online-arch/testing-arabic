@@ -11,7 +11,7 @@ tags:
   - Jira
   - أساسيات الاختبار
   - ISTQB
-cover: /uploads/ChatGPT Image Sep 12, 2026, 06_00_49 PM.png
+cover: /uploads/chatgpt-image-sep-12-2026-06-00-49-pm.png
 featured: false
 draft: false
 ---

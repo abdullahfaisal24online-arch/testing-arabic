@@ -11,7 +11,7 @@ tags:
   - تقنيات تصميم الاختبار
   - معايير القبول
   - مهارات المختبر
-cover: /uploads/ChatGPT Image Sep 12, 2026, 06_23_54 PM.png
+cover: /uploads/chatgpt-image-sep-12-2026-06-23-54-pm.png
 featured: false
 draft: false
 ---

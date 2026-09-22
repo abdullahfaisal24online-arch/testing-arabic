@@ -3,7 +3,7 @@ title: ISTQB تصدر منهج CT-AI نسخة 2.0 — تركيز كامل على
 slug: istqb-ct-ai-v2
 description: 'ISTQB أصدرت نسخة 2.0 من منهج CT-AI: هيكل مختصر بثلاث أيام تدريب، إزالة موضوع «استخدام الذكاء الاصطناعي بالاختبار»، وأقسام جديدة لاختبار الذكاء التوليدي و LLM.'
 publishDate: 2026-09-07
-cover: /uploads/ChatGPT Image Sep 12, 2026, 07_01_47 PM.png
+cover: /uploads/chatgpt-image-sep-12-2026-07-01-47-pm.png
 pinned: false
 draft: false
 ---

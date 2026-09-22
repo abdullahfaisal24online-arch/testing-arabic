@@ -9,7 +9,7 @@ level: متقدّم
 duration: 10:04
 videoId: 0c24627b-0451-42e5-9be4-efd3f75024a9
 youtubeUrl: ''
-thumbnail: /uploads/تعلم (1).png
+thumbnail: /uploads/introduction-to-apis-and-postman-1.png
 course: postman-course
 order: 1
 lessonType: شرح

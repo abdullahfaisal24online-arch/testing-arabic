@@ -9,7 +9,7 @@ level: متوسط
 duration: 32:38
 videoId: 80e680c1-7890-498d-a286-48d901806bc1
 youtubeUrl: ''
-thumbnail: /uploads/Mobile Application Testing (CT-MAT) (1).png
+thumbnail: /uploads/mobile-application-testing-ct-mat-1.png
 course: istqb-ct-mat
 order: 2
 lessonType: شرح

@@ -9,9 +9,9 @@ audience: مهندسو ضمان الجودة (QA Engineers)، مصممو واج�
 format: Word, PDF
 files:
   - label: (Usability & Accessibility Checklist)
-    url: /uploads/(Usability & Accessibility Checklist).docx
+    url: /uploads/usability-accessibility-checklist.docx
   - label: (Usability & Accessibility Checklist)
-    url: /uploads/(Usability & Accessibility Checklist).pdf
+    url: /uploads/usability-accessibility-checklist.pdf
 tags:
   - Accessibility
   - Usability

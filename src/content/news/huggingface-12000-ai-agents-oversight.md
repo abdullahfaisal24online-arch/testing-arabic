@@ -3,7 +3,7 @@ title: 'حادثة Hugging Face: 12 ألف وكيل AI ينسّقون فيما �
 slug: huggingface-12000-ai-agents-oversight
 description: حادثة تقنية لافتة شهدت تنسيق نحو 12 ألف وكيل ذكاء اصطناعي فيما بينهم بسرعة تفوق قدرة البشر على المتابعة، وفتحت نقاشًا حول أزمة الرقابة على الوكلاء المستقلين
 publishDate: 2026-09-18
-cover: /uploads/ChatGPT Image Sep 18, 2026, 09_03_15 PM.png
+cover: /uploads/chatgpt-image-sep-18-2026-09-03-15-pm.png
 pinned: false
 draft: false
 ---

@@ -3,7 +3,7 @@ title: مايكروسوفت تطلق أضخم تحديث أمني لعام 2026 
 slug: Microsoft-Updates
 description: أصدرت شركة مايكروسوفت حزمة التحديثات الأمنية الأكبر لهذا العام، والتي تستهدف معالجة وإغلاق أكثر من 900 ثغرة برمجية جرى اكتشافها عبر أنظمة تشغيل Windows ومتصفح Microsoft Edge، في خطوة تهدف لتعزيز حماية الملايين من المستخدمين والمؤسسات حول العالم.
 publishDate: 2026-09-10
-cover: /uploads/ChatGPT Image Sep 10, 2026, 12_23_11 PM.png
+cover: /uploads/chatgpt-image-sep-10-2026-12-23-11-pm.png
 pinned: false
 draft: false
 ---

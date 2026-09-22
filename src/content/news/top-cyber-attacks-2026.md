@@ -3,7 +3,7 @@ title: 'أخطر الاختراقات السيبرانية في 2026: بيانا
 slug: top-cyber-attacks-2026
 description: قائمة ملخصة لأبرز وأخطر الاختراقات والحروب السيبرانية والهجمات الهجينة في عام 2026، والتي طالت البنى التحتية، الأجهزة الطبية، وأنظمة الذكاء الاصطناعي.
 publishDate: 2026-09-16
-cover: /uploads/ChatGPT Image Sep 16, 2026, 12_25_54 PM.png
+cover: /uploads/chatgpt-image-sep-16-2026-12-25-54-pm.png
 pinned: false
 draft: false
 ---
