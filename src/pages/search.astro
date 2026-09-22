@@ -58,6 +58,8 @@ import Icon from '../components/Icon.astro';
   const hint = document.getElementById('hint');
   let items: Item[] = [];
   let loaded = false;
+  let analyticsTimer: number | undefined;
+  let lastTrackedQuery = '';
 
   const normalize = (s: string) =>
     s
@@ -142,6 +144,14 @@ import Icon from '../components/Icon.astro';
         </a></li>`
       )
       .join('');
+
+    window.clearTimeout(analyticsTimer);
+    analyticsTimer = window.setTimeout(() => {
+      if (nq === lastTrackedQuery) return;
+      lastTrackedQuery = nq;
+      const safeTerm = nq.includes('@') ? '[redacted]' : nq.slice(0, 80);
+      (window as any).taTrack?.('search', { search_term: safeTerm, result_count: hits.length });
+    }, 700);
   }
 
   input?.addEventListener('input', async () => {
