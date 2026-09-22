@@ -9,6 +9,7 @@
   (function () {
     function openStoreSoon() {
       if (document.getElementById('storeSoon')) return;
+      window.taTrack && window.taTrack('store_interest', { source: location.pathname });
       var o = document.createElement('div');
       o.id = 'storeSoon';
       o.innerHTML =
