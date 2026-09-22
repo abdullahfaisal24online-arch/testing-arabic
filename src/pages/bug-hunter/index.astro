@@ -362,6 +362,7 @@ const jsonLd = {
       if (mode === 'challenge' && !muted) unlockAudio();
       resetGame();
       active = true;
+      window.taTrack?.('bug_hunter_start', { mode: selectedMode, bug_count: settings.bugs.length });
       document.body.classList.add('bug-hunter-active');
       mission.hidden = true; results.hidden = true; gameScreen.hidden = false;
       byId('timer-stat').hidden = mode !== 'challenge';
@@ -371,7 +372,7 @@ const jsonLd = {
         startMusic();
         timer = setInterval(() => {
           remaining -= 1; updateHud();
-          if (remaining <= 0) finishGame();
+          if (remaining <= 0) finishGame('timeout');
         }, 1000);
       }
     };
@@ -469,11 +470,11 @@ const jsonLd = {
     const closeQuestion = () => {
       if (layer.hidden) return;
       layer.hidden = true; document.body.classList.remove('modal-open');
-      if (answered.size === settings.bugs.length) finishGame();
+      if (answered.size === settings.bugs.length) finishGame('completed');
       else currentBug = null;
     };
 
-    const finishGame = () => {
+    const finishGame = (reason = 'completed') => {
       if (!active) return;
       active = false; clearInterval(timer); stopMusic(); layer.hidden = true;
       document.body.classList.remove('modal-open', 'bug-hunter-active');
@@ -482,6 +483,9 @@ const jsonLd = {
       localStorage.setItem(storageKey, String(best));
       const ranks = [...settings.ranks].sort((a, b) => a.min - b.min);
       const rank = ranks.filter((item) => correct >= item.min).at(-1)?.label || 'QA Intern';
+      window.taTrack?.(reason === 'manual_exit' ? 'bug_hunter_exit' : 'bug_hunter_complete', {
+        mode, reason, score, correct, answered: answered.size, bug_count: settings.bugs.length,
+      });
       byId('result-rank').textContent = rank;
       byId('result-score').textContent = String(score);
       byId('result-correct').textContent = String(correct);
@@ -506,7 +510,7 @@ const jsonLd = {
 
     document.querySelectorAll('[data-start-mode]').forEach((button) => button.addEventListener('click', () => startGame(button.dataset.startMode)));
     markers.forEach((marker) => marker.addEventListener('click', () => openQuestion(marker.dataset.bug)));
-    byId('end-game').addEventListener('click', finishGame);
+    byId('end-game').addEventListener('click', () => finishGame('manual_exit'));
     byId('continue-game').addEventListener('click', closeQuestion);
     byId('modal-close').addEventListener('click', closeQuestion);
     layer.addEventListener('click', (event) => { if (event.target === layer) closeQuestion(); });
