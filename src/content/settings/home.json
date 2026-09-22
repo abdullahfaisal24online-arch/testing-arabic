@@ -26,7 +26,7 @@
   "statLessonsLabel": "دروس",
   "statCoursesLabel": "دورات",
   "statArticlesLabel": "مقالات",
-  "showWelcome": true,
+  "showWelcome": false,
   "welcomeVideoId": "",
   "welcomeTitle": "عن المنصة ورسالتنا",
   "welcomeText": "نسعى لتمكين المهندسين والمبتدئين من إتقان جودة البرمجيات وتطوير مهاراتهم عبر محتوى عربي عملي ومبسط.",
