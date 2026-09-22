@@ -89,7 +89,12 @@ const jsonLd = [
           <div><b>{data.level}</b><span>المستوى</span></div>
         </div>
         {lessons.length > 0 && (
-          <a class="btn btn-primary" href={`/lessons/${lessons[0].id}/`}>
+          <a
+            class="btn btn-primary"
+            href={`/lessons/${lessons[0].id}/`}
+            data-analytics-event="course_start"
+            data-analytics-course-id={course.id}
+          >
             ابدأ الدورة <Icon name="arrow" size={19} />
           </a>
         )}
