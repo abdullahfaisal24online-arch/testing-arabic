@@ -220,6 +220,8 @@ const site = defineCollection({
     author: optString,
     youtube: optString,
     linkedin: optString,
+    facebook: optString,
+    instagram: optString,
     email: optString,
     newsletterAction: optString,
     newsletterField: optString,
