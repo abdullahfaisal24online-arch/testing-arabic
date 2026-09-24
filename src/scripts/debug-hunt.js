@@ -149,6 +149,44 @@ function buildGrass() {
   return c;
 }
 
+
+/* ===================== حاوية الزبالة + الصورة القديمة ===================== */
+const BIN = { x: 287, y: 85, w: 24, h: 26 };
+function buildBin() {
+  const c = makeCanvas(32, 34), g = c.getContext('2d');
+  const o = '#1c2533', body = '#5b6b80', rid = '#46546a', hi = '#8193ab', lid = '#6d7f98';
+  // زبالة طالعة من فوق
+  px(g, 6, 2, 6, 3, '#f7c948'); px(g, 5, 3, 2, 3, '#f7c948'); px(g, 12, 1, 2, 3, '#e8d9a8');   // قشرة موز
+  px(g, 15, 1, 7, 4, '#e9eef5'); px(g, 16, 2, 5, 1, '#b9c4d3');                                 // ورقة
+  px(g, 22, 3, 4, 3, '#6b4a2e');                                                                 // علبة
+  // الغطا (مايل شوي ومفتوح)
+  px(g, 2, 5, 28, 3, o); px(g, 3, 5, 26, 2, lid); px(g, 3, 5, 26, 1, hi); px(g, 13, 3, 6, 2, o); px(g, 14, 3, 4, 1, lid);
+  // الجسم
+  px(g, 4, 8, 24, 26, o); px(g, 5, 8, 22, 25, body);
+  for (let x = 8; x < 26; x += 5) px(g, x, 10, 2, 21, rid);
+  px(g, 6, 9, 2, 22, hi);
+  px(g, 5, 31, 22, 2, '#3a4658');
+  return c;
+}
+function buildDefaultPhoto() {
+  // صورة قديمة افتراضية (شخص pixel بألوان sepia) لو ما في صورة من الـ CMS
+  const c = makeCanvas(16, 18), g = c.getContext('2d');
+  px(g, 0, 0, 16, 18, '#c9a877'); px(g, 3, 4, 10, 12, '#a47d4d'); px(g, 5, 3, 6, 6, '#e1c294'); px(g, 5, 2, 6, 2, '#5a3b22');
+  px(g, 6, 5, 1, 1, '#3a2616'); px(g, 9, 5, 1, 1, '#3a2616'); px(g, 7, 7, 2, 1, '#8a5a3a'); px(g, 4, 10, 8, 6, '#6b4a2e');
+  return c;
+}
+function pixelatePhoto(img) {
+  // نصغّر الصورة لـ 16x18 (crop من النص) ونعطيها لون قديم
+  const tw = 16, th = 18, c = makeCanvas(tw, th), g = c.getContext('2d');
+  const r = img.naturalWidth / img.naturalHeight, tr = tw / th;
+  let sw = img.naturalWidth, sh = img.naturalHeight, sx = 0, sy = 0;
+  if (r > tr) { sw = sh * tr; sx = (img.naturalWidth - sw) / 2; } else { sh = sw / tr; sy = (img.naturalHeight - sh) * 0.3; }
+  g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+  try { g.filter = 'sepia(.55) contrast(1.15) saturate(.9)'; } catch { /* */ }
+  g.drawImage(img, sx, sy, sw, sh, 0, 0, tw, th);
+  return c;
+}
+
 /* ===================== الصوت (Web Audio) ===================== */
 const NOTE = (base, semi) => base * Math.pow(2, semi / 12);
 class Audio8 {
@@ -195,6 +233,8 @@ class Audio8 {
   laugh() { [520, 440, 520, 440, 520].forEach((f, i) => this.tone(f, 0.06, { when: i * 0.085, vol: 0.08 })); }
   happy() { [784, 988].forEach((f, i) => this.tone(f, 0.07, { when: i * 0.08, vol: 0.07, type: 'triangle' })); }
   fanfare() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, i === 3 ? 0.4 : 0.12, { when: i * 0.12, vol: 0.1 })); }
+  trash() { this.noise(0.18, { vol: 0.25, hp: 200 }); this.tone(300, 0.35, { type: 'triangle', slide: 70, vol: 0.12, when: 0.05 }); [660, 880].forEach((f, i) => this.tone(f, 0.07, { when: 0.35 + i * 0.07, vol: 0.07 })); }
+  buzz() { this.tone(210, 0.18, { type: 'sawtooth', slide: 190, vol: 0.05 }); this.tone(230, 0.18, { type: 'sawtooth', slide: 205, vol: 0.04, when: 0.03 }); }
   gameOver() { [392, 330, 262, 196].forEach((f, i) => this.tone(f, 0.22, { when: i * 0.2, vol: 0.1, type: 'triangle' })); }
   // ---- الموسيقى التفاعلية ----
   startMusic(tempo) {
@@ -235,7 +275,19 @@ export function initDebugHunt(root) {
   const titleEl = ui('#dh-title'), reportEl = ui('#dh-report'), bannerEl = ui('#dh-banner'), rotateEl = ui('#dh-rotate'), pauseEl = ui('#dh-pause');
   const cabinet = ui('.dh-cabinet');
   const audio = new Audio8();
-  const bg = buildBackground(), grass = buildGrass();
+  const bg = buildBackground(), grass = buildGrass(), binSprite = buildBin();
+  const trashOn = root.dataset.trashEnabled !== 'false';
+  const trashPoints = Number(root.dataset.trashPoints) > 0 ? Number(root.dataset.trashPoints) : 50;
+  let photoSprite = buildDefaultPhoto();
+  if (trashOn && root.dataset.trashPhoto) {
+    const im = new Image(); im.decoding = 'async';
+    im.onload = () => { try { photoSprite = pixelatePhoto(im); } catch { /* نضل على الافتراضية */ } };
+    im.src = root.dataset.trashPhoto;
+  }
+  const trash = { state: 'hang', t: 0, ang: -0.22, y: 0, vy: 0, jolt: 3 + Math.random() * 2, scatter: 0,
+    flies: Array.from({ length: 4 }, (_, i) => ({ a: i * 1.6, r: rand(5, 11), sp: rand(2.2, 3.6), h: rand(4, 12) })) };
+  const photoCenter = () => ({ x: BIN.x + 12, y: BIN.y + 14 + trash.y });
+  const flyPos = (f) => ({ x: BIN.x + 12 + Math.cos(f.a) * (f.r + trash.scatter * 14), y: BIN.y - 4 - f.h * 0.6 + Math.sin(f.a * 1.7) * 3 - trash.scatter * 10 });
   const coarse = window.matchMedia('(pointer: coarse)').matches;
 
   const S = {
@@ -277,6 +329,7 @@ export function initDebugHunt(root) {
   const tempo = () => Math.min(176, 120 + 8 * (S.sprint - 1));
   function startSprint() { S.statuses = Array(10).fill('pending'); S.cursor = 0; audio.tempo = tempo(); audio.intense = false; nextWave(); }
   function nextWave() {
+    if (trashOn && trash.state === 'gone') { trash.state = 'hang'; trash.y = -30; trash.vy = 0; trash.t = 0; trash.jolt = 2; }
     const remaining = 10 - S.cursor;
     if (remaining <= 0) return endSprint();
     const n = Math.min(2, remaining);
@@ -372,6 +425,14 @@ export function initDebugHunt(root) {
       S.butterfly.state = 'hit'; S.butterfly.t = 0;
       popup(S.butterfly.x - 10, S.butterfly.y - 4, '-50 REGRESSION!', '#38bdf8');
       audio.error(); S.shake = 0.25;
+    } else if (trashOn && trash.state === 'hang' && Math.hypot(photoCenter().x - p.x, photoCenter().y - p.y) < R) {
+      const pts = Math.round((trashPoints * cfg(S.sprint).mult) / 5) * 5;
+      S.score += pts; trash.state = 'fall'; trash.t = 0; trash.vy = -60; trash.scatter = 1;
+      popup(BIN.x - 72, BIN.y - 12, `+${pts} CLEANUP!`, '#34d399');
+      audio.trash(); S.shake = 0.15;
+    } else if (trashOn && trash.flies.some((f) => { const q = flyPos(f); return Math.hypot(q.x - p.x, q.y - p.y) < 5; })) {
+      popup(BIN.x - 150, BIN.y - 22, "IT'S A FLY, NOT A BUG!", '#c9d6ea');
+      audio.buzz(); trash.scatter = 1; S.combo = 0; audio.combo = false;
     } else {
       S.combo = 0; audio.combo = false;
     }
@@ -384,6 +445,7 @@ export function initDebugHunt(root) {
     S.popups.forEach((p) => { p.t += dt; p.y -= dt * 14; }); S.popups = S.popups.filter((p) => p.t < 1.1);
     if (S.toast) { S.toast.t += dt; if (S.toast.t > 1.8) S.toast = null; }
     if (S.aim.t > 0) S.aim.t -= dt;
+    if (trashOn) updateTrash(dt);
 
     if (S.mode === 'title') {
       if (S.bugs.length < 3) S.bugs.push(newBug(true));
@@ -422,6 +484,41 @@ export function initDebugHunt(root) {
       T.y = GROUND + 4 - up * 34;
       if (T.t > 1.4) { S.testo = null; if (!S.butterfly || S.butterfly.state !== 'fly') { nextWave(); } else { S.butterfly = null; nextWave(); } }
     }
+  }
+  function updateTrash(dt) {
+    trash.t += dt; trash.scatter = Math.max(0, trash.scatter - dt * 0.8);
+    trash.flies.forEach((f) => { f.a += f.sp * dt * (1 + trash.scatter * 2); });
+    if (trash.state === 'hang' && trash.y < 0) { trash.y = Math.min(0, trash.y + dt * 60); }
+    if (trash.state === 'hang' && trash.y >= 0) {
+      trash.jolt -= dt;
+      // بتتمرجح، وكل كم ثانية بتنزل شوي كأنها رح توقع
+      const j = trash.jolt < 0 ? Math.max(0, 1 + trash.jolt / 0.6) : 0;
+      trash.ang = -0.22 + Math.sin(trash.t * 2.3) * 0.05 - j * 0.35;
+      trash.y = j * 2;
+      if (trash.jolt < -0.6) trash.jolt = rand(3, 5.5);
+    } else if (trash.state === 'fall') {
+      trash.vy += 300 * dt; trash.y += trash.vy * dt; trash.ang += dt * 7;
+      if (trash.y > 26) { trash.state = 'gone'; trash.t = 0; }
+    }
+  }
+  function drawTrash() {
+    g.drawImage(binSprite, BIN.x - 4, BIN.y - 8);
+    if (trash.state !== 'gone') {
+      const c = photoCenter();
+      g.save(); g.translate(Math.round(c.x), Math.round(c.y)); g.rotate(trash.ang);
+      g.fillStyle = '#efe6d2'; g.fillRect(-10, -11, 20, 22);                // إطار الصورة
+      g.drawImage(photoSprite, -8, -10, 16, 18);
+      g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(-10, 10, 20, 1);
+      if (trash.state === 'hang') { g.fillStyle = 'rgba(240,246,255,.75)'; g.fillRect(4, -13, 8, 3); }   // لزقة بزاوية وحدة
+      g.restore();
+    }
+  }
+  function drawFlies() {
+    trash.flies.forEach((f, i) => {
+      const q = flyPos(f), x = Math.round(q.x), y = Math.round(q.y);
+      px(g, x, y, 2, 2, '#0b0f16');
+      if (Math.floor(S.t * 20 + i) % 2) { g.globalAlpha = .6; px(g, x - 1, y - 1, 1, 1, '#cfe9ff'); px(g, x + 2, y - 1, 1, 1, '#cfe9ff'); g.globalAlpha = 1; }
+    });
   }
   function moveBug(b, dt, demo) {
     b.turn -= dt;
@@ -476,12 +573,14 @@ export function initDebugHunt(root) {
     g.save();
     if (S.shake > 0) g.translate(Math.round(rand(-2, 2)), Math.round(rand(-1, 1)));
     g.drawImage(bg, 0, 0);
+    if (trashOn) drawTrash();
     if (S.testo) {
       const T = S.testo;
       testoSprite(g, T.x, T.y, T.laugh);
       T.hold.forEach((gold, i) => sprite(g, LB, gold ? PAL.gold : PAL.red, T.x + 18 + i * 12, T.y - 12));
     }
     g.drawImage(grass, 0, 0);
+    if (trashOn) drawFlies();
     if (S.butterfly) { const bf = S.butterfly; sprite(g, Math.floor(bf.t * 8) % 2 ? BF : BF_CLOSED, BF_PAL, bf.x, bf.y, bf.state === 'hit'); if (bf.state === 'fly') text(g, 'FEATURE', bf.x - 8, bf.y - 11, '#38bdf8'); }
     S.bugs.forEach((b) => { if (b.state !== 'done') drawBug(b); });
     S.popups.forEach((p) => { g.globalAlpha = clamp(1.2 - p.t, 0, 1); text(g, p.text, p.x, p.y, p.col); g.globalAlpha = 1; });
