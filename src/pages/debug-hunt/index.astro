@@ -35,6 +35,7 @@ const jsonLd = {
         <div class="dh-screen">
           <canvas id="dh-canvas" width="320" height="180" aria-label="شاشة لعبة Debug Hunt" role="img"></canvas>
           <div class="dh-photo" id="dh-photo" hidden aria-hidden="true"><img alt="" decoding="async" /></div>
+          <canvas id="dh-fx" width="320" height="180" aria-hidden="true"></canvas>
 
           <div class="dh-layer dh-title" id="dh-title">
             <div class="dh-logo px">DEBUG HUNT</div>
@@ -85,6 +86,8 @@ const jsonLd = {
           <button type="button" class="ctl" id="dh-sfx" aria-pressed="true"><i>🔈</i> <span>المؤثرات</span></button>
           <button type="button" class="ctl" id="dh-music" aria-pressed="true"><i>🎵</i> <span>الموسيقى</span></button>
           <button type="button" class="ctl" id="dh-fs" aria-pressed="false"><i>⛶</i> <span>ملء الشاشة</span></button>
+          <button type="button" class="ctl ctl-quit" id="dh-quit" hidden><i>⏹</i> <span>إنهاء اللعبة</span></button>
+          <a class="ctl ctl-home" href="/"><i>🏠</i> <span>الرئيسية</span></a>
           <span class="best px" dir="ltr">BEST <b data-best>000000</b></span>
         </div>
       </div>
@@ -125,6 +128,7 @@ const jsonLd = {
     box-shadow: 0 30px 70px rgba(0,0,0,.45), 0 0 0 6px #060b16, 0 0 60px rgba(56,189,248,.15); }
   .dh-screen { position: relative; border-radius: 10px; overflow: hidden; border: 4px solid #060b16; aspect-ratio: 16/9; background: #070f1e; user-select: none; -webkit-user-select: none; }
   #dh-canvas { display: block; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; image-rendering: crisp-edges; touch-action: none; cursor: none; }
+  #dh-fx { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; image-rendering: crisp-edges; pointer-events: none; }
   .dh-layer { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #f0f6ff; }
   .dh-layer[hidden] { display: none; }
 
@@ -186,7 +190,10 @@ const jsonLd = {
   .dh-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 14px 6px 2px; }
   .ctl { font: inherit; font-size: 14px; font-weight: 600; padding: 7px 14px; border-radius: 10px; background: rgba(56,189,248,.1); border: 1px solid rgba(56,189,248,.3); color: #cfe6fb; cursor: pointer; }
   .ctl i { font-style: normal; }
-  .ctl[aria-pressed="false"] { opacity: .6; }
+  a.ctl { display: inline-flex; align-items: center; gap: 4px; text-decoration: none; }
+  .ctl-quit { border-color: rgba(255,107,107,.45); color: #ffb4b4; background: rgba(255,107,107,.08); }
+  .ctl-quit[hidden] { display: none; }
+  #dh-sfx[aria-pressed="false"], #dh-music[aria-pressed="false"] { opacity: .6; }
   .ctl[hidden] { display: none; }
   .best { margin-inline-start: auto; font-size: 12px; color: #8a9ebd; }
   .best b { color: #f6823b; font-weight: 400; }
