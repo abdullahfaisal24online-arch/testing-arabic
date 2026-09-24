@@ -535,20 +535,46 @@ export function initDebugHunt(root) {
   sfxBtn.addEventListener('click', () => { audio.init(); audio.setSfx(!audio.sfxOn); paintToggles(); });
   musicBtn.addEventListener('click', () => { audio.init(); audio.setMusic(!audio.musicOn); paintToggles(); });
   paintToggles();
-  const fsSupported = !!(cabinet.requestFullscreen || cabinet.webkitRequestFullscreen);
-  if (!fsSupported) fsBtn.hidden = true;
-  function enterFs() {
-    const req = cabinet.requestFullscreen || cabinet.webkitRequestFullscreen; if (!req) return;
-    Promise.resolve(req.call(cabinet)).then(() => { try { screen.orientation?.lock?.('landscape').catch(() => {}); } catch { /* */ } }).catch(() => {});
+  /* ملء الشاشة: الـ API الأصلي إذا موجود (Android/كمبيوتر)، وإلا "وضع اللعب" بالـ CSS
+     (iPhone Safari ما بيدعم fullscreen لأي عنصر غير الفيديو). */
+  const nativeFs = !!(cabinet.requestFullscreen || cabinet.webkitRequestFullscreen);
+  const fsLabel = fsBtn.querySelector('span');
+  const isNativeFs = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+  const isImmersive = () => document.body.classList.contains('dh-immersive');
+  const paintFs = () => {
+    const on = isNativeFs() || isImmersive();
+    fsBtn.querySelector('i').textContent = on ? '✕' : '⛶';
+    if (fsLabel) fsLabel.textContent = on ? 'خروج' : 'ملء الشاشة';
+    fsBtn.setAttribute('aria-pressed', String(on));
+  };
+  function enterImmersive() {
+    document.body.classList.add('dh-immersive');
+    window.scrollTo(0, 0);
+    paintFs();
   }
-  function exitFs() { (document.exitFullscreen || document.webkitExitFullscreen)?.call(document); }
-  fsBtn.addEventListener('click', () => { (document.fullscreenElement || document.webkitFullscreenElement) ? exitFs() : enterFs(); });
-  function goFullscreenOnMobile() { if (coarse && fsSupported && !document.fullscreenElement) enterFs(); }
+  function exitImmersive() { document.body.classList.remove('dh-immersive'); paintFs(); }
+  function enterFs() {
+    if (!nativeFs) return enterImmersive();
+    const req = cabinet.requestFullscreen || cabinet.webkitRequestFullscreen;
+    Promise.resolve(req.call(cabinet))
+      .then(() => { try { screen.orientation?.lock?.('landscape').catch(() => {}); } catch { /* */ } })
+      .catch(() => enterImmersive());
+  }
+  function exitFs() {
+    if (isNativeFs()) (document.exitFullscreen || document.webkitExitFullscreen)?.call(document);
+    exitImmersive();
+  }
+  fsBtn.addEventListener('click', () => { (isNativeFs() || isImmersive()) ? exitFs() : enterFs(); });
+  document.addEventListener('fullscreenchange', paintFs);
+  document.addEventListener('webkitfullscreenchange', paintFs);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isImmersive()) exitImmersive(); });
+  function goFullscreenOnMobile() { if (coarse && !isNativeFs() && !isImmersive()) enterFs(); }
+  paintFs();
 
   function maybeRotateHint() {
     const portrait = window.matchMedia('(orientation: portrait)').matches;
     let seen = false; try { seen = !!sessionStorage.getItem('dh_rot'); } catch { /* */ }
-    if (coarse && portrait && !seen && !document.fullscreenElement) { rotateEl.hidden = false; pause(true); }
+    if (coarse && portrait && !seen) { rotateEl.hidden = false; pause(true); }
   }
   ui('#dh-rot-ok').addEventListener('click', () => { try { sessionStorage.setItem('dh_rot', '1'); } catch { /* */ } rotateEl.hidden = true; resume(); });
   window.matchMedia('(orientation: landscape)').addEventListener?.('change', (e) => { if (e.matches && !rotateEl.hidden) { rotateEl.hidden = true; resume(); } });
