@@ -1,0 +1,24 @@
+<section class="section dh-strip-sec">
+  <div class="wrap">
+    <a class="dh-strip" href="/debug-hunt/">
+      <img src="/games/debug-hunt-preview.webp" alt="" aria-hidden="true" width="960" height="540" loading="lazy" decoding="async" />
+      <div class="dh-copy">
+        <span class="eyebrow">استراحة 60 ثانية 🎮</span>
+        <h2>Debug Hunt</h2>
+        <p>لعبة retro خفيفة: اصطاد الـ bugs قبل ما توصل Production، وانتبه لا تكسر feature 😅</p>
+      </div>
+      <span class="btn btn-primary dh-btn">العب هلأ ←</span>
+    </a>
+  </div>
+</section>
+<style>
+  .dh-strip-sec { padding-top: 0; }
+  .dh-strip { display: grid; grid-template-columns: 300px 1fr auto; gap: 28px; align-items: center; padding: 16px 28px 16px 16px;
+    border-radius: 20px; border: 2px solid rgba(56,189,248,.35); background: linear-gradient(90deg, #0c1629, #111f3a); color: #eaf3ff;
+    box-shadow: 0 0 0 5px #060b16 inset; }
+  .dh-strip:hover { border-color: #38bdf8; transform: translateY(-2px); }
+  .dh-strip img { width: 300px; aspect-ratio: 16/9; object-fit: cover; border-radius: 12px; border: 3px solid #060b16; image-rendering: pixelated; }
+  .dh-copy h2 { font-family: 'Press Start 2P', monospace; font-size: 24px; margin: 10px 0 8px; direction: ltr; text-align: right; }
+  .dh-copy p { color: #b9c9df; margin: 0; font-size: 16px; line-height: 1.8; }
+  @media (max-width: 800px) { .dh-strip { grid-template-columns: 1fr; padding: 14px; } .dh-strip img { width: 100%; } .dh-btn { justify-self: start; } }
+</style>
