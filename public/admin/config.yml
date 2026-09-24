@@ -1227,6 +1227,27 @@ collections:
             value_type: int
             min: 0
             default: 50
+          - name: showHomeCard
+            label: "إظهار كرت اللعبة بالرئيسية"
+            widget: boolean
+            default: true
+          - name: homeBadge
+            label: "شارة الكرت"
+            widget: string
+          - name: homeTitle
+            label: "عنوان الكرت"
+            widget: string
+          - name: homeText
+            label: "وصف الكرت"
+            widget: text
+          - name: homeCta
+            label: "نص زر الكرت"
+            widget: string
+          - name: homeMeta
+            label: "التفاصيل الصغيرة تحت الوصف"
+            widget: list
+            required: false
+            hint: "كل سطر بيطلع كشارة صغيرة (مثلاً: 60 ثانية)"
 
       - name: start
         label: "صفحة ابدأ من هنا"
