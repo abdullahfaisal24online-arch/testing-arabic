@@ -11,6 +11,10 @@ import Base from '../layouts/Base.astro';
       <a class="btn btn-ghost" href="/lessons/">كل الدروس</a>
       <a class="btn btn-ghost" href="/search/">بحث</a>
     </div>
+    <a class="nf-game" href="/debug-hunt/">
+      <span aria-hidden="true">🐞</span>
+      <span>الصفحة مش موجودة… بس لقينا <b>bugs</b> هون! <u>اصطادهم بـ Debug Hunt</u></span>
+    </a>
   </section>
 </Base>
 
@@ -18,4 +22,8 @@ import Base from '../layouts/Base.astro';
   .nf { display: grid; gap: 18px; justify-items: start; padding-block: 90px 110px; }
   .code { font-size: 15px; color: var(--cyan); letter-spacing: 2px; }
   .cta { display: flex; gap: 12px; flex-wrap: wrap; }
+  .nf-game { display: inline-flex; align-items: center; gap: 12px; margin-top: 10px; padding: 14px 20px; border-radius: 14px;
+    border: 1px dashed rgba(246,130,59,.6); background: rgba(246,130,59,.07); color: var(--ink-2); font-weight: 600; }
+  .nf-game b { color: #f6823b; } .nf-game u { color: #38bdf8; text-underline-offset: 4px; }
+  .nf-game span:first-child { font-size: 26px; }
 </style>

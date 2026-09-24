@@ -9,6 +9,7 @@ import NewsCard from '../components/NewsCard.astro';
 import ResourceCard from '../components/ResourceCard.astro';
 import Newsletter from '../components/Newsletter.astro';
 import BugHunterCard from '../components/BugHunterCard.astro';
+import DebugHuntStrip from '../components/DebugHuntStrip.astro';
 import OptimizedImage from '../components/OptimizedImage.astro';
 import { getSite, getHome, splitHighlight } from '../lib/site';
 import { bunnyThumb, bunnyEmbed } from '../lib/utils';
@@ -219,6 +220,7 @@ const jsonLd = [
 
   <!-- ===== لعبة Bug Hunter ===== -->
   {bugHunter?.enabled && bugHunter.showHomeCard && <BugHunterCard settings={bugHunter} />}
+  <DebugHuntStrip />
 
   <!-- ===== الدورات ===== -->
   {home.showCourses && courses.length > 0 && (
