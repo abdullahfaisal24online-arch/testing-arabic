@@ -1208,6 +1208,26 @@ collections:
                     label: "النوع أو المدة"
                     widget: string
 
+      - name: debugHunt
+        label: "لعبة Debug Hunt"
+        file: src/content/settings/debug-hunt.json
+        fields:
+          - name: trashEnabled
+            label: "إظهار حاوية الزبالة والصورة القديمة"
+            widget: boolean
+            default: true
+          - name: trashPhoto
+            label: "الصورة المعلّقة على الحاوية"
+            widget: image
+            required: false
+            hint: "أي صورة (يفضّل وجه أو لوغو بالنص). اللعبة بتحوّلها تلقائياً لـ pixel بلون قديم. سمّي الملف بالإنجليزي وبدون مسافات. إذا صورة شخص، خليها بموافقته 🙂 — فاضية = صورة افتراضية"
+          - name: trashPoints
+            label: "نقاط إسقاط الصورة"
+            widget: number
+            value_type: int
+            min: 0
+            default: 50
+
       - name: start
         label: "صفحة ابدأ من هنا"
         file: src/content/settings/start.json
