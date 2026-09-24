@@ -274,12 +274,26 @@ export function initDebugHunt(root) {
   const trashPoints = Number(root.dataset.trashPoints) > 0 ? Number(root.dataset.trashPoints) : 50;
   // الصورة المعلّقة: عنصر HTML فوق الـ canvas عشان تطلع واضحة بدقتها الأصلية (مش pixel)
   const photoEl = root.querySelector('#dh-photo'), photoImg = photoEl && photoEl.querySelector('img');
-  if (photoEl && trashOn) {
-    const src = root.dataset.trashPhoto;
-    if (src) { photoImg.src = src; photoImg.onerror = () => { photoImg.src = buildDefaultPhoto().toDataURL(); photoEl.classList.add('is-pixel'); }; }
-    else { photoImg.src = buildDefaultPhoto().toDataURL(); photoEl.classList.add('is-pixel'); }
-    photoEl.hidden = false;
+  // لكل Sprint صورة: 1 ← الصورة الأولى، 2 ← الثانية، 3 ← الثالثة، وبعدين بتلف من جديد.
+  // أي خانة فاضية بتاخد أول صورة موجودة، وإذا ما في ولا صورة بتطلع الافتراضية.
+  let photoSlots = [];
+  try { photoSlots = JSON.parse(root.dataset.trashPhotos || '[]'); } catch { photoSlots = []; }
+  if (!photoSlots.length && root.dataset.trashPhoto) photoSlots = [root.dataset.trashPhoto];
+  const photoList = photoSlots.filter(Boolean);
+  const defaultPhotoUrl = buildDefaultPhoto().toDataURL();
+  photoList.forEach((u) => { const im = new Image(); im.src = u; }); // تحميل مسبق
+  let photoShown = '';
+  function setPhotoForSprint(n) {
+    if (!photoEl || !trashOn) return;
+    const url = photoSlots.length ? (photoSlots[(n - 1) % Math.max(3, photoSlots.length)] || photoList[0]) : '';
+    const src = url || defaultPhotoUrl;
+    if (src === photoShown) return;
+    photoShown = src;
+    photoEl.classList.toggle('is-pixel', !url);
+    photoImg.onerror = () => { photoImg.onerror = null; photoImg.src = defaultPhotoUrl; photoEl.classList.add('is-pixel'); };
+    photoImg.src = src;
   }
+  if (photoEl && trashOn) { setPhotoForSprint(1); photoEl.hidden = false; }
   const PHOTO_W = 22, PHOTO_H = 26; // حجم الصورة مع إطارها بوحدات المشهد
   const trash = { state: 'hang', t: 0, ang: -0.22, y: 0, vy: 0, jolt: 3 + Math.random() * 2, scatter: 0,
     flies: Array.from({ length: 4 }, (_, i) => ({ a: i * 1.6, r: rand(5, 11), sp: rand(2.2, 3.6), h: rand(4, 12) })) };
@@ -318,7 +332,7 @@ export function initDebugHunt(root) {
     Object.assign(S, { mode: 'title', paused: false, bugs: [], butterfly: null, popups: [], toast: null, wave: null, testo: null, statuses: [] });
     [reportEl, bannerEl, pauseEl, rotateEl].forEach((el) => { el.hidden = true; });
     titleEl.hidden = false; document.body.classList.remove('dh-playing');
-    if (trashOn) { trash.state = 'hang'; trash.y = 0; }
+    if (trashOn) { trash.state = 'hang'; trash.y = 0; setPhotoForSprint(1); }
     paintQuit();
     ui('#dh-start')?.focus({ preventScroll: true });
   }
@@ -333,7 +347,12 @@ export function initDebugHunt(root) {
     track('debug_hunt_start');
   }
   const tempo = () => Math.min(176, 120 + 8 * (S.sprint - 1));
-  function startSprint() { S.statuses = Array(10).fill('pending'); S.cursor = 0; audio.tempo = tempo(); audio.intense = false; nextWave(); }
+  function startSprint() {
+    if (trashOn) {
+      const before = photoShown; setPhotoForSprint(S.sprint);
+      if (photoShown !== before || trash.state === 'gone') { trash.state = 'hang'; trash.y = -30; trash.vy = 0; trash.t = 0; trash.jolt = 2; }
+    }
+    S.statuses = Array(10).fill('pending'); S.cursor = 0; audio.tempo = tempo(); audio.intense = false; nextWave(); }
   function nextWave() {
     if (trashOn && trash.state === 'gone') { trash.state = 'hang'; trash.y = -30; trash.vy = 0; trash.t = 0; trash.jolt = 2; }
     const remaining = 10 - S.cursor;
