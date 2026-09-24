@@ -327,6 +327,16 @@ const home = defineCollection({
   }),
 });
 
+/* ===== لعبة Debug Hunt ===== */
+const debugHunt = defineCollection({
+  loader: glob({ base: './src/content/settings', pattern: 'debug-hunt.json' }),
+  schema: z.object({
+    trashEnabled: bool(true),
+    trashPhoto: optString,
+    trashPoints: num(50),
+  }),
+});
+
 /* ===== لعبة Bug Hunter ===== */
 const bugHunter = defineCollection({
   loader: glob({ base: './src/content/settings', pattern: 'bug-hunter.json' }),
@@ -399,4 +409,4 @@ const products = defineCollection({
   }),
 });
 
-export const collections = { products, lessons, articles, courses, news, resources, glossary, questions, pages, site, home, start, chat, bugHunter };
+export const collections = { products, lessons, articles, courses, news, resources, glossary, questions, pages, site, home, start, chat, bugHunter, debugHunt };
