@@ -333,6 +333,8 @@ const debugHunt = defineCollection({
   schema: z.object({
     trashEnabled: bool(true),
     trashPhoto: optString,
+    trashPhoto2: optString,
+    trashPhoto3: optString,
     trashPoints: num(50),
     showHomeCard: bool(true),
     homeBadge: str('جديد 🎮'),
