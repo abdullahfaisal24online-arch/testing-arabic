@@ -263,6 +263,7 @@ class Audio8 {
 export function initDebugHunt(root) {
   const canvas = root.querySelector('#dh-canvas');
   const g = canvas.getContext('2d'); g.imageSmoothingEnabled = false;
+  const fx = root.querySelector('#dh-fx'), fg = fx.getContext('2d'); fg.imageSmoothingEnabled = false;
   const ui = (id) => root.querySelector(id);
   const titleEl = ui('#dh-title'), reportEl = ui('#dh-report'), bannerEl = ui('#dh-banner'), rotateEl = ui('#dh-rotate'), pauseEl = ui('#dh-pause');
   const cabinet = ui('.dh-cabinet');
@@ -312,11 +313,20 @@ export function initDebugHunt(root) {
     return { x: rand(40, W - 50), y: GROUND - 22, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, gold, state: 'fly', t: 0,
       life: demo ? 1e9 : c.life * (gold ? 0.8 : 1), turn: rand(0.5, 1.2), idx: -1, speed: sp };
   }
+  function quitToTitle() {
+    audio.stopMusic();
+    Object.assign(S, { mode: 'title', paused: false, bugs: [], butterfly: null, popups: [], toast: null, wave: null, testo: null, statuses: [] });
+    [reportEl, bannerEl, pauseEl, rotateEl].forEach((el) => { el.hidden = true; });
+    titleEl.hidden = false; document.body.classList.remove('dh-playing');
+    if (trashOn) { trash.state = 'hang'; trash.y = 0; }
+    paintQuit();
+    ui('#dh-start')?.focus({ preventScroll: true });
+  }
   function startGame() {
     audio.init();
     Object.assign(S, { mode: 'play', sprint: 1, score: 0, shots: 0, hits: 0, caught: 0, critical: 0, escaped: 0, broken: 0, combo: 0,
       bugs: [], butterfly: null, popups: [], toast: null, sprintsPassed: 0 });
-    titleEl.hidden = true; reportEl.hidden = true; document.body.classList.add('dh-playing');
+    titleEl.hidden = true; reportEl.hidden = true; document.body.classList.add('dh-playing'); setTimeout(paintQuit, 0);
     startSprint();
     audio.startMusic(tempo());
     maybeRotateHint();
@@ -359,7 +369,7 @@ export function initDebugHunt(root) {
     }
   }
   function gameOver(got, need) {
-    S.mode = 'over'; audio.stopMusic(); audio.gameOver(); document.body.classList.remove('dh-playing');
+    S.mode = 'over'; audio.stopMusic(); audio.gameOver(); document.body.classList.remove('dh-playing'); paintQuit();
     const isBest = S.score > S.best; if (isBest) { S.best = S.score; store.set('dh_best', S.best); }
     const acc = S.shots ? Math.round((S.hits / S.shots) * 100) : 0;
     const set = (sel, v) => { const el = reportEl.querySelector(sel); if (el) el.textContent = v; };
@@ -566,10 +576,10 @@ export function initDebugHunt(root) {
     if (S.mode !== 'title') text(g, `BEST ${pad6(S.best)}`, W - 6, 5, '#f6823b', 'right');
   }
   function drawCrosshair(x, y) {
-    x = Math.round(x); y = Math.round(y); const c = '#38bdf8';
-    px(g, x - 10, y, 6, 1, c); px(g, x + 5, y, 6, 1, c); px(g, x, y - 10, 1, 6, c); px(g, x, y + 5, 1, 6, c);
-    [[-7, -7], [7, -7], [-7, 7], [7, 7]].forEach(([a, b]) => { px(g, x + a - (a < 0 ? 0 : 2), y + b, 3, 1, c); px(g, x + a, y + b - (b < 0 ? 0 : 2), 1, 3, c); });
-    px(g, x, y, 1, 1, '#f6823b');
+    const k = fg; x = Math.round(x); y = Math.round(y); const c = '#38bdf8';
+    px(k, x - 10, y, 6, 1, c); px(k, x + 5, y, 6, 1, c); px(k, x, y - 10, 1, 6, c); px(k, x, y + 5, 1, 6, c);
+    [[-7, -7], [7, -7], [-7, 7], [7, 7]].forEach(([a, b]) => { px(k, x + a - (a < 0 ? 0 : 2), y + b, 3, 1, c); px(k, x + a, y + b - (b < 0 ? 0 : 2), 1, 3, c); });
+    px(k, x, y, 1, 1, '#f6823b');
   }
   function render() {
     g.save();
@@ -585,13 +595,15 @@ export function initDebugHunt(root) {
     if (trashOn) drawFlies();
     if (S.butterfly) { const bf = S.butterfly; sprite(g, Math.floor(bf.t * 8) % 2 ? BF : BF_CLOSED, BF_PAL, bf.x, bf.y, bf.state === 'hit'); if (bf.state === 'fly') text(g, 'FEATURE', bf.x - 8, bf.y - 11, '#38bdf8'); }
     S.bugs.forEach((b) => { if (b.state !== 'done') drawBug(b); });
-    S.popups.forEach((p) => { g.globalAlpha = clamp(1.2 - p.t, 0, 1); text(g, p.text, p.x, p.y, p.col); g.globalAlpha = 1; });
-    if (S.toast) {
-      const tw = S.toast.text.length * 8 + 14, x = (W - tw) / 2, y = 24;
-      px(g, x, y, tw, 16, '#1a0b10'); px(g, x, y, tw, 2, S.toast.col); px(g, x, y + 14, tw, 2, S.toast.col); px(g, x, y, 2, 16, S.toast.col); px(g, x + tw - 2, y, 2, 16, S.toast.col);
-      text(g, S.toast.text, W / 2, y + 4, S.toast.col, 'center', false);
-    }
     g.restore();
+    // الطبقة العلوية: نصوص طايرة + إشعارات + crosshair (فوق الصورة المعلّقة)
+    fg.clearRect(0, 0, W, H);
+    S.popups.forEach((p) => { fg.globalAlpha = clamp(1.2 - p.t, 0, 1); text(fg, p.text, p.x, p.y, p.col); fg.globalAlpha = 1; });
+    if (S.toast) {
+      const tw = S.toast.text.length * 8 + 14, x = (W - tw) / 2, y = 24, k = fg;
+      px(k, x, y, tw, 16, '#1a0b10'); px(k, x, y, tw, 2, S.toast.col); px(k, x, y + 14, tw, 2, S.toast.col); px(k, x, y, 2, 16, S.toast.col); px(k, x + tw - 2, y, 2, 16, S.toast.col);
+      text(k, S.toast.text, W / 2, y + 4, S.toast.col, 'center', false);
+    }
     if (S.flash > 0) { g.globalAlpha = 0.18; px(g, 0, 0, W, HUD_Y, '#ffffff'); g.globalAlpha = 1; }
     drawHUD();
     if (S.mode === 'play' && !S.paused && (S.aim.show || S.aim.t > 0)) drawCrosshair(S.aim.x, S.aim.y);
@@ -618,6 +630,9 @@ export function initDebugHunt(root) {
   });
   ui('#dh-start').addEventListener('click', () => { goFullscreenOnMobile(); startGame(); });
   ui('#dh-again').addEventListener('click', () => startGame());
+  const quitBtn = ui('#dh-quit');
+  function paintQuit() { if (quitBtn) quitBtn.hidden = !(S.mode === 'play' || S.mode === 'banner'); }
+  quitBtn?.addEventListener('click', quitToTitle);
   document.addEventListener('keydown', (e) => {
     if ((e.key === 'Enter' || e.key === ' ') && (S.mode === 'title') && document.activeElement === document.body) { e.preventDefault(); startGame(); }
   });
@@ -657,7 +672,7 @@ export function initDebugHunt(root) {
       if (r.width > 0 && r.height > 0 && r.width / r.height > 16 / 9 + 0.02) nw = clamp(Math.round((H * r.width) / r.height), 320, 480);
     }
     if (nw === W) return;
-    W = nw; canvas.width = W; canvas.height = H; g.imageSmoothingEnabled = false;
+    W = nw; canvas.width = W; canvas.height = H; g.imageSmoothingEnabled = false; fx.width = W; fx.height = H; fg.imageSmoothingEnabled = false;
     bg = buildBackground(); grass = buildGrass(); BIN.x = W - 33;
     S.bugs.forEach((b) => { b.x = clamp(b.x, 8, W - 24); });
   }
@@ -684,7 +699,11 @@ export function initDebugHunt(root) {
   fsBtn.addEventListener('click', () => { (isNativeFs() || isImmersive()) ? exitFs() : enterFs(); });
   document.addEventListener('fullscreenchange', () => { paintFs(); relayout(); });
   document.addEventListener('webkitfullscreenchange', paintFs);
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isImmersive()) exitImmersive(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (isImmersive()) exitImmersive();
+    else if ((S.mode === 'play' || S.mode === 'banner') && !S.paused) pause();
+  });
   function goFullscreenOnMobile() { if (coarse && !isNativeFs() && !isImmersive()) enterFs(); }
   paintFs();
 
