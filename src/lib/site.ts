@@ -11,6 +11,8 @@ const SITE_DEFAULTS = {
   author: 'عبدالله',
   youtube: '',
   linkedin: '',
+  facebook: '',
+  instagram: '',
   email: '',
   newsletterAction: '',
   newsletterField: 'email',
