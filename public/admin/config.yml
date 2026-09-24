@@ -1217,10 +1217,20 @@ collections:
             widget: boolean
             default: true
           - name: trashPhoto
-            label: "الصورة المعلّقة على الحاوية"
+            label: "صورة الحاوية — Sprint 1"
             widget: image
             required: false
-            hint: "أي صورة (يفضّل وجه أو لوغو بالنص). اللعبة بتحوّلها تلقائياً لـ pixel بلون قديم. سمّي الملف بالإنجليزي وبدون مسافات. إذا صورة شخص، خليها بموافقته 🙂 — فاضية = صورة افتراضية"
+            hint: "بتطلع بـ Sprint 1 (وبـ Sprint 4، 7…). يفضّل وجه أو لوغو بالنص. سمّي الملف بالإنجليزي وبدون مسافات. فاضية = صورة افتراضية"
+          - name: trashPhoto2
+            label: "صورة الحاوية — Sprint 2"
+            widget: image
+            required: false
+            hint: "بتطلع بـ Sprint 2 (وبـ Sprint 5، 8…). إذا فاضية بتنعاد صورة Sprint 1"
+          - name: trashPhoto3
+            label: "صورة الحاوية — Sprint 3"
+            widget: image
+            required: false
+            hint: "بتطلع بـ Sprint 3 (وبـ Sprint 6، 9…). إذا فاضية بتنعاد صورة Sprint 1"
           - name: trashPoints
             label: "نقاط إسقاط الصورة"
             widget: number
