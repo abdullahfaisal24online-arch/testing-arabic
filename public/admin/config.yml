@@ -778,6 +778,14 @@ collections:
             label: "رابط لينكدإن"
             widget: string
             required: false
+          - name: facebook
+            label: "رابط صفحة فيسبوك"
+            widget: string
+            required: false
+          - name: instagram
+            label: "رابط إنستغرام"
+            widget: string
+            required: false
           - name: email
             label: "بريد التواصل"
             widget: string
