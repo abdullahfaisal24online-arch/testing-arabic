@@ -1,0 +1,204 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getSite } from '../../lib/site';
+
+const site = await getSite();
+const title = 'Debug Hunt — اصطاد الـ bugs قبل ما توصل Production';
+const description = 'لعبة retro خفيفة من Testing بالعربي: اصطاد الـ bugs، انتبه لا تكسر أي feature، وشارك سكورك مع صحابك.';
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'VideoGame',
+  name: 'Debug Hunt',
+  description,
+  url: `${site.url}/debug-hunt/`,
+  inLanguage: 'ar',
+  genre: 'Arcade',
+  gamePlatform: 'Web browser',
+  applicationCategory: 'Game',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
+---
+
+<Base title={title} description={description} jsonLd={jsonLd}>
+  <main class="dh dots" id="dh-app">
+    <div class="wrap">
+      <header class="dh-head">
+        <span class="eyebrow">استراحة 60 ثانية</span>
+        <h1><span class="px">Debug Hunt</span> <span aria-hidden="true">🐞</span></h1>
+        <p class="lead">اصطاد الـ bugs قبل ما توصل Production… وانتبه لا تكسر أي feature.</p>
+      </header>
+
+      <div class="dh-cabinet">
+        <div class="dh-screen">
+          <canvas id="dh-canvas" width="320" height="180" aria-label="شاشة لعبة Debug Hunt" role="img"></canvas>
+
+          <div class="dh-layer dh-title" id="dh-title">
+            <div class="dh-logo px">DEBUG HUNT</div>
+            <p class="dh-tag">اصطاد الـ bugs قبل ما توصل Production 🐞</p>
+            <button class="dh-btn-start px" id="dh-start" type="button">▶ START</button>
+            <div class="dh-legend px" dir="ltr">
+              <span><b class="r">●</b> BUG +25</span><span><b class="y">●</b> CRITICAL +100</span><span><b class="c">●</b> FEATURE -50</span>
+            </div>
+          </div>
+
+          <div class="dh-layer dh-banner" id="dh-banner" hidden><b class="px"></b><span></span></div>
+
+          <div class="dh-layer dh-pause" id="dh-pause" hidden>
+            <b class="px">PAUSED</b><span>اضغط لتكمّل</span>
+          </div>
+
+          <div class="dh-layer dh-rotate" id="dh-rotate" hidden>
+            <div class="rot-ico" aria-hidden="true">📱↻</div>
+            <b>لفّ الموبايل بالعرض</b><span>بتلعب أحسن وبتشوف الـ bugs أوضح</span>
+            <button type="button" id="dh-rot-ok">كمّل هيك</button>
+          </div>
+
+          <div class="dh-layer dh-report" id="dh-report" hidden>
+            <div class="rep-card">
+              <div class="rep-title px">SPRINT REPORT</div>
+              <div class="rep-new px dh-newbest" hidden>★ NEW BEST ★</div>
+              <dl class="rep-rows" dir="ltr">
+                <div><dt>Bugs found</dt><dd data-r="found">0</dd></div>
+                <div><dt>Critical caught</dt><dd class="y" data-r="critical">0</dd></div>
+                <div><dt>Escaped to Production</dt><dd class="red" data-r="escaped">0</dd></div>
+                <div><dt>Features broken</dt><dd class="c" data-r="broken">0</dd></div>
+                <div><dt>Accuracy</dt><dd data-r="acc">0%</dd></div>
+                <div><dt>Reached</dt><dd>Sprint <span data-r="sprint">1</span></dd></div>
+              </dl>
+              <div class="rep-score" dir="ltr"><span class="px">SCORE</span><b class="px" data-r="score">000000</b></div>
+              <p class="rep-msg" data-r="msg"></p>
+              <div class="rep-actions">
+                <button type="button" class="rb rb-primary" id="dh-share">شارك النتيجة</button>
+                <button type="button" class="rb rb-ghost" id="dh-again">العب مرة تانية</button>
+                <button type="button" class="rb rb-link" id="dh-card">حمّل بطاقة السكور</button>
+              </div>
+              <p class="dh-note" hidden></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="dh-controls">
+          <button type="button" class="ctl" id="dh-sfx" aria-pressed="true"><i>🔈</i> المؤثرات</button>
+          <button type="button" class="ctl" id="dh-music" aria-pressed="true"><i>🎵</i> الموسيقى</button>
+          <button type="button" class="ctl" id="dh-fs"><i>⛶</i> ملء الشاشة</button>
+          <span class="best px" dir="ltr">BEST <b data-best>000000</b></span>
+        </div>
+      </div>
+
+      <section class="how" aria-labelledby="how-title">
+        <h2 id="how-title">كيف تلعب؟</h2>
+        <div class="how-grid">
+          <div class="how-card"><i aria-hidden="true">🎯</i><b>صوّب واضغط</b><p>بالماوس أو اللمس. عندك 3 test runs لكل موجة bugs.</p></div>
+          <div class="how-card"><i aria-hidden="true">🐞</i><b>الـ bugs نقاط</b><p>الحمرا +25، والذهبية Critical <span class="g">+100</span> بس أسرع بكثير.</p></div>
+          <div class="how-card"><i aria-hidden="true">🦋</i><b>ممنوع الـ features</b><p>إذا صبت فراشة بتخسر 50 نقطة… Regression 😅</p></div>
+          <div class="how-card"><i aria-hidden="true">🚨</i><b>عدّي الـ Sprint</b><p>كل Sprint فيه 10 bugs. لازم تصيد 6 على الأقل عشان تكمّل، وكل Sprint أسرع من اللي قبله.</p></div>
+        </div>
+      </section>
+
+      <a class="cross" href="/bug-hunter/">
+        <span>بدك تحدّي أعمق؟ جرّب <b>Bug Hunter</b> — اكتشف أخطاء حقيقية بمتجر كامل</span><span class="arr" aria-hidden="true">←</span>
+      </a>
+    </div>
+  </main>
+</Base>
+
+<script>
+  import { initDebugHunt } from '../../scripts/debug-hunt.js';
+  const root = document.getElementById('dh-app');
+  if (root) initDebugHunt(root);
+</script>
+
+<style>
+  .dh { padding-block: 40px 70px; }
+  .px { font-family: 'Press Start 2P', monospace; letter-spacing: 0; }
+  .dh-head { text-align: center; display: flex; flex-direction: column; align-items: center; }
+  .dh-head h1 { font-size: clamp(24px, 4vw, 42px); margin: 16px 0 10px; line-height: 1.5; }
+  .dh-head h1 .px { direction: ltr; unicode-bidi: isolate; }
+  .dh-head .lead { margin-inline: auto; text-align: center; }
+
+  .dh-cabinet { margin: 30px auto 0; max-width: min(1100px, calc((100vh - 120px) * 16 / 9 + 32px)); padding: 16px; border-radius: 22px;
+    background: linear-gradient(180deg, #15223b, #0c1629); border: 2px solid rgba(56,189,248,.45);
+    box-shadow: 0 30px 70px rgba(0,0,0,.45), 0 0 0 6px #060b16, 0 0 60px rgba(56,189,248,.15); }
+  .dh-screen { position: relative; border-radius: 10px; overflow: hidden; border: 4px solid #060b16; aspect-ratio: 16/9; background: #070f1e; user-select: none; -webkit-user-select: none; }
+  #dh-canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges; touch-action: none; cursor: none; }
+  .dh-layer { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #f0f6ff; }
+  .dh-layer[hidden] { display: none; }
+
+  /* شاشة البداية */
+  .dh-title { background: radial-gradient(ellipse at center, rgba(5,10,20,.55), rgba(5,10,20,.15) 70%); gap: clamp(8px, 2vw, 22px); padding-bottom: 18%; }
+  .dh-logo { font-size: clamp(22px, 6.2vw, 72px); color: #f0f6ff; text-shadow: .08em .08em 0 #000, 0 0 30px rgba(56,189,248,.5); direction: ltr; }
+  .dh-tag { font-weight: 700; font-size: clamp(13px, 2.3vw, 26px); color: #38bdf8; text-shadow: 0 3px 14px #000; margin: 0; padding-inline: 12px; }
+  .dh-btn-start { font-size: clamp(12px, 2.2vw, 24px); background: #f6823b; color: #1a0d04; border: 4px solid #000; box-shadow: 6px 6px 0 #000; padding: .8em 1.4em; cursor: pointer; animation: dh-blink 1.1s steps(2) infinite; }
+  .dh-btn-start:hover { background: #ff9d5c; }
+  .dh-btn-start:active { transform: translate(3px, 3px); box-shadow: 3px 3px 0 #000; }
+  @keyframes dh-blink { 50% { filter: brightness(1.25); } }
+  .dh-legend { display: flex; gap: clamp(8px, 2vw, 26px); flex-wrap: wrap; justify-content: center; font-size: clamp(7px, 1.1vw, 13px); text-shadow: 2px 2px 0 #000; }
+  .dh-legend .r { color: #e8412f; } .dh-legend .y { color: #f7c948; } .dh-legend .c { color: #38bdf8; }
+
+  .dh-banner { background: rgba(5,10,20,.55); gap: 12px; pointer-events: none; }
+  .dh-banner b { font-size: clamp(16px, 4vw, 44px); color: #38bdf8; text-shadow: 4px 4px 0 #000; direction: ltr; }
+  .dh-banner span { font-weight: 700; font-size: clamp(13px, 2.2vw, 26px); text-shadow: 0 3px 12px #000; padding-inline: 12px; }
+
+  .dh-pause, .dh-rotate { background: rgba(5,10,20,.8); gap: 10px; cursor: pointer; padding: 16px; }
+  .dh-pause b { font-size: clamp(16px, 3.5vw, 36px); color: #f6823b; }
+  .dh-rotate { cursor: default; }
+  .dh-rotate .rot-ico { font-size: 34px; }
+  .dh-rotate b { font-size: 18px; } .dh-rotate span { color: #b9c9df; font-size: 14px; }
+  .dh-rotate button { margin-top: 6px; font: inherit; font-weight: 700; font-size: 14px; background: #0b162a; color: #38bdf8; border: 2px solid #38bdf8; border-radius: 10px; padding: 6px 16px; cursor: pointer; }
+
+  /* التقرير */
+  .dh-report { background: rgba(5,10,20,.72); padding: 2%; overflow-y: auto; }
+  .rep-card { width: min(94%, 760px); background: #0b162a; border: 5px solid #38bdf8; box-shadow: 10px 10px 0 #000; padding: clamp(12px, 2.8vw, 36px) clamp(14px, 3.4vw, 44px); }
+  .rep-title { font-size: clamp(12px, 2.1vw, 24px); color: #38bdf8; direction: ltr; }
+  .rep-new { margin-top: 8px; font-size: clamp(8px, 1.2vw, 13px); color: #f7c948; animation: dh-blink .8s steps(2) infinite; }
+  .rep-rows { margin: clamp(8px, 1.6vw, 20px) 0 0; display: grid; grid-template-columns: 1fr 1fr; column-gap: 28px; }
+  .rep-rows div { display: flex; justify-content: space-between; gap: 10px; padding: clamp(4px, .8vw, 10px) 0; border-bottom: 2px dashed #1f4b73; font-family: 'Press Start 2P', monospace; font-size: clamp(7px, 1.05vw, 13px); line-height: 1.4; }
+  .rep-rows dt { color: #8a9ebd; } .rep-rows dd { margin: 0; color: #f0f6ff; }
+  .rep-rows .y { color: #f7c948; } .rep-rows .red { color: #ff6b6b; } .rep-rows .c { color: #38bdf8; }
+  .rep-score { display: flex; justify-content: space-between; align-items: center; margin-top: clamp(8px, 1.6vw, 20px); }
+  .rep-score span { font-size: clamp(9px, 1.4vw, 16px); color: #8a9ebd; }
+  .rep-score b { font-size: clamp(18px, 3.6vw, 40px); color: #f6823b; text-shadow: 4px 4px 0 #000; }
+  .rep-msg { margin: clamp(8px, 1.6vw, 18px) 0 0; font-weight: 700; font-size: clamp(13px, 1.9vw, 22px); line-height: 1.6; }
+  .rep-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: clamp(10px, 1.8vw, 20px); }
+  .rb { font: inherit; font-weight: 700; font-size: clamp(13px, 1.6vw, 18px); padding: .55em 1.3em; cursor: pointer; border: 3px solid #000; box-shadow: 5px 5px 0 #000; }
+  .rb:active { transform: translate(2px, 2px); box-shadow: 3px 3px 0 #000; }
+  .rb-primary { background: #f6823b; color: #1a0d04; }
+  .rb-ghost { background: #0b162a; color: #38bdf8; border-color: #38bdf8; }
+  .rb-link { background: transparent; color: #b9c9df; border: 0; box-shadow: none; text-decoration: underline; padding-inline: .4em; }
+  .dh-note { margin: 10px 0 0; color: #34d399; font-size: 14px; }
+
+  /* أزرار التحكم */
+  .dh-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 14px 6px 2px; }
+  .ctl { font: inherit; font-size: 14px; font-weight: 600; padding: 7px 14px; border-radius: 10px; background: rgba(56,189,248,.1); border: 1px solid rgba(56,189,248,.3); color: #cfe6fb; cursor: pointer; }
+  .ctl i { font-style: normal; }
+  .ctl[aria-pressed="false"] { opacity: .6; }
+  .ctl[hidden] { display: none; }
+  .best { margin-inline-start: auto; font-size: 12px; color: #8a9ebd; }
+  .best b { color: #f6823b; font-weight: 400; }
+
+  /* ملء الشاشة */
+  .dh-cabinet:fullscreen { max-width: none; margin: 0; border-radius: 0; border: 0; padding: 0; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .dh-cabinet:fullscreen .dh-screen { width: min(100vw, calc((100vh - 56px) * 16 / 9)); border-radius: 0; border: 0; }
+  .dh-cabinet:fullscreen .dh-controls { width: min(100vw, calc((100vh - 56px) * 16 / 9)); padding: 8px; }
+  .dh-cabinet:-webkit-full-screen { width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+  :global(body.dh-playing .tachat-launcher) { display: none !important; }
+  .how { margin-top: 48px; }
+  .how h2 { font-size: 26px; text-align: center; margin-bottom: 20px; }
+  .how-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .how-card { background: var(--bg-2, #0f1b31); border: 1px solid var(--line, #1d2a44); border-radius: 16px; padding: 20px; }
+  .how-card i { font-style: normal; font-size: 30px; display: block; }
+  .how-card b { display: block; margin: 10px 0 6px; font-size: 18px; }
+  .how-card p { color: var(--ink-3); font-size: 15px; line-height: 1.8; margin: 0; }
+  .how-card .g { color: #f7c948; font-weight: 700; }
+  .cross { margin: 34px auto 0; max-width: 1100px; display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    padding: 18px 24px; border-radius: 16px; border: 1px dashed rgba(246,130,59,.55); background: rgba(246,130,59,.06); color: var(--ink-2); }
+  .cross b { color: #f6823b; } .cross .arr { color: #f6823b; font-size: 22px; }
+
+  @media (max-width: 900px) { .how-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 640px) {
+    .how-grid { grid-template-columns: 1fr; } .dh-cabinet { padding: 8px; } .best { margin-inline-start: 0; }
+    .rep-rows { grid-template-columns: 1fr; } .rep-rows div:nth-child(n+5) { display: none; }
+    .dh-legend { display: none; }
+  }
+</style>
