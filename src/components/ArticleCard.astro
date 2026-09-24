@@ -20,7 +20,7 @@ const cover = article.data.cover;
     </div>
   )}
   <div class="card-body">
-    <span class="meta mono">{article.data.category} · {minutesLabel(mins)} قراءة</span>
+    <span class="meta"><b>{article.data.category}</b> · {minutesLabel(mins)} قراءة</span>
     <span class="ttl">{article.data.title}</span>
     <p class="desc">{article.data.description}</p>
     <span class="date">{formatDate(article.data.publishDate)}</span>
@@ -30,7 +30,8 @@ const cover = article.data.cover;
 <style>
 .art { color: inherit; background: var(--navy); }
 .art .card-body { padding: 24px; gap: 12px; }
-.meta { font-size: 12px; font-weight: 500; color: var(--cyan); }
+.meta { font-size: 13px; font-weight: 500; line-height: 1.6; color: var(--ink-3); }
+.meta b { font-weight: 600; color: var(--cyan); }
 .ttl { font-size: 19px; font-weight: 700; line-height: 1.6; }
 .desc { font-size: 15px; color: var(--ink-3); line-height: 1.85; }
 .date { font-size: 13px; color: var(--faint); margin-top: auto; }
