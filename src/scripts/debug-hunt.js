@@ -178,17 +178,6 @@ function buildDefaultPhoto() {
   px(g, 6, 5, 1, 1, '#3a2616'); px(g, 9, 5, 1, 1, '#3a2616'); px(g, 7, 7, 2, 1, '#8a5a3a'); px(g, 4, 10, 8, 6, '#6b4a2e');
   return c;
 }
-function pixelatePhoto(img) {
-  // نصغّر الصورة لـ 16x18 (crop من النص) ونعطيها لون قديم
-  const tw = 16, th = 18, c = makeCanvas(tw, th), g = c.getContext('2d');
-  const r = img.naturalWidth / img.naturalHeight, tr = tw / th;
-  let sw = img.naturalWidth, sh = img.naturalHeight, sx = 0, sy = 0;
-  if (r > tr) { sw = sh * tr; sx = (img.naturalWidth - sw) / 2; } else { sh = sw / tr; sy = (img.naturalHeight - sh) * 0.3; }
-  g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
-  try { g.filter = 'sepia(.55) contrast(1.15) saturate(.9)'; } catch { /* */ }
-  g.drawImage(img, sx, sy, sw, sh, 0, 0, tw, th);
-  return c;
-}
 
 /* ===================== الصوت (Web Audio) ===================== */
 const NOTE = (base, semi) => base * Math.pow(2, semi / 12);
@@ -282,12 +271,15 @@ export function initDebugHunt(root) {
   const binSprite = buildBin();
   const trashOn = root.dataset.trashEnabled !== 'false';
   const trashPoints = Number(root.dataset.trashPoints) > 0 ? Number(root.dataset.trashPoints) : 50;
-  let photoSprite = buildDefaultPhoto();
-  if (trashOn && root.dataset.trashPhoto) {
-    const im = new Image(); im.decoding = 'async';
-    im.onload = () => { try { photoSprite = pixelatePhoto(im); } catch { /* نضل على الافتراضية */ } };
-    im.src = root.dataset.trashPhoto;
+  // الصورة المعلّقة: عنصر HTML فوق الـ canvas عشان تطلع واضحة بدقتها الأصلية (مش pixel)
+  const photoEl = root.querySelector('#dh-photo'), photoImg = photoEl && photoEl.querySelector('img');
+  if (photoEl && trashOn) {
+    const src = root.dataset.trashPhoto;
+    if (src) { photoImg.src = src; photoImg.onerror = () => { photoImg.src = buildDefaultPhoto().toDataURL(); photoEl.classList.add('is-pixel'); }; }
+    else { photoImg.src = buildDefaultPhoto().toDataURL(); photoEl.classList.add('is-pixel'); }
+    photoEl.hidden = false;
   }
+  const PHOTO_W = 22, PHOTO_H = 26; // حجم الصورة مع إطارها بوحدات المشهد
   const trash = { state: 'hang', t: 0, ang: -0.22, y: 0, vy: 0, jolt: 3 + Math.random() * 2, scatter: 0,
     flies: Array.from({ length: 4 }, (_, i) => ({ a: i * 1.6, r: rand(5, 11), sp: rand(2.2, 3.6), h: rand(4, 12) })) };
   const photoCenter = () => ({ x: BIN.x + 12, y: BIN.y + 14 + trash.y });
@@ -430,7 +422,7 @@ export function initDebugHunt(root) {
       S.butterfly.state = 'hit'; S.butterfly.t = 0;
       popup(S.butterfly.x - 10, S.butterfly.y - 4, '-50 REGRESSION!', '#38bdf8');
       audio.error(); S.shake = 0.25;
-    } else if (trashOn && trash.state === 'hang' && Math.hypot(photoCenter().x - p.x, photoCenter().y - p.y) < R) {
+    } else if (trashOn && trash.state === 'hang' && Math.hypot(photoCenter().x - p.x, photoCenter().y - p.y) < Math.max(R, 13)) {
       const pts = Math.round((trashPoints * cfg(S.sprint).mult) / 5) * 5;
       S.score += pts; trash.state = 'fall'; trash.t = 0; trash.vy = -60; trash.scatter = 1;
       popup(BIN.x - 72, BIN.y - 12, `+${pts} CLEANUP!`, '#34d399');
@@ -508,15 +500,19 @@ export function initDebugHunt(root) {
   }
   function drawTrash() {
     g.drawImage(binSprite, BIN.x - 4, BIN.y - 8);
-    if (trash.state !== 'gone') {
-      const c = photoCenter();
-      g.save(); g.translate(Math.round(c.x), Math.round(c.y)); g.rotate(trash.ang);
-      g.fillStyle = '#efe6d2'; g.fillRect(-10, -11, 20, 22);                // إطار الصورة
-      g.drawImage(photoSprite, -8, -10, 16, 18);
-      g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(-10, 10, 20, 1);
-      if (trash.state === 'hang') { g.fillStyle = 'rgba(240,246,255,.75)'; g.fillRect(4, -13, 8, 3); }   // لزقة بزاوية وحدة
-      g.restore();
-    }
+  }
+  function placePhoto() {
+    if (!photoEl || photoEl.hidden) return;
+    if (trash.state === 'gone') { photoEl.style.opacity = '0'; return; }
+    const cw = canvas.clientWidth, ch = canvas.clientHeight; if (!cw || !ch) return;
+    const sc = Math.min(cw / W, ch / H), ox = (cw - W * sc) / 2 + canvas.offsetLeft, oy = (ch - H * sc) / 2 + canvas.offsetTop;
+    const c = photoCenter();
+    photoEl.style.opacity = '1';
+    photoEl.style.width = `${PHOTO_W * sc}px`; photoEl.style.height = `${PHOTO_H * sc}px`;
+    photoEl.style.left = `${ox + c.x * sc}px`; photoEl.style.top = `${oy + c.y * sc}px`;
+    photoEl.style.setProperty('--u', `${sc}px`);
+    photoEl.style.transform = `translate(-50%, -50%) rotate(${trash.ang}rad)`;
+    photoEl.classList.toggle('is-falling', trash.state === 'fall');
   }
   function drawFlies() {
     trash.flies.forEach((f, i) => {
@@ -599,6 +595,7 @@ export function initDebugHunt(root) {
     if (S.flash > 0) { g.globalAlpha = 0.18; px(g, 0, 0, W, HUD_Y, '#ffffff'); g.globalAlpha = 1; }
     drawHUD();
     if (S.mode === 'play' && !S.paused && (S.aim.show || S.aim.t > 0)) drawCrosshair(S.aim.x, S.aim.y);
+    if (trashOn) placePhoto();
   }
 
   /* ---------- الحلقة ---------- */
