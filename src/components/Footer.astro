@@ -41,6 +41,8 @@ const year = new Date().getFullYear();
       <h3 class="ttl">تابعني</h3>
       {site.youtube && <a href={site.youtube} rel="me noopener" target="_blank"><Icon name="youtube" size={17} /> يوتيوب</a>}
       {site.linkedin && <a href={site.linkedin} rel="me noopener" target="_blank"><Icon name="board" size={17} /> لينكدإن</a>}
+      {site.facebook && <a href={site.facebook} rel="me noopener" target="_blank"><Icon name="facebook" size={17} /> فيسبوك</a>}
+      {site.instagram && <a href={site.instagram} rel="me noopener" target="_blank"><Icon name="instagram" size={17} /> إنستغرام</a>}
       <a href="/rss.xml"><Icon name="rss" size={17} /> RSS</a>
       {site.email && <a href={`mailto:${site.email}`}><Icon name="mail" size={17} /> بريد</a>}
     </div>
