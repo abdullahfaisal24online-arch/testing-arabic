@@ -3,7 +3,8 @@
  * كل الرسم pixel على canvas بدقة 320x180، وكل الصوت متولّد بـ Web Audio (بدون ملفات).
  */
 
-const W = 320, H = 180, GROUND = 118, HUD_Y = 144;
+const H = 180, GROUND = 118, HUD_Y = 144;
+let W = 320; // العرض المنطقي — بيكبر على الشاشات العريضة (وضع اللعب بالعرض)
 const FONT = '8px "Press Start 2P", monospace';
 const SITE_URL = 'https://testing-arabic.com/debug-hunt/';
 
@@ -117,11 +118,13 @@ function buildBackground() {
   const sky = ['#070f1e', '#0a1528', '#0d1b33', '#11223f', '#152a4b', '#1a3356'];
   sky.forEach((col, i) => px(g, 0, i * 20, W, 20, col));
   for (let i = 1; i < sky.length; i++) for (let x = 0; x < W; x += 2) { px(g, x + (i % 2), i * 20 - 1, 1, 1, sky[i]); px(g, x + ((i + 1) % 2), i * 20, 1, 1, sky[i - 1]); }
-  [[20, 12], [48, 30], [90, 8], [130, 22], [170, 10], [205, 34], [240, 14], [280, 26], [300, 8], [60, 50], [150, 46], [262, 52], [110, 60]].forEach(([x, y], i) => {
+  const sx = W / 320;
+  [[20, 12], [48, 30], [90, 8], [130, 22], [170, 10], [205, 34], [240, 14], [280, 26], [300, 8], [60, 50], [150, 46], [262, 52], [110, 60]].map(([x, y]) => [Math.round(x * sx), y]).forEach(([x, y], i) => {
     px(g, x, y, 1, 1, i % 3 ? '#8fb6e0' : '#38bdf8');
     if (i % 4 === 0) { ['#2b4f7a'].forEach((cc) => { px(g, x - 1, y, 1, 1, cc); px(g, x + 1, y, 1, 1, cc); px(g, x, y - 1, 1, 1, cc); px(g, x, y + 1, 1, 1, cc); }); }
   });
-  px(g, 268, 18, 12, 12, '#f0f6ff'); px(g, 266, 20, 16, 8, '#f0f6ff'); px(g, 270, 16, 8, 16, '#f0f6ff'); px(g, 271, 21, 3, 2, '#c9d6ea'); px(g, 275, 26, 2, 2, '#c9d6ea');
+  const mx = W - 52;
+  px(g, mx, 18, 12, 12, '#f0f6ff'); px(g, mx - 2, 20, 16, 8, '#f0f6ff'); px(g, mx + 2, 16, 8, 16, '#f0f6ff'); px(g, mx + 3, 21, 3, 2, '#c9d6ea'); px(g, mx + 7, 26, 2, 2, '#c9d6ea');
   // شجرة
   const tx = 22, ty = 36;
   px(g, tx + 14, ty + 20, 6, 50, '#3a2616'); px(g, tx + 15, ty + 20, 2, 50, '#4e3420'); px(g, tx + 6, ty + 34, 10, 3, '#3a2616'); px(g, tx + 20, ty + 28, 10, 3, '#3a2616');
@@ -130,7 +133,7 @@ function buildBackground() {
   cn.forEach(([a, b, w, h]) => px(g, tx + a - 2, ty + b - 4, w, h - 2, '#17564a'));
   [[4, 2], [14, 6], [24, 12], [8, 14], [28, 20]].forEach(([a, b]) => px(g, tx + a, ty + b, 4, 2, '#22786a'));
   // شجيرة
-  const bx = 250, by = 104;
+  const bx = W - 70, by = 104;
   px(g, bx, by + 6, 34, 12, '#0f3b34'); px(g, bx + 4, by, 24, 10, '#0f3b34'); px(g, bx + 3, by + 3, 20, 10, '#17564a'); px(g, bx + 10, by + 2, 8, 3, '#22786a');
   return c;
 }
@@ -275,7 +278,8 @@ export function initDebugHunt(root) {
   const titleEl = ui('#dh-title'), reportEl = ui('#dh-report'), bannerEl = ui('#dh-banner'), rotateEl = ui('#dh-rotate'), pauseEl = ui('#dh-pause');
   const cabinet = ui('.dh-cabinet');
   const audio = new Audio8();
-  const bg = buildBackground(), grass = buildGrass(), binSprite = buildBin();
+  let bg = buildBackground(), grass = buildGrass();
+  const binSprite = buildBin();
   const trashOn = root.dataset.trashEnabled !== 'false';
   const trashPoints = Number(root.dataset.trashPoints) > 0 ? Number(root.dataset.trashPoints) : 50;
   let photoSprite = buildDefaultPhoto();
@@ -313,7 +317,7 @@ export function initDebugHunt(root) {
   function newBug(demo = false) {
     const c = cfg(S.sprint), gold = !demo && Math.random() < c.gold;
     const ang = rand(-Math.PI * 0.85, -Math.PI * 0.15), sp = c.speed * (gold ? 1.6 : 1) * rand(0.85, 1.15);
-    return { x: rand(40, 270), y: GROUND - 22, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, gold, state: 'fly', t: 0,
+    return { x: rand(40, W - 50), y: GROUND - 22, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, gold, state: 'fly', t: 0,
       life: demo ? 1e9 : c.life * (gold ? 0.8 : 1), turn: rand(0.5, 1.2), idx: -1, speed: sp };
   }
   function startGame() {
@@ -334,7 +338,7 @@ export function initDebugHunt(root) {
     if (remaining <= 0) return endSprint();
     const n = Math.min(2, remaining);
     S.bugs = [];
-    for (let i = 0; i < n; i++) { const b = newBug(); if (i === 1) b.x = S.bugs[0].x < 155 ? rand(175, 270) : rand(40, 135); b.idx = S.cursor++; S.statuses[b.idx] = 'active'; S.bugs.push(b); if (b.gold) setTimeout(() => audio.goldAlert(), 150); }
+    for (let i = 0; i < n; i++) { const b = newBug(); if (i === 1) b.x = S.bugs[0].x < W / 2 ? rand(W / 2 + 15, W - 50) : rand(40, W / 2 - 25); b.idx = S.cursor++; S.statuses[b.idx] = 'active'; S.bugs.push(b); if (b.gold) setTimeout(() => audio.goldAlert(), 150); }
     S.wave = { shots: 3, phase: 'fly', t: 0 };
     S.butterfly = Math.random() < cfg(S.sprint).butterfly ? { x: Math.random() < 0.5 ? -14 : W + 2, y: rand(18, 70), t: 0, state: 'fly', dir: 0 } : null;
     if (S.butterfly) S.butterfly.dir = S.butterfly.x < 0 ? 1 : -1;
@@ -342,7 +346,7 @@ export function initDebugHunt(root) {
   }
   function endWave() {
     const caughtNow = S.bugs.filter((b) => b.state === 'done' && b.caught);
-    const x = caughtNow.length ? clamp(caughtNow[0].x - 5, 40, 260) : 148;
+    const x = caughtNow.length ? clamp(caughtNow[0].x - 5, 40, W - 60) : Math.round(W / 2 - 12);
     S.testo = { x, y: GROUND + 4, t: 0, laugh: caughtNow.length === 0, hold: caughtNow.map((b) => b.gold) };
     S.wave.phase = 'testo';
     if (caughtNow.length === 0) audio.laugh(); else audio.happy();
@@ -397,7 +401,8 @@ export function initDebugHunt(root) {
   /* ---------- الإطلاق ---------- */
   function toLogical(ev) {
     const r = canvas.getBoundingClientRect();
-    return { x: ((ev.clientX - r.left) / r.width) * W, y: ((ev.clientY - r.top) / r.height) * H };
+    const sc = Math.min(r.width / W, r.height / H), ox = (r.width - W * sc) / 2, oy = (r.height - H * sc) / 2;
+    return { x: (ev.clientX - r.left - ox) / sc, y: (ev.clientY - r.top - oy) / sc };
   }
   function shoot(p) {
     if (S.mode !== 'play' || S.paused || !S.wave || S.wave.phase !== 'fly' || S.wave.shots <= 0) return;
@@ -543,22 +548,23 @@ export function initDebugHunt(root) {
   function drawHUD() {
     px(g, 0, HUD_Y, W, H - HUD_Y, '#060b16'); px(g, 0, HUD_Y, W, 1, '#38bdf8');
     const box = (x, w) => { px(g, x, 149, w, 27, '#0b162a'); px(g, x, 149, w, 1, '#1f4b73'); px(g, x, 175, w, 1, '#1f4b73'); px(g, x, 149, 1, 27, '#1f4b73'); px(g, x + w - 1, 149, 1, 27, '#1f4b73'); };
-    box(5, 50); box(60, 168); box(233, 82);
+    const bw = W - 152, sxBox = W - 87;
+    box(5, 50); box(60, bw); box(sxBox, 82);
     text(g, 'RUNS', 9, 152, '#8a9ebd', 'left', false);
     const shots = S.wave ? S.wave.shots : 3;
     for (let i = 0; i < 3; i++) { const on = i < shots; px(g, 10 + i * 9, 164, 5, 8, on ? '#f6823b' : '#2a3a55'); px(g, 10 + i * 9, 162, 5, 2, on ? '#ffc59e' : '#2a3a55'); }
     text(g, 'BUGS', 64, 152, '#8a9ebd', 'left', false);
     const st = S.statuses.length ? S.statuses : Array(10).fill('pending');
     st.forEach((s, i) => {
-      const x = 66 + i * 16, y = 162;
+      const x = 60 + Math.round((bw - 160) / 2) + 2 + i * 16, y = 162;
       let pal = PAL.off;
       if (s === 'caught') pal = PAL.red; else if (s === 'gold') pal = PAL.gold; else if (s === 'escaped') pal = PAL.esc;
       else if (s === 'active' && Math.floor(S.t * 4) % 2) pal = { ...PAL.off, R: '#4b6a93' };
       sprite(g, LB_MINI.slice(0, 12), pal, x, y - 1);
       if (s === 'escaped') { px(g, x + 3, y + 3, 7, 1, '#ff6b6b'); px(g, x + 3, y + 7, 7, 1, '#ff6b6b'); }
     });
-    text(g, 'SCORE', 238, 152, '#8a9ebd', 'left', false);
-    text(g, pad6(S.score), 238, 164, '#f0f6ff', 'left', false);
+    text(g, 'SCORE', sxBox + 5, 152, '#8a9ebd', 'left', false);
+    text(g, pad6(S.score), sxBox + 5, 164, '#f0f6ff', 'left', false);
     // الشريط العلوي
     if (S.mode !== 'title') text(g, `SPRINT ${S.sprint}`, 6, 5, '#38bdf8');
     if (S.mode !== 'title') text(g, `BEST ${pad6(S.best)}`, W - 6, 5, '#f6823b', 'right');
@@ -646,12 +652,27 @@ export function initDebugHunt(root) {
     if (fsLabel) fsLabel.textContent = on ? 'خروج' : 'ملء الشاشة';
     fsBtn.setAttribute('aria-pressed', String(on));
   };
+  const screenEl = ui('.dh-screen');
+  function layout() {
+    let nw = 320;
+    if (isImmersive() || isNativeFs()) {
+      const r = screenEl.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0 && r.width / r.height > 16 / 9 + 0.02) nw = clamp(Math.round((H * r.width) / r.height), 320, 480);
+    }
+    if (nw === W) return;
+    W = nw; canvas.width = W; canvas.height = H; g.imageSmoothingEnabled = false;
+    bg = buildBackground(); grass = buildGrass(); BIN.x = W - 33;
+    S.bugs.forEach((b) => { b.x = clamp(b.x, 8, W - 24); });
+  }
+  const relayout = () => requestAnimationFrame(() => requestAnimationFrame(layout));
+  window.addEventListener('resize', relayout);
+  window.addEventListener('orientationchange', relayout);
   function enterImmersive() {
     document.body.classList.add('dh-immersive');
     window.scrollTo(0, 0);
-    paintFs();
+    paintFs(); relayout();
   }
-  function exitImmersive() { document.body.classList.remove('dh-immersive'); paintFs(); }
+  function exitImmersive() { document.body.classList.remove('dh-immersive'); paintFs(); relayout(); }
   function enterFs() {
     if (!nativeFs) return enterImmersive();
     const req = cabinet.requestFullscreen || cabinet.webkitRequestFullscreen;
@@ -664,7 +685,7 @@ export function initDebugHunt(root) {
     exitImmersive();
   }
   fsBtn.addEventListener('click', () => { (isNativeFs() || isImmersive()) ? exitFs() : enterFs(); });
-  document.addEventListener('fullscreenchange', paintFs);
+  document.addEventListener('fullscreenchange', () => { paintFs(); relayout(); });
   document.addEventListener('webkitfullscreenchange', paintFs);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isImmersive()) exitImmersive(); });
   function goFullscreenOnMobile() { if (coarse && !isNativeFs() && !isImmersive()) enterFs(); }
