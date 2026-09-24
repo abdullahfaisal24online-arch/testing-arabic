@@ -123,7 +123,7 @@ const jsonLd = {
     background: linear-gradient(180deg, #15223b, #0c1629); border: 2px solid rgba(56,189,248,.45);
     box-shadow: 0 30px 70px rgba(0,0,0,.45), 0 0 0 6px #060b16, 0 0 60px rgba(56,189,248,.15); }
   .dh-screen { position: relative; border-radius: 10px; overflow: hidden; border: 4px solid #060b16; aspect-ratio: 16/9; background: #070f1e; user-select: none; -webkit-user-select: none; }
-  #dh-canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges; touch-action: none; cursor: none; }
+  #dh-canvas { display: block; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; image-rendering: crisp-edges; touch-action: none; cursor: none; }
   .dh-layer { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #f0f6ff; }
   .dh-layer[hidden] { display: none; }
 
@@ -197,11 +197,18 @@ const jsonLd = {
   :global(body.dh-immersive) .dh-controls .ctl { padding: 5px 10px; font-size: 13px; }
   :global(body.dh-immersive) .dh-controls .best { display: none; }
   :global(body.dh-immersive .tachat-launcher) { display: none !important; }
+  /* بالعرض: اللعبة بتاخد الشاشة كلها (العرض المنطقي بيكبر بالكود)، والأزرار فوق بالنص */
   @media (orientation: landscape) and (max-height: 500px) {
-    :global(body.dh-immersive) .dh-cabinet { flex-direction: row; }
-    :global(body.dh-immersive) .dh-screen { width: min(calc(100vw - 64px - env(safe-area-inset-left) - env(safe-area-inset-right)), calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 16 / 9)); }
-    :global(body.dh-immersive) .dh-controls { flex-direction: column; padding: 0; width: 56px; }
-    :global(body.dh-immersive) .dh-controls .ctl { width: 52px; height: 52px; padding: 0; display: grid; place-items: center; border-radius: 12px; font-size: 20px; }
+    :global(body.dh-immersive) .dh-cabinet { gap: 0; }
+    :global(body.dh-immersive) .dh-screen { width: 100%; height: 100%; aspect-ratio: auto; }
+    :global(body.dh-immersive) .dh-controls {
+      position: absolute; z-index: 6; top: calc(env(safe-area-inset-top) + 4px); left: 50%; transform: translateX(-50%);
+      padding: 0; gap: 8px; width: auto; flex-wrap: nowrap; pointer-events: none;
+    }
+    :global(body.dh-immersive) .dh-controls .ctl {
+      pointer-events: auto; width: 34px; height: 34px; padding: 0; display: grid; place-items: center; border-radius: 10px;
+      font-size: 16px; background: rgba(6, 11, 22, .55); border-color: rgba(56, 189, 248, .35); backdrop-filter: blur(4px);
+    }
     :global(body.dh-immersive) .dh-controls .ctl span, :global(body.dh-immersive) .dh-controls .ctl :global(span) { display: none; }
   }
 
