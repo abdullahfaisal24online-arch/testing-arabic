@@ -288,6 +288,7 @@ const CHAT_CORE = `أنت "Testo" — مساعد منصة "Testing بالعرب�
 - إذا انرفقلك "سياق من محتوى المنصة" تحت وكان مناسب للسؤال، استند عليه بإجابتك. إذا مش مناسب أو فاضي، جاوب من معرفتك العامة بالـ QA بشكل طبيعي.
 - المصطلحات التقنية الإنجليزية اكتبها بالحروف اللاتينية زي ما هي (bug, sprint, regression, test case, ISTQB, Selenium…) — ممنوع تكتبها بحروف عربية.
 - ما تخترع روابط ولا مصادر ولا أرقام.
+- اكتب فقط بالحروف العربية، والحروف اللاتينية للمصطلحات التقنية. ممنوع منعاً باتاً أي حرف صيني أو ياباني أو كوري أو روسي أو من أي لغة تانية.
 
 جاوب دايماً باللغة العربية.`;
 
@@ -441,26 +442,39 @@ async function handleChat(req: Request, env: Env) {
   }
 
   // ---------- نداء الموديل ----------
-  let reply = '';
-  try {
-    const out = await env.AI.run(model, {
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: message },
-      ],
-      max_tokens: maxTokens,
-      temperature: 0.3,
-    });
-    reply =
-      (out &&
-        (out.response ||
-          out.output_text ||
-          (out.choices && out.choices[0] && out.choices[0].message && out.choices[0].message.content))) ||
-      '';
-    if (typeof reply !== 'string') reply = String(reply ?? '');
-    reply = reply.trim();
-  } catch {
-    reply = '';
+  const ask = async (sys: string, temperature: number) => {
+    try {
+      const out = await env.AI.run(model, {
+        messages: [
+          { role: 'system', content: sys },
+          { role: 'user', content: message },
+        ],
+        max_tokens: maxTokens,
+        temperature,
+      });
+      let r: any =
+        (out &&
+          (out.response ||
+            out.output_text ||
+            (out.choices && out.choices[0] && out.choices[0].message && out.choices[0].message.content))) ||
+        '';
+      if (typeof r !== 'string') r = String(r ?? '');
+      return r.trim();
+    } catch {
+      return '';
+    }
+  };
+
+  let reply = await ask(system, 0.3);
+
+  // الموديل أحياناً بيدسّ كلمات صينية/غريبة — منعيد المحاولة مرة وحدة بتنبيه صريح، وبعدين منظّف.
+  if (reply && hasForeignScript(reply)) {
+    const retry = await ask(
+      `${system}\n\nتنبيه مهم: اكتب الإجابة بالعربي فقط، والمصطلحات التقنية بالإنجليزي. لا تستخدم أي حرف صيني أو من لغة تانية.`,
+      0.1,
+    );
+    if (retry && !hasForeignScript(retry)) reply = retry;
+    else reply = stripForeignScript(retry || reply);
   }
 
   if (!reply) {
@@ -468,6 +482,31 @@ async function handleChat(req: Request, env: Env) {
   }
 
   return json({ ok: true, reply, sources });
+}
+
+/** حروف من لغات غريبة بتتسرّب أحياناً من الموديل (صيني/ياباني/كوري/سيريلي/هندي/تايلندي…). */
+const FOREIGN_SCRIPT_RE =
+  /[\u0400-\u04FF\u0900-\u0DFF\u0E00-\u0E7F\u1100-\u11FF\u2E80-\u2FFF\u3000-\u303F\u3040-\u30FF\u3100-\u31FF\u3400-\u4DBF\u4E00-\u9FFF\uAC00-\uD7AF\uF900-\uFAFF\uFF00-\uFFEF]/;
+const FOREIGN_SCRIPT_RE_G = new RegExp(FOREIGN_SCRIPT_RE.source, 'g');
+
+const hasForeignScript = (s: string) => FOREIGN_SCRIPT_RE.test(s);
+
+/** شبكة أمان أخيرة: يحوّل علامات الترقيم العريضة ويشيل أي حرف غريب ضايل. */
+function stripForeignScript(s: string): string {
+  return s
+    .replace(/，/g, '، ')
+    .replace(/。/g, '. ')
+    .replace(/：/g, ': ')
+    .replace(/；/g, '؛ ')
+    .replace(/？/g, '؟')
+    .replace(/！/g, '!')
+    .replace(/（/g, ' (')
+    .replace(/）/g, ') ')
+    .replace(FOREIGN_SCRIPT_RE_G, '')
+    .replace(/\(\s*\)/g, '')
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/ +([،.:؛؟!])/g, '$1')
+    .trim();
 }
 
 /* ===================== النشرة (نسخة احتياطية محلية) ===================== */
