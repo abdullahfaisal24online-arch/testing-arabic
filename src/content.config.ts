@@ -334,6 +334,12 @@ const debugHunt = defineCollection({
     trashEnabled: bool(true),
     trashPhoto: optString,
     trashPoints: num(50),
+    showHomeCard: bool(true),
+    homeBadge: str('جديد 🎮'),
+    homeTitle: str('Debug Hunt'),
+    homeText: str('اصطاد الـ bugs قبل ما توصل Production… وانتبه لا تكسر أي feature 😅'),
+    homeCta: str('العب Debug Hunt'),
+    homeMeta: strList,
   }),
 });
 
