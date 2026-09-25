@@ -40,13 +40,29 @@ const jsonLd = {
           <div class="dh-layer dh-title" id="dh-title">
             <div class="dh-logo px">DEBUG HUNT</div>
             <p class="dh-tag">اصطاد الـ bugs قبل ما توصل Production 🐞</p>
-            <button class="dh-btn-start px" id="dh-start" type="button">▶ START</button>
+            <div class="dh-starts">
+              <button class="dh-btn-start px" id="dh-start" type="button">▶ START</button>
+              <button class="dh-btn-daily px" id="dh-daily" type="button">📅 DAILY</button>
+            </div>
+            <small class="dh-daily-note" id="dh-daily-note"></small>
             <div class="dh-legend px" dir="ltr">
               <span><b class="r">●</b> BUG +25</span><span><b class="y">●</b> CRITICAL +100</span><span><b class="c">●</b> FEATURE -50</span>
             </div>
           </div>
 
           <div class="dh-layer dh-banner" id="dh-banner" hidden><b class="px"></b><span></span></div>
+
+          <div class="dh-layer dh-tip" id="dh-tip" hidden role="dialog" aria-label="QA Tip">
+            <div class="tip-card">
+              <div class="tip-k px">💡 QA TIP</div>
+              <b class="tip-t"></b>
+              <p class="tip-p"></p>
+              <div class="tip-a">
+                <a class="tip-link" href="/glossary/" target="_blank" rel="noopener">اقرأ أكثر ←</a>
+                <button type="button" class="tip-go" id="dh-tip-go">كمّل ▶ <span></span></button>
+              </div>
+            </div>
+          </div>
 
           <div class="dh-layer dh-pause" id="dh-pause" hidden>
             <b class="px">PAUSED</b><span>اضغط لتكمّل</span>
@@ -114,6 +130,10 @@ const jsonLd = {
           <div class="how-card"><i aria-hidden="true">🐞</i><b>الـ bugs نقاط</b><p>الحمرا +25، والذهبية Critical <span class="g">+100</span> بس أسرع بكثير.</p></div>
           <div class="how-card"><i aria-hidden="true">🦋</i><b>ممنوع الـ features</b><p>إذا صبت فراشة بتخسر 50 نقطة… Regression 😅</p></div>
           <div class="how-card"><i aria-hidden="true">🚨</i><b>عدّي الـ Sprint</b><p>كل Sprint فيه 10 bugs. لازم تصيد 6 على الأقل عشان تكمّل، وكل Sprint أسرع من اللي قبله.</p></div>
+          <div class="how-card"><i aria-hidden="true">👻</i><b>bugs بأنواعها</b><p><b class="k">Flaky</b> بيختفي وبيرجع، <b class="k">Duplicate</b> بينقسم لاثنين، واللي بيهرب منك بيرجع <b class="k">Regression</b> بالـ Sprint الجاي.</p></div>
+          <div class="how-card"><i aria-hidden="true">🔥</i><b>Production Incident</b><p>كل رابع Sprint بيطلعلك Boss ضخم. طلقات مفتوحة، بس لازم تخلّصه قبل ما يخلص الوقت.</p></div>
+          <div class="how-card"><i aria-hidden="true">⚡</i><b>Power-ups</b><p>اطخّها لما تمرق: <b class="k">Hotfix</b> بيجمّد الـ bugs، <b class="k">Automation</b> طلقات مفتوحة، <b class="k">Code Review</b> بيبطّئ كل إشي.</p></div>
+          <div class="how-card"><i aria-hidden="true">📅</i><b>Daily Challenge</b><p>كل يوم نفس الـ bugs لكل اللاعبين، ومحاولة وحدة. شارك نتيجتك وشوف مين أحسن.</p></div>
         </div>
       </section>
 
@@ -166,12 +186,31 @@ const jsonLd = {
   .dh-btn-start:hover { background: #ff9d5c; }
   .dh-btn-start:active { transform: translate(3px, 3px); box-shadow: 3px 3px 0 #000; }
   @keyframes dh-blink { 50% { filter: brightness(1.25); } }
+  .dh-starts { display: flex; gap: clamp(8px, 1.6vw, 18px); flex-wrap: wrap; justify-content: center; }
+  .dh-btn-daily { font-size: clamp(10px, 1.6vw, 18px); background: #0b162a; color: #38bdf8; border: 4px solid #000; box-shadow: 6px 6px 0 #000, inset 0 0 0 2px #38bdf8; padding: .95em 1.1em; cursor: pointer; direction: ltr; }
+  .dh-btn-daily:hover { background: #13284a; }
+  .dh-btn-daily:active { transform: translate(3px, 3px); box-shadow: 3px 3px 0 #000, inset 0 0 0 2px #38bdf8; }
+  .dh-btn-daily.is-done { color: #34d399; box-shadow: 6px 6px 0 #000, inset 0 0 0 2px #34d399; cursor: default; }
+  .dh-daily-note { margin-top: -4px; font-size: clamp(11px, 1.4vw, 15px); font-weight: 700; color: #b9c9df; text-shadow: 0 2px 8px #000; padding-inline: 12px; }
   .dh-legend { display: flex; gap: clamp(8px, 2vw, 26px); flex-wrap: wrap; justify-content: center; font-size: clamp(7px, 1.1vw, 13px); text-shadow: 2px 2px 0 #000; }
   .dh-legend .r { color: #e8412f; } .dh-legend .y { color: #f7c948; } .dh-legend .c { color: #38bdf8; }
 
   .dh-banner { background: rgba(5,10,20,.55); gap: 12px; pointer-events: none; }
   .dh-banner b { font-size: clamp(16px, 4vw, 44px); color: #38bdf8; text-shadow: 4px 4px 0 #000; direction: ltr; }
   .dh-banner span { font-weight: 700; font-size: clamp(13px, 2.2vw, 26px); text-shadow: 0 3px 12px #000; padding-inline: 12px; }
+
+  /* QA Tip بين الـ Sprints */
+  .dh-tip { background: rgba(5,10,20,.72); padding: 3%; }
+  .tip-card { width: min(92%, 620px); background: #0b162a; border: 4px solid #f7c948; box-shadow: 8px 8px 0 #000; padding: clamp(12px, 2.2vw, 26px); text-align: start; max-height: 100%; overflow-y: auto; }
+  .tip-k { font-size: clamp(9px, 1.2vw, 13px); color: #f7c948; direction: ltr; text-align: right; }
+  .tip-t { display: block; margin-top: clamp(6px, 1vw, 12px); font-size: clamp(16px, 2.3vw, 26px); color: #f0f6ff; }
+  .tip-p { margin: clamp(6px, 1vw, 10px) 0 0; font-size: clamp(13px, 1.7vw, 18px); line-height: 1.75; color: #cfdcef; }
+  .tip-a { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: clamp(10px, 1.6vw, 18px); flex-wrap: wrap; }
+  .tip-link { color: #38bdf8; font-weight: 700; font-size: clamp(13px, 1.5vw, 16px); text-decoration: none; border-bottom: 2px solid rgba(56,189,248,.4); }
+  .tip-link:hover { color: #7dd3fc; }
+  .tip-go { font: inherit; font-weight: 700; font-size: clamp(13px, 1.5vw, 16px); background: #f6823b; color: #1a0d04; border: 3px solid #000; box-shadow: 4px 4px 0 #000; padding: 8px 16px; cursor: pointer; }
+  .tip-go span { font-weight: 400; opacity: .75; }
+  .how-card .k { color: #38bdf8; font-weight: 700; }
 
   .dh-pause, .dh-rotate { background: rgba(5,10,20,.8); gap: 10px; cursor: pointer; padding: 16px; }
   .dh-pause b { font-size: clamp(16px, 3.5vw, 36px); color: #f6823b; }
@@ -214,6 +253,9 @@ const jsonLd = {
 
   /* الموبايل: التقرير نافذة فوق الشاشة كلها بدل ما ينحشر جوّا اللعبة */
   @media (max-width: 900px), (max-height: 560px) {
+    .dh-tip { position: fixed; inset: 0; z-index: 10050; padding: 14px; }
+    .dh-tip[hidden] { display: none; }
+    .tip-card { width: min(100%, 520px); }
     .dh-report { position: fixed; inset: 0; z-index: 10050; padding: 14px; padding-top: max(14px, env(safe-area-inset-top)); padding-bottom: max(14px, env(safe-area-inset-bottom));
       background: rgba(5, 10, 20, .82); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); justify-content: flex-start; }
     .dh-report[hidden] { display: none; }
@@ -306,5 +348,10 @@ const jsonLd = {
   @media (max-width: 640px) {
     .how-grid { grid-template-columns: 1fr; } .dh-cabinet { padding: 8px; } .best { margin-inline-start: 0; }
     .dh-legend { display: none; }
+    :global(body:not(.dh-immersive)) .dh-daily-note { display: none; }
+    :global(body:not(.dh-immersive)) .dh-title { padding-bottom: 12%; gap: 6px; }
+    :global(body:not(.dh-immersive)) .dh-logo { font-size: 20px; }
+    :global(body:not(.dh-immersive)) .dh-tag { font-size: 12px; }
+    :global(body:not(.dh-immersive)) .dh-btn-start, :global(body:not(.dh-immersive)) .dh-btn-daily { font-size: 10px; padding: .8em 1em; border-width: 3px; }
   }
 </style>

@@ -14,6 +14,11 @@ const store = {
 };
 
 const rand = (a, b) => a + Math.random() * (b - a);
+// RNG ثابت (seed) للتحدّي اليومي — نفس ترتيب الـ bugs لكل اللاعبين بنفس اليوم
+function mulberry32(a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function hashStr(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+let srnd = Math.random;
+const srand = (a, b) => a + srnd() * (b - a);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const pad6 = (n) => String(Math.max(0, Math.round(n))).padStart(6, '0');
 
@@ -42,6 +47,9 @@ const PAL = {
   off: { K: '#2a3a55', W: '#2a3a55', R: '#2a3a55', r: '#223049', H: '#2a3a55' },
   esc: { K: '#3a2330', W: '#3a2330', R: '#5b2a35', r: '#40202a', H: '#5b2a35' },
   flash: { K: '#ffffff', W: '#ffffff', R: '#ffffff', r: '#ffffff', H: '#ffffff' },
+  regress: { K: '#15161c', W: '#f3efe6', R: '#a855f7', r: '#6b21a8', H: '#e9d5ff' },
+  minion: { K: '#15161c', W: '#f3efe6', R: '#c2410c', r: '#7c2d12', H: '#fdba74' },
+  boss: { K: '#0d0e12', W: '#ffe4e4', R: '#b91c1c', r: '#7f1d1d', H: '#fca5a5' },
 };
 const BF = [
   '.cc.......cc.',
@@ -227,6 +235,10 @@ class Audio8 {
   fanfare() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, i === 3 ? 0.4 : 0.12, { when: i * 0.12, vol: 0.1 })); }
   trash() { this.noise(0.18, { vol: 0.25, hp: 200 }); this.tone(300, 0.35, { type: 'triangle', slide: 70, vol: 0.12, when: 0.05 }); [660, 880].forEach((f, i) => this.tone(f, 0.07, { when: 0.35 + i * 0.07, vol: 0.07 })); }
   buzz() { this.tone(210, 0.18, { type: 'sawtooth', slide: 190, vol: 0.05 }); this.tone(230, 0.18, { type: 'sawtooth', slide: 205, vol: 0.04, when: 0.03 }); }
+  powerup() { [523, 784, 1047, 1568].forEach((f, i) => this.tone(f, 0.07, { when: i * 0.05, vol: 0.08, type: 'triangle' })); }
+  siren() { for (let i = 0; i < 4; i++) this.tone(i % 2 ? 520 : 780, 0.2, { type: 'sawtooth', vol: 0.05, when: i * 0.2 }); }
+  bossHit() { this.tone(180, 0.08, { slide: 90, vol: 0.12 }); this.noise(0.05, { vol: 0.12, hp: 1500 }); }
+  bossDown() { this.noise(0.5, { vol: 0.3, hp: 120 }); [262, 330, 392, 523, 659].forEach((f, i) => this.tone(f, 0.14, { when: 0.3 + i * 0.1, vol: 0.1 })); }
   gameOver() { [392, 330, 262, 196].forEach((f, i) => this.tone(f, 0.22, { when: i * 0.2, vol: 0.1, type: 'triangle' })); }
   // ---- الموسيقى التفاعلية ----
   startMusic(tempo) {
@@ -307,6 +319,8 @@ export function initDebugHunt(root) {
     best: store.get('dh_best', 0), sprintsPassed: 0,
     bugs: [], butterfly: null, popups: [], toast: null, flash: 0,
     wave: null, testo: null, aim: { x: W / 2, y: 60, show: false, t: 0 }, shake: 0,
+    daily: false, history: [], regressLeft: 0, sprintEscaped: 0, bossesBeaten: 0,
+    fx: { hotfix: 0, auto: 0, review: 0 }, power: null, boss: null, bossTime: 0, bossFail: false,
   };
 
   if (/[?&]dhdebug\b/.test(location.search)) window.__dh = S;
@@ -318,55 +332,127 @@ export function initDebugHunt(root) {
     butterfly: s === 1 ? 0.25 : 0.42,
     pass: s <= 2 ? 6 : s <= 4 ? 7 : 8,
     mult: 1 + 0.2 * (s - 1),
+    flaky: s >= 2 ? 0.2 : 0,          // Flaky من Sprint 2
+    dup: s >= 3 ? 0.15 : 0,           // Duplicate من Sprint 3
+    power: s >= 2 ? 0.16 : 0,         // Power-ups من Sprint 2
   });
+  const isBoss = (s) => s % 4 === 0;  // كل رابع Sprint = Production Incident
+  const DAILY_SPRINTS = 4;            // التحدّي اليومي: 3 Sprints + Boss
+
+  /* ---------- التحدّي اليومي ---------- */
+  function dailyInfo() {
+    const d = new Date();
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const num = Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(2026, 8, 25)) / 864e5) + 1;
+    return { key, num: Math.max(1, num) };
+  }
+  const dailySaved = () => { const v = store.get('dh_daily', null); return v && v.key === dailyInfo().key ? v : null; };
+  const dailyBtn = ui('#dh-daily'), dailyNote = ui('#dh-daily-note');
+  function paintDaily() {
+    if (!dailyBtn) return;
+    const info = dailyInfo(), done = dailySaved();
+    dailyBtn.textContent = done ? `✓ DAILY #${info.num}  ${pad6(done.score)}` : `📅 DAILY #${info.num}`;
+    dailyBtn.classList.toggle('is-done', !!done);
+    if (dailyNote) dailyNote.textContent = done ? 'خلّصت تحدّي اليوم — تحدّي جديد بكرة 👀' : 'نفس الـ bugs لكل اللاعبين اليوم · محاولة وحدة';
+  }
 
   /* ---------- مساعدات الحالة ---------- */
-  function newBug(demo = false) {
-    const c = cfg(S.sprint), gold = !demo && Math.random() < c.gold;
-    const ang = rand(-Math.PI * 0.85, -Math.PI * 0.15), sp = c.speed * (gold ? 1.6 : 1) * rand(0.85, 1.15);
-    return { x: rand(40, W - 50), y: GROUND - 22, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, gold, state: 'fly', t: 0,
-      life: demo ? 1e9 : c.life * (gold ? 0.8 : 1), turn: rand(0.5, 1.2), idx: -1, speed: sp };
+  const POWERS = {
+    hotfix: { label: 'HOTFIX', col: '#38bdf8', letter: 'H', dur: 3, msg: 'FREEZE!' },
+    auto: { label: 'AUTOMATION', col: '#f6823b', letter: 'A', dur: 4, msg: 'UNLIMITED RUNS!' },
+    review: { label: 'CODE REVIEW', col: '#34d399', letter: 'R', dur: 5, msg: 'SLOW MOTION!' },
+  };
+  const LABEL = { flaky: ['FLAKY', '#c9d6ea'], dup: ['DUPLICATE', '#fbbf24'], regress: ['REGRESSION', '#c084fc'] };
+  function newBug(demo = false, type = 'normal') {
+    const c = cfg(S.sprint), R = demo ? Math.random : srnd, r = (a, b) => a + R() * (b - a);
+    if (!demo && type === 'normal') {
+      if (S.regressLeft > 0) { type = 'regress'; S.regressLeft--; }
+      else { const q = R(); if (q < c.flaky) type = 'flaky'; else if (q < c.flaky + c.dup) type = 'dup'; }
+    }
+    const gold = !demo && type === 'normal' && R() < c.gold;
+    const mul = gold ? 1.6 : type === 'regress' ? 1.3 : type === 'kid' ? 1.2 : 1;
+    const ang = r(-Math.PI * 0.85, -Math.PI * 0.15), sp = c.speed * mul * r(0.85, 1.15);
+    return { x: r(40, W - 50), y: GROUND - 22, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, gold, type, state: 'fly', t: 0,
+      life: demo ? 1e9 : c.life * (gold ? 0.8 : 1) * (type === 'regress' ? 0.9 : 1), turn: r(0.5, 1.2), idx: -1, speed: sp,
+      vis: true, ph: R() * 1.2, mini: type === 'kid' };
+  }
+  // bug إضافي (ولد الـ Duplicate أو جندي الـ Boss): ما إله خانة بالـ Sprint وما بيحسب هروب
+  function extraBug(x, y, type) {
+    const b = newBug(true, type); b.type = type; b.mini = type === 'kid'; b.x = x; b.y = y; b.idx = -1;
+    b.life = type === 'kid' ? 2.8 : 3.2; b.t = 0;
+    const ang = rand(0, Math.PI * 2), sp = cfg(S.sprint).speed * 1.2; b.vx = Math.cos(ang) * sp; b.vy = Math.sin(ang) * sp; b.speed = sp;
+    return b;
   }
   function quitToTitle() {
-    audio.stopMusic();
-    Object.assign(S, { mode: 'title', paused: false, bugs: [], butterfly: null, popups: [], toast: null, wave: null, testo: null, statuses: [] });
+    audio.stopMusic(); clearTip();
+    Object.assign(S, { mode: 'title', paused: false, bugs: [], butterfly: null, popups: [], toast: null, wave: null, testo: null, statuses: [], boss: null, power: null, daily: false });
+    S.fx = { hotfix: 0, auto: 0, review: 0 };
     [reportEl, bannerEl, pauseEl, rotateEl].forEach((el) => { el.hidden = true; });
     titleEl.hidden = false; document.body.classList.remove('dh-playing');
     if (trashOn) { trash.state = 'hang'; trash.y = 0; setPhotoForSprint(1); }
-    paintQuit();
+    paintQuit(); paintDaily();
     ui('#dh-start')?.focus({ preventScroll: true });
   }
-  function startGame() {
+  function startGame(daily = false) {
     audio.init();
+    if (daily && dailySaved()) { paintDaily(); return; }
+    const info = dailyInfo();
+    srnd = daily ? mulberry32(hashStr(`dh-daily-${info.key}`)) : Math.random;
     Object.assign(S, { mode: 'play', sprint: 1, score: 0, shots: 0, hits: 0, caught: 0, critical: 0, escaped: 0, broken: 0, combo: 0,
-      bugs: [], butterfly: null, popups: [], toast: null, sprintsPassed: 0 });
+      bugs: [], butterfly: null, popups: [], toast: null, sprintsPassed: 0, daily, history: [], regressLeft: 0, sprintEscaped: 0,
+      bossesBeaten: 0, power: null, boss: null, bossFail: false });
+    S.fx = { hotfix: 0, auto: 0, review: 0 };
     titleEl.hidden = true; reportEl.hidden = true; document.body.classList.add('dh-playing'); setTimeout(paintQuit, 0);
     startSprint();
     audio.startMusic(tempo());
     maybeRotateHint();
-    track('debug_hunt_start');
+    track(daily ? 'debug_hunt_daily_start' : 'debug_hunt_start', daily ? { daily: info.num } : undefined);
   }
-  const tempo = () => Math.min(176, 120 + 8 * (S.sprint - 1));
+  const tempo = () => Math.min(176, 120 + 8 * (S.sprint - 1)) + (S.boss ? 16 : 0);
   function startSprint() {
     if (trashOn) {
       const before = photoShown; setPhotoForSprint(S.sprint);
       if (photoShown !== before || trash.state === 'gone') { trash.state = 'hang'; trash.y = -30; trash.vy = 0; trash.t = 0; trash.jolt = 2; }
     }
-    S.statuses = Array(10).fill('pending'); S.cursor = 0; audio.tempo = tempo(); audio.intense = false; nextWave(); }
+    S.regressLeft = Math.min(3, S.sprintEscaped); S.sprintEscaped = 0;
+    S.statuses = Array(10).fill('pending'); S.cursor = 0; audio.intense = false; S.power = null;
+    if (isBoss(S.sprint)) return startBoss();
+    audio.tempo = tempo(); nextWave();
+  }
+  function startBoss() {
+    const k = S.sprint / 4;
+    S.boss = { x: W / 2 - 22, y: 22, vx: 46 + 8 * k, vy: 20, hp: 10 + 4 * (k - 1), max: 10 + 4 * (k - 1), t: 0, spawn: 1.6, hitT: 0, state: 'fight' };
+    S.bossTime = 18; S.bugs = []; S.butterfly = null;
+    S.wave = { shots: 3, phase: 'boss', t: 0 };
+    audio.tempo = tempo(); audio.intense = true; audio.siren(); S.shake = 0.4;
+    toast('PRODUCTION INCIDENT!', '#ff6b6b');
+  }
+  function maybePower() {
+    const c = cfg(S.sprint);
+    if (S.power || !c.power || srnd() >= c.power) return;
+    const kinds = Object.keys(POWERS), kind = kinds[Math.floor(srnd() * kinds.length)];
+    const dir = srnd() < 0.5 ? 1 : -1;
+    S.power = { kind, x: dir > 0 ? -14 : W + 2, y: srand(28, 78), dir, t: 0 };
+  }
   function nextWave() {
     if (trashOn && trash.state === 'gone') { trash.state = 'hang'; trash.y = -30; trash.vy = 0; trash.t = 0; trash.jolt = 2; }
     const remaining = 10 - S.cursor;
     if (remaining <= 0) return endSprint();
     const n = Math.min(2, remaining);
     S.bugs = [];
-    for (let i = 0; i < n; i++) { const b = newBug(); if (i === 1) b.x = S.bugs[0].x < W / 2 ? rand(W / 2 + 15, W - 50) : rand(40, W / 2 - 25); b.idx = S.cursor++; S.statuses[b.idx] = 'active'; S.bugs.push(b); if (b.gold) setTimeout(() => audio.goldAlert(), 150); }
+    for (let i = 0; i < n; i++) {
+      const b = newBug(); if (i === 1) b.x = S.bugs[0].x < W / 2 ? srand(W / 2 + 15, W - 50) : srand(40, W / 2 - 25);
+      b.idx = S.cursor++; S.statuses[b.idx] = 'active'; S.bugs.push(b);
+      if (b.gold) setTimeout(() => audio.goldAlert(), 150);
+    }
     S.wave = { shots: 3, phase: 'fly', t: 0 };
-    S.butterfly = Math.random() < cfg(S.sprint).butterfly ? { x: Math.random() < 0.5 ? -14 : W + 2, y: rand(18, 70), t: 0, state: 'fly', dir: 0 } : null;
+    S.butterfly = srnd() < cfg(S.sprint).butterfly ? { x: srnd() < 0.5 ? -14 : W + 2, y: srand(18, 70), t: 0, state: 'fly', dir: 0 } : null;
     if (S.butterfly) S.butterfly.dir = S.butterfly.x < 0 ? 1 : -1;
+    maybePower();
     audio.intense = 10 - S.cursor <= 2;
   }
   function endWave() {
-    const caughtNow = S.bugs.filter((b) => b.state === 'done' && b.caught);
+    const caughtNow = S.bugs.filter((b) => b.state === 'done' && b.caught && b.idx >= 0);
     const x = caughtNow.length ? clamp(caughtNow[0].x - 5, 40, W - 60) : Math.round(W / 2 - 12);
     S.testo = { x, y: GROUND + 4, t: 0, laugh: caughtNow.length === 0, hold: caughtNow.map((b) => b.gold) };
     S.wave.phase = 'testo';
@@ -375,20 +461,42 @@ export function initDebugHunt(root) {
   function endSprint() {
     const got = S.statuses.filter((s) => s === 'caught' || s === 'gold').length;
     const c = cfg(S.sprint);
-    S.wave = null; S.bugs = []; S.butterfly = null;
+    S.history.push(S.statuses.slice());
+    S.wave = null; S.bugs = []; S.butterfly = null; S.power = null;
     if (got >= c.pass) {
       S.sprintsPassed++;
       let bonus = 0; if (got === 10) { bonus = Math.round(500 * c.mult); S.score += bonus; }
       audio.fanfare();
-      showBanner(`SPRINT ${S.sprint} ✓`, got === 10 ? `ولا bug وصل Production! +${bonus} 🏆` : `${got}/10 — Release جاهز، كمّل 💪`);
-      S.mode = 'banner';
-      setTimeout(() => { hideBanner(); if (S.mode !== 'banner') return; S.sprint++; S.mode = 'play'; startSprint(); }, 2300);
+      let sub = got === 10 ? `ولا bug وصل Production! +${bonus} 🏆` : `${got}/10 — Release جاهز، كمّل 💪`;
+      if (isBoss(S.sprint + 1)) sub = `${got}/10 ✓ — انتبه: جاي Production Incident 🚨`;
+      else if (S.sprintEscaped > 0) sub += ` · ${Math.min(3, S.sprintEscaped)} راجعين كـ Regression 👾`;
+      afterSprintPass(`SPRINT ${S.sprint} ✓`, sub);
     } else {
       gameOver(got, c.pass);
     }
   }
-  function gameOver(got, need) {
-    S.mode = 'over'; audio.stopMusic(); audio.gameOver(); document.body.classList.remove('dh-playing'); paintQuit();
+  function bossWon() {
+    const c = cfg(S.sprint), bonus = Math.round(500 * c.mult);
+    S.score += bonus; S.bossesBeaten++; S.sprintsPassed++; S.history.push('boss-win');
+    S.boss = null; S.bugs = []; S.wave = null; S.power = null; S.fx = { hotfix: 0, auto: 0, review: 0 };
+    audio.fanfare(); audio.intense = false;
+    afterSprintPass('INCIDENT RESOLVED ✓', `حلّيت الـ Production Incident! +${bonus} 🏆`);
+  }
+  function afterSprintPass(title, sub) {
+    if (S.daily && S.sprint >= DAILY_SPRINTS) { S.mode = 'over'; setTimeout(() => gameOver(0, 0, true), 700); return; }
+    showBanner(title, sub);
+    S.mode = 'banner';
+    setTimeout(() => {
+      hideBanner(); if (S.mode !== 'banner') return;
+      showTip(() => { S.sprint++; S.mode = 'play'; audio.tempo = tempo(); startSprint(); });
+    }, 2100);
+  }
+  function gameOver(got, need, dailyWin = false) {
+    S.mode = 'over'; audio.stopMusic(); document.body.classList.remove('dh-playing'); paintQuit();
+    if (dailyWin) audio.fanfare(); else audio.gameOver();
+    if (!dailyWin && !S.boss && S.statuses.length && S.history.length < S.sprint) S.history.push(S.statuses.slice());
+    if (!dailyWin && S.boss) S.history.push('boss-lose');
+    S.boss = null; S.power = null;
     const isBest = S.score > S.best; if (isBest) { S.best = S.score; store.set('dh_best', S.best); }
     const acc = S.shots ? Math.round((S.hits / S.shots) * 100) : 0;
     const set = (sel, v) => { reportEl.querySelectorAll(sel).forEach((el) => { el.textContent = v; }); };
@@ -400,18 +508,34 @@ export function initDebugHunt(root) {
     set('[data-r=sprint]', `${S.sprint}`);
     set('[data-r=score]', pad6(S.score));
     set('[data-r=best]', pad6(S.best));
+    const info = dailyInfo();
+    set('#rep-title', S.daily ? `DAILY #${info.num}` : 'SPRINT REPORT');
     reportEl.querySelector('.dh-newbest').hidden = !isBest;
     let msg;
     const n = S.sprintsPassed;
-    if (S.escaped === 0) msg = 'QA أسطوري! ولا bug وصل Production 🏆';
-    else if (S.broken >= 2) msg = `صدت bugs… بس كسرت ${S.broken} features 😅 انتبه للـ regression`;
+    if (dailyWin) msg = `خلّصت تحدّي اليوم كامل وحلّيت الـ Incident 🏆 شارك النتيجة وشوف مين بيكسرها`;
+    else if (S.bossFail) msg = `الـ Production Incident ما انحلّ بالوقت… السيرفر وقع 🔥 جرّب مرة ثانية`;
+    else if (S.escaped === 0) msg = 'QA أسطوري! ولا bug وصل Production 🏆';
+    else if (S.broken >= 2) msg = `صدت bugs… بس كسرت ${S.broken} features 😅 انتبه، هيك بتصير Regression`;
     else if (n >= 3) msg = `QA محترف! عدّيت ${n} Sprints، بس ${S.escaped} bugs هربوا على Production 🚨`;
     else if (n >= 1) msg = `شغل حلو! عدّيت ${n === 1 ? 'Sprint واحد' : n + ' Sprints'}، بس Sprint ${S.sprint} ما عدّى (${got}/10، المطلوب ${need}) 💪`;
     else msg = `Sprint ${S.sprint} ما عدّى (${got}/10، المطلوب ${need}) — الـ Production صار مليان bugs 😬`;
+    if (S.daily) {
+      msg += ' · تحدّي جديد بكرة';
+      store.set('dh_daily', { key: info.key, num: info.num, score: S.score, grid: dailyGrid(), win: dailyWin });
+    }
     set('[data-r=msg]', msg);
     setTimeout(() => { reportEl.hidden = false; reportEl.querySelector('#dh-again')?.focus({ preventScroll: true }); }, 900);
-    updateBestLabels();
-    track('debug_hunt_end', { score: S.score, sprint: S.sprint });
+    updateBestLabels(); paintDaily();
+    track(S.daily ? 'debug_hunt_daily_end' : 'debug_hunt_end', { score: S.score, sprint: S.sprint, ...(S.daily ? { daily: info.num, win: dailyWin } : {}) });
+  }
+  // شبكة النتيجة زي Wordle: 🟩 صدته · 🟨 Critical · 🟥 هرب · ⬛ ما وصلته
+  function dailyGrid() {
+    return S.history.map((row, i) => {
+      if (row === 'boss-win') return `🚨 BOSS ✅`;
+      if (row === 'boss-lose') return `🚨 BOSS ❌`;
+      return `S${i + 1} ` + row.map((s) => (s === 'gold' ? '🟨' : s === 'caught' ? '🟩' : s === 'escaped' ? '🟥' : '⬛')).join('');
+    }).join('\n');
   }
   function showBanner(title, sub) { bannerEl.querySelector('b').textContent = title; bannerEl.querySelector('span').textContent = sub; bannerEl.hidden = false; }
   function hideBanner() { bannerEl.hidden = true; }
@@ -419,40 +543,120 @@ export function initDebugHunt(root) {
   function toast(t, col) { S.toast = { text: t, col, t: 0 }; }
   function track(name, params) { try { window.gtag && window.gtag('event', name, params || {}); } catch { /* */ } }
 
+  /* ---------- QA Tip بين الـ Sprints ---------- */
+  const tipEl = ui('#dh-tip');
+  const TIPS = [
+    { k: 'flaky', t: 'Flaky Test', p: 'تست بينجح مرة وبيفشل مرة بدون ما يتغيّر الكود. لا تتجاهله: غالباً السبب waits غلط أو test data مشتركة.', href: '/glossary/flaky-test/' },
+    { k: 'dup', t: 'Duplicate Bug', p: 'قبل ما تفتح bug جديد، دوّر بالـ backlog. الـ Duplicate بيضيّع وقت الفريق، وبيتسكّر بحالة Duplicate بالـ Defect Life Cycle.', href: '/articles/defect-life-cycle/' },
+    { k: 'regress', t: 'Regression', p: 'تصليح bug أو إضافة feature ممكن يكسر إشي كان شغّال. عشان هيك بنعيد نختبر الأجزاء المتأثرة بعد كل تغيير.', href: '/glossary/regression/' },
+    { k: 'boss', t: 'Critical bug بالـ Production؟', p: 'أول إشي: وثّق خطوات الـ reproduce والأثر، وبلّغ الفريق فوراً. بعد الـ hotfix اعمل regression على المنطقة المتأثرة.', href: '/questions/critical-bug-in-production-handling/' },
+    { k: 'feature', t: 'مش كل غلط Bug', p: 'قبل ما تبلّغ، ارجع للـ requirements والـ acceptance criteria. أحياناً السلوك الغريب هو feature مقصودة.', href: '/glossary/acceptance-criteria/' },
+    { k: 'gold', t: 'Severity ≠ Priority', p: 'الـ Severity قدّيش الـ bug مأثّر على النظام، والـ Priority قدّيش لازم ينحل بسرعة. ممكن يكون bug خفيف بس أولويته عالية.', href: '/articles/severity-vs-priority/' },
+    { k: 'any', t: 'Smoke Testing', p: 'أول ما يوصلك build جديد، جرّب الوظائف الأساسية بسرعة. إذا فشل الـ Smoke، ما في داعي تكمّل اختبار تفصيلي.', href: '/glossary/smoke-test/' },
+    { k: 'any', t: 'Bug Report قوي', p: 'عنوان واضح، خطوات reproduce مرتّبة، Actual و Expected، وصورة أو فيديو. هيك الـ developer بيصلّح بدون ما يرجعلك.', href: '/lessons/how-to-write-a-bug-report/' },
+    { k: 'auto', t: 'شو نأتمت؟', p: 'مش كل إشي بينفع للـ automation. ابدأ بالسيناريوهات اللي بتتكرّر كل release ومستقرة، مثل الـ regression suite.', href: '/questions/what-to-automate/' },
+    { k: 'any', t: 'Exploratory Testing', p: 'اختبار بدون test cases مكتوبة مسبقاً، بتتعلّم التطبيق وبتختبره بنفس الوقت. ممتاز لاكتشاف bugs ما حدا توقعها.', href: '/glossary/exploratory-testing/' },
+    { k: 'any', t: 'Test Pyramid', p: 'كثير unit tests بالقاعدة، أقل integration، وأقل بكثير UI tests فوق. هيك الـ suite بيكون أسرع وأثبت.', href: '/glossary/test-pyramid/' },
+    { k: 'review', t: 'Static Testing', p: 'مراجعة الكود والـ requirements بدون تشغيل النظام. بتلاقي الأخطاء بدري وبتكون أرخص بكثير.', href: '/glossary/static-testing/' },
+  ];
+  const shownTips = new Set();
+  let tipTimer = null, tipDone = null;
+  function pickTip() {
+    const next = S.sprint + 1, nc = cfg(next), cur = cfg(S.sprint);
+    const wants = [];
+    if (isBoss(next)) wants.push('boss');
+    if (S.sprintEscaped > 0) wants.push('regress');
+    if (nc.flaky && !cur.flaky) wants.push('flaky');
+    if (nc.dup && !cur.dup) wants.push('dup');
+    if (S.broken > 0) wants.push('feature');
+    if (S.critical > 0) wants.push('gold');
+    for (const k of wants) { const t = TIPS.find((x) => x.k === k && !shownTips.has(x.t)); if (t) return t; }
+    const pool = TIPS.filter((x) => !shownTips.has(x.t));
+    return (pool.length ? pool : TIPS)[Math.floor(Math.random() * (pool.length || TIPS.length))];
+  }
+  function clearTip() { if (tipTimer) clearInterval(tipTimer); tipTimer = null; tipDone = null; if (tipEl) tipEl.hidden = true; }
+  function showTip(done) {
+    if (!tipEl) return done();
+    const tip = pickTip(); shownTips.add(tip.t);
+    tipEl.querySelector('.tip-t').textContent = tip.t;
+    tipEl.querySelector('.tip-p').textContent = tip.p;
+    const a = tipEl.querySelector('.tip-link'); a.href = tip.href; a.onclick = () => track('debug_hunt_tip_click', { tip: tip.t });
+    S.mode = 'tip'; tipDone = done; tipEl.hidden = false; paintQuit();
+    let left = 9; const cnt = tipEl.querySelector('.tip-go span');
+    cnt.textContent = `(${left})`;
+    tipTimer = setInterval(() => { if (document.hidden || S.paused) return; left--; cnt.textContent = `(${left})`; if (left <= 0) continueTip(); }, 1000);
+    tipEl.querySelector('#dh-tip-go')?.focus({ preventScroll: true });
+  }
+  function continueTip() { const d = tipDone; clearTip(); paintQuit(); if (d && S.mode === 'tip') d(); }
+  ui('#dh-tip-go')?.addEventListener('click', continueTip);
+
   /* ---------- الإطلاق ---------- */
   function toLogical(ev) {
     const r = canvas.getBoundingClientRect();
     const sc = Math.min(r.width / W, r.height / H), ox = (r.width - W * sc) / 2, oy = (r.height - H * sc) / 2;
     return { x: (ev.clientX - r.left - ox) / sc, y: (ev.clientY - r.top - oy) / sc };
   }
+  const bossRect = (B) => ({ x: B.x, y: B.y, w: 45, h: 45 });
   function shoot(p) {
-    if (S.mode !== 'play' || S.paused || !S.wave || S.wave.phase !== 'fly' || S.wave.shots <= 0) return;
+    if (S.mode !== 'play' || S.paused || !S.wave) return;
+    const boss = S.wave.phase === 'boss';
+    if (!boss && (S.wave.phase !== 'fly' || S.wave.shots <= 0)) return;
     if (p.y > HUD_Y) return;
-    S.wave.shots--; S.shots++; S.flash = 0.06; audio.shot();
+    const free = boss || S.fx.auto > 0;
+    if (!free) S.wave.shots--;
+    if (!boss) S.shots++;
+    S.flash = 0.06; audio.shot();
     const R = coarse ? 13 : 10;
+    const c = cfg(S.sprint);
+    // 1) الـ Boss
+    if (boss && S.boss && S.boss.state === 'fight') {
+      const r = bossRect(S.boss);
+      if (p.x > r.x - 3 && p.x < r.x + r.w + 3 && p.y > r.y - 3 && p.y < r.y + r.h + 3) {
+        S.boss.hp--; S.boss.hitT = 0.12; S.score += Math.round((20 * c.mult) / 5) * 5; S.shake = 0.08;
+        popup(p.x - 8, p.y - 10, `-1 HP`, '#ff6b6b'); audio.bossHit();
+        if (S.boss.hp <= 0) { S.boss.state = 'dead'; S.boss.t = 0; audio.bossDown(); S.shake = 0.5; popup(S.boss.x - 20, S.boss.y - 6, 'INCIDENT RESOLVED!', '#34d399'); }
+        return;
+      }
+    }
+    // 2) الـ bugs
     let hitBug = null, best = 1e9;
     for (const b of S.bugs) {
-      if (b.state !== 'fly') continue;
-      const d = Math.hypot(b.x + 7.5 - p.x, b.y + 7.5 - p.y);
-      if (d < R && d < best) { best = d; hitBug = b; }
+      if (b.state !== 'fly' || (b.type === 'flaky' && !b.vis)) continue;
+      const off = b.mini ? 6 : 7.5;
+      const d = Math.hypot(b.x + off - p.x, b.y + off - p.y);
+      if (d < (b.mini ? R - 3 : R) && d < best) { best = d; hitBug = b; }
     }
     if (hitBug) {
-      const c = cfg(S.sprint);
-      const pts = Math.round(((hitBug.gold ? 100 : 25) * c.mult) / 5) * 5;
-      S.score += pts; S.hits++; S.caught++; S.combo++;
+      const base = hitBug.gold ? 100 : hitBug.type === 'regress' ? 50 : hitBug.type === 'flaky' ? 40 : hitBug.idx < 0 ? 15 : 25;
+      const pts = Math.round((base * c.mult) / 5) * 5;
+      S.score += pts; S.hits++; S.combo++;
+      if (hitBug.idx >= 0) S.caught++;
       if (hitBug.gold) S.critical++;
       hitBug.state = 'hit'; hitBug.t = 0; hitBug.caught = true;
-      S.statuses[hitBug.idx] = hitBug.gold ? 'gold' : 'caught';
-      popup(hitBug.x, hitBug.y - 4, hitBug.gold ? `+${pts} CRITICAL` : `+${pts}`, hitBug.gold ? '#f7c948' : '#f6823b');
-      if (S.combo >= 3 && S.combo % 3 === 0) popup(hitBug.x, hitBug.y + 6, `COMBO x${S.combo}`, '#38bdf8');
+      if (hitBug.idx >= 0) S.statuses[hitBug.idx] = hitBug.gold ? 'gold' : 'caught';
+      const tag = hitBug.gold ? ' CRITICAL' : hitBug.type === 'regress' ? ' REGRESSION' : hitBug.type === 'flaky' ? ' FLAKY' : '';
+      popup(hitBug.x, hitBug.y - 4, `+${pts}${tag}`, hitBug.gold ? '#f7c948' : hitBug.type === 'regress' ? '#c084fc' : '#f6823b');
+      if (hitBug.type === 'dup') {
+        S.bugs.push(extraBug(hitBug.x, hitBug.y, 'kid'), extraBug(hitBug.x + 4, hitBug.y + 2, 'kid'));
+        if (!free) S.wave.shots++;
+        popup(hitBug.x - 6, hitBug.y + 8, 'DUPLICATE! +1 RUN', '#fbbf24');
+      }
+      if (S.combo >= 3 && S.combo % 3 === 0) popup(hitBug.x, hitBug.y + 16, `COMBO x${S.combo}`, '#38bdf8');
       audio.hit(hitBug.gold); audio.combo = S.combo >= 3;
+    } else if (S.power && Math.hypot(S.power.x + 6 - p.x, S.power.y + 6 - p.y) < R + 2) {
+      const P = POWERS[S.power.kind];
+      S.fx[S.power.kind] = P.dur;
+      popup(S.power.x - 20, S.power.y - 6, `${P.label}: ${P.msg}`, P.col);
+      if (S.power.kind === 'auto' && !boss) S.wave.shots = Math.max(S.wave.shots, 1);
+      audio.powerup(); S.power = null;
+      track('debug_hunt_power', { power: P.label });
     } else if (S.butterfly && S.butterfly.state === 'fly' && Math.hypot(S.butterfly.x + 6 - p.x, S.butterfly.y + 4 - p.y) < R) {
       S.score = Math.max(0, S.score - 50); S.broken++; S.combo = 0; audio.combo = false;
       S.butterfly.state = 'hit'; S.butterfly.t = 0;
-      popup(S.butterfly.x - 10, S.butterfly.y - 4, '-50 REGRESSION!', '#38bdf8');
+      popup(S.butterfly.x - 14, S.butterfly.y - 4, '-50 FEATURE BROKEN!', '#38bdf8');
       audio.error(); S.shake = 0.25;
     } else if (trashOn && trash.state === 'hang' && Math.hypot(photoCenter().x - p.x, photoCenter().y - p.y) < Math.max(R, 13)) {
-      const pts = Math.round((trashPoints * cfg(S.sprint).mult) / 5) * 5;
+      const pts = Math.round((trashPoints * c.mult) / 5) * 5;
       S.score += pts; trash.state = 'fall'; trash.t = 0; trash.vy = -60; trash.scatter = 1;
       popup(BIN.x - 72, BIN.y - 12, `+${pts} CLEANUP!`, '#34d399');
       audio.trash(); S.shake = 0.15;
@@ -462,7 +666,12 @@ export function initDebugHunt(root) {
     } else {
       S.combo = 0; audio.combo = false;
     }
-    if (S.wave.shots === 0) for (const b of S.bugs) if (b.state === 'fly') b.life = Math.min(b.life, b.t + 0.15);
+    trimIfOut();
+  }
+  // إذا خلصت الـ test runs، الـ bugs الباقية بتهرب
+  function trimIfOut() {
+    if (!S.wave || S.wave.phase !== 'fly' || S.wave.shots > 0 || S.fx.auto > 0) return;
+    for (const b of S.bugs) if (b.state === 'fly') b.life = Math.min(b.life, b.t + 0.15);
   }
 
   /* ---------- التحديث ---------- */
@@ -480,27 +689,42 @@ export function initDebugHunt(root) {
     }
     if (S.mode !== 'play' || S.paused) return;
 
+    // Power-ups: الوقت بيمشي حقيقي، بس الـ bugs بتتجمّد (Hotfix) أو بتبطّأ (Code Review)
+    const hadAuto = S.fx.auto > 0;
+    for (const k of Object.keys(S.fx)) S.fx[k] = Math.max(0, S.fx[k] - dt);
+    if (hadAuto && S.fx.auto === 0) trimIfOut();
+    const fdt = S.fx.hotfix > 0 ? 0 : S.fx.review > 0 ? dt * 0.45 : dt;
+
     const w = S.wave; if (!w) return;
     w.t += dt;
+    if (S.power) {
+      const P = S.power; P.t += dt; P.x += P.dir * 30 * fdt; P.y += Math.sin(P.t * 3) * 10 * fdt;
+      if (P.x < -24 || P.x > W + 24) S.power = null;
+    }
     for (const b of S.bugs) {
-      b.t += dt;
       if (b.state === 'fly') {
-        moveBug(b, dt, false);
-        if (b.t > b.life) { b.state = 'escape'; b.vx *= 0.3; b.vy = -140; }
+        b.t += fdt;
+        moveBug(b, fdt, false);
+        if (b.type === 'flaky') b.vis = ((b.t + b.ph) % 1.2) < 0.72;
+        if (b.t > b.life) { b.state = 'escape'; b.vx *= 0.3; b.vy = -140; b.vis = true; }
       } else if (b.state === 'escape') {
-        b.x += b.vx * dt; b.y += b.vy * dt;
-        if (b.y < -20) { b.state = 'done'; b.caught = false; S.escaped++; S.statuses[b.idx] = 'escaped'; toast('BUG ESCAPED TO PRODUCTION!', '#ff6b6b'); audio.escape(); S.combo = 0; audio.combo = false; }
+        b.t += dt; b.x += b.vx * dt; b.y += b.vy * dt;
+        if (b.y < -20) {
+          b.state = 'done'; b.caught = false;
+          if (b.idx >= 0) { S.escaped++; S.sprintEscaped++; S.statuses[b.idx] = 'escaped'; toast('BUG ESCAPED TO PRODUCTION!', '#ff6b6b'); audio.escape(); S.combo = 0; audio.combo = false; }
+        }
       } else if (b.state === 'hit') {
-        if (b.t > 0.28) { b.state = 'fall'; b.vy = 40; }
+        b.t += dt; if (b.t > 0.28) { b.state = 'fall'; b.vy = 40; }
       } else if (b.state === 'fall') {
-        b.vy += 420 * dt; b.y += b.vy * dt;
+        b.t += dt; b.vy += 420 * dt; b.y += b.vy * dt;
         if (b.y > GROUND - 2) b.state = 'done';
       }
     }
+    if (w.phase === 'boss') { updateBoss(dt, fdt); return; }
     const bf = S.butterfly;
     if (bf) {
       bf.t += dt;
-      if (bf.state === 'fly') { bf.x += bf.dir * 34 * dt; bf.y += Math.sin(bf.t * 5) * 18 * dt; if (bf.x < -20 || bf.x > W + 20) S.butterfly = null; }
+      if (bf.state === 'fly') { bf.x += bf.dir * 34 * fdt; bf.y += Math.sin(bf.t * 5) * 18 * fdt; if (bf.x < -20 || bf.x > W + 20) S.butterfly = null; }
       else { bf.y += 70 * dt; bf.x += bf.dir * 20 * dt; if (bf.y > GROUND) S.butterfly = null; }
     }
     if (w.phase === 'fly' && S.bugs.every((b) => b.state === 'done')) endWave();
@@ -508,8 +732,28 @@ export function initDebugHunt(root) {
       const T = S.testo; T.t += dt;
       const up = T.t < 0.35 ? T.t / 0.35 : T.t < 1.05 ? 1 : Math.max(0, 1 - (T.t - 1.05) / 0.3);
       T.y = GROUND + 4 - up * 34;
-      if (T.t > 1.4) { S.testo = null; if (!S.butterfly || S.butterfly.state !== 'fly') { nextWave(); } else { S.butterfly = null; nextWave(); } }
+      if (T.t > 1.4) { S.testo = null; S.butterfly = null; nextWave(); }
     }
+  }
+  function updateBoss(dt, fdt) {
+    const B = S.boss; if (!B) return;
+    B.t += dt; B.hitT = Math.max(0, B.hitT - dt);
+    S.bugs = S.bugs.filter((b) => b.state !== 'done');
+    if (B.state === 'dead') {
+      B.y += 60 * dt;
+      if (B.t > 1.1) bossWon();
+      return;
+    }
+    if (S.fx.hotfix <= 0) S.bossTime = Math.max(0, S.bossTime - dt);
+    B.x += B.vx * fdt; B.y += B.vy * fdt + Math.sin(B.t * 2.2) * 12 * fdt;
+    if (B.x < 12) { B.x = 12; B.vx = Math.abs(B.vx); } if (B.x > W - 57) { B.x = W - 57; B.vx = -Math.abs(B.vx); }
+    if (B.y < 20) { B.y = 20; B.vy = Math.abs(B.vy); } if (B.y > 66) { B.y = 66; B.vy = -Math.abs(B.vy); }
+    B.spawn -= fdt;
+    if (B.spawn <= 0 && S.bugs.filter((b) => b.state === 'fly').length < 3) {
+      S.bugs.push(extraBug(B.x + 16, B.y + 20, 'minion')); B.spawn = Math.max(1.4, 2.6 - 0.2 * (S.sprint / 4));
+    }
+    audio.intense = S.bossTime < 6;
+    if (S.bossTime <= 0) { S.bossFail = true; toast('SERVER DOWN!', '#ff6b6b'); S.shake = 0.6; gameOver(0, 0); }
   }
   function updateTrash(dt) {
     trash.t += dt; trash.scatter = Math.max(0, trash.scatter - dt * 0.8);
@@ -563,12 +807,46 @@ export function initDebugHunt(root) {
   }
 
   /* ---------- الرسم ---------- */
+  const palOf = (b) => (b.gold ? PAL.gold : b.type === 'regress' ? PAL.regress : b.type === 'minion' ? PAL.minion : PAL.red);
   function drawBug(b) {
     const open = Math.floor(S.t * 12 + b.x) % 2 === 0;
-    if (b.state === 'hit') { sprite(g, LB, Math.floor(b.t * 20) % 2 ? PAL.flash : (b.gold ? PAL.gold : PAL.red), b.x, b.y); return; }
-    if (b.state === 'fall') { sprite(g, LB, b.gold ? PAL.gold : PAL.red, b.x, b.y, true); return; }
-    wings(g, b.x, b.y, open); sprite(g, LB, b.gold ? PAL.gold : PAL.red, b.x, b.y);
+    const rows = b.mini ? LB_MINI : LB, pal = palOf(b);
+    if (b.state === 'hit') { sprite(g, rows, Math.floor(b.t * 20) % 2 ? PAL.flash : pal, b.x, b.y); return; }
+    if (b.state === 'fall') { sprite(g, rows, pal, b.x, b.y, true); return; }
+    const ghost = b.type === 'flaky' && !b.vis;
+    if (ghost) g.globalAlpha = 0.14;
+    if (!b.mini) wings(g, b.x, b.y, open);
+    sprite(g, rows, pal, b.x, b.y);
+    g.globalAlpha = 1;
+    if (S.fx.hotfix > 0 && b.state === 'fly') { const c = '#bfe8ff'; px(g, b.x - 2, b.y - 2, 4, 1, c); px(g, b.x - 2, b.y - 2, 1, 4, c); px(g, b.x + 14, b.y + 16, 4, 1, c); px(g, b.x + 17, b.y + 13, 1, 4, c); }
     if (b.gold && Math.floor(S.t * 6) % 2) { px(g, b.x - 3, b.y - 2, 1, 1, '#fff1a8'); px(g, b.x + 17, b.y + 12, 1, 1, '#fff1a8'); }
+    const L = LABEL[b.type];
+    if (L && b.state === 'fly' && b.t < 2.2 && !ghost) text(g, L[0], b.x + 7.5, b.y - 11, L[1], 'center');
+  }
+  function drawPower() {
+    const P = S.power; if (!P) return;
+    const D = POWERS[P.kind], x = Math.round(P.x), y = Math.round(P.y);
+    const blink = Math.floor(S.t * 5) % 2;
+    px(g, x - 1, y - 1, 14, 14, '#000'); px(g, x, y, 12, 12, blink ? D.col : '#0b162a'); px(g, x + 1, y + 1, 10, 10, '#0b162a');
+    text(g, D.letter, x + 2, y + 2, D.col, 'left', false);
+    text(g, D.label, x + 6, y - 11, D.col, 'center');
+  }
+  let bossCanvas = null;
+  function drawBoss() {
+    const B = S.boss; if (!B) return;
+    if (!bossCanvas) bossCanvas = makeCanvas(34, 20);
+    const k = bossCanvas.getContext('2d'); k.clearRect(0, 0, 34, 20);
+    wings(k, 9, 3, Math.floor(S.t * 10) % 2 === 0);
+    sprite(k, LB, B.hitT > 0 ? PAL.flash : PAL.boss, 9, 3, B.state === 'dead');
+    if (B.state !== 'dead') { px(k, 13, 6, 2, 1, '#ff3b3b'); px(k, 19, 6, 2, 1, '#ff3b3b'); } // عيون غاضبة
+    g.drawImage(bossCanvas, Math.round(B.x) - 27, Math.round(B.y) - 9, 102, 60);
+    if (B.state === 'dead') return;
+    // شريط الـ HP والوقت
+    const bw = 120, bx = Math.round(W / 2 - bw / 2), by = 17;
+    text(g, 'PRODUCTION INCIDENT', W / 2, 5, Math.floor(S.t * 3) % 2 ? '#ff6b6b' : '#ffb4b4', 'center');
+    px(g, bx - 1, by - 1, bw + 2, 7, '#000'); px(g, bx, by, bw, 5, '#2a1520');
+    px(g, bx, by, Math.round((bw * B.hp) / B.max), 5, '#ef4444'); px(g, bx, by, Math.round((bw * B.hp) / B.max), 1, '#fca5a5');
+    text(g, `${Math.ceil(S.bossTime)}s`, bx + bw + 6, by - 2, S.bossTime < 6 ? '#ff6b6b' : '#f0f6ff');
   }
   function drawHUD() {
     px(g, 0, HUD_Y, W, H - HUD_Y, '#060b16'); px(g, 0, HUD_Y, W, 1, '#38bdf8');
@@ -576,23 +854,36 @@ export function initDebugHunt(root) {
     const bw = W - 152, sxBox = W - 87;
     box(5, 50); box(60, bw); box(sxBox, 82);
     text(g, 'RUNS', 9, 152, '#8a9ebd', 'left', false);
-    const shots = S.wave ? S.wave.shots : 3;
-    for (let i = 0; i < 3; i++) { const on = i < shots; px(g, 10 + i * 9, 164, 5, 8, on ? '#f6823b' : '#2a3a55'); px(g, 10 + i * 9, 162, 5, 2, on ? '#ffc59e' : '#2a3a55'); }
-    text(g, 'BUGS', 64, 152, '#8a9ebd', 'left', false);
-    const st = S.statuses.length ? S.statuses : Array(10).fill('pending');
-    st.forEach((s, i) => {
-      const x = 60 + Math.round((bw - 160) / 2) + 2 + i * 16, y = 162;
-      let pal = PAL.off;
-      if (s === 'caught') pal = PAL.red; else if (s === 'gold') pal = PAL.gold; else if (s === 'escaped') pal = PAL.esc;
-      else if (s === 'active' && Math.floor(S.t * 4) % 2) pal = { ...PAL.off, R: '#4b6a93' };
-      sprite(g, LB_MINI.slice(0, 12), pal, x, y - 1);
-      if (s === 'escaped') { px(g, x + 3, y + 3, 7, 1, '#ff6b6b'); px(g, x + 3, y + 7, 7, 1, '#ff6b6b'); }
-    });
+    const unlimited = S.boss || S.fx.auto > 0;
+    const shots = unlimited ? 3 : S.wave ? S.wave.shots : 3;
+    for (let i = 0; i < 3; i++) {
+      const on = i < shots, col = unlimited ? (Math.floor(S.t * 8 + i) % 2 ? '#f6823b' : '#ffc59e') : on ? '#f6823b' : '#2a3a55';
+      px(g, 10 + i * 9, 164, 5, 8, col); px(g, 10 + i * 9, 162, 5, 2, on || unlimited ? '#ffc59e' : '#2a3a55');
+    }
+    if (shots > 3 && !unlimited) text(g, `+${shots - 3}`, 38, 164, '#fbbf24', 'left', false);
+    if (S.boss) {
+      text(g, 'BOSS FIGHT', 60 + bw / 2, 152, '#ff6b6b', 'center', false);
+      text(g, 'SHOOT FAST!', 60 + bw / 2, 164, '#f0f6ff', 'center', false);
+    } else {
+      text(g, 'BUGS', 64, 152, '#8a9ebd', 'left', false);
+      const st = S.statuses.length ? S.statuses : Array(10).fill('pending');
+      st.forEach((s, i) => {
+        const x = 60 + Math.round((bw - 160) / 2) + 2 + i * 16, y = 162;
+        let pal = PAL.off;
+        if (s === 'caught') pal = PAL.red; else if (s === 'gold') pal = PAL.gold; else if (s === 'escaped') pal = PAL.esc;
+        else if (s === 'active' && Math.floor(S.t * 4) % 2) pal = { ...PAL.off, R: '#4b6a93' };
+        sprite(g, LB_MINI.slice(0, 12), pal, x, y - 1);
+        if (s === 'escaped') { px(g, x + 3, y + 3, 7, 1, '#ff6b6b'); px(g, x + 3, y + 7, 7, 1, '#ff6b6b'); }
+      });
+    }
     text(g, 'SCORE', sxBox + 5, 152, '#8a9ebd', 'left', false);
     text(g, pad6(S.score), sxBox + 5, 164, '#f0f6ff', 'left', false);
     // الشريط العلوي
-    if (S.mode !== 'title') text(g, `SPRINT ${S.sprint}`, 6, 5, '#38bdf8');
-    if (S.mode !== 'title') text(g, `BEST ${pad6(S.best)}`, W - 6, 5, '#f6823b', 'right');
+    if (S.mode !== 'title' && !S.boss) text(g, S.daily ? `DAILY S${S.sprint}` : `SPRINT ${S.sprint}`, 6, 5, '#38bdf8');
+    if (S.mode !== 'title' && !S.boss) text(g, `BEST ${pad6(S.best)}`, W - 6, 5, '#f6823b', 'right');
+    // الـ Power-up الشغّال
+    const act = Object.keys(S.fx).find((k) => S.fx[k] > 0);
+    if (act && S.mode === 'play') { const D = POWERS[act]; text(g, `${D.label} ${Math.ceil(S.fx[act])}`, W / 2, S.boss ? 26 : 5, D.col, 'center'); }
   }
   function drawCrosshair(x, y) {
     const k = fg; x = Math.round(x); y = Math.round(y); const c = '#38bdf8';
@@ -613,7 +904,9 @@ export function initDebugHunt(root) {
     g.drawImage(grass, 0, 0);
     if (trashOn) drawFlies();
     if (S.butterfly) { const bf = S.butterfly; sprite(g, Math.floor(bf.t * 8) % 2 ? BF : BF_CLOSED, BF_PAL, bf.x, bf.y, bf.state === 'hit'); if (bf.state === 'fly') text(g, 'FEATURE', bf.x - 8, bf.y - 11, '#38bdf8'); }
+    if (S.boss) drawBoss();
     S.bugs.forEach((b) => { if (b.state !== 'done') drawBug(b); });
+    drawPower();
     g.restore();
     // الطبقة العلوية: نصوص طايرة + إشعارات + crosshair (فوق الصورة المعلّقة)
     fg.clearRect(0, 0, W, H);
@@ -648,9 +941,11 @@ export function initDebugHunt(root) {
     shoot(p);
   });
   ui('#dh-start').addEventListener('click', () => { goFullscreenOnMobile(); startGame(); });
-  ui('#dh-again').addEventListener('click', () => startGame());
+  dailyBtn?.addEventListener('click', () => { if (dailySaved()) { paintDaily(); return; } goFullscreenOnMobile(); startGame(true); });
+  paintDaily();
+  ui('#dh-again').addEventListener('click', () => startGame(false));
   const quitBtn = ui('#dh-quit');
-  function paintQuit() { if (quitBtn) quitBtn.hidden = !(S.mode === 'play' || S.mode === 'banner'); }
+  function paintQuit() { if (quitBtn) quitBtn.hidden = !(S.mode === 'play' || S.mode === 'banner' || S.mode === 'tip'); }
   quitBtn?.addEventListener('click', quitToTitle);
   // خروج من التقرير: بيسكّر التقرير وبيطلع من وضع ملء الشاشة وبيرجع لشاشة البداية
   const exitFromReport = () => {
@@ -746,7 +1041,10 @@ export function initDebugHunt(root) {
   updateBestLabels();
 
   /* ---------- المشاركة ---------- */
-  function shareText() { return `جبت ${S.score} نقطة بـ Debug Hunt 🐞 ووصلت Sprint ${S.sprint}. بتقدر تكسر رقمي؟`; }
+  function shareText() {
+    if (S.daily) return `Debug Hunt Daily #${dailyInfo().num} 🐞\n${dailyGrid()}\nSCORE ${S.score}\nبتقدر تكسر رقمي؟`;
+    return `جبت ${S.score} نقطة بـ Debug Hunt 🐞 ووصلت Sprint ${S.sprint}. بتقدر تكسر رقمي؟`;
+  }
   async function makeCard() {
     const c = makeCanvas(1080, 1080), x = c.getContext('2d'); x.imageSmoothingEnabled = false;
     x.drawImage(bg, 70, 0, 180, 144, 0, 0, 1080, 864); x.drawImage(grass, 70, 0, 180, 144, 0, 0, 1080, 864);
@@ -758,7 +1056,7 @@ export function initDebugHunt(root) {
     x.font = '64px "Press Start 2P"'; x.fillStyle = '#000'; x.fillText('DEBUG HUNT', 546, 116); x.fillStyle = '#f0f6ff'; x.fillText('DEBUG HUNT', 540, 110);
     x.font = '32px "Press Start 2P"'; x.fillStyle = '#8a9ebd'; x.fillText('SCORE', 540, 330);
     x.font = '112px "Press Start 2P"'; x.fillStyle = '#000'; x.fillText(pad6(S.score), 548, 398); x.fillStyle = '#f6823b'; x.fillText(pad6(S.score), 540, 390);
-    x.font = '30px "Press Start 2P"'; x.fillStyle = '#38bdf8'; x.fillText(`SPRINT ${S.sprint}  ·  BUGS ${S.caught}`, 540, 560);
+    x.font = '30px "Press Start 2P"'; x.fillStyle = '#38bdf8'; x.fillText(S.daily ? `DAILY #${dailyInfo().num}  ·  BUGS ${S.caught}` : `SPRINT ${S.sprint}  ·  BUGS ${S.caught}`, 540, 560);
     x.font = '700 64px "IBM Plex Sans Arabic", sans-serif'; x.fillStyle = '#f0f6ff'; x.direction = 'rtl'; x.fillText('بتقدر تكسر رقمي؟', 540, 690);
     x.direction = 'ltr'; x.font = '28px "Press Start 2P"'; x.fillStyle = '#f6823b'; x.fillText('testing-arabic.com/debug-hunt', 540, 950);
     return new Promise((res) => c.toBlob(res, 'image/png'));
@@ -779,6 +1077,9 @@ export function initDebugHunt(root) {
     setTimeout(() => URL.revokeObjectURL(a.href), 4000); track('debug_hunt_card');
   });
   function flashNote(t) { const n = reportEl.querySelector('.dh-note'); n.textContent = t; n.hidden = false; setTimeout(() => { n.hidden = true; }, 3500); }
+
+  // أداة اختبار بس مع ?dhdebug: القفز لأي Sprint
+  if (/[?&]dhdebug\b/.test(location.search)) window.__dhGo = (n) => { S.sprint = n; S.mode = 'play'; startSprint(); };
 
   /* ---------- البداية ---------- */
   const fontReady = document.fonts ? document.fonts.load(FONT).catch(() => {}) : Promise.resolve();

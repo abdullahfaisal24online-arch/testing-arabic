@@ -29,12 +29,12 @@ const jsonLd = {
     <section class="mission-screen" id="mission-screen">
       <div class="mission-card">
         <span class="case-label"><span aria-hidden="true">●</span> {game.caseLabel}</span>
-        <div class="mission-icon" aria-hidden="true"><Icon name="bug" size={42} /></div>
+        <div class="mission-icon" aria-hidden="true"><img src="/brand/ladybug.webp" alt="" width="62" height="68" decoding="async" /></div>
         <h1>{game.caseTitle}</h1>
         <p class="mission-copy">{game.caseText}</p>
 
         <div class="mission-facts">
-          <span><Icon name="bug" size={18} /><b>{game.bugs.length}</b> أخطاء مخفية</span>
+          <span><img class="lb-mini" src="/brand/ladybug.webp" alt="" width="18" height="20" decoding="async" /><b>{game.bugs.length}</b> أخطاء مخفية</span>
           <span><Icon name="clock" size={18} /><b>{game.durationSeconds}</b> ثانية بالتحدي</span>
           <span><Icon name="check" size={18} /> محاولة واحدة لكل Bug</span>
         </div>
@@ -60,7 +60,7 @@ const jsonLd = {
     <section class="game-screen" id="game-screen" hidden aria-label="متجر The Broken Shop">
       <div class="game-hud">
         <div class="game-toolbar">
-          <div class="toolbar-brand"><Icon name="bug" size={22} /><span>BUG HUNTER</span><small>CASE 01</small></div>
+          <div class="toolbar-brand"><img class="lb-mini" src="/brand/ladybug.webp" alt="" width="22" height="24" decoding="async" /><span>BUG HUNTER</span><small>CASE 01</small></div>
           <div class="toolbar-stats">
             <span class="stat"><small>SCORE</small><b id="score-value">0000</b></span>
             <span class="stat"><small>FOUND</small><b><i id="found-value">0</i>/{game.bugs.length}</b></span>
@@ -551,6 +551,8 @@ const jsonLd = {
   .mission-copy, .result-card > p { max-width: 720px; margin: 12px auto 0; color: var(--ink-3); font-size: 18px; }
   .mission-facts { display: flex; justify-content: center; flex-wrap: wrap; gap: 14px 26px; margin-top: 28px; color: var(--ink-2); }
   .mission-facts span { display: flex; align-items: center; gap: 7px; }
+  .mission-icon img { width: 62px; height: auto; transform: rotate(18deg); filter: drop-shadow(0 6px 8px rgba(0,0,0,.5)) drop-shadow(0 0 12px rgba(255,90,60,.35)); }
+  .lb-mini { height: auto; transform: rotate(18deg); filter: drop-shadow(0 2px 3px rgba(0,0,0,.45)); }
   .mission-facts :global(svg) { color: var(--cyan); }
   .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 36px; text-align: right; }
   .mode-card { position: relative; min-height: 190px; padding: 25px; display: flex; flex-direction: column; align-items: flex-start; border: 1px solid var(--line-strong); border-radius: 17px; background: color-mix(in srgb, var(--surface-2) 72%, transparent); color: var(--ink); cursor: pointer; transition: .18s ease; }
