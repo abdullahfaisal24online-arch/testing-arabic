@@ -38,6 +38,40 @@ const measurementId = 'G-PQF8VX7WJ4';
     function pageContextEvent() {
       var lesson = location.pathname.match(/^\/lessons\/([^/]+)\/?$/);
       if (lesson) window.taTrack('lesson_open', { lesson_id: decodeURIComponent(lesson[1]) });
+      aiReferral();
+    }
+
+    // GEO: مين إجا من أدوات الذكاء الاصطناعي (ChatGPT, Perplexity, Gemini, Claude, Copilot…)
+    var AI_SOURCES = [
+      ['chatgpt', /(^|\.)(chatgpt\.com|chat\.openai\.com|openai\.com)$/],
+      ['perplexity', /(^|\.)perplexity\.ai$/],
+      ['gemini', /(^|\.)(gemini\.google\.com|bard\.google\.com)$/],
+      ['claude', /(^|\.)claude\.ai$/],
+      ['copilot', /(^|\.)(copilot\.microsoft\.com|copilot\.cloud\.microsoft)$/],
+      ['deepseek', /(^|\.)deepseek\.com$/],
+      ['grok', /(^|\.)grok\.com$/],
+      ['meta_ai', /(^|\.)meta\.ai$/],
+      ['mistral', /(^|\.)chat\.mistral\.ai$/],
+      ['you', /(^|\.)you\.com$/]
+    ];
+    function aiSourceOf(value) {
+      if (!value) return '';
+      var host = String(value).toLowerCase();
+      try { if (host.indexOf('/') > -1) host = new URL(host).hostname; } catch (e) {}
+      for (var i = 0; i < AI_SOURCES.length; i++) {
+        if (AI_SOURCES[i][1].test(host) || host === AI_SOURCES[i][0]) return AI_SOURCES[i][0];
+      }
+      return /^(chatgpt|perplexity|gemini|claude|copilot)/.test(host) ? host.split(/[.\s]/)[0] : '';
+    }
+    function aiReferral() {
+      var key = 'ta-ai-ref-sent';
+      try { if (sessionStorage.getItem(key)) return; } catch (e) {}
+      var utm = '';
+      try { utm = new URLSearchParams(location.search).get('utm_source') || ''; } catch (e) {}
+      var source = aiSourceOf(utm) || aiSourceOf(document.referrer);
+      if (!source) return;
+      window.taTrack('ai_referral', { ai_source: source, landing_page: location.pathname });
+      try { sessionStorage.setItem(key, '1'); } catch (e) {}
     }
 
     function loadAnalytics() {

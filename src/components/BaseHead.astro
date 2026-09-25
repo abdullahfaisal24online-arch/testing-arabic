@@ -1,4 +1,5 @@
 ---
+import { getEntry } from 'astro:content';
 import { getSite } from '../lib/site';
 
 interface Props {
@@ -40,6 +41,54 @@ const usefulDescription = cleanDescription.length < 70
   ? `${cleanDescription} شرح مبسّط وعملي بالعربي من منصة ${site.name}.`
   : cleanDescription;
 const metaDescription = shorten(usefulDescription, 160);
+// ===== GEO: هوية المنصة والمؤسس بكل صفحة (ثابتة بـ @id عشان محركات البحث وأدوات الـ AI تربطهم ببعض) =====
+const siteUrl = site.url.replace(/\/$/, '');
+const about = await getEntry('pages', 'about').catch(() => undefined);
+const profile = about?.data as Record<string, string> | undefined;
+const graph = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'EducationalOrganization',
+      '@id': `${siteUrl}/#organization`,
+      name: site.name,
+      alternateName: ['Testing Arabic', 'Testing Bil Arabi'],
+      url: `${siteUrl}/`,
+      logo: { '@type': 'ImageObject', url: `${siteUrl}/brand/testing-arabic-logo.jpg` },
+      description: site.description,
+      inLanguage: 'ar',
+      founder: { '@id': `${siteUrl}/#author` },
+      ...(site.email ? { email: site.email } : {}),
+      sameAs: [site.facebook, site.instagram, site.youtube].filter(Boolean),
+      knowsAbout: ['Software Testing', 'Quality Assurance', 'ISTQB', 'Test Management', 'Agile', 'Scrum', 'Jira', 'API Testing', 'Postman', 'Mobile Test Automation'],
+    },
+    {
+      '@type': 'Person',
+      '@id': `${siteUrl}/#author`,
+      name: site.author,
+      url: `${siteUrl}/about/`,
+      ...(profile?.profileRole ? { jobTitle: profile.profileRole } : {}),
+      ...(profile?.profilePhoto ? { image: `${siteUrl}${profile.profilePhoto}` } : {}),
+      worksFor: { '@id': `${siteUrl}/#organization` },
+      sameAs: [site.linkedin].filter(Boolean),
+      knowsAbout: ['Software Testing', 'Quality Assurance', 'ISTQB', 'Test Automation'],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${siteUrl}/#website`,
+      name: site.name,
+      url: `${siteUrl}/`,
+      inLanguage: 'ar',
+      description: site.description,
+      publisher: { '@id': `${siteUrl}/#organization` },
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: `${siteUrl}/search/?q={search_term_string}`,
+        'query-input': 'required name=search_term_string',
+      },
+    },
+  ],
+};
 const blocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
 <meta charset="utf-8" />
@@ -52,6 +101,7 @@ const blocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="alternate" type="application/rss+xml" title={site.name} href="/rss.xml" />
 <link rel="sitemap" href="/sitemap-index.xml" />
+<link rel="alternate" type="text/markdown" title="llms.txt" href="/llms.txt" />
 
 <meta property="og:type" content={type} />
 <meta property="og:site_name" content={site.name} />
@@ -70,6 +120,7 @@ const blocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
 <meta name="theme-color" content="#0a1428" />
 
+<script type="application/ld+json" set:html={JSON.stringify(graph)} />
 {blocks.map((block) => (
   <script type="application/ld+json" set:html={JSON.stringify(block)} />
 ))}
