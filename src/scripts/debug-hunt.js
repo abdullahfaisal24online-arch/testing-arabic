@@ -580,7 +580,6 @@ export function initDebugHunt(root) {
     const tip = pickTip(); shownTips.add(tip.t);
     tipEl.querySelector('.tip-t').textContent = tip.t;
     tipEl.querySelector('.tip-p').textContent = tip.p;
-    const a = tipEl.querySelector('.tip-link'); a.href = tip.href; a.onclick = () => track('debug_hunt_tip_click', { tip: tip.t });
     S.mode = 'tip'; tipDone = done; tipEl.hidden = false; paintQuit();
     let left = 9; const cnt = tipEl.querySelector('.tip-go span');
     cnt.textContent = `(${left})`;
