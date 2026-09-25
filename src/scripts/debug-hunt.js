@@ -652,6 +652,14 @@ export function initDebugHunt(root) {
   const quitBtn = ui('#dh-quit');
   function paintQuit() { if (quitBtn) quitBtn.hidden = !(S.mode === 'play' || S.mode === 'banner'); }
   quitBtn?.addEventListener('click', quitToTitle);
+  // خروج من التقرير: بيسكّر التقرير وبيطلع من وضع ملء الشاشة وبيرجع لشاشة البداية
+  const exitFromReport = () => {
+    quitToTitle();
+    try { if (typeof isImmersive === 'function' && isImmersive()) exitImmersive(); else if (typeof isNativeFs === 'function' && isNativeFs()) exitFs(); } catch { /* */ }
+  };
+  ui('#dh-exit')?.addEventListener('click', exitFromReport);
+  ui('#dh-exit-x')?.addEventListener('click', exitFromReport);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !reportEl.hidden) exitFromReport(); });
   document.addEventListener('keydown', (e) => {
     if ((e.key === 'Enter' || e.key === ' ') && (S.mode === 'title') && document.activeElement === document.body) { e.preventDefault(); startGame(); }
   });
