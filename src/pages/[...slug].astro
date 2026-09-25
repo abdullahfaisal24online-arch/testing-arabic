@@ -32,6 +32,7 @@ const jsonLd: Record<string, unknown> = {
 if (hasProfile) {
   jsonLd.about = {
     '@type': 'Person',
+    ...(profileName === site.author ? { '@id': `${site.url.replace(/\/$/, '')}/#author` } : {}),
     name: profileName,
     ...(data.profileRole ? { jobTitle: data.profileRole } : {}),
     ...(data.profilePhoto ? { image: `${site.url}${data.profilePhoto}` } : {}),

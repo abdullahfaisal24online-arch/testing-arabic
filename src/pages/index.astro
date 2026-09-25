@@ -66,27 +66,7 @@ const courseTitles = Object.fromEntries(courses.map((c) => [c.id, c.data.title])
 const courseTitleOf = (l: (typeof lessons)[number]) =>
   courseTitles[(l.data.course ?? l.data.track) ?? ''];
 
-const jsonLd = [
-  {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: site.name,
-    url: site.url,
-    inLanguage: 'ar',
-    description: site.description,
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: `${site.url}/search/?q={search_term_string}`,
-      'query-input': 'required name=search_term_string',
-    },
-  },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'EducationalOrganization',
-    name: site.name,
-    url: site.url,
-    sameAs: [site.youtube, site.linkedin].filter(Boolean),
-  },
+const jsonLd: Record<string, unknown>[] = [
 ];
 ---
 <Base title={site.name} description={site.description} jsonLd={jsonLd}>
