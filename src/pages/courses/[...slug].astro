@@ -49,7 +49,7 @@ const jsonLd = [
     inLanguage: 'ar',
     url: `${site.url}/courses/${course.id}/`,
     ...(coverUrl ? { image: coverUrl } : {}),
-    provider: { '@type': 'Organization', name: site.name, url: site.url },
+    provider: { '@id': `${site.url.replace(/\/$/, '')}/#organization` },
     isAccessibleForFree: true,
     hasCourseInstance: {
       '@type': 'CourseInstance',
