@@ -29,7 +29,7 @@ const isLatin = (t: string) => /^[\x00-\x7F\s]+$/.test(t);
 const games = [
   bugHunter?.enabled && bugHunter.showHomeCard && {
     href: '/bug-hunter/',
-    img: '/games/bug-hunter-preview.webp',
+    img: '/games/bug-hunter-cover.webp',
     kind: 'تحدّي عملي',
     badge: bugHunter.homeBadge,
     title: bugHunter.homeTitle,
@@ -40,7 +40,7 @@ const games = [
   },
   dh.showHomeCard && {
     href: '/debug-hunt/',
-    img: '/games/debug-hunt-preview.webp',
+    img: '/games/debug-hunt-cover.webp',
     kind: 'استراحة retro',
     badge: dh.homeBadge,
     title: dh.homeTitle,
@@ -48,7 +48,7 @@ const games = [
     meta: dh.homeMeta?.length ? dh.homeMeta : ['60 ثانية', 'بتلعب عالموبايل', 'شارك سكورك'],
     cta: dh.homeCta,
     tone: 'cyan',
-    pixel: true,
+    pixel: false,
     pixelTitle: isLatin(dh.homeTitle),
   },
 ].filter(Boolean) as any[];
@@ -69,7 +69,7 @@ const games = [
         {games.map((g) => (
           <a class:list={['game-card', `tone-${g.tone}`]} href={g.href}>
             <div class="shot">
-              <img src={g.img} alt="" width="960" height="540" loading="lazy" decoding="async" class:list={{ pixel: g.pixel }} />
+              <img src={g.img} alt="" width="1280" height="720" loading="lazy" decoding="async" class:list={{ pixel: g.pixel }} />
             </div>
             <div class="body">
               {g.badge && <span class="badge"><span aria-hidden="true">●</span> {g.badge}</span>}
