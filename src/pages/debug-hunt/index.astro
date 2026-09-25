@@ -60,6 +60,7 @@ const jsonLd = {
 
           <div class="dh-layer dh-report" id="dh-report" hidden role="dialog" aria-modal="true" aria-labelledby="rep-title">
             <div class="rep-card">
+              <button type="button" class="rep-x" id="dh-exit-x" aria-label="خروج من اللعبة">✕</button>
               <div class="rep-head">
                 <div class="rep-title px" id="rep-title">SPRINT REPORT</div>
                 <div class="rep-new px dh-newbest" hidden>★ NEW BEST ★</div>
@@ -84,7 +85,11 @@ const jsonLd = {
                 <div class="rep-actions">
                   <button type="button" class="rb rb-primary" id="dh-share">شارك النتيجة</button>
                   <button type="button" class="rb rb-ghost" id="dh-again">العب مرة تانية</button>
-                  <button type="button" class="rb rb-link" id="dh-card">حمّل بطاقة السكور</button>
+                  <div class="rep-links">
+                    <button type="button" class="rb rb-link" id="dh-card">حمّل بطاقة السكور</button>
+                    <span aria-hidden="true">·</span>
+                    <button type="button" class="rb rb-link" id="dh-exit">خروج</button>
+                  </div>
                 </div>
                 <p class="dh-note" hidden></p>
               </div>
@@ -196,7 +201,11 @@ const jsonLd = {
   .tile span { display: block; margin-top: 6px; font-size: clamp(12px, 1.2vw, 14px); line-height: 1.4; color: #9fb4d4; }
   .tile .y { color: #f7c948; } .tile .red { color: #ff6b6b; } .tile .c { color: #38bdf8; }
   .rep-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: clamp(10px, 1.4vw, 16px); }
-  .rep-actions .rb-link { grid-column: 1 / -1; justify-self: center; }
+  .rep-links { grid-column: 1 / -1; display: flex; justify-content: center; align-items: center; gap: 12px; color: #5f7292; }
+  .rep-card { position: relative; }
+  .rep-x { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; display: grid; place-items: center; font: inherit; font-size: 18px; line-height: 1;
+    color: #cfe6fb; background: #0f1f38; border: 2px solid #1f4b73; border-radius: 10px; cursor: pointer; }
+  .rep-x:hover { border-color: #38bdf8; color: #fff; }
   .rb { font: inherit; font-weight: 700; font-size: clamp(14px, 1.5vw, 18px); padding: .6em 1em; cursor: pointer; border: 3px solid #000; box-shadow: 5px 5px 0 #000; }
   .rb:active { transform: translate(2px, 2px); box-shadow: 3px 3px 0 #000; }
   .rb-primary { background: #f6823b; color: #1a0d04; }
