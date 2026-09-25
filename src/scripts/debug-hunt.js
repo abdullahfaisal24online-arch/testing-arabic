@@ -402,6 +402,7 @@ export function initDebugHunt(root) {
       bugs: [], butterfly: null, popups: [], toast: null, sprintsPassed: 0, daily, history: [], regressLeft: 0, sprintEscaped: 0,
       bossesBeaten: 0, power: null, boss: null, bossFail: false });
     S.fx = { hotfix: 0, auto: 0, review: 0 };
+    gameTips.length = 0;
     titleEl.hidden = true; reportEl.hidden = true; document.body.classList.add('dh-playing'); setTimeout(paintQuit, 0);
     startSprint();
     audio.startMusic(tempo());
@@ -525,6 +526,7 @@ export function initDebugHunt(root) {
       store.set('dh_daily', { key: info.key, num: info.num, score: S.score, grid: dailyGrid(), win: dailyWin });
     }
     set('[data-r=msg]', msg);
+    renderLearn();
     setTimeout(() => { reportEl.hidden = false; reportEl.querySelector('#dh-again')?.focus({ preventScroll: true }); }, 900);
     updateBestLabels(); paintDaily();
     track(S.daily ? 'debug_hunt_daily_end' : 'debug_hunt_end', { score: S.score, sprint: S.sprint, ...(S.daily ? { daily: info.num, win: dailyWin } : {}) });
@@ -560,6 +562,7 @@ export function initDebugHunt(root) {
     { k: 'review', t: 'Static Testing', p: 'مراجعة الكود والـ requirements بدون تشغيل النظام. بتلاقي الأخطاء بدري وبتكون أرخص بكثير.', href: '/glossary/static-testing/' },
   ];
   const shownTips = new Set();
+  const gameTips = []; // الـ tips اللي شافها اللاعب بهاي الجولة — بتطلع كروابط بتقرير النهاية
   let tipTimer = null, tipDone = null;
   function pickTip() {
     const next = S.sprint + 1, nc = cfg(next), cur = cfg(S.sprint);
@@ -574,10 +577,28 @@ export function initDebugHunt(root) {
     const pool = TIPS.filter((x) => !shownTips.has(x.t));
     return (pool.length ? pool : TIPS)[Math.floor(Math.random() * (pool.length || TIPS.length))];
   }
+  // تقرير النهاية: 3 روابط — اللي شافها باللعبة أولاً، وبعدين حسب اللي صار معه
+  function renderLearn() {
+    const box = reportEl.querySelector('.rep-learn'); if (!box) return;
+    const list = gameTips.slice(-3);
+    const want = [S.bossFail && 'boss', S.escaped > 0 && 'regress', S.broken > 0 && 'feature', S.critical > 0 && 'gold', S.sprint >= 2 && 'flaky', 'any'].filter(Boolean);
+    for (const k of want) {
+      if (list.length >= 3) break;
+      TIPS.filter((x) => x.k === k && !list.includes(x)).slice(0, 3 - list.length).forEach((x) => list.push(x));
+    }
+    const wrap = box.querySelector('.rep-learn-list'); wrap.textContent = '';
+    list.forEach((tip) => {
+      const a = document.createElement('a'); a.href = tip.href;
+      a.innerHTML = '<b></b><span aria-hidden="true">←</span>'; a.querySelector('b').textContent = tip.t;
+      a.addEventListener('click', () => track('debug_hunt_learn_click', { tip: tip.t }));
+      wrap.appendChild(a);
+    });
+    box.hidden = !list.length;
+  }
   function clearTip() { if (tipTimer) clearInterval(tipTimer); tipTimer = null; tipDone = null; if (tipEl) tipEl.hidden = true; }
   function showTip(done) {
     if (!tipEl) return done();
-    const tip = pickTip(); shownTips.add(tip.t);
+    const tip = pickTip(); shownTips.add(tip.t); if (!gameTips.includes(tip)) gameTips.push(tip);
     tipEl.querySelector('.tip-t').textContent = tip.t;
     tipEl.querySelector('.tip-p').textContent = tip.p;
     S.mode = 'tip'; tipDone = done; tipEl.hidden = false; paintQuit();
