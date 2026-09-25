@@ -337,7 +337,7 @@ const debugHunt = defineCollection({
     trashPhoto3: optString,
     trashPoints: num(50),
     showHomeCard: bool(true),
-    homeBadge: str('جديد 🎮'),
+    homeBadge: optString,
     homeTitle: str('Debug Hunt'),
     homeText: str('اصطاد الـ bugs قبل ما توصل Production… وانتبه لا تكسر أي feature 😅'),
     homeCta: str('العب Debug Hunt'),
@@ -351,7 +351,7 @@ const bugHunter = defineCollection({
   schema: z.object({
     enabled: bool(true),
     showHomeCard: bool(true),
-    homeBadge: str('تحدٍ مجاني جديد'),
+    homeBadge: optString,
     homeTitle: str('هل عينك عين فاحص جودة؟'),
     homeText: str('اصطد الأخطاء داخل متجر تجريبي واختبر مهاراتك قبل انتهاء الوقت.'),
     homeCta: str('ابدأ تحدي Bug Hunter'),
