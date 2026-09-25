@@ -5,7 +5,7 @@ import { getEntry } from 'astro:content';
 
 const site = await getSite();
 const dhEntry = await getEntry('debugHunt', 'debug-hunt').catch(() => undefined);
-const dh = dhEntry?.data ?? { trashEnabled: true, trashPhoto: '', trashPoints: 50 };
+const dh = dhEntry?.data ?? { trashEnabled: true, trashPhoto: '', trashPhoto2: '', trashPhoto3: '', trashPoints: 50 };
 const title = 'Debug Hunt — اصطاد الـ bugs قبل ما توصل Production';
 const description = 'لعبة retro خفيفة من Testing بالعربي: اصطاد الـ bugs، انتبه لا تكسر أي feature، وشارك سكورك مع صحابك.';
 const jsonLd = {
@@ -23,7 +23,7 @@ const jsonLd = {
 ---
 
 <Base title={title} description={description} jsonLd={jsonLd}>
-  <main class="dh dots" id="dh-app" data-trash-enabled={String(dh.trashEnabled)} data-trash-photo={dh.trashPhoto || ''} data-trash-points={String(dh.trashPoints)}>
+  <main class="dh dots" id="dh-app" data-trash-enabled={String(dh.trashEnabled)} data-trash-photos={JSON.stringify([dh.trashPhoto || '', dh.trashPhoto2 || '', dh.trashPhoto3 || ''])} data-trash-points={String(dh.trashPoints)}>
     <div class="wrap">
       <header class="dh-head">
         <span class="eyebrow">استراحة 60 ثانية</span>
