@@ -70,10 +70,9 @@ const games = [
           <a class:list={['game-card', `tone-${g.tone}`]} href={g.href}>
             <div class="shot">
               <img src={g.img} alt="" width="960" height="540" loading="lazy" decoding="async" class:list={{ pixel: g.pixel }} />
-              <span class="kind">{g.kind}</span>
             </div>
             <div class="body">
-              <span class="badge"><span aria-hidden="true">●</span> {g.badge}</span>
+              {g.badge && <span class="badge"><span aria-hidden="true">●</span> {g.badge}</span>}
               <h3 class:list={{ px: g.pixelTitle }}>{g.title}</h3>
               <p>{g.text}</p>
               <ul class="meta">{g.meta.map((m: string) => <li>{m}</li>)}</ul>
