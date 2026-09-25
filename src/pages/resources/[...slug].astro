@@ -36,8 +36,8 @@ const jsonLd = [
     datePublished: data.publishDate.toISOString(),
     isAccessibleForFree: true,
     learningResourceType: data.category,
-    author: { '@type': 'Person', name: site.author },
-    publisher: { '@type': 'Organization', name: site.name, url: site.url },
+    author: { '@id': `${site.url.replace(/\/$/, '')}/#author` },
+    publisher: { '@id': `${site.url.replace(/\/$/, '')}/#organization` },
     url: `${site.url}/resources/${resource.id}/`,
   },
   {
