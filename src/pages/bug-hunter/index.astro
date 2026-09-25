@@ -405,8 +405,14 @@ const jsonLd = {
       get(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (_) { try { return Number(localStorage.getItem(k)) || null; } catch (e) { return null; } } },
       set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} },
     };
-    // أحسن نتيجة لكل Case: {score, correct} (المفتاح القديم كان رقم بس)
-    const bestOf = (c) => { const v = store.get(c.storageKey); if (v == null) return null; return typeof v === 'number' ? { score: v, correct: null } : v; };
+    // أحسن نتيجة لكل Case: {score, correct}. النسخة القديمة كانت تخزّن السكور كرقم بس (100 لكل Bug)،
+    // وكل Bug صح = 100 والفخ بيخصم، فـ floor(score/100) دايماً ≤ عدد الـ bugs الصح — منستعمله لنصلّح الأرقام القديمة.
+    const bestOf = (c) => {
+      const v = store.get(c.storageKey); if (v == null || typeof v !== 'object' && typeof v !== 'number') return null;
+      const score = Math.max(0, Number(typeof v === 'number' ? v : v.score) || 0);
+      const saved = typeof v === 'number' ? 0 : Number(v.correct) || 0;
+      return { score, correct: Math.min(c.bugs.length, Math.max(saved, Math.floor(score / 100))) };
+    };
     const caseNum = (c) => (c.caseLabel.match(/CASE\s*\d+/i) || ['CASE'])[0].toUpperCase();
 
     const scene = () => document.querySelector(`.scene[data-scene="${C.scene}"]`);
@@ -517,10 +523,10 @@ const jsonLd = {
         const best = bestOf(c), badge = card.querySelector('[data-case-badge]'), prog = card.querySelector('[data-case-progress]'), go = card.querySelector('[data-pick-case]');
         const isNew = card.querySelector('[data-case-new]');
         if (best) {
-          const full = best.correct != null && best.correct >= c.bugs.length;
+          const full = best.correct >= c.bugs.length;
           badge.hidden = false; badge.className = 'case-badge done'; badge.textContent = full ? '✓ مكتملة' : '✓ لعبتها';
           if (isNew) isNew.hidden = true;
-          prog.innerHTML = best.correct != null ? `أحسن نتيجة: <b>${best.correct} / ${c.bugs.length}</b>` : `أحسن سكور: <b>${best.score}</b>`;
+          prog.innerHTML = `أحسن نتيجة: <b>${best.correct} / ${c.bugs.length}</b>`;
           if (go) go.innerHTML = 'العب مرة ثانية <span aria-hidden="true">←</span>';
         }
       });
