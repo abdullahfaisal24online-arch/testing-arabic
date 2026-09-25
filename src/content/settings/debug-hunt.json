@@ -1,5 +1,17 @@
 {
   "trashEnabled": true,
   "trashPhoto": "/uploads/s-l1600.webp",
-  "trashPoints": 50
+  "trashPhoto2": "/uploads/neten-yahoo.webp",
+  "trashPhoto3": "/uploads/trump-crazy.webp",
+  "trashPoints": 50,
+  "showHomeCard": true,
+  "homeBadge": "جديد 🎮",
+  "homeTitle": "Debug Hunt",
+  "homeText": "اصطاد الـ bugs قبل ما توصل Production… وانتبه لا تكسر أي feature 😅",
+  "homeCta": "العب Debug Hunt",
+  "homeMeta": [
+    "60 ثانية",
+    "بتلعب عالموبايل",
+    "شارك سكورك"
+  ]
 }
