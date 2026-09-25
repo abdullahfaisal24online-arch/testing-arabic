@@ -66,7 +66,7 @@ const jsonLd = [
     thumbnailUrl: thumbAbs ? [thumbAbs] : undefined,
     embedUrl: embed || undefined,
     inLanguage: 'ar',
-    publisher: { '@type': 'Organization', name: site.name, url: site.url },
+    publisher: { '@id': `${site.url.replace(/\/$/, '')}/#organization` },
   },
   {
     '@context': 'https://schema.org',
