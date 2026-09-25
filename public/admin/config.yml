@@ -741,6 +741,150 @@ collections:
         widget: markdown
         hint: "تقدر تحط نصوص وصور وعناوين — وحتى كود تضمين فيديو"
 
+  - name: bugCases
+    label: "Bug Hunter — الـ Cases"
+    label_singular: "Case"
+    folder: src/content/bug-cases
+    create: true
+    extension: json
+    format: json
+    slug: "{{fields.slug}}"
+    summary: "{{caseTitle}}"
+    description: "كل Case إلها شاشة مبنية بالتصميم (scene). المحتوى (الأسئلة والفخاخ) من هون."
+    fields:
+      - name: slug
+        label: "الرابط بالإنجليزي بدون مسافات"
+        widget: string
+        hint: "مثال: login-lockdown — لا تغيّره بعد النشر"
+      - name: enabled
+        label: "إظهار الـ Case"
+        widget: boolean
+        default: true
+      - name: comingSoon
+        label: "قريباً (مقفلة)"
+        widget: boolean
+        default: false
+      - name: order
+        label: "الترتيب"
+        widget: number
+        value_type: int
+        default: 10
+      - name: scene
+        label: "الشاشة"
+        widget: select
+        options:
+          - { label: "متجر (Broken Shop)", value: "shop" }
+          - { label: "تسجيل دخول (Login)", value: "login" }
+          - { label: "بدون (قريباً)", value: "none" }
+        default: "login"
+      - name: badge
+        label: "شارة الكرت"
+        widget: string
+        required: false
+      - name: cover
+        label: "صورة الكرت"
+        widget: image
+        required: false
+      - name: kicker
+        label: "السطر الصغير بالكرت"
+        widget: string
+        hint: "مثال: CASE 02 · AUTHENTICATION"
+      - name: caseLabel
+        label: "رقم القضية"
+        widget: string
+        hint: "مثال: BUG HUNTER • CASE 02"
+      - name: caseTitle
+        label: "اسم القضية"
+        widget: string
+      - name: caseText
+        label: "رسالة المهمة قبل اللعب"
+        widget: text
+      - name: durationSeconds
+        label: "مدة Challenge Mode بالثواني"
+        widget: number
+        value_type: int
+        default: 90
+      - name: bugs
+        label: "الأخطاء والأسئلة"
+        widget: list
+        required: false
+        summary: "{{fields.title}}"
+        fields:
+          - name: id
+            label: "المعرّف البرمجي"
+            widget: string
+            hint: "لازم يطابق معرّف علامة موجودة بشاشة الـ Case"
+          - name: title
+            label: "اسم الـ Bug"
+            widget: string
+          - name: sceneLabel
+            label: "وصف مكان المشكلة"
+            widget: string
+          - name: question
+            label: "السؤال"
+            widget: text
+          - name: answers
+            label: "خيارات الإجابة"
+            widget: list
+            field:
+              name: answer
+              label: "الخيار"
+              widget: string
+          - name: correctAnswer
+            label: "الإجابة الصحيحة"
+            widget: string
+            hint: "لازم تطابق أحد الخيارات حرفيًا."
+          - name: explanation
+            label: "شرح الإجابة"
+            widget: text
+          - name: expectedResult
+            label: "السلوك المتوقع"
+            widget: text
+            required: false
+          - name: correctMessage
+            label: "رسالة الإجابة الصحيحة"
+            widget: string
+          - name: reportTitle
+            label: "عنوان الـ Bug بتقرير Jira (بالإنجليزي)"
+            widget: string
+            required: false
+          - name: severity
+            label: "الخطورة (Severity)"
+            widget: select
+            required: false
+            options: ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+          - name: resources
+            label: "محتوى تعليمي مرتبط"
+            widget: list
+            required: false
+            summary: "{{fields.label}}"
+            fields:
+              - name: label
+                label: "العنوان"
+                widget: string
+              - name: href
+                label: "الرابط"
+                widget: string
+              - name: kind
+                label: "النوع أو المدة"
+                widget: string
+      - name: traps
+        label: "فخاخ Not a Bug"
+        widget: list
+        required: false
+        summary: "{{fields.title}}"
+        hint: "عناصر شكلها غلط بس هي مقصودة. مكانها بالشاشة ثابت بالتصميم ومربوط بالمعرّف."
+        fields:
+          - name: id
+            label: "المعرّف البرمجي"
+            widget: string
+          - name: title
+            label: "اسم العنصر"
+            widget: string
+          - name: explanation
+            label: "ليش هو مش Bug؟"
+            widget: text
+
   - name: settings
     label: "إعدادات الموقع"
     files:
@@ -1110,6 +1254,34 @@ collections:
           - name: homeCta
             label: "نص زر البطاقة"
             widget: string
+          - name: pickerTitle
+            label: "عنوان صفحة اختيار الـ Case"
+            widget: string
+            required: false
+          - name: pickerText
+            label: "نص صفحة اختيار الـ Case"
+            widget: text
+            required: false
+          - name: trapPenalty
+            label: "خصم فخ Not a Bug (نقاط)"
+            widget: number
+            value_type: int
+            min: 0
+            default: 30
+          - name: caseKicker
+            label: "Case 01 — السطر الصغير بكرت الاختيار"
+            widget: string
+            required: false
+            hint: "مثال: CASE 01 · E-COMMERCE"
+          - name: caseBadge
+            label: "Case 01 — شارة الكرت"
+            widget: string
+            required: false
+          - name: caseCover
+            label: "Case 01 — صورة الكرت"
+            widget: image
+            required: false
+            hint: "فاضية = الصورة الافتراضية"
           - name: caseLabel
             label: "رقم القضية"
             widget: string
@@ -1194,6 +1366,16 @@ collections:
               - name: correctMessage
                 label: "رسالة الإجابة الصحيحة"
                 widget: string
+              - name: reportTitle
+                label: "عنوان الـ Bug بتقرير Jira (بالإنجليزي)"
+                widget: string
+                required: false
+                hint: "مثال: Cart total is calculated incorrectly"
+              - name: severity
+                label: "الخطورة (Severity)"
+                widget: select
+                required: false
+                options: ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
               - name: resources
                 label: "محتوى تعليمي مرتبط"
                 widget: list
@@ -1209,6 +1391,22 @@ collections:
                   - name: kind
                     label: "النوع أو المدة"
                     widget: string
+          - name: traps
+            label: "فخاخ Not a Bug"
+            widget: list
+            required: false
+            summary: "{{fields.title}}"
+            hint: "عناصر شكلها غلط بس هي مقصودة. مكانها بالشاشة ثابت بالتصميم ومربوط بالمعرّف."
+            fields:
+              - name: id
+                label: "المعرّف البرمجي"
+                widget: string
+              - name: title
+                label: "اسم العنصر"
+                widget: string
+              - name: explanation
+                label: "ليش هو مش Bug؟"
+                widget: text
 
       - name: debugHunt
         label: "لعبة Debug Hunt"

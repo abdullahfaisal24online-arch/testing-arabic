@@ -1,5 +1,5 @@
 ---
-import { getEntry } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import { getSite } from '../../lib/site';
@@ -10,11 +10,54 @@ const game = entry?.data;
 
 if (!game?.enabled) return Astro.redirect('/');
 
-const serializedGame = JSON.stringify(game).replace(/</g, '\\u003c');
+// عناوين تقرير Jira والخطورة لبغات Case 01 (لو ما انعبّت من لوحة التحكم)
+const CASE01_REPORT: Record<string, [string, string]> = {
+  'broken-image': ['Product image is not displayed on the Wireless Headphones card', 'LOW'],
+  'add-to-cart': ['Add to Cart button does not add the product to the cart', 'HIGH'],
+  'wrong-total': ['Cart total is calculated incorrectly ($42.80 instead of $27.20)', 'HIGH'],
+  'expired-coupon': ['Expired coupon EXPIRED20 is accepted as valid', 'HIGH'],
+  'invalid-email': ['Email field accepts an invalid value (ahmad@)', 'MEDIUM'],
+  'low-contrast': ['Add to Cart text has insufficient color contrast', 'LOW'],
+  'duplicate-order': ['Double-clicking Place Order creates two identical orders', 'CRITICAL'],
+  'false-payment-success': ['Success message is shown after a failed payment (500)', 'CRITICAL'],
+  'mobile-overflow': ['Checkout button is cut off on 360px screens', 'MEDIUM'],
+  'keyboard-skip': ['Place Order cannot be reached or activated with the keyboard', 'MEDIUM'],
+};
+type AnyBug = (typeof game.bugs)[number];
+const withReport = (bugs: AnyBug[], map: Record<string, [string, string]> = {}) =>
+  bugs.map((b) => ({ ...b, reportTitle: b.reportTitle || map[b.id]?.[0] || b.title, severity: b.severity || map[b.id]?.[1] || 'MEDIUM' }));
+
+const extraCases = (await getCollection('bugCases').catch(() => []))
+  .filter((c) => c.data.enabled)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const cases = [
+  {
+    id: 'broken-shop', scene: 'shop', comingSoon: false, badge: game.caseBadge || '',
+    cover: game.caseCover || '/games/bug-hunter-cover.webp', kicker: game.caseKicker,
+    caseLabel: game.caseLabel, caseTitle: game.caseTitle, caseText: game.caseText,
+    durationSeconds: game.durationSeconds, bugs: withReport(game.bugs, CASE01_REPORT), traps: game.traps,
+    storageKey: 'testing-arabic:bug-hunter:best',
+  },
+  ...extraCases.map((c) => ({
+    id: c.id, scene: c.data.scene, comingSoon: c.data.comingSoon || !c.data.bugs.length, badge: c.data.badge || '',
+    cover: c.data.cover || '', kicker: c.data.kicker, caseLabel: c.data.caseLabel, caseTitle: c.data.caseTitle,
+    caseText: c.data.caseText, durationSeconds: c.data.durationSeconds, bugs: withReport(c.data.bugs), traps: c.data.traps,
+    storageKey: `testing-arabic:bug-hunter:best:${c.id}`,
+  })),
+];
+const settings = {
+  pickerTitle: game.pickerTitle, pickerText: game.pickerText, trapPenalty: game.trapPenalty,
+  challengeLabel: game.challengeLabel, practiceLabel: game.practiceLabel, oneAttemptNote: game.oneAttemptNote,
+  resultTitle: game.resultTitle, resultText: game.resultText, ranks: game.ranks, cases,
+};
+const first = cases[0];
+const showPicker = cases.length > 1;
+const serializedGame = JSON.stringify(settings).replace(/</g, '\\u003c');
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
-  name: game.caseTitle,
+  name: 'Bug Hunter',
   description: game.caseText,
   url: `${site.url}/bug-hunter/`,
   inLanguage: 'ar',
@@ -24,18 +67,54 @@ const jsonLd = {
 };
 ---
 
-<Base title={game.caseTitle} description={game.caseText} jsonLd={jsonLd}>
+<Base title="Bug Hunter — اصطاد الـ bugs بنفسك" description={game.caseText} jsonLd={jsonLd}>
   <main class="hunter-page dots" id="bug-hunter-app">
-    <section class="mission-screen" id="mission-screen">
+    {showPicker && (
+      <section class="picker-screen" id="picker-screen">
+        <div class="picker-head">
+          <span class="case-label"><span aria-hidden="true">●</span> BUG HUNTER</span>
+          <h1>{game.pickerTitle}</h1>
+          <p>{game.pickerText}</p>
+        </div>
+        <div class="case-grid">
+          {cases.map((c) => (
+            <article class:list={['case-card', { soon: c.comingSoon }]} data-case-card={c.id}>
+              <div class="case-thumb">
+                {c.cover ? <img src={c.cover} alt="" width="640" height="360" loading="lazy" decoding="async" /> : <div class="case-thumb-ph" aria-hidden="true"><img src="/brand/ladybug.webp" alt="" width="64" height="70" /></div>}
+                {c.comingSoon && <span class="case-lock" aria-hidden="true">🔒</span>}
+                <span class="case-badge" data-case-badge hidden></span>
+                {c.badge && !c.comingSoon && <span class="case-badge new" data-case-new>{c.badge}</span>}
+              </div>
+              <div class="case-body">
+                <small class="case-kicker">{c.kicker}</small>
+                <h2>{c.caseTitle}</h2>
+                <p>{c.caseText}</p>
+                {!c.comingSoon && (
+                  <div class="case-meta"><span>{c.bugs.length} Bugs</span>{c.traps.length > 0 && <span>{c.traps.length} Not a Bug</span>}<span>{c.durationSeconds} ثانية</span></div>
+                )}
+                <div class="case-cta">
+                  <span class="case-progress" data-case-progress>{c.comingSoon ? 'بتنفتح لما تنضاف من الـ CMS' : 'لسا ما لعبتها'}</span>
+                  {!c.comingSoon && <button type="button" class="btn btn-primary case-go" data-pick-case={c.id}>ابدأ <Icon name="arrow" size={17} /></button>}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="mission-screen" id="mission-screen" hidden={showPicker}>
       <div class="mission-card">
-        <span class="case-label"><span aria-hidden="true">●</span> {game.caseLabel}</span>
+        {showPicker && <button type="button" class="back-cases" id="back-cases">→ كل الـ Cases</button>}
+        <span class="case-label"><span aria-hidden="true">●</span> <b id="m-label">{first.caseLabel}</b></span>
         <div class="mission-icon" aria-hidden="true"><img src="/brand/ladybug.webp" alt="" width="62" height="68" decoding="async" /></div>
-        <h1>{game.caseTitle}</h1>
-        <p class="mission-copy">{game.caseText}</p>
+        <h1 id="m-title">{first.caseTitle}</h1>
+        <p class="mission-copy" id="m-text">{first.caseText}</p>
 
         <div class="mission-facts">
-          <span><img class="lb-mini" src="/brand/ladybug.webp" alt="" width="18" height="20" decoding="async" /><b>{game.bugs.length}</b> أخطاء مخفية</span>
-          <span><Icon name="clock" size={18} /><b>{game.durationSeconds}</b> ثانية بالتحدي</span>
+          <span><img class="lb-mini" src="/brand/ladybug.webp" alt="" width="18" height="20" decoding="async" /><b id="m-bugs">{first.bugs.length}</b> أخطاء مخفية</span>
+          <span id="m-traps-wrap"><span aria-hidden="true">🧐</span><b id="m-traps">{first.traps.length}</b> فخ Not a Bug</span>
+          <span><Icon name="clock" size={18} /><b id="m-time">{first.durationSeconds}</b> ثانية بالتحدي</span>
           <span><Icon name="check" size={18} /> محاولة واحدة لكل Bug</span>
         </div>
 
@@ -53,17 +132,17 @@ const jsonLd = {
             <span class="mode-action">ابدأ التدريب <Icon name="arrow" size={17} /></span>
           </button>
         </div>
-        <p class="attempt-note">{game.oneAttemptNote}</p>
+        <p class="attempt-note">{game.oneAttemptNote} <span class="trap-note">وانتبه: مش كل علامة Bug حقيقي — البلاغ الغلط بيخصم {game.trapPenalty} نقطة.</span></p>
       </div>
     </section>
 
-    <section class="game-screen" id="game-screen" hidden aria-label="متجر The Broken Shop">
+    <section class="game-screen" id="game-screen" hidden aria-label="Bug Hunter">
       <div class="game-hud">
         <div class="game-toolbar">
-          <div class="toolbar-brand"><img class="lb-mini" src="/brand/ladybug.webp" alt="" width="22" height="24" decoding="async" /><span>BUG HUNTER</span><small>CASE 01</small></div>
+          <div class="toolbar-brand"><img class="lb-mini" src="/brand/ladybug.webp" alt="" width="22" height="24" decoding="async" /><span>BUG HUNTER</span><small id="hud-case">CASE 01</small></div>
           <div class="toolbar-stats">
             <span class="stat"><small>SCORE</small><b id="score-value">0000</b></span>
-            <span class="stat"><small>FOUND</small><b><i id="found-value">0</i>/{game.bugs.length}</b></span>
+            <span class="stat"><small>FOUND</small><b><i id="found-value">0</i>/<i id="found-total">{first.bugs.length}</i></b></span>
             <span class="stat timer-stat" id="timer-stat"><small>TIME</small><b id="time-value">01:30</b></span>
             <button class="sound-toggle" id="sound-toggle" type="button" aria-label="إيقاف الصوت والموسيقى" aria-pressed="false" title="كتم الصوت والموسيقى">♪</button>
           </div>
@@ -74,7 +153,8 @@ const jsonLd = {
         </div>
       </div>
 
-      <div class="shop-window">
+      <!-- ===== Scene: shop (Case 01) ===== -->
+      <div class="shop-window scene" data-scene="shop">
         <header class="shop-header">
           <a href="#" tabindex="-1" class="shop-logo">BROKEN<span>SHOP</span></a>
           <label class="shop-search">⌕ <input tabindex="-1" value="Search products..." readonly /></label>
@@ -96,16 +176,20 @@ const jsonLd = {
               </article>
 
               <article class="product-card issue-box">
+                <span class="sale-tag">SALE −17%</span>
                 <div class="product-art keyboard">⌨</div>
-                <div class="product-copy"><small>ACCESSORIES</small><h3>Mechanical Keyboard</h3><b>$49.00</b></div>
+                <div class="product-copy"><small>ACCESSORIES</small><h3>Mechanical Keyboard</h3><b>$49.00 <s>$59.00</s></b></div>
                 <button class="fake-cart dead-button" tabindex="-1">ADD TO CART</button>
                 <button class="bug-marker marker-cart" type="button" data-bug="add-to-cart" aria-label="افحص زر الإضافة"><span>🐞</span></button>
+                <button class="bug-marker marker-sale" type="button" data-trap="sale-price" aria-label="افحص السعر"><span>🐞</span></button>
               </article>
 
-              <article class="product-card faded-card">
+              <article class="product-card soldout-card issue-box">
+                <span class="stock-tag">OUT OF STOCK</span>
                 <div class="product-art">▱</div>
                 <div class="product-copy"><small>DESK</small><h3>Minimal Desk Lamp</h3><b>$36.00</b></div>
-                <button class="fake-cart" tabindex="-1">ADD TO CART</button>
+                <button class="fake-cart soldout" tabindex="-1" disabled>SOLD OUT</button>
+                <button class="bug-marker marker-soldout" type="button" data-trap="sold-out" aria-label="افحص زر المنتج"><span>🐞</span></button>
               </article>
             </div>
 
@@ -150,24 +234,111 @@ const jsonLd = {
           </aside>
         </div>
       </div>
-      <p class="game-tip">دور على علامات الـBug الحمراء واضغط عليها. كل إجابة صحيحة = 100 نقطة.</p>
+
+      <!-- ===== Scene: login (Case 02) ===== -->
+      <div class="auth-window scene" data-scene="login" hidden>
+        <header class="auth-top">
+          <span class="auth-logo">SECURE<span>APP</span></span>
+          <span class="auth-links"><span>Help</span><span>EN ▾</span></span>
+        </header>
+        <div class="auth-grid">
+          <section class="auth-card">
+            <small class="auth-kicker">WELCOME BACK</small>
+            <h2>Sign in</h2>
+            <label class="a-field issue-box"><span>Email</span>
+              <input class="a-input bad" tabindex="-1" value=" ahmad@mail.com" readonly />
+              <small class="a-err">✕ Invalid email address</small>
+              <button class="bug-marker m-email-trim" type="button" data-bug="email-trim" aria-label="افحص حقل الإيميل"><span>🐞</span></button>
+            </label>
+            <label class="a-field issue-box"><span>Password</span>
+              <input class="a-input" tabindex="-1" value="Ahmad@2026" readonly />
+              <button class="bug-marker m-pass-visible" type="button" data-bug="password-visible" aria-label="افحص حقل الباسورد"><span>🐞</span></button>
+            </label>
+            <div class="a-row"><label class="a-check"><span class="box"></span> Remember me</label><span class="a-link">Forgot password?</span></div>
+            <div class="a-alert issue-box"><b>Error 0x80040E14</b><small>NullReferenceException at AuthService.Login()</small>
+              <button class="bug-marker m-error" type="button" data-bug="error-technical" aria-label="افحص رسالة الخطأ"><span>🐞</span></button>
+            </div>
+            <button class="a-btn" tabindex="-1">SIGN IN</button>
+          </section>
+
+          <section class="auth-card">
+            <small class="auth-kicker">NEW HERE?</small>
+            <h2>Create account</h2>
+            <label class="a-field issue-box"><span>Full name</span>
+              <input class="a-input bad" tabindex="-1" value="عبدالله" readonly dir="rtl" />
+              <small class="a-err">✕ Name contains invalid characters</small>
+              <button class="bug-marker m-arabic" type="button" data-bug="arabic-name" aria-label="افحص حقل الاسم"><span>🐞</span></button>
+            </label>
+            <label class="a-field issue-box"><span>Password <em>Min. 8 characters</em></span>
+              <span class="a-pass"><input class="a-input" tabindex="-1" value="Ab1!" readonly /><span class="eye on" title="Hide password">👁</span></span>
+              <small class="a-ok">✓ Strong password</small>
+              <button class="bug-marker m-length" type="button" data-bug="password-length" aria-label="افحص طول الباسورد"><span>🐞</span></button>
+              <button class="bug-marker m-toggle" type="button" data-trap="show-password-toggle" aria-label="افحص إظهار الباسورد"><span>🐞</span></button>
+            </label>
+            <label class="a-field issue-box"><span>Confirm password</span>
+              <span class="a-pass"><input class="a-input" tabindex="-1" value="Ab1?" readonly /><span class="eye on">👁</span></span>
+              <small class="a-ok">✓ Passwords match</small>
+              <button class="bug-marker m-confirm" type="button" data-bug="confirm-mismatch" aria-label="افحص تأكيد الباسورد"><span>🐞</span></button>
+            </label>
+            <div class="a-terms issue-box"><label class="a-check"><span class="box"></span> I agree to the <u>Terms</u> <i>*</i></label>
+              <div class="a-success">✓ Account created</div>
+              <button class="bug-marker m-terms" type="button" data-bug="terms-unchecked" aria-label="افحص الموافقة على الشروط"><span>🐞</span></button>
+            </div>
+            <button class="a-btn orange" tabindex="-1">CREATE ACCOUNT</button>
+          </section>
+
+          <aside class="auth-side">
+            <div class="auth-card mini issue-box">
+              <small class="auth-kicker">VERIFY EMAIL</small>
+              <b class="mini-t">Enter the 6-digit code</b>
+              <small class="mini-s">Sent to ahmad.new@mail.com</small>
+              <div class="otp"><span>4</span><span>8</span><span>1</span><span></span><span></span><span></span></div>
+              <button class="a-btn ghost" tabindex="-1" disabled>Resend code (0:45)</button>
+              <button class="bug-marker m-resend" type="button" data-trap="resend-cooldown" aria-label="افحص زر إعادة الإرسال"><span>🐞</span></button>
+            </div>
+            <div class="auth-card mini dash issue-box">
+              <small class="auth-kicker">DASHBOARD</small>
+              <small class="mini-s">Logged in as <b>ahmad@mail.com</b></small>
+              <div class="dash-user"><span class="av">S</span><div><b>Welcome back, Sara Khalil 👋</b><small>sara.k@mail.com</small></div></div>
+              <button class="bug-marker m-user" type="button" data-bug="wrong-user" aria-label="افحص بيانات المستخدم"><span>🐞</span></button>
+            </div>
+          </aside>
+        </div>
+      </div>
+      <p class="game-tip">دوّر على علامات الـ Bug الحمراء واضغط عليها. كل إجابة صحيحة = 100 نقطة — بس انتبه، في علامات على أشياء مش Bugs.</p>
     </section>
 
     <section class="result-screen" id="result-screen" hidden>
       <div class="result-card">
-        <span class="result-kicker">CASE 01 • CLOSED</span>
-        <div class="result-trophy" aria-hidden="true">🏆</div>
+        <span class="result-kicker" id="r-kicker">CASE 01 • CLOSED</span>
         <h2>{game.resultTitle}</h2>
         <p>{game.resultText}</p>
         <strong class="result-rank" id="result-rank">QA Intern</strong>
         <div class="result-grid">
-          <div><small>SCORE</small><b><span id="result-score">0</span><i>/1000</i></b></div>
-          <div><small>CORRECT</small><b><span id="result-correct">0</span><i>/{game.bugs.length}</i></b></div>
-          <div><small>BEST</small><b><span id="result-best">0</span><i>/1000</i></b></div>
+          <div><small>SCORE</small><b><span id="result-score">0</span><i>/<span id="result-max">1000</span></i></b></div>
+          <div><small>CORRECT</small><b><span id="result-correct">0</span><i>/<span id="result-total">10</span></i></b></div>
+          <div><small>NOT A BUG</small><b class="tr"><span id="result-traps">0</span></b></div>
+          <div><small>BEST</small><b><span id="result-best">0</span></b></div>
         </div>
+
+        <div class="report-wrap">
+          <div class="jira">
+            <div class="jira-head"><div><b id="j-title">Bug Report</b><small id="j-meta"></small></div></div>
+            <div class="jira-table-wrap"><table class="jira-table"><thead><tr><th>Key</th><th>Summary</th><th>Severity</th><th>Status</th></tr></thead><tbody id="j-rows"></tbody></table></div>
+            <div class="jira-foot">
+              <label class="tester"><span>اسمك على التقرير</span><input id="tester-name" type="text" maxlength="40" placeholder="Your name" dir="auto" /></label>
+              <button class="btn btn-primary" id="download-pdf" type="button">⬇ حمّل PDF</button>
+            </div>
+          </div>
+          <figure class="share-card">
+            <img id="share-card-img" alt="بطاقة نتيجتك" width="540" height="540" />
+            <figcaption><button class="btn btn-ghost" id="share-result" type="button">شارك النتيجة</button><button class="btn btn-ghost" id="download-card" type="button">حمّل البطاقة</button></figcaption>
+          </figure>
+        </div>
+
         <div class="result-actions">
           <button class="btn btn-primary" id="play-again" type="button">العب مرة ثانية <Icon name="arrow" size={18} /></button>
-          <button class="btn btn-ghost" id="share-result" type="button">شارك نتيجتك</button>
+          {showPicker && <button class="btn btn-ghost" id="other-cases" type="button">العب Case ثانية</button>}
           <a class="btn btn-ghost" href="/">العودة للرئيسية</a>
         </div>
         <p class="share-status" id="share-status" aria-live="polite"></p>
@@ -179,16 +350,17 @@ const jsonLd = {
     </section>
 
     <div class="question-layer" id="question-layer" hidden>
-      <div class="question-modal" role="dialog" aria-modal="true" aria-labelledby="question-title">
+      <div class="question-modal" id="question-modal" role="dialog" aria-modal="true" aria-labelledby="question-title">
         <button class="modal-close" id="modal-close" type="button" aria-label="إغلاق السؤال">×</button>
         <span class="question-count" id="question-count">BUG 01 / 10</span>
-        <div class="question-icon" aria-hidden="true">🐞</div>
+        <div class="question-icon" id="question-icon" aria-hidden="true">🐞</div>
         <p class="question-bug" id="question-bug"></p>
         <h2 id="question-title"></h2>
         <div class="answer-list" id="answer-list"></div>
         <div class="answer-feedback" id="answer-feedback" hidden>
           <strong id="feedback-title"></strong>
           <p id="feedback-copy"></p>
+          <div id="trap-rule" hidden>💡 <b>قبل ما تبلّغ:</b> ارجع للـ requirements أو الـ acceptance criteria. مش كل إشي غريب Bug، والتقارير الغلط بتضيّع وقت الفريق.</div>
           <div id="expected-result" hidden><small>EXPECTED RESULT</small><span></span></div>
           <button class="btn btn-primary" id="continue-game" type="button">كمّل الصيد <Icon name="arrow" size={17} /></button>
         </div>
@@ -199,6 +371,9 @@ const jsonLd = {
     <div class="game-toast" id="game-toast" role="status" aria-live="polite"></div>
   </main>
 
+  <!-- تقرير الطباعة / PDF (بيظهر بس وقت الطباعة) -->
+  <div id="print-report" aria-hidden="true"></div>
+
   <script type="application/json" id="bug-hunter-data" set:html={serializedGame}></script>
 </Base>
 
@@ -208,31 +383,44 @@ const jsonLd = {
     if (!dataNode) return;
     const settings = JSON.parse(dataNode.textContent || '{}');
     const byId = (id) => document.getElementById(id);
+    const picker = byId('picker-screen');
     const mission = byId('mission-screen');
     const gameScreen = byId('game-screen');
     const results = byId('result-screen');
     const layer = byId('question-layer');
+    const modal = byId('question-modal');
     const answersEl = byId('answer-list');
     const feedback = byId('answer-feedback');
     const swarm = byId('swarm-layer');
-    const toast = byId('game-toast');
-    const markers = [...document.querySelectorAll('.bug-marker')];
-    const storageKey = 'testing-arabic:bug-hunter:best';
     const soundStorageKey = 'testing-arabic:bug-hunter:muted';
+    const PENALTY = Number(settings.trapPenalty) || 30;
+    const cases = settings.cases || [];
+    let C = cases.find((c) => !c.comingSoon) || cases[0];
     let mode = 'challenge';
     let active = false;
-    let remaining = Number(settings.durationSeconds) || 90;
+    let remaining = Number(C?.durationSeconds) || 90;
     let timer = null;
     let currentBug = null;
     let score = 0;
     let correct = 0;
     let answered = new Map();
+    let trapped = new Set();
     let muted = false;
     try { muted = localStorage.getItem(soundStorageKey) === '1'; } catch (_) {}
     let audioContext = null;
     let musicTimer = null;
     let musicStep = 0;
     let musicGain = null;
+    const store = {
+      get(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (_) { try { return Number(localStorage.getItem(k)) || null; } catch (e) { return null; } } },
+      set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} },
+    };
+    // أحسن نتيجة لكل Case: {score, correct} (المفتاح القديم كان رقم بس)
+    const bestOf = (c) => { const v = store.get(c.storageKey); if (v == null) return null; return typeof v === 'number' ? { score: v, correct: null } : v; };
+    const caseNum = (c) => (c.caseLabel.match(/CASE\s*\d+/i) || ['CASE'])[0].toUpperCase();
+
+    const scene = () => document.querySelector(`.scene[data-scene="${C.scene}"]`);
+    const markers = () => [...(scene()?.querySelectorAll('.bug-marker') || [])];
 
     const shuffle = (items) => {
       const copy = [...items];
@@ -248,19 +436,15 @@ const jsonLd = {
       if (audioContext.state === 'suspended') audioContext.resume();
       return audioContext;
     };
-
     // بعض متصفحات الموبايل تحتاج صوتًا قصيرًا من نفس ضغطة المستخدم حتى تسمح بالموسيقى.
     const unlockAudio = () => {
       try {
         const context = ensureAudio();
         const buffer = context.createBuffer(1, 1, 22050);
         const source = context.createBufferSource();
-        source.buffer = buffer;
-        source.connect(context.destination);
-        source.start(0);
+        source.buffer = buffer; source.connect(context.destination); source.start(0);
       } catch (_) {}
     };
-
     const playTone = (kind) => {
       if (muted) return;
       try {
@@ -268,28 +452,23 @@ const jsonLd = {
         const now = context.currentTime;
         const osc = context.createOscillator();
         const gain = context.createGain();
-        osc.type = kind === 'correct' ? 'sine' : 'sawtooth';
-        osc.frequency.setValueAtTime(kind === 'correct' ? 520 : 170, now);
-        if (kind === 'correct') osc.frequency.exponentialRampToValueAtTime(780, now + .22);
+        const ok = kind === 'correct', trap = kind === 'trap';
+        osc.type = ok ? 'sine' : trap ? 'triangle' : 'sawtooth';
+        osc.frequency.setValueAtTime(ok ? 520 : trap ? 440 : 170, now);
+        if (ok) osc.frequency.exponentialRampToValueAtTime(780, now + .22);
+        if (trap) osc.frequency.exponentialRampToValueAtTime(220, now + .3);
         gain.gain.setValueAtTime(.0001, now);
         gain.gain.exponentialRampToValueAtTime(.1, now + .015);
-        gain.gain.exponentialRampToValueAtTime(.0001, now + .28);
+        gain.gain.exponentialRampToValueAtTime(.0001, now + .32);
         osc.connect(gain).connect(context.destination);
-        osc.start(now); osc.stop(now + .3);
+        osc.start(now); osc.stop(now + .34);
       } catch (_) {}
     };
-
     const stopMusic = () => {
-      clearInterval(musicTimer);
-      musicTimer = null;
-      if (musicGain && audioContext) {
-        const now = audioContext.currentTime;
-        musicGain.gain.cancelScheduledValues(now);
-        musicGain.gain.setTargetAtTime(0, now, .035);
-      }
+      clearInterval(musicTimer); musicTimer = null;
+      if (musicGain && audioContext) { const now = audioContext.currentTime; musicGain.gain.cancelScheduledValues(now); musicGain.gain.setTargetAtTime(0, now, .035); }
       musicGain = null;
     };
-
     // مقطوعة Spy Jazz أصلية ومولّدة مباشرة داخل المتصفح — بدون ملف صوت خارجي.
     const startMusic = () => {
       if (muted || mode !== 'challenge' || !active || musicTimer) return;
@@ -306,8 +485,7 @@ const jsonLd = {
           const now = context.currentTime;
           const osc = context.createOscillator();
           const gain = context.createGain();
-          osc.type = type;
-          osc.frequency.setValueAtTime(frequency, now);
+          osc.type = type; osc.frequency.setValueAtTime(frequency, now);
           gain.gain.setValueAtTime(.0001, now);
           gain.gain.exponentialRampToValueAtTime(volume, now + .012);
           gain.gain.exponentialRampToValueAtTime(.0001, now + duration);
@@ -320,11 +498,9 @@ const jsonLd = {
           if (musicStep % 4 === 2) scheduleNote(880, 'square', .055, .035);
           musicStep = (musicStep + 1) % bass.length;
         };
-        tick();
-        musicTimer = setInterval(tick, 245);
+        tick(); musicTimer = setInterval(tick, 245);
       } catch (_) {}
     };
-
     const updateSoundButton = () => {
       const button = byId('sound-toggle');
       button.setAttribute('aria-pressed', String(muted));
@@ -334,25 +510,62 @@ const jsonLd = {
     };
 
     const formatTime = (seconds) => `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
-
     const updateHud = () => {
       byId('score-value').textContent = String(score).padStart(4, '0');
       byId('found-value').textContent = String(answered.size);
+      byId('found-total').textContent = String(C.bugs.length);
       byId('time-value').textContent = formatTime(Math.max(0, remaining));
-      byId('game-progress').style.width = `${(answered.size / settings.bugs.length) * 100}%`;
+      byId('game-progress').style.width = `${(answered.size / Math.max(1, C.bugs.length)) * 100}%`;
       byId('timer-stat').classList.toggle('urgent', mode === 'challenge' && remaining <= 15);
     };
 
+    /* ---------- اختيار الـ Case ---------- */
+    const paintPicker = () => {
+      if (!picker) return;
+      cases.forEach((c) => {
+        const card = picker.querySelector(`[data-case-card="${CSS.escape(c.id)}"]`); if (!card || c.comingSoon) return;
+        const best = bestOf(c), badge = card.querySelector('[data-case-badge]'), prog = card.querySelector('[data-case-progress]'), go = card.querySelector('[data-pick-case]');
+        const isNew = card.querySelector('[data-case-new]');
+        if (best) {
+          const full = best.correct != null && best.correct >= c.bugs.length;
+          badge.hidden = false; badge.className = 'case-badge done'; badge.textContent = full ? '✓ مكتملة' : '✓ لعبتها';
+          if (isNew) isNew.hidden = true;
+          prog.innerHTML = best.correct != null ? `أحسن نتيجة: <b>${best.correct} / ${c.bugs.length}</b>` : `أحسن سكور: <b>${best.score}</b>`;
+          if (go) go.innerHTML = 'العب مرة ثانية <span aria-hidden="true">←</span>';
+        }
+      });
+    };
+    const openCase = (id) => {
+      const c = cases.find((x) => x.id === id && !x.comingSoon); if (!c) return;
+      C = c;
+      byId('m-label').textContent = c.caseLabel; byId('m-title').textContent = c.caseTitle; byId('m-text').textContent = c.caseText;
+      byId('m-bugs').textContent = String(c.bugs.length); byId('m-traps').textContent = String(c.traps.length); byId('m-time').textContent = String(c.durationSeconds);
+      byId('m-traps-wrap').hidden = !c.traps.length;
+      if (picker) picker.hidden = true; results.hidden = true; mission.hidden = false;
+      try { history.replaceState(null, '', `?case=${encodeURIComponent(c.id)}`); } catch (_) {}
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    const showPicker = () => {
+      if (!picker) { mission.hidden = false; results.hidden = true; return; }
+      paintPicker(); mission.hidden = true; results.hidden = true; picker.hidden = false;
+      try { history.replaceState(null, '', location.pathname); } catch (_) {}
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const resetGame = () => {
-      score = 0; correct = 0; answered = new Map(); currentBug = null;
-      remaining = Number(settings.durationSeconds) || 90;
-      markers.forEach((marker) => {
-        marker.disabled = false;
-        marker.classList.remove('is-correct', 'is-wrong');
+      score = 0; correct = 0; answered = new Map(); trapped = new Set(); currentBug = null;
+      remaining = Number(C.durationSeconds) || 90;
+      document.querySelectorAll('.scene').forEach((s) => { s.hidden = s.dataset.scene !== C.scene; });
+      const bugIds = new Set(C.bugs.map((b) => b.id)), trapIds = new Set(C.traps.map((t) => t.id));
+      markers().forEach((marker) => {
+        const ok = marker.dataset.bug ? bugIds.has(marker.dataset.bug) : trapIds.has(marker.dataset.trap);
+        marker.hidden = !ok; marker.disabled = false;
+        marker.classList.remove('is-correct', 'is-wrong', 'is-trap');
         marker.querySelector('span').textContent = '🐞';
       });
-      feedback.hidden = true;
-      answersEl.hidden = false;
+      byId('hud-case').textContent = caseNum(C);
+      gameScreen.setAttribute('aria-label', C.caseTitle);
+      feedback.hidden = true; answersEl.hidden = false;
       updateHud();
     };
 
@@ -362,42 +575,66 @@ const jsonLd = {
       if (mode === 'challenge' && !muted) unlockAudio();
       resetGame();
       active = true;
-      window.taTrack?.('bug_hunter_start', { mode: selectedMode, bug_count: settings.bugs.length });
+      window.taTrack?.('bug_hunter_start', { mode: selectedMode, bug_count: C.bugs.length, case_id: C.id });
       document.body.classList.add('bug-hunter-active');
+      if (picker) picker.hidden = true;
       mission.hidden = true; results.hidden = true; gameScreen.hidden = false;
       byId('timer-stat').hidden = mode !== 'challenge';
       window.scrollTo({ top: 0, behavior: 'smooth' });
       clearInterval(timer);
       if (mode === 'challenge') {
         startMusic();
-        timer = setInterval(() => {
-          remaining -= 1; updateHud();
-          if (remaining <= 0) finishGame('timeout');
-        }, 1000);
+        timer = setInterval(() => { remaining -= 1; updateHud(); if (remaining <= 0) finishGame('timeout'); }, 1000);
       }
     };
 
+    const openLayer = () => { layer.hidden = false; document.body.classList.add('modal-open'); };
     const openQuestion = (bugId) => {
       if (!active || answered.has(bugId)) return;
-      currentBug = settings.bugs.find((bug) => bug.id === bugId);
+      currentBug = C.bugs.find((bug) => bug.id === bugId);
       if (!currentBug) return;
-      const bugNumber = settings.bugs.findIndex((bug) => bug.id === bugId) + 1;
-      byId('question-count').textContent = `BUG ${String(bugNumber).padStart(2, '0')} / ${settings.bugs.length}`;
+      modal.classList.remove('trap-mode');
+      byId('question-icon').textContent = '🐞';
+      const bugNumber = C.bugs.findIndex((bug) => bug.id === bugId) + 1;
+      byId('question-count').textContent = `BUG ${String(bugNumber).padStart(2, '0')} / ${C.bugs.length}`;
       byId('question-bug').textContent = currentBug.title;
       byId('question-title').textContent = currentBug.question;
       answersEl.innerHTML = '';
       shuffle(currentBug.answers).forEach((answer, index) => {
         const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'answer-option';
+        button.type = 'button'; button.className = 'answer-option';
         button.innerHTML = `<span>${String.fromCharCode(65 + index)}</span><b></b>`;
         button.querySelector('b').textContent = answer;
         button.addEventListener('click', () => answerBug(answer, button));
         answersEl.append(button);
       });
-      answersEl.hidden = false; feedback.hidden = true; layer.hidden = false;
-      document.body.classList.add('modal-open');
+      byId('trap-rule').hidden = true;
+      answersEl.hidden = false; feedback.hidden = true; openLayer();
       setTimeout(() => answersEl.querySelector('button')?.focus(), 30);
+    };
+
+    // فخ Not a Bug: بلاغ غلط = خصم نقاط مع شرح ليش هو سلوك مقصود
+    const openTrap = (trapId, marker) => {
+      if (!active || trapped.has(trapId)) return;
+      const trap = C.traps.find((t) => t.id === trapId); if (!trap) return;
+      trapped.add(trapId); currentBug = null;
+      score = Math.max(0, score - PENALTY);
+      marker.disabled = true; marker.classList.add('is-trap'); marker.querySelector('span').textContent = '🧐';
+      modal.classList.add('trap-mode');
+      byId('question-icon').textContent = '🟢';
+      byId('question-count').textContent = 'NOT A BUG';
+      byId('question-bug').textContent = trap.title;
+      byId('question-title').textContent = '';
+      answersEl.hidden = true; answersEl.innerHTML = '';
+      byId('feedback-title').innerHTML = `Not a Bug! <small>−${PENALTY}</small>`;
+      byId('feedback-title').className = 'trap-title';
+      byId('feedback-copy').textContent = trap.explanation;
+      byId('trap-rule').hidden = false;
+      byId('expected-result').hidden = true;
+      feedback.hidden = false; openLayer(); playTone('trap');
+      window.taTrack?.('bug_hunter_trap', { case_id: C.id, trap_id: trapId });
+      updateHud();
+      setTimeout(() => byId('continue-game')?.focus(), 30);
     };
 
     const localBurst = (marker) => {
@@ -413,7 +650,6 @@ const jsonLd = {
         setTimeout(() => bug.remove(), 1300);
       }
     };
-
     const wrongSwarm = () => {
       swarm.innerHTML = '';
       for (let i = 0; i < 46; i++) {
@@ -434,11 +670,10 @@ const jsonLd = {
       if (!currentBug || answered.has(currentBug.id)) return;
       const isCorrect = choice === currentBug.correctAnswer;
       answered.set(currentBug.id, isCorrect);
-      const marker = document.querySelector(`[data-bug="${CSS.escape(currentBug.id)}"]`);
+      const marker = scene()?.querySelector(`[data-bug="${CSS.escape(currentBug.id)}"]`);
       [...answersEl.children].forEach((option) => {
         option.disabled = true;
-        const text = option.querySelector('b')?.textContent;
-        if (text === currentBug.correctAnswer) option.classList.add('answer-correct');
+        if (option.querySelector('b')?.textContent === currentBug.correctAnswer) option.classList.add('answer-correct');
       });
       if (isCorrect) {
         score += 100; correct += 1;
@@ -456,13 +691,14 @@ const jsonLd = {
         byId('feedback-title').className = 'wrong-title';
         wrongSwarm(); playTone('wrong');
       }
-      marker.disabled = true;
+      if (marker) marker.disabled = true;
       // بعد اختيار الإجابة منعرض النتيجة لحالها حتى يظل الصندوق كامل داخل الشاشة.
       answersEl.hidden = true;
       byId('feedback-copy').textContent = currentBug.explanation;
       const expected = byId('expected-result');
       expected.hidden = !currentBug.expectedResult;
       expected.querySelector('span').textContent = currentBug.expectedResult || '';
+      byId('trap-rule').hidden = true;
       feedback.hidden = false;
       updateHud();
     };
@@ -470,28 +706,100 @@ const jsonLd = {
     const closeQuestion = () => {
       if (layer.hidden) return;
       layer.hidden = true; document.body.classList.remove('modal-open');
-      if (answered.size === settings.bugs.length) finishGame('completed');
+      if (answered.size === C.bugs.length) finishGame('completed');
       else currentBug = null;
+    };
+
+    /* ---------- التقرير (Jira) + البطاقة + PDF ---------- */
+    const SEV_ORDER = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
+    const keyPrefix = () => `BH${caseNum(C).replace(/\D/g, '') || ''}`;
+    let last = null; // آخر نتيجة (للـ PDF والمشاركة)
+    const rowsData = () => C.bugs
+      .map((b, i) => ({ b, i, st: answered.has(b.id) ? (answered.get(b.id) ? 'found' : 'wrong') : 'missed' }))
+      .sort((x, y) => (SEV_ORDER[x.b.severity] ?? 9) - (SEV_ORDER[y.b.severity] ?? 9) || x.i - y.i)
+      .map((r, n) => ({ ...r, key: `${keyPrefix()}-${101 + n}` }));
+    const statusLabel = { found: '✓ Found', wrong: '✗ Wrong answer', missed: 'Missed' };
+    const renderJira = () => {
+      const tb = byId('j-rows'); tb.textContent = '';
+      rowsData().forEach(({ b, st, key }) => {
+        const tr = document.createElement('tr'); tr.className = `st-${st}`;
+        tr.innerHTML = '<td class="k"></td><td class="t"></td><td><span class="sev"></span></td><td class="s"></td>';
+        tr.querySelector('.k').textContent = key;
+        tr.querySelector('.t').textContent = b.reportTitle;
+        const sv = tr.querySelector('.sev'); sv.textContent = b.severity; sv.classList.add(`sev-${b.severity.toLowerCase()}`);
+        tr.querySelector('.s').textContent = statusLabel[st];
+        tb.append(tr);
+      });
+      byId('j-title').textContent = `Bug Report — ${C.caseTitle}`;
+      byId('j-meta').textContent = `${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} · ${mode === 'challenge' ? 'Challenge Mode' : 'Practice Mode'} · Found ${correct}/${C.bugs.length} · Not a Bug ${trapped.size}`;
+    };
+
+    const loadImg = (src) => new Promise((res) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
+    const roundRect = (x, rx, ry, w, h, r) => { x.beginPath(); x.moveTo(rx + r, ry); x.arcTo(rx + w, ry, rx + w, ry + h, r); x.arcTo(rx + w, ry + h, rx, ry + h, r); x.arcTo(rx, ry + h, rx, ry, r); x.arcTo(rx, ry, rx + w, ry, r); x.closePath(); };
+    const makeCard = async () => {
+      const c = document.createElement('canvas'); c.width = 1080; c.height = 1080; const x = c.getContext('2d');
+      const g = x.createLinearGradient(0, 0, 1080, 1080); g.addColorStop(0, '#070f1e'); g.addColorStop(1, '#0f1d37'); x.fillStyle = g; x.fillRect(0, 0, 1080, 1080);
+      const r1 = x.createRadialGradient(860, 120, 10, 860, 120, 620); r1.addColorStop(0, 'rgba(56,189,248,.22)'); r1.addColorStop(1, 'rgba(56,189,248,0)'); x.fillStyle = r1; x.fillRect(0, 0, 1080, 1080);
+      const r2 = x.createRadialGradient(120, 1000, 10, 120, 1000, 560); r2.addColorStop(0, 'rgba(246,130,59,.2)'); r2.addColorStop(1, 'rgba(246,130,59,0)'); x.fillStyle = r2; x.fillRect(0, 0, 1080, 1080);
+      x.fillStyle = 'rgba(56,189,248,.12)'; for (let yy = 22; yy < 1080; yy += 44) for (let xx = 22; xx < 1080; xx += 44) { x.beginPath(); x.arc(xx, yy, 1.6, 0, 7); x.fill(); }
+      const lb = await loadImg('/brand/ladybug.webp');
+      if (lb) { x.save(); x.translate(880, 190); x.rotate(0.35); x.shadowColor = 'rgba(0,0,0,.5)'; x.shadowBlur = 30; x.drawImage(lb, -95, -105, 190, 210); x.restore(); }
+      x.textAlign = 'center'; x.textBaseline = 'alphabetic';
+      x.fillStyle = '#f6823b'; x.font = '700 34px "IBM Plex Mono", monospace'; x.fillText(`BUG HUNTER · ${caseNum(C)}`, 540, 250);
+      x.fillStyle = '#f0f6ff'; x.font = '700 74px "IBM Plex Sans Arabic", sans-serif'; x.fillText(last.rank, 540, 360);
+      x.fillStyle = '#f6823b'; x.font = '700 210px "IBM Plex Mono", monospace'; x.fillText(String(last.score), 540, 580);
+      const pills = [`${last.correct} / ${last.total} Bugs`, `Not a Bug ${last.traps}`];
+      x.font = '600 34px "IBM Plex Sans Arabic", sans-serif';
+      const pw = pills.map((p) => x.measureText(p).width + 60), totalW = pw.reduce((a, b) => a + b, 0) + 24;
+      let px0 = 540 - totalW / 2;
+      pills.forEach((p, i) => { x.strokeStyle = 'rgba(56,189,248,.45)'; x.lineWidth = 2; roundRect(x, px0, 628, pw[i], 64, 32); x.stroke(); x.fillStyle = '#cfe6fb'; x.fillText(p, px0 + pw[i] / 2, 672); px0 += pw[i] + 24; });
+      x.fillStyle = '#f0f6ff'; x.font = '700 60px "IBM Plex Sans Arabic", sans-serif'; x.direction = 'rtl'; x.fillText('بتقدر تلاقي أكثر؟', 540, 810); x.direction = 'ltr';
+      x.font = '600 36px "IBM Plex Mono", monospace'; const url = 'testing-arabic.com/bug-hunter', uw = x.measureText(url).width + 70;
+      x.fillStyle = '#f6823b'; roundRect(x, 540 - uw / 2, 870, uw, 80, 18); x.fill(); x.fillStyle = '#1a0d04'; x.fillText(url, 540, 923);
+      return c;
+    };
+    const cardBlob = async () => { const c = await makeCard(); return new Promise((res) => c.toBlob(res, 'image/png')); };
+    const renderCardPreview = async () => { const c = await makeCard(); byId('share-card-img').src = c.toDataURL('image/png'); };
+
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    const buildPrint = () => {
+      const name = (byId('tester-name').value || '').trim() || 'Testing بالعربي player';
+      try { localStorage.setItem('testing-arabic:bug-hunter:tester', name); } catch (_) {}
+      const date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+      const rows = rowsData().map(({ b, st, key }) => `<tr class="st-${st}"><td class="k">${esc(key)}</td><td><b>${esc(b.reportTitle)}</b>${b.expectedResult ? `<div class="exp"><span>Expected:</span> <bdi dir="auto">${esc(b.expectedResult)}</bdi></div>` : ''}</td><td><span class="sev sev-${esc(b.severity.toLowerCase())}">${esc(b.severity)}</span></td><td class="s">${esc(statusLabel[st])}</td></tr>`).join('');
+      byId('print-report').innerHTML = `
+        <div class="pr-head"><div><div class="pr-k">BUG HUNTER · ${esc(caseNum(C))}</div><h1>Bug Report — ${esc(C.caseTitle)}</h1>
+          <div class="pr-meta">Tester: <b dir="auto">${esc(name)}</b> · ${esc(date)} · ${mode === 'challenge' ? 'Challenge Mode' : 'Practice Mode'}</div></div>
+          <div class="pr-brand"><b>Testing</b> بالعربي</div></div>
+        <div class="pr-stats"><div><b>${last.score}</b><span>Score / ${last.max}</span></div><div><b>${last.correct}/${last.total}</b><span>Bugs found</span></div><div><b>${last.traps}</b><span>Not a Bug reports</span></div><div><b>${esc(last.rank)}</b><span>Rank</span></div></div>
+        <table><thead><tr><th>Key</th><th>Summary</th><th>Severity</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>
+        <div class="pr-foot">Generated by Bug Hunter · testing-arabic.com/bug-hunter</div>`;
     };
 
     const finishGame = (reason = 'completed') => {
       if (!active) return;
       active = false; clearInterval(timer); stopMusic(); layer.hidden = true;
       document.body.classList.remove('modal-open', 'bug-hunter-active');
-      const previousBest = Number(localStorage.getItem(storageKey) || 0);
-      const best = Math.max(previousBest, score);
-      localStorage.setItem(storageKey, String(best));
+      const prev = bestOf(C);
+      const best = { score: Math.max(prev?.score || 0, score), correct: Math.max(prev?.correct || 0, correct) };
+      store.set(C.storageKey, best);
+      const total = C.bugs.length, max = total * 100;
       const ranks = [...settings.ranks].sort((a, b) => a.min - b.min);
-      const rank = ranks.filter((item) => correct >= item.min).at(-1)?.label || 'QA Intern';
+      const scaled = total ? Math.round((correct / total) * 10) : 0; // الرتب مبنية على 10 bugs
+      const rank = ranks.filter((item) => scaled >= item.min).at(-1)?.label || 'QA Intern';
+      last = { score, correct, total, max, traps: trapped.size, rank };
       window.taTrack?.(reason === 'manual_exit' ? 'bug_hunter_exit' : 'bug_hunter_complete', {
-        mode, reason, score, correct, answered: answered.size, bug_count: settings.bugs.length,
+        mode, reason, score, correct, answered: answered.size, bug_count: total, traps: trapped.size, case_id: C.id,
       });
+      byId('r-kicker').textContent = `${caseNum(C)} • CLOSED`;
       byId('result-rank').textContent = rank;
-      byId('result-score').textContent = String(score);
-      byId('result-correct').textContent = String(correct);
-      byId('result-best').textContent = String(best);
-      const missedIds = settings.bugs.filter((bug) => answered.get(bug.id) !== true).map((bug) => bug.id);
-      const learningBugs = missedIds.length ? settings.bugs.filter((bug) => missedIds.includes(bug.id)) : settings.bugs.slice(0, 2);
+      byId('result-score').textContent = String(score); byId('result-max').textContent = String(max);
+      byId('result-correct').textContent = String(correct); byId('result-total').textContent = String(total);
+      byId('result-traps').textContent = String(trapped.size);
+      byId('result-best').textContent = String(best.score);
+      renderJira(); renderCardPreview();
+      const missedIds = C.bugs.filter((bug) => answered.get(bug.id) !== true).map((bug) => bug.id);
+      const learningBugs = missedIds.length ? C.bugs.filter((bug) => missedIds.includes(bug.id)) : C.bugs.slice(0, 2);
       const resourceMap = new Map();
       learningBugs.flatMap((bug) => bug.resources || []).forEach((resource) => resourceMap.set(resource.href, resource));
       const resources = [...resourceMap.values()].slice(0, 6);
@@ -504,34 +812,64 @@ const jsonLd = {
         link.querySelector('b').textContent = resource.label;
         byId('resource-links').append(link);
       });
+      byId('learning-list').hidden = !resources.length;
       gameScreen.hidden = true; results.hidden = false;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    /* ---------- الأحداث ---------- */
+    document.querySelectorAll('[data-pick-case]').forEach((b) => b.addEventListener('click', () => openCase(b.dataset.pickCase)));
+    byId('back-cases')?.addEventListener('click', showPicker);
+    byId('other-cases')?.addEventListener('click', showPicker);
     document.querySelectorAll('[data-start-mode]').forEach((button) => button.addEventListener('click', () => startGame(button.dataset.startMode)));
-    markers.forEach((marker) => marker.addEventListener('click', () => openQuestion(marker.dataset.bug)));
+    document.querySelectorAll('.bug-marker').forEach((marker) => marker.addEventListener('click', () => {
+      if (marker.dataset.trap) openTrap(marker.dataset.trap, marker); else openQuestion(marker.dataset.bug);
+    }));
     byId('end-game').addEventListener('click', () => finishGame('manual_exit'));
     byId('continue-game').addEventListener('click', closeQuestion);
     byId('modal-close').addEventListener('click', closeQuestion);
     layer.addEventListener('click', (event) => { if (event.target === layer) closeQuestion(); });
     document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !layer.hidden) closeQuestion(); });
-    byId('play-again').addEventListener('click', () => { results.hidden = true; mission.hidden = false; window.scrollTo({top: 0, behavior: 'smooth'}); });
+    byId('play-again').addEventListener('click', () => { results.hidden = true; mission.hidden = false; window.scrollTo({ top: 0, behavior: 'smooth' }); });
     updateSoundButton();
     byId('sound-toggle').addEventListener('click', () => {
       muted = !muted;
       try { localStorage.setItem(soundStorageKey, muted ? '1' : '0'); } catch (_) {}
       updateSoundButton();
-      if (muted) stopMusic();
-      else if (active && mode === 'challenge') startMusic();
+      if (muted) stopMusic(); else if (active && mode === 'challenge') startMusic();
     });
+    try { byId('tester-name').value = localStorage.getItem('testing-arabic:bug-hunter:tester') || ''; } catch (_) {}
+    byId('download-pdf').addEventListener('click', () => {
+      if (!last) return;
+      buildPrint(); document.body.append(byId('print-report')); document.body.classList.add('bh-printing');
+      window.taTrack?.('bug_hunter_pdf', { case_id: C.id });
+      setTimeout(() => { window.print(); }, 60);
+    });
+    window.addEventListener('afterprint', () => document.body.classList.remove('bh-printing'));
+    const shareText = () => `اصطدت ${last.correct}/${last.total} Bugs وجبت ${last.score}/${last.max} في Bug Hunter (${C.caseTitle}) — رتبتي ${last.rank}! جرّب تتفوق عليّ:`;
+    const shareUrl = () => `${location.origin}/bug-hunter/`;
     byId('share-result').addEventListener('click', async () => {
-      const rank = byId('result-rank').textContent;
-      const text = `اصطدت ${correct}/${settings.bugs.length} Bugs وجبت ${score}/1000 في Bug Hunter — رتبتي ${rank}! جرّب تتفوق عليّ:`;
+      if (!last) return;
+      const text = shareText();
       try {
-        if (navigator.share) await navigator.share({ title: settings.caseTitle, text, url: location.href });
-        else { await navigator.clipboard.writeText(`${text} ${location.href}`); byId('share-status').textContent = 'تم نسخ النتيجة والرابط ✓'; }
-      } catch (_) {}
+        const blob = await cardBlob();
+        const file = blob && new File([blob], 'bug-hunter-score.png', { type: 'image/png' });
+        if (file && navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text: `${text} ${shareUrl()}` }); window.taTrack?.('bug_hunter_share', { method: 'file', case_id: C.id }); return; }
+        if (navigator.share) { await navigator.share({ title: 'Bug Hunter', text, url: shareUrl() }); window.taTrack?.('bug_hunter_share', { method: 'link', case_id: C.id }); return; }
+        await navigator.clipboard.writeText(`${text} ${shareUrl()}`); byId('share-status').textContent = 'تم نسخ النتيجة والرابط ✓';
+      } catch (e) { if (e && e.name === 'AbortError') return; byId('share-status').textContent = shareUrl(); }
     });
+    byId('download-card').addEventListener('click', async () => {
+      if (!last) return;
+      const blob = await cardBlob(); if (!blob) return;
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'bug-hunter-score.png'; a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000); window.taTrack?.('bug_hunter_card', { case_id: C.id });
+    });
+
+    // فتح Case مباشرة من الرابط: /bug-hunter/?case=login-lockdown
+    const want = new URLSearchParams(location.search).get('case');
+    if (want && cases.some((c) => c.id === want && !c.comingSoon)) openCase(want);
+    else paintPicker();
   })();
 </script>
 
@@ -610,7 +948,6 @@ const jsonLd = {
   .fake-cart { margin-top: auto; padding: 10px; border: 0; border-radius: 5px; background: #15243f; color: white; font: 700 9px 'IBM Plex Mono', monospace; }
   .low-contrast { background: #bad6df; color: #a9c5cf; }
   .dead-button { box-shadow: inset 0 0 0 2px #ef4444; }
-  .faded-card { opacity: .58; }
   .bug-marker { position: absolute; z-index: 6; width: 36px; height: 36px; display: grid; place-items: center; border: 2px solid #ef4444; border-radius: 50%; background: #fee2e2; box-shadow: 0 0 0 7px rgba(239,68,68,.11), 0 7px 12px rgba(127,29,29,.2); cursor: pointer; animation: marker-pulse 1.7s infinite; }
   .bug-marker span { font-size: 18px; line-height: 1; }
   .bug-marker:hover { transform: scale(1.13); }
@@ -724,7 +1061,6 @@ const jsonLd = {
     .sound-toggle { flex: 0 0 38px; width: 38px; height: 38px; }
     .end-game { inset-inline-end: 6px; min-width: 64px; font-size: 9px; padding-inline: 7px; }
     .product-grid { grid-template-columns: 1fr 1fr; }
-    .product-grid .faded-card { display: none; }
     .shop-search { display: none; }
     .shop-header { padding-inline: 16px; }
     .shop-cart { margin-left: auto; }
@@ -764,4 +1100,211 @@ const jsonLd = {
     .stat { padding-block: 6px; }
     .question-modal { padding-inline: 14px; }
   }
+
+  /* ===== اختيار الـ Case ===== */
+  .picker-screen { max-width: 1180px; margin: 0 auto; }
+  .picker-head { text-align: center; }
+  .picker-head h1 { margin-top: 12px; font-size: clamp(32px, 5vw, 52px); }
+  .picker-head p { max-width: 640px; margin: 10px auto 0; color: var(--ink-3); font-size: 17px; }
+  .case-grid { margin-top: 34px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+  .case-card { position: relative; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 20px; background: linear-gradient(160deg, var(--surface), color-mix(in srgb, var(--surface) 86%, #061022)); box-shadow: var(--shadow-lg); transition: transform .18s ease, border-color .18s ease; }
+  .case-card:not(.soon):hover { transform: translateY(-4px); border-color: var(--orange-line); }
+  .case-thumb { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #081226; }
+  .case-thumb > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .case-thumb-ph { position: absolute; inset: 0; display: grid; place-items: center; background: radial-gradient(260px 160px at 50% 60%, rgba(246,130,59,.18), transparent 70%), linear-gradient(160deg, #0b1729, #0e1f3a); }
+  .case-thumb-ph img { width: 64px; height: auto; opacity: .55; transform: rotate(18deg); }
+  .soon .case-thumb { filter: grayscale(.6) brightness(.6); }
+  .case-lock { position: absolute; inset: 0; display: grid; place-items: center; font-size: 46px; }
+  .case-badge { position: absolute; top: 12px; left: 12px; padding: 4px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 700; }
+  .case-badge[hidden] { display: none; }
+  .case-badge.done { background: rgba(52,211,153,.16); border: 1px solid rgba(52,211,153,.55); color: #6ee7b7; }
+  .case-badge.new { background: rgba(246,130,59,.2); border: 1px solid rgba(246,130,59,.6); color: #ffc59e; }
+  .case-body { flex: 1; display: flex; flex-direction: column; padding: 18px 20px 20px; }
+  .case-kicker { color: var(--orange); font: 700 12px 'IBM Plex Mono', monospace; letter-spacing: .5px; direction: ltr; text-align: right; }
+  .case-body h2 { margin: 6px 0 4px; font-size: 24px; direction: ltr; text-align: right; }
+  .case-body p { color: var(--ink-3); font-size: 14.5px; line-height: 1.75; }
+  .case-meta { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .case-meta span { padding: 3px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--cyan-soft); color: var(--ink-2); font-size: 12.5px; font-weight: 600; }
+  .case-cta { margin-top: auto; padding-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .case-progress { color: var(--muted); font-size: 13px; }
+  .case-progress :global(b) { color: #34d399; }
+  .case-go { min-height: 42px; padding: 8px 16px; }
+  .back-cases { position: absolute; top: 18px; right: 20px; z-index: 2; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ink-3); font: inherit; font-size: 13px; cursor: pointer; }
+  .back-cases:hover { border-color: var(--cyan); color: var(--cyan); }
+  .trap-note { display: block; margin-top: 6px; color: #6ee7b7; }
+  .mission-facts span[hidden] { display: none; }
+
+  /* ===== عناصر الفخاخ بالمتجر ===== */
+  .sale-tag { position: absolute; top: 18px; left: 18px; z-index: 2; padding: 3px 8px; border-radius: 5px; background: #ef4444; color: #fff; font: 700 10px 'IBM Plex Mono', monospace; }
+  .product-copy b s { margin-left: 6px; color: #94a3b8; font-size: 11px; font-weight: 600; }
+  .soldout-card .product-art { opacity: .55; }
+  .stock-tag { position: absolute; top: 18px; left: 18px; z-index: 2; padding: 3px 8px; border-radius: 5px; background: #64748b; color: #fff; font: 700 9px 'IBM Plex Mono', monospace; }
+  .fake-cart.soldout { background: #cbd5e1; color: #64748b; cursor: not-allowed; }
+  .marker-sale { top: 176px; right: 8px; animation-delay: -1.1s; }
+  .marker-soldout { bottom: 8px; left: 44%; animation-delay: -.3s; }
+  .bug-marker[hidden] { display: none; }
+  .bug-marker.is-trap { border-color: #10b981; background: #d1fae5; box-shadow: 0 0 0 7px rgba(16,185,129,.14); animation: none; }
+
+  /* ===== Scene: Login ===== */
+  .auth-window { overflow: hidden; border: 1px solid var(--line); border-top: 0; border-radius: 0 0 18px 18px; background: linear-gradient(160deg, #eef2f7, #e3eaf3); color: #152039; direction: ltr; box-shadow: var(--shadow-lg); }
+  .auth-window[hidden], .shop-window[hidden] { display: none; }
+  .auth-top { min-height: 62px; padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #d8e0ea; background: #fff; }
+  .auth-logo { font: 800 17px 'IBM Plex Mono', monospace; color: #0e1c34; }
+  .auth-logo span { color: #2563eb; }
+  .auth-links { display: flex; gap: 18px; color: #64748b; font-size: 12px; }
+  .auth-grid { padding: clamp(18px, 3vw, 34px); display: grid; grid-template-columns: 1fr 1fr 290px; gap: 18px; align-items: start; }
+  .auth-card { position: relative; padding: 22px 20px; border: 1px solid #dfe5ee; border-radius: 14px; background: #fff; box-shadow: 0 12px 30px rgba(15,29,54,.07); }
+  .auth-card h2 { margin: 2px 0 14px; font: 800 22px system-ui, sans-serif; }
+  .auth-kicker { color: #2563eb; font: 700 8px 'IBM Plex Mono', monospace; letter-spacing: 1px; }
+  .a-field { position: relative; display: flex; flex-direction: column; margin-top: 12px; }
+  .a-field > span { margin-bottom: 5px; font-size: 10.5px; font-weight: 700; color: #334155; display: flex; justify-content: space-between; }
+  .a-field > span em { font-style: normal; font-weight: 500; color: #64748b; }
+  .a-input { width: 100%; padding: 10px 11px; border: 1px solid #cfd8e3; border-radius: 7px; background: #fff; color: #152039; font: 13px 'IBM Plex Mono', monospace; white-space: pre; }
+  .a-input.bad { border-color: #ef4444; background: #fff5f5; }
+  .a-err { margin-top: 4px; color: #dc2626; font-size: 10px; }
+  .a-ok { margin-top: 4px; color: #16a34a; font-size: 10px; }
+  .a-pass { position: relative; display: block; }
+  .a-pass .eye { position: absolute; right: 9px; top: 50%; translate: 0 -50%; font-size: 13px; opacity: .45; }
+  .a-pass .eye.on { opacity: 1; filter: drop-shadow(0 0 4px rgba(37,99,235,.6)); }
+  .a-row { margin-top: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
+  .a-check { display: flex; align-items: center; gap: 7px; color: #334155; }
+  .a-check .box { width: 14px; height: 14px; border: 1.5px solid #94a3b8; border-radius: 4px; background: #fff; }
+  .a-check i { color: #dc2626; font-style: normal; }
+  .a-link { color: #2563eb; }
+  .a-alert { position: relative; margin-top: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; border: 1px solid #fecaca; border-radius: 8px; background: #fef2f2; color: #b91c1c; }
+  .a-alert b { font: 700 11.5px 'IBM Plex Mono', monospace; }
+  .a-alert small { font: 9px 'IBM Plex Mono', monospace; color: #dc2626; }
+  .a-terms { position: relative; margin-top: 14px; font-size: 11px; }
+  .a-success { margin-top: 8px; padding: 7px 10px; border: 1px solid #86efac; border-radius: 7px; background: #f0fdf4; color: #15803d; font-size: 11px; font-weight: 700; }
+  .a-btn { width: 100%; margin-top: 14px; padding: 12px; border: 0; border-radius: 7px; background: #0f1d36; color: #fff; font: 800 10px 'IBM Plex Mono', monospace; letter-spacing: .5px; }
+  .a-btn.orange { background: #f06e37; }
+  .a-btn.ghost { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
+  .auth-side { display: flex; flex-direction: column; gap: 18px; }
+  .auth-card.mini { padding: 18px 16px; }
+  .mini-t { display: block; margin-top: 4px; font-size: 14px; }
+  .mini-s { display: block; margin-top: 3px; color: #64748b; font-size: 10.5px; }
+  .otp { margin-top: 10px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; }
+  .otp span { height: 32px; display: grid; place-items: center; border: 1px solid #cfd8e3; border-radius: 6px; font: 700 14px 'IBM Plex Mono', monospace; }
+  .dash-user { margin-top: 10px; display: flex; gap: 10px; align-items: center; }
+  .dash-user .av { flex: 0 0 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; background: #fce7f3; color: #be185d; font-weight: 800; }
+  .dash-user b { display: block; font-size: 12.5px; }
+  .dash-user small { color: #64748b; font-size: 10.5px; }
+  .m-email-trim { top: 18px; right: -14px; }
+  .m-pass-visible { top: 18px; right: -14px; animation-delay: -.5s; }
+  .m-error { top: -14px; right: -12px; animation-delay: -.9s; }
+  .m-arabic { top: 18px; left: -14px; animation-delay: -.3s; }
+  .m-length { top: 44px; right: -14px; animation-delay: -1.2s; }
+  .m-toggle { top: 20px; right: 34px; animation-delay: -.7s; }
+  .m-confirm { top: 44px; right: -14px; animation-delay: -.2s; }
+  .m-terms { top: 18px; right: -14px; animation-delay: -1s; }
+  .m-resend { bottom: 14px; right: 14px; animation-delay: -.6s; }
+  .m-user { top: 12px; right: 12px; animation-delay: -.4s; }
+
+  /* ===== مودال الفخ ===== */
+  .question-modal.trap-mode { border-color: rgba(52,211,153,.6); }
+  .question-modal.trap-mode .question-icon { border-color: rgba(52,211,153,.5); background: rgba(52,211,153,.12); }
+  .question-modal.trap-mode .question-count { color: #34d399; }
+  .trap-title { color: #6ee7b7; font-size: 22px !important; }
+  .trap-title :global(small) { margin-inline-start: 8px; color: #fb7185; font: 700 15px 'IBM Plex Mono', monospace; }
+  #trap-rule { margin-top: 12px; padding: 11px 13px; border: 1px dashed rgba(56,189,248,.4); border-radius: 10px; background: rgba(56,189,248,.07); color: #cfe6fb; font-size: 13px; line-height: 1.8; }
+  #trap-rule[hidden] { display: none; }
+  #trap-rule b { color: #38bdf8; }
+
+  /* ===== تقرير النهاية ===== */
+  .result-card { max-width: 1120px; }
+  .result-grid { max-width: 820px; grid-template-columns: repeat(4, 1fr); }
+  .result-grid b.tr { color: #fb7185; }
+  .report-wrap { margin-top: 30px; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; text-align: right; }
+  .jira { overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: color-mix(in srgb, var(--surface-2) 70%, transparent); }
+  .jira-head { padding: 14px 18px; border-bottom: 1px solid var(--line); background: rgba(3,10,24,.25); direction: ltr; text-align: left; }
+  .jira-head b { display: block; font-size: 17px; }
+  .jira-head small { color: var(--muted); font-size: 12px; }
+  .jira-table-wrap { overflow-x: auto; }
+  .jira-table { width: 100%; border-collapse: collapse; direction: ltr; text-align: left; font-size: 13px; }
+  .jira-table th { padding: 9px 14px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .jira-table :global(td) { padding: 10px 14px; border-bottom: 1px solid color-mix(in srgb, var(--line) 50%, transparent); vertical-align: middle; }
+  .jira-table :global(td.k) { color: var(--cyan); font: 600 12px 'IBM Plex Mono', monospace; white-space: nowrap; }
+  .jira-table :global(td.t) { font-weight: 600; color: var(--ink); }
+  .jira-table :global(td.s) { font-size: 12px; font-weight: 700; white-space: nowrap; }
+  .jira-table :global(tr.st-found td.s) { color: #34d399; }
+  .jira-table :global(tr.st-wrong td.s) { color: #fb7185; }
+  .jira-table :global(tr.st-missed td) { opacity: .5; }
+  .jira-table :global(.sev), #print-report :global(.sev) { display: inline-block; padding: 2px 9px; border-radius: 5px; font: 700 10.5px 'IBM Plex Mono', monospace; }
+  .jira-table :global(.sev-critical) { background: rgba(239,68,68,.16); color: #fca5a5; }
+  .jira-table :global(.sev-high) { background: rgba(246,130,59,.16); color: #fdba74; }
+  .jira-table :global(.sev-medium) { background: rgba(247,201,72,.14); color: #fde68a; }
+  .jira-table :global(.sev-low) { background: rgba(56,189,248,.12); color: #7dd3fc; }
+  .jira-foot { padding: 14px 18px; display: flex; flex-wrap: wrap; align-items: end; gap: 12px; justify-content: space-between; background: rgba(3,10,24,.2); }
+  .tester { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+  .tester input { min-width: 200px; padding: 9px 11px; border: 1px solid var(--line-strong); border-radius: 9px; background: var(--surface); color: var(--ink); font: inherit; }
+  .share-card { margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .share-card img { width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: 16px; border: 1px solid var(--line); background: #0b162a; }
+  .share-card figcaption { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .share-card .btn { min-height: 42px; padding: 8px 10px; font-size: 14px; }
+  .learning-list[hidden] { display: none; }
+  #print-report { display: none; }
+
+  @media (max-width: 1100px) {
+    .auth-grid { grid-template-columns: 1fr 1fr; }
+    .auth-side { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 1000px) {
+    .case-grid { grid-template-columns: 1fr 1fr; }
+    .report-wrap { grid-template-columns: 1fr; }
+    .share-card { max-width: 420px; margin-inline: auto; width: 100%; }
+  }
+  @media (max-width: 720px) {
+    .case-grid { grid-template-columns: 1fr; }
+    .auth-grid, .auth-side { grid-template-columns: 1fr; }
+    .auth-top { padding-inline: 16px; }
+    .result-grid { grid-template-columns: 1fr 1fr; }
+    .back-cases { position: static; margin-bottom: 12px; }
+    .jira-foot .btn { width: 100%; }
+    .tester, .tester input { width: 100%; }
+    .jira-table thead { display: none; }
+    .jira-table :global(tr) { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "k sev s" "t t t"; gap: 6px 10px; align-items: center; padding: 11px 14px; border-bottom: 1px solid color-mix(in srgb, var(--line) 50%, transparent); }
+    .jira-table :global(td) { padding: 0; border: 0; }
+    .jira-table :global(td.k) { grid-area: k; }
+    .jira-table :global(td:nth-child(3)) { grid-area: sev; justify-self: start; }
+    .jira-table :global(td.s) { grid-area: s; }
+    .jira-table :global(td.t) { grid-area: t; line-height: 1.5; }
+  }
+</style>
+
+<style is:global>
+  #print-report { display: none; }
+  @media print {
+    @page { size: A4; margin: 14mm; }
+    html, body.bh-printing { background: #fff !important; }
+    body.bh-printing::before, body.bh-printing::after { display: none !important; }
+    body.bh-printing > :not(#print-report) { display: none !important; }
+    body.bh-printing #print-report { display: block !important; }
+  }
+  #print-report { direction: ltr; text-align: left; color: #0f172a; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; background: #fff; }
+  #print-report .pr-head { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 3px solid #f6823b; }
+  #print-report .pr-k { color: #f6823b; font: 700 11px 'IBM Plex Mono', monospace; letter-spacing: 1px; }
+  #print-report h1 { margin: 4px 0 4px; font-size: 22px; color: #0a1428; }
+  #print-report .pr-meta { color: #475569; font-size: 11.5px; }
+  #print-report .pr-brand { font-size: 15px; color: #0a1428; white-space: nowrap; }
+  #print-report .pr-stats { margin: 14px 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  #print-report .pr-stats div { padding: 9px 10px; border: 1px solid #e2e8f0; border-radius: 8px; }
+  #print-report .pr-stats b { display: block; font: 700 16px 'IBM Plex Mono', monospace; color: #0a1428; }
+  #print-report .pr-stats span { color: #64748b; font-size: 10.5px; }
+  #print-report table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+  #print-report th { padding: 7px 8px; background: #f1f5f9; color: #334155; text-align: left; font-size: 10.5px; border-bottom: 1px solid #cbd5e1; }
+  #print-report td { padding: 8px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+  #print-report td.k { color: #1d4ed8; font: 600 11px 'IBM Plex Mono', monospace; white-space: nowrap; }
+  #print-report td.s { white-space: nowrap; font-weight: 700; }
+  #print-report tr.st-found td.s { color: #15803d; }
+  #print-report tr.st-wrong td.s { color: #be123c; }
+  #print-report tr.st-missed td { color: #94a3b8; }
+  #print-report .exp { margin-top: 3px; color: #475569; font-size: 10.5px; }
+  #print-report .exp span { font-weight: 700; color: #334155; }
+  #print-report .sev { display: inline-block; padding: 2px 8px; border-radius: 4px; font: 700 9.5px 'IBM Plex Mono', monospace; }
+  #print-report .sev-critical { background: #fee2e2; color: #b91c1c; }
+  #print-report .sev-high { background: #ffedd5; color: #c2410c; }
+  #print-report .sev-medium { background: #fef9c3; color: #a16207; }
+  #print-report .sev-low { background: #e0f2fe; color: #0369a1; }
+  #print-report .pr-foot { margin-top: 16px; padding-top: 8px; border-top: 1px solid #e2e8f0; color: #94a3b8; font-size: 10px; text-align: center; }
+  #print-report tr { page-break-inside: avoid; }
 </style>

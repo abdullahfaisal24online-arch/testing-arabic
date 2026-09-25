@@ -346,6 +346,30 @@ const debugHunt = defineCollection({
 });
 
 /* ===== لعبة Bug Hunter ===== */
+/* ===== Bug Hunter ===== */
+const bhResource = z.object({ label: str(''), href: str('/'), kind: str('محتوى') });
+const bhBug = z.object({
+  id: str(''),
+  title: str(''),
+  sceneLabel: str(''),
+  question: str(''),
+  answers: strList,
+  correctAnswer: str(''),
+  explanation: str(''),
+  expectedResult: optString,
+  correctMessage: str('Correct! +100'),
+  // لتقرير النهاية (بشكل Jira): عنوان إنجليزي احترافي + الخطورة
+  reportTitle: optString,
+  severity: z.preprocess(blank, z.enum(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']).optional()),
+  resources: z.preprocess(fallback([]), z.array(bhResource)),
+});
+// فخ "Not a Bug": عنصر شكله غلط بس هو سلوك مقصود
+const bhTrap = z.object({ id: str(''), title: str(''), explanation: str('') });
+const CASE01_TRAPS = [
+  { id: 'sale-price', title: 'سعر مشطوب على Mechanical Keyboard', explanation: 'السعر المشطوب $59.00 هو السعر القديم، والمنتج عليه خصم SALE مقصود. هاد سلوك مطلوب من الـ Business، مش خطأ.' },
+  { id: 'sold-out', title: 'زر SOLD OUT معطّل على Minimal Desk Lamp', explanation: 'المنتج نافد من المخزون، فالزر معطّل ومكتوب عليه SOLD OUT. هاد سلوك مقصود بيمنع المستخدم يطلب منتج مش موجود.' },
+];
+
 const bugHunter = defineCollection({
   loader: glob({ base: './src/content/settings', pattern: 'bug-hunter.json' }),
   schema: z.object({
@@ -355,6 +379,12 @@ const bugHunter = defineCollection({
     homeTitle: str('هل عينك عين فاحص جودة؟'),
     homeText: str('اصطد الأخطاء داخل متجر تجريبي واختبر مهاراتك قبل انتهاء الوقت.'),
     homeCta: str('ابدأ تحدي Bug Hunter'),
+    pickerTitle: str('اختار الـ Case'),
+    pickerText: str('كل Case إلها شاشة وbugs وأسئلة خاصة فيها. اختار وحدة وابدأ الصيد.'),
+    trapPenalty: num(30),
+    caseKicker: str('CASE 01 · E-COMMERCE'),
+    caseBadge: optString,
+    caseCover: optString,
     caseLabel: str('BUG HUNTER • CASE 01'),
     caseTitle: str('The Broken Shop'),
     caseText: str('متجر جديد على وشك الإطلاق، لكن فريق التطوير ترك خلفه مجموعة من الأخطاء.'),
@@ -368,24 +398,29 @@ const bugHunter = defineCollection({
       fallback([]),
       z.array(z.object({ min: num(0), label: str('QA Intern') })),
     ),
-    bugs: z.preprocess(
-      fallback([]),
-      z.array(z.object({
-        id: str(''),
-        title: str(''),
-        sceneLabel: str(''),
-        question: str(''),
-        answers: strList,
-        correctAnswer: str(''),
-        explanation: str(''),
-        expectedResult: optString,
-        correctMessage: str('Correct! +100'),
-        resources: z.preprocess(
-          fallback([]),
-          z.array(z.object({ label: str(''), href: str('/'), kind: str('محتوى') })),
-        ),
-      })),
-    ),
+    bugs: z.preprocess(fallback([]), z.array(bhBug)),
+    // فاضية = فخاخ Case 01 الافتراضية (لأن لوحة التحكم ممكن تحفظها كـ [])
+    traps: z.preprocess((v) => (Array.isArray(v) && v.length === 0 ? CASE01_TRAPS : fallback(CASE01_TRAPS)(v)), z.array(bhTrap)),
+  }),
+});
+
+// Cases إضافية للعبة (كل ملف = Case). الشاشة نفسها (scene) مبنية بالكود، والمحتوى من لوحة التحكم.
+const bugCases = defineCollection({
+  loader: glob({ base: './src/content/bug-cases', pattern: '*.json' }),
+  schema: z.object({
+    enabled: bool(true),
+    comingSoon: bool(false),
+    order: num(10),
+    scene: str('login'),
+    badge: optString,
+    cover: optString,
+    kicker: str('CASE 02'),
+    caseLabel: str('BUG HUNTER • CASE 02'),
+    caseTitle: str('New Case'),
+    caseText: str(''),
+    durationSeconds: num(90),
+    bugs: z.preprocess(fallback([]), z.array(bhBug)),
+    traps: z.preprocess(fallback([]), z.array(bhTrap)),
   }),
 });
 
@@ -417,4 +452,4 @@ const products = defineCollection({
   }),
 });
 
-export const collections = { products, lessons, articles, courses, news, resources, glossary, questions, pages, site, home, start, chat, bugHunter, debugHunt };
+export const collections = { products, lessons, articles, courses, news, resources, glossary, questions, pages, site, home, start, chat, bugHunter, bugCases, debugHunt };

@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "comingSoon": true,
+  "order": 3,
+  "scene": "none",
+  "kicker": "CASE 03 · MOBILE APP",
+  "caseLabel": "BUG HUNTER • CASE 03",
+  "caseTitle": "قريباً",
+  "caseText": "تطبيق موبايل لحجز ملعب… جاي قريب.",
+  "durationSeconds": 90,
+  "bugs": [],
+  "traps": []
+}
