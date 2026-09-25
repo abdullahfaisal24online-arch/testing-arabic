@@ -1,4 +1,5 @@
 ---
+import { getCollection } from 'astro:content';
 import { BUG_HUNTER_CASES } from '../data/bug-hunter-cases';
 /** قسم "العب وتعلّم" بالرئيسية — كل ألعاب المنصة بكروت موحّدة جنب بعض. */
 import Icon from './Icon.astro';
@@ -25,17 +26,22 @@ interface Props {
 }
 const { bugHunter, debugHunt } = Astro.props;
 const dh = debugHunt ?? { showHomeCard: true, homeBadge: 'جديد 🎮', homeTitle: 'Debug Hunt', homeText: 'اصطاد الـ bugs قبل ما توصل Production… وانتبه لا تكسر أي feature 😅', homeCta: 'العب Debug Hunt', homeMeta: [] };
+// الـ Cases المتاحة للعب: Case 01 دايماً + كل Case مفعّلة بالـ CMS وإلها محتوى بالكود — الأرقام بتتحدّث لحالها
+const liveIds = new Set(['broken-shop', ...(await getCollection('bugCases').catch(() => []))
+  .filter((c) => c.data.enabled && !c.data.comingSoon).map((c) => c.id)]);
+const liveCases = Object.entries(BUG_HUNTER_CASES).filter(([id, c]) => liveIds.has(id) && c.bugs.length);
+const bhBugs = liveCases.reduce((n, [, c]) => n + c.bugs.length, 0);
 const isLatin = (t: string) => /^[\x00-\x7F\s]+$/.test(t);
 
 const games = [
   bugHunter?.enabled && bugHunter.showHomeCard && {
     href: '/bug-hunter/',
-    img: '/games/bug-hunter-cover.webp',
+    img: '/games/bug-hunter-case-files.webp',
     kind: 'تحدّي عملي',
     badge: bugHunter.homeBadge,
     title: bugHunter.homeTitle,
     text: bugHunter.homeText,
-    meta: [`${bugHunter.durationSeconds} ثانية`, `${BUG_HUNTER_CASES['broken-shop'].bugs.length} Bugs`, 'بدون تسجيل'],
+    meta: [liveCases.length > 1 ? `${liveCases.length} Cases` : `${bugHunter.durationSeconds} ثانية`, `${bhBugs} Bugs`, 'بدون تسجيل'],
     cta: bugHunter.homeCta,
     tone: 'orange',
   },
