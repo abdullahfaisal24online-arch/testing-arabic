@@ -391,7 +391,7 @@ export function initDebugHunt(root) {
     S.mode = 'over'; audio.stopMusic(); audio.gameOver(); document.body.classList.remove('dh-playing'); paintQuit();
     const isBest = S.score > S.best; if (isBest) { S.best = S.score; store.set('dh_best', S.best); }
     const acc = S.shots ? Math.round((S.hits / S.shots) * 100) : 0;
-    const set = (sel, v) => { const el = reportEl.querySelector(sel); if (el) el.textContent = v; };
+    const set = (sel, v) => { reportEl.querySelectorAll(sel).forEach((el) => { el.textContent = v; }); };
     set('[data-r=found]', `${S.caught}`);
     set('[data-r=critical]', `${S.critical}`);
     set('[data-r=escaped]', `${S.escaped}`);
