@@ -1099,6 +1099,8 @@ collections:
           - name: homeBadge
             label: "شارة البطاقة"
             widget: string
+            required: false
+            hint: "فاضية = ما بتظهر شارة"
           - name: homeTitle
             label: "عنوان البطاقة"
             widget: string
@@ -1244,6 +1246,8 @@ collections:
           - name: homeBadge
             label: "شارة الكرت"
             widget: string
+            required: false
+            hint: "فاضية = ما بتظهر شارة"
           - name: homeTitle
             label: "عنوان الكرت"
             widget: string
