@@ -2,7 +2,7 @@
   "enabled": true,
   "showHomeCard": true,
   "homeBadge": "تحدي جديد",
-  "homeTitle": "هل عينك عين فاحص جودة؟ 🐞",
+  "homeTitle": "Bug Hunter",
   "homeText": "ادخل متجرًا مليئًا بالأخطاء، اصطد الحشرات وجاوب على أسئلة QA عملية. أمامك محاولة واحدة لكل Bug!",
   "homeCta": "ابدأ تحدي Bug Hunter",
   "caseLabel": "BUG HUNTER • CASE 01",
