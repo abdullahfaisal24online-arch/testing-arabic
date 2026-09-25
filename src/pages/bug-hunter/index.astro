@@ -78,7 +78,7 @@ const jsonLd = {
         </div>
         <div class="case-grid">
           {cases.map((c) => (
-            <article class:list={['case-card', { soon: c.comingSoon }]} data-case-card={c.id}>
+            <article class:list={['case-card', { soon: c.comingSoon, 'tri-cursor': !c.comingSoon }]} data-case-card={c.id} {...(!c.comingSoon ? { role: 'button', tabindex: 0, 'aria-label': `ابدأ ${c.caseTitle}` } : {})}>
               <div class="case-thumb">
                 {c.cover ? <img src={c.cover} alt="" width="640" height="360" loading="lazy" decoding="async" /> : <div class="case-thumb-ph" aria-hidden="true"><img src="/brand/ladybug.webp" alt="" width="64" height="70" /></div>}
                 {c.comingSoon && <span class="case-lock" aria-hidden="true">🔒</span>}
@@ -818,7 +818,12 @@ const jsonLd = {
     };
 
     /* ---------- الأحداث ---------- */
-    document.querySelectorAll('[data-pick-case]').forEach((b) => b.addEventListener('click', () => openCase(b.dataset.pickCase)));
+    document.querySelectorAll('[data-pick-case]').forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); openCase(b.dataset.pickCase); }));
+    // الكرت كامل قابل للضغط (مع تأثير 🔻 تبع الماوس)
+    document.querySelectorAll('.case-card[role="button"]').forEach((card) => {
+      card.addEventListener('click', () => openCase(card.dataset.caseCard));
+      card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCase(card.dataset.caseCard); } });
+    });
     byId('back-cases')?.addEventListener('click', showPicker);
     byId('other-cases')?.addEventListener('click', showPicker);
     document.querySelectorAll('[data-start-mode]').forEach((button) => button.addEventListener('click', () => startGame(button.dataset.startMode)));
@@ -992,25 +997,25 @@ const jsonLd = {
   .game-tip { margin: 14px 0 0; color: var(--muted); text-align: center; font-size: 14px; }
   .question-layer { position: fixed; z-index: 1000; inset: 0; width: 100%; height: 100dvh; padding: 16px; display: grid; place-items: center; overflow: hidden; background: rgba(3,9,22,.82); backdrop-filter: blur(9px); }
   .question-layer[hidden] { display: none; }
-  .question-modal { position: relative; width: min(720px, 100%); max-height: calc(100dvh - 32px); overflow: hidden; padding: clamp(22px, 3vw, 32px); border: 1px solid rgba(56,189,248,.4); border-radius: 19px; background: #101e37; color: #e8eef9; box-shadow: 0 30px 90px rgba(0,0,0,.55); text-align: right; }
+  .question-modal { position: relative; width: min(820px, 100%); max-height: calc(100dvh - 32px); overflow: hidden; padding: clamp(22px, 3vw, 32px); border: 1px solid rgba(56,189,248,.4); border-radius: 19px; background: #101e37; color: #e8eef9; box-shadow: 0 30px 90px rgba(0,0,0,.55); text-align: right; }
   .modal-close { position: absolute; top: 13px; left: 14px; width: 34px; height: 34px; border: 1px solid rgba(255,255,255,.12); border-radius: 50%; background: transparent; color: #9eb0c8; font-size: 21px; cursor: pointer; }
   .question-count { color: #f6823b; font: 600 11px 'IBM Plex Mono', monospace; letter-spacing: 1px; }
   .question-icon { width: 44px; height: 44px; margin-top: 11px; display: grid; place-items: center; border: 1px solid rgba(239,68,68,.4); border-radius: 11px; background: rgba(239,68,68,.1); font-size: 21px; }
-  .question-bug { margin-top: 10px; color: #38bdf8; font-size: 13px; font-weight: 700; }
+  .question-bug { margin-top: 10px; color: #38bdf8; font-size: 14.5px; font-weight: 700; }
   .question-modal h2 { margin-top: 2px; padding-inline-end: 6px; font-size: clamp(19px, 2.6vw, 24px); line-height: 1.55; }
-  .answer-list { margin-top: 17px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .answer-list { margin-top: 18px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
   .answer-list[hidden] { display: none; }
-  :global(.answer-option) { width: 100%; min-height: 54px; padding: 9px 11px; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(56,189,248,.16); border-radius: 9px; background: rgba(255,255,255,.025); color: #dbe7f7; text-align: right; cursor: pointer; transition: .15s ease; }
+  :global(.answer-option) { width: 100%; min-height: 64px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(56,189,248,.16); border-radius: 9px; background: rgba(255,255,255,.025); color: #dbe7f7; text-align: right; cursor: pointer; transition: .15s ease; }
   :global(.answer-option:hover:not(:disabled)) { border-color: #38bdf8; background: rgba(56,189,248,.08); transform: translateX(-3px); }
-  :global(.answer-option > span) { flex: 0 0 32px; height: 32px; display: grid; place-items: center; border-radius: 7px; background: rgba(56,189,248,.09); color: #7dd3fc; font: 700 12px 'IBM Plex Mono', monospace; }
-  :global(.answer-option b) { font-size: 13px; line-height: 1.5; }
+  :global(.answer-option > span) { flex: 0 0 36px; height: 36px; display: grid; place-items: center; border-radius: 7px; background: rgba(56,189,248,.09); color: #7dd3fc; font: 700 12px 'IBM Plex Mono', monospace; }
+  :global(.answer-option b) { font-size: 15.5px; font-weight: 600; line-height: 1.6; color: #f0f6ff; }
   :global(.answer-option.answer-correct) { border-color: #22c55e; background: rgba(34,197,94,.13); }
   :global(.answer-option.answer-wrong) { border-color: #ef4444; background: rgba(239,68,68,.14); }
   .answer-feedback { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.1); }
   .answer-feedback > strong { display: block; font-size: 18px; }
   .correct-title { color: #4ade80; }
   .wrong-title { color: #fb7185; }
-  .answer-feedback > p { margin-top: 6px; color: #b8c7db; font-size: 13px; line-height: 1.75; }
+  .answer-feedback > p { margin-top: 6px; color: #c9d6e8; font-size: 15px; line-height: 1.8; }
   #expected-result { margin-top: 13px; padding: 11px 13px; display: flex; flex-direction: column; border-right: 3px solid #38bdf8; background: rgba(56,189,248,.07); }
   #expected-result[hidden] { display: none; }
   #expected-result small { color: #38bdf8; font: 8px 'IBM Plex Mono', monospace; }
@@ -1076,9 +1081,9 @@ const jsonLd = {
     .question-bug { margin-top: 7px; font-size: 12px; }
     .question-modal h2 { font-size: clamp(17px, 5vw, 21px); line-height: 1.45; }
     .answer-list { grid-template-columns: 1fr; margin-top: 12px; gap: 7px; }
-    :global(.answer-option) { min-height: 46px; padding: 7px 9px; }
+    :global(.answer-option) { min-height: 52px; padding: 9px 11px; }
     :global(.answer-option > span) { flex-basis: 28px; width: 28px; height: 28px; }
-    :global(.answer-option b) { font-size: 12.5px; line-height: 1.4; }
+    :global(.answer-option b) { font-size: 14.5px; line-height: 1.5; }
     .answer-feedback { margin-top: 11px; padding-top: 11px; }
     #expected-result { margin-top: 9px; padding: 8px 10px; }
     .answer-feedback .btn { width: 100%; margin-top: 11px; }
@@ -1090,7 +1095,7 @@ const jsonLd = {
     .question-bug { margin-top: 6px; }
     .question-modal h2 { font-size: 20px; line-height: 1.4; }
     .answer-list { margin-top: 10px; gap: 7px; }
-    :global(.answer-option) { min-height: 46px; padding-block: 7px; }
+    :global(.answer-option) { min-height: 54px; padding-block: 9px; }
   }
   @media (max-width: 460px) {
     .mission-card, .result-card { padding: 28px 18px; }
@@ -1108,17 +1113,20 @@ const jsonLd = {
   .picker-head p { max-width: 640px; margin: 10px auto 0; color: var(--ink-3); font-size: 17px; }
   .case-grid { margin-top: 34px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
   .case-card { position: relative; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 20px; background: linear-gradient(160deg, var(--surface), color-mix(in srgb, var(--surface) 86%, #061022)); box-shadow: var(--shadow-lg); transition: transform .18s ease, border-color .18s ease; }
-  .case-card:not(.soon):hover { transform: translateY(-4px); border-color: var(--orange-line); }
+  .case-card:not(.soon) { cursor: pointer; }
+  .case-card:not(.soon):hover, .case-card:not(.soon):focus-visible { transform: translateY(-4px); border-color: var(--orange-line); outline: none; box-shadow: var(--shadow-lg), 0 0 0 1px var(--orange-line); }
+  .case-card:not(.soon):hover .case-thumb > img { transform: scale(1.04); }
+  .case-thumb > img { transition: transform .35s ease; }
   .case-thumb { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #081226; }
   .case-thumb > img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .case-thumb-ph { position: absolute; inset: 0; display: grid; place-items: center; background: radial-gradient(260px 160px at 50% 60%, rgba(246,130,59,.18), transparent 70%), linear-gradient(160deg, #0b1729, #0e1f3a); }
   .case-thumb-ph img { width: 64px; height: auto; opacity: .55; transform: rotate(18deg); }
   .soon .case-thumb { filter: grayscale(.6) brightness(.6); }
   .case-lock { position: absolute; inset: 0; display: grid; place-items: center; font-size: 46px; }
-  .case-badge { position: absolute; top: 12px; left: 12px; padding: 4px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 700; }
+  .case-badge { position: absolute; top: 12px; left: 12px; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 800; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
   .case-badge[hidden] { display: none; }
-  .case-badge.done { background: rgba(52,211,153,.16); border: 1px solid rgba(52,211,153,.55); color: #6ee7b7; }
-  .case-badge.new { background: rgba(246,130,59,.2); border: 1px solid rgba(246,130,59,.6); color: #ffc59e; }
+  .case-badge.done { background: #047857; border: 1px solid #34d399; color: #ecfdf5; }
+  .case-badge.new { background: #f6823b; border: 1px solid #ffb07c; color: #1a0d04; }
   .case-body { flex: 1; display: flex; flex-direction: column; padding: 18px 20px 20px; }
   .case-kicker { color: var(--orange); font: 700 12px 'IBM Plex Mono', monospace; letter-spacing: .5px; direction: ltr; text-align: right; }
   .case-body h2 { margin: 6px 0 4px; font-size: 24px; direction: ltr; text-align: right; }
