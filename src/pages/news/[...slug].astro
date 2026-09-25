@@ -36,8 +36,8 @@ const jsonLd = [
     description: data.description,
     inLanguage: 'ar',
     datePublished: data.publishDate.toISOString(),
-    author: { '@type': 'Person', name: site.author },
-    publisher: { '@type': 'Organization', name: site.name, url: site.url },
+    author: { '@id': `${site.url.replace(/\/$/, '')}/#author` },
+    publisher: { '@id': `${site.url.replace(/\/$/, '')}/#organization` },
     mainEntityOfPage: `${site.url}/news/${item.id}/`,
   },
   {
