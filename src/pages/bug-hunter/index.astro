@@ -3,6 +3,7 @@ import { getCollection, getEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import { getSite } from '../../lib/site';
+import { BUG_HUNTER_CASES } from '../../data/bug-hunter-cases';
 
 const site = await getSite();
 const entry = await getEntry('bugHunter', 'bug-hunter');
@@ -10,41 +11,30 @@ const game = entry?.data;
 
 if (!game?.enabled) return Astro.redirect('/');
 
-// عناوين تقرير Jira والخطورة لبغات Case 01 (لو ما انعبّت من لوحة التحكم)
-const CASE01_REPORT: Record<string, [string, string]> = {
-  'broken-image': ['Product image is not displayed on the Wireless Headphones card', 'LOW'],
-  'add-to-cart': ['Add to Cart button does not add the product to the cart', 'HIGH'],
-  'wrong-total': ['Cart total is calculated incorrectly ($42.80 instead of $27.20)', 'HIGH'],
-  'expired-coupon': ['Expired coupon EXPIRED20 is accepted as valid', 'HIGH'],
-  'invalid-email': ['Email field accepts an invalid value (ahmad@)', 'MEDIUM'],
-  'low-contrast': ['Add to Cart text has insufficient color contrast', 'LOW'],
-  'duplicate-order': ['Double-clicking Place Order creates two identical orders', 'CRITICAL'],
-  'false-payment-success': ['Success message is shown after a failed payment (500)', 'CRITICAL'],
-  'mobile-overflow': ['Checkout button is cut off on 360px screens', 'MEDIUM'],
-  'keyboard-skip': ['Place Order cannot be reached or activated with the keyboard', 'MEDIUM'],
-};
-type AnyBug = (typeof game.bugs)[number];
-const withReport = (bugs: AnyBug[], map: Record<string, [string, string]> = {}) =>
-  bugs.map((b) => ({ ...b, reportTitle: b.reportTitle || map[b.id]?.[0] || b.title, severity: b.severity || map[b.id]?.[1] || 'MEDIUM' }));
-
+// الأسئلة والفخاخ من الكود (src/data/bug-hunter-cases.ts)، والعناوين والنصوص العامة من لوحة التحكم
 const extraCases = (await getCollection('bugCases').catch(() => []))
   .filter((c) => c.data.enabled)
   .sort((a, b) => a.data.order - b.data.order);
 
+const content = (id: string) => BUG_HUNTER_CASES[id];
+const case01 = content('broken-shop');
 const cases = [
   {
-    id: 'broken-shop', scene: 'shop', comingSoon: false, badge: game.caseBadge || '',
+    id: 'broken-shop', scene: case01.scene, comingSoon: false, badge: game.caseBadge || '',
     cover: game.caseCover || '/games/bug-hunter-cover.webp', kicker: game.caseKicker,
     caseLabel: game.caseLabel, caseTitle: game.caseTitle, caseText: game.caseText,
-    durationSeconds: game.durationSeconds, bugs: withReport(game.bugs, CASE01_REPORT), traps: game.traps,
+    durationSeconds: game.durationSeconds, bugs: case01.bugs, traps: case01.traps,
     storageKey: 'testing-arabic:bug-hunter:best',
   },
-  ...extraCases.map((c) => ({
-    id: c.id, scene: c.data.scene, comingSoon: c.data.comingSoon || !c.data.bugs.length, badge: c.data.badge || '',
-    cover: c.data.cover || '', kicker: c.data.kicker, caseLabel: c.data.caseLabel, caseTitle: c.data.caseTitle,
-    caseText: c.data.caseText, durationSeconds: c.data.durationSeconds, bugs: withReport(c.data.bugs), traps: c.data.traps,
-    storageKey: `testing-arabic:bug-hunter:best:${c.id}`,
-  })),
+  ...extraCases.map((c) => {
+    const cc = content(c.id);
+    return {
+      id: c.id, scene: cc?.scene || 'none', comingSoon: c.data.comingSoon || !cc?.bugs.length, badge: c.data.badge || '',
+      cover: c.data.cover || '', kicker: c.data.kicker, caseLabel: c.data.caseLabel, caseTitle: c.data.caseTitle,
+      caseText: c.data.caseText, durationSeconds: c.data.durationSeconds, bugs: cc?.bugs || [], traps: cc?.traps || [],
+      storageKey: `testing-arabic:bug-hunter:best:${c.id}`,
+    };
+  }),
 ];
 const settings = {
   pickerTitle: game.pickerTitle, pickerText: game.pickerText, trapPenalty: game.trapPenalty,

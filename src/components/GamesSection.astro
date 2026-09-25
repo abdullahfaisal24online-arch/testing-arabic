@@ -1,4 +1,5 @@
 ---
+import { BUG_HUNTER_CASES } from '../data/bug-hunter-cases';
 /** قسم "العب وتعلّم" بالرئيسية — كل ألعاب المنصة بكروت موحّدة جنب بعض. */
 import Icon from './Icon.astro';
 
@@ -34,7 +35,7 @@ const games = [
     badge: bugHunter.homeBadge,
     title: bugHunter.homeTitle,
     text: bugHunter.homeText,
-    meta: [`${bugHunter.durationSeconds} ثانية`, `${bugHunter.bugs.length} Bugs`, 'بدون تسجيل'],
+    meta: [`${bugHunter.durationSeconds} ثانية`, `${BUG_HUNTER_CASES['broken-shop'].bugs.length} Bugs`, 'بدون تسجيل'],
     cta: bugHunter.homeCta,
     tone: 'orange',
   },
