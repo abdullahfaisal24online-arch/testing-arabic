@@ -58,26 +58,36 @@ const jsonLd = {
             <button type="button" id="dh-rot-ok">كمّل هيك</button>
           </div>
 
-          <div class="dh-layer dh-report" id="dh-report" hidden>
+          <div class="dh-layer dh-report" id="dh-report" hidden role="dialog" aria-modal="true" aria-labelledby="rep-title">
             <div class="rep-card">
-              <div class="rep-title px">SPRINT REPORT</div>
-              <div class="rep-new px dh-newbest" hidden>★ NEW BEST ★</div>
-              <dl class="rep-rows" dir="ltr">
-                <div><dt>Bugs found</dt><dd data-r="found">0</dd></div>
-                <div><dt>Critical caught</dt><dd class="y" data-r="critical">0</dd></div>
-                <div><dt>Escaped to Production</dt><dd class="red" data-r="escaped">0</dd></div>
-                <div><dt>Features broken</dt><dd class="c" data-r="broken">0</dd></div>
-                <div><dt>Accuracy</dt><dd data-r="acc">0%</dd></div>
-                <div><dt>Reached</dt><dd>Sprint <span data-r="sprint">1</span></dd></div>
-              </dl>
-              <div class="rep-score" dir="ltr"><span class="px">SCORE</span><b class="px" data-r="score">000000</b></div>
-              <p class="rep-msg" data-r="msg"></p>
-              <div class="rep-actions">
-                <button type="button" class="rb rb-primary" id="dh-share">شارك النتيجة</button>
-                <button type="button" class="rb rb-ghost" id="dh-again">العب مرة تانية</button>
-                <button type="button" class="rb rb-link" id="dh-card">حمّل بطاقة السكور</button>
+              <div class="rep-head">
+                <div class="rep-title px" id="rep-title">SPRINT REPORT</div>
+                <div class="rep-new px dh-newbest" hidden>★ NEW BEST ★</div>
               </div>
-              <p class="dh-note" hidden></p>
+              <div class="rep-main">
+                <div class="rep-score">
+                  <small class="px">SCORE</small>
+                  <b class="px" data-r="score">000000</b>
+                  <i class="px">BEST <span data-r="best">000000</span> · SPRINT <span data-r="sprint">1</span></i>
+                </div>
+                <p class="rep-msg" data-r="msg"></p>
+              </div>
+              <div class="rep-side">
+                <div class="rep-grid">
+                  <div class="tile"><b class="px" data-r="found">0</b><span>Bugs صدتها</span></div>
+                  <div class="tile"><b class="px y" data-r="critical">0</b><span>Critical</span></div>
+                  <div class="tile"><b class="px red" data-r="escaped">0</b><span>هربوا على Production</span></div>
+                  <div class="tile"><b class="px c" data-r="broken">0</b><span>Features انكسرت</span></div>
+                  <div class="tile"><b class="px" data-r="acc">0%</b><span>الدقة</span></div>
+                  <div class="tile"><b class="px" data-r="sprint">1</b><span>وصلت Sprint</span></div>
+                </div>
+                <div class="rep-actions">
+                  <button type="button" class="rb rb-primary" id="dh-share">شارك النتيجة</button>
+                  <button type="button" class="rb rb-ghost" id="dh-again">العب مرة تانية</button>
+                  <button type="button" class="rb rb-link" id="dh-card">حمّل بطاقة السكور</button>
+                </div>
+                <p class="dh-note" hidden></p>
+              </div>
             </div>
           </div>
         </div>
@@ -166,24 +176,57 @@ const jsonLd = {
   .dh-rotate button { margin-top: 6px; font: inherit; font-weight: 700; font-size: 14px; background: #0b162a; color: #38bdf8; border: 2px solid #38bdf8; border-radius: 10px; padding: 6px 16px; cursor: pointer; }
 
   /* التقرير */
-  .dh-report { background: rgba(5,10,20,.72); padding: 2%; overflow-y: auto; }
-  .rep-card { width: min(94%, 760px); background: #0b162a; border: 5px solid #38bdf8; box-shadow: 10px 10px 0 #000; padding: clamp(12px, 2.8vw, 36px) clamp(14px, 3.4vw, 44px); }
-  .rep-title { font-size: clamp(12px, 2.1vw, 24px); color: #38bdf8; direction: ltr; }
-  .rep-new { margin-top: 8px; font-size: clamp(8px, 1.2vw, 13px); color: #f7c948; animation: dh-blink .8s steps(2) infinite; }
-  .rep-rows { margin: clamp(8px, 1.6vw, 20px) 0 0; display: grid; grid-template-columns: 1fr 1fr; column-gap: 28px; }
-  .rep-rows div { display: flex; justify-content: space-between; gap: 10px; padding: clamp(4px, .8vw, 10px) 0; border-bottom: 2px dashed #1f4b73; font-family: 'Press Start 2P', monospace; font-size: clamp(7px, 1.05vw, 13px); line-height: 1.4; }
-  .rep-rows dt { color: #8a9ebd; } .rep-rows dd { margin: 0; color: #f0f6ff; }
-  .rep-rows .y { color: #f7c948; } .rep-rows .red { color: #ff6b6b; } .rep-rows .c { color: #38bdf8; }
-  .rep-score { display: flex; justify-content: space-between; align-items: center; margin-top: clamp(8px, 1.6vw, 20px); }
-  .rep-score span { font-size: clamp(9px, 1.4vw, 16px); color: #8a9ebd; }
-  .rep-score b { font-size: clamp(18px, 3.6vw, 40px); color: #f6823b; text-shadow: 4px 4px 0 #000; }
-  .rep-msg { margin: clamp(8px, 1.6vw, 18px) 0 0; font-weight: 700; font-size: clamp(13px, 1.9vw, 22px); line-height: 1.6; }
-  .rep-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: clamp(10px, 1.8vw, 20px); }
-  .rb { font: inherit; font-weight: 700; font-size: clamp(13px, 1.6vw, 18px); padding: .55em 1.3em; cursor: pointer; border: 3px solid #000; box-shadow: 5px 5px 0 #000; }
+  /* تقرير النهاية — عمودين جوّا شاشة اللعبة عالكمبيوتر، ونافذة كاملة عالموبايل */
+  .dh-report { background: rgba(5,10,20,.74); padding: 2%; overflow-y: auto; }
+  .rep-card { width: min(96%, 900px); background: #0b162a; border: 5px solid #38bdf8; box-shadow: 10px 10px 0 #000;
+    padding: clamp(14px, 2.2vw, 28px) clamp(16px, 2.6vw, 32px); display: grid; gap: clamp(8px, 1.4vw, 16px) clamp(16px, 2.4vw, 30px);
+    grid-template-columns: 1fr 1.15fr; grid-template-areas: "head head" "main side"; align-items: center; }
+  .rep-head { grid-area: head; text-align: center; }
+  .rep-main { grid-area: main; text-align: center; }
+  .rep-side { grid-area: side; }
+  .rep-title { font-size: clamp(14px, 2vw, 24px); color: #38bdf8; direction: ltr; }
+  .rep-new { margin-top: 8px; font-size: clamp(9px, 1.1vw, 13px); color: #f7c948; animation: dh-blink .8s steps(2) infinite; direction: ltr; }
+  .rep-score small { display: block; font-size: clamp(9px, 1.1vw, 13px); color: #8a9ebd; direction: ltr; }
+  .rep-score b { display: block; margin-top: 8px; font-size: clamp(28px, 4.2vw, 50px); font-weight: 400; color: #f6823b; text-shadow: 4px 4px 0 #000; direction: ltr; }
+  .rep-score i { display: block; margin-top: 10px; font-style: normal; font-size: clamp(8px, 1vw, 12px); color: #8a9ebd; direction: ltr; }
+  .rep-msg { margin: clamp(10px, 1.4vw, 16px) 0 0; font-weight: 700; font-size: clamp(15px, 1.7vw, 20px); line-height: 1.7; }
+  .rep-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .tile { background: #0f1f38; border: 2px solid #1f4b73; border-radius: 10px; padding: clamp(7px, 1vw, 12px) 6px; text-align: center; }
+  .tile b { display: block; font-weight: 400; font-size: clamp(14px, 1.7vw, 20px); color: #f0f6ff; direction: ltr; }
+  .tile span { display: block; margin-top: 6px; font-size: clamp(12px, 1.2vw, 14px); line-height: 1.4; color: #9fb4d4; }
+  .tile .y { color: #f7c948; } .tile .red { color: #ff6b6b; } .tile .c { color: #38bdf8; }
+  .rep-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: clamp(10px, 1.4vw, 16px); }
+  .rep-actions .rb-link { grid-column: 1 / -1; justify-self: center; }
+  .rb { font: inherit; font-weight: 700; font-size: clamp(14px, 1.5vw, 18px); padding: .6em 1em; cursor: pointer; border: 3px solid #000; box-shadow: 5px 5px 0 #000; }
   .rb:active { transform: translate(2px, 2px); box-shadow: 3px 3px 0 #000; }
   .rb-primary { background: #f6823b; color: #1a0d04; }
   .rb-ghost { background: #0b162a; color: #38bdf8; border-color: #38bdf8; }
-  .rb-link { background: transparent; color: #b9c9df; border: 0; box-shadow: none; text-decoration: underline; padding-inline: .4em; }
+  .rb-link { background: transparent; color: #b9c9df; border: 0; box-shadow: none; text-decoration: underline; padding-inline: .4em; font-size: 14px; }
+
+  /* الموبايل: التقرير نافذة فوق الشاشة كلها بدل ما ينحشر جوّا اللعبة */
+  @media (max-width: 900px), (max-height: 560px) {
+    .dh-report { position: fixed; inset: 0; z-index: 10050; padding: 14px; padding-top: max(14px, env(safe-area-inset-top)); padding-bottom: max(14px, env(safe-area-inset-bottom));
+      background: rgba(5, 10, 20, .82); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); justify-content: flex-start; }
+    .dh-report[hidden] { display: none; }
+    .rep-card { width: min(100%, 520px); margin: auto; grid-template-columns: 1fr; grid-template-areas: "head" "main" "side"; padding: 18px; }
+    .rep-title { font-size: 17px; } .rep-new { font-size: 10px; }
+    .rep-score small { font-size: 10px; } .rep-score b { font-size: 38px; } .rep-score i { font-size: 10px; }
+    .rep-msg { font-size: 17px; }
+    .tile b { font-size: 16px; } .tile span { font-size: 12.5px; }
+    .rep-actions { grid-template-columns: 1fr; }
+    .rb { font-size: 17px; padding: 12px; } .rb-link { font-size: 14px; padding: 4px; box-shadow: none; }
+  }
+  @media (orientation: landscape) and (max-height: 560px) {
+    .dh-report { padding: 8px 14px; padding-left: max(14px, env(safe-area-inset-left)); padding-right: max(14px, env(safe-area-inset-right)); }
+    .rep-card { width: min(100%, 780px); grid-template-columns: 1fr 1.15fr; grid-template-areas: "head head" "main side"; padding: 10px 16px 12px; gap: 4px 16px; border-width: 4px; }
+    .rep-head { display: flex; justify-content: center; align-items: baseline; gap: 14px; }
+    .rep-title { font-size: 14px; } .rep-new { margin-top: 0; font-size: 9px; }
+    .rep-score small { font-size: 9px; } .rep-score b { font-size: 30px; margin-top: 6px; } .rep-score i { font-size: 9px; margin-top: 6px; }
+    .rep-msg { font-size: 14px; margin-top: 6px; line-height: 1.6; }
+    .rep-grid { gap: 6px; } .tile { padding: 5px 4px; } .tile b { font-size: 14px; } .tile span { font-size: 11.5px; margin-top: 3px; line-height: 1.3; }
+    .rep-actions { grid-template-columns: 1fr 1fr; margin-top: 8px; gap: 8px; }
+    .rb { font-size: 14px; padding: 8px; box-shadow: 4px 4px 0 #000; } .rb-link { font-size: 13px; padding: 0; box-shadow: none; }
+  }
   .dh-note { margin: 10px 0 0; color: #34d399; font-size: 14px; }
 
   /* أزرار التحكم */
@@ -253,7 +296,6 @@ const jsonLd = {
   @media (max-width: 900px) { .how-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 640px) {
     .how-grid { grid-template-columns: 1fr; } .dh-cabinet { padding: 8px; } .best { margin-inline-start: 0; }
-    .rep-rows { grid-template-columns: 1fr; } .rep-rows div:nth-child(n+5) { display: none; }
     .dh-legend { display: none; }
   }
 </style>
