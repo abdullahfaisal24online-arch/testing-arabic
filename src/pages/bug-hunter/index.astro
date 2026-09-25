@@ -93,7 +93,7 @@ const jsonLd = {
                   <div class="case-meta"><span>{c.bugs.length} Bugs</span>{c.traps.length > 0 && <span>{c.traps.length} Not a Bug</span>}<span>{c.durationSeconds} ثانية</span></div>
                 )}
                 <div class="case-cta">
-                  <span class="case-progress" data-case-progress>{c.comingSoon ? 'بتنفتح لما تنضاف من الـ CMS' : 'لسا ما لعبتها'}</span>
+                  <span class="case-progress" data-case-progress>{c.comingSoon ? '🔔 جاية قريب… تابعنا عشان تكون أول واحد يلعبها' : 'لسا ما لعبتها'}</span>
                   {!c.comingSoon && <button type="button" class="btn btn-primary case-go" data-pick-case={c.id}>ابدأ <Icon name="arrow" size={17} /></button>}
                 </div>
               </div>
