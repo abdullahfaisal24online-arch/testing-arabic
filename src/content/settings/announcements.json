@@ -7,7 +7,9 @@
       "text": "🎮 جرّب لعبة Debug Hunt — اصطاد الـ bugs قبل ما توصل Production",
       "href": "/debug-hunt/",
       "badge": "جديد",
-      "tone": "orange"
+      "tone": "orange",
+      "start": "2026-09-27",
+      "end": "2026-10-31"
     }
   ]
 }
