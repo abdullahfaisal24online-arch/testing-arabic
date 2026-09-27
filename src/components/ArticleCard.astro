@@ -6,7 +6,7 @@ interface Props {
   article: {
     id: string;
     body?: string;
-    data: { title: string; description: string; category: string; publishDate: Date; cover?: string };
+    data: { title: string; description: string; category: string[]; publishDate: Date; cover?: string };
   };
 }
 const { article } = Astro.props;
@@ -20,7 +20,7 @@ const cover = article.data.cover;
     </div>
   )}
   <div class="card-body">
-    <span class="meta"><b>{article.data.category}</b> · {minutesLabel(mins)} قراءة</span>
+    <span class="meta"><b>{article.data.category.join(' · ')}</b> · {minutesLabel(mins)} قراءة</span>
     <span class="ttl">{article.data.title}</span>
     <p class="desc">{article.data.description}</p>
     <span class="date">{formatDate(article.data.publishDate)}</span>

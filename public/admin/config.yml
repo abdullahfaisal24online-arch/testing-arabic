@@ -217,8 +217,10 @@ collections:
         required: false
       - name: category
         label: "التصنيف"
+        hint: "بتقدر تختار أكثر من تصنيف"
         widget: select
-        default: "أساسيات"
+        multiple: true
+        default: ["أساسيات"]
         options:
           - "أساسيات"
           - "أتمتة"
@@ -393,8 +395,10 @@ collections:
         required: false
       - name: category
         label: "التصنيف"
+        hint: "بتقدر تختار أكثر من تصنيف"
         widget: select
-        default: "مهارات"
+        multiple: true
+        default: ["مهارات"]
         options:
           - "مهارات"
           - "أدوات"

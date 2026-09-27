@@ -38,7 +38,7 @@ const rows = lessons.map((l) => {
   return { lesson: l, courseId: cid, title: courseTitle(cid) };
 });
 
-const categories = [...new Set(lessons.map((l) => l.data.category))];
+const categories = [...new Set(lessons.flatMap((l) => l.data.category))];
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -76,7 +76,7 @@ const jsonLd = {
     <div class="wrap">
       <div class="grid grid-4" id="lesson-grid">
         {rows.map((r) => (
-          <div data-cat={r.lesson.data.category} data-scope={r.title ? 'course' : 'solo'}>
+          <div data-cat={r.lesson.data.category.join('|')} data-scope={r.title ? 'course' : 'solo'}>
             <LessonCard lesson={r.lesson} courseTitle={r.title} />
           </div>
         ))}
@@ -120,7 +120,7 @@ const jsonLd = {
   function apply() {
     let shown = 0;
     cells.forEach((cell) => {
-      const okCat = cat === 'all' || cell.dataset.cat === cat;
+      const okCat = cat === 'all' || (cell.dataset.cat ?? '').split('|').includes(cat);
       const match = okCat;
       cell.style.display = match ? '' : 'none';
       if (match) shown++;

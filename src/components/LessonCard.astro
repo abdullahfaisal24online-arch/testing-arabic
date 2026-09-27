@@ -10,7 +10,7 @@ interface Props {
     data: {
       title: string;
       description: string;
-      category: string;
+      category: string[];
       duration: string;
       videoId?: string;
       thumbnail?: string;
@@ -39,7 +39,7 @@ const thumb = bunnyThumb(data.videoId, data.thumbnail, site.bunnyCdnHostname);
     <span class="time mono">{data.duration}</span>
   </div>
   <div class="card-body">
-    <span class="cat">{data.category}</span>
+    <span class="cat">{data.category.join(' · ')}</span>
     <span class="card-title">{data.title}</span>
     <span class="card-meta">
       {courseTitle ? (

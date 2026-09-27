@@ -30,7 +30,7 @@ export async function getStaticPaths() {
       .filter(
         (l) =>
           l.id !== lesson.id &&
-          l.data.category === lesson.data.category &&
+          l.data.category.some((c) => lesson.data.category.includes(c)) &&
           !manual.some((m) => m.id === l.id),
       )
       .slice(0, 4);
@@ -126,7 +126,7 @@ const jsonLd = [
           <span>{formatDate(data.publishDate)}</span><span>·</span>
           <span class="mono">{data.duration}</span><span>·</span>
           <span class="badge badge-orange">{data.level}</span>
-          <span class="badge badge-outline">{data.category}</span>
+          {data.category.map((c) => <span class="badge badge-outline">{c}</span>)}
           <span class="badge badge-outline">{data.lessonType}</span>
         </div>
         <p class="lead">{data.description}</p>

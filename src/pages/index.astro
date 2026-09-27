@@ -175,7 +175,7 @@ const jsonLd: Record<string, unknown>[] = [
             <span class="card-meta">
               <Icon name="clock" size={14} /> {featured.data.duration}
               <span>·</span>
-              <span>{featured.data.category}</span>
+              <span>{featured.data.category.join(' · ')}</span>
               <span class="grow"></span>
               <span class="go">{home.featuredCta}</span>
             </span>

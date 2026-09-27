@@ -17,6 +17,13 @@ const bool = (def: boolean) => z.preprocess(fallback(def), z.boolean());
 const num = (def: number) => z.preprocess(fallback(def), z.coerce.number());
 const level = z.preprocess(fallback('مبتدئ'), z.enum(levels));
 const strList = z.preprocess(fallback([]), z.array(str('')));
+// تصنيف واحد أو أكثر: بيقبل النص القديم (تصنيف واحد) أو قائمة من لوحة التحكم، وما بيطلع فاضي أبداً
+const catList = (def: string) =>
+  z.preprocess((v) => {
+    const raw = Array.isArray(v) ? v : v === '' || v === null || v === undefined ? [] : [v];
+    const list = [...new Set(raw.map((x) => String(x ?? '').trim()).filter(Boolean))];
+    return list.length ? list : [def];
+  }, z.array(z.string()).min(1));
 
 /* ===== الدروس ===== */
 const lessons = defineCollection({
@@ -26,7 +33,7 @@ const lessons = defineCollection({
     description: str(''),
     publishDate: z.coerce.date(),
     updatedDate: optDate,
-    category: str('أساسيات'),
+    category: catList('أساسيات'),
     level,
     duration: str('00:00'),
     videoId: optString,
@@ -70,7 +77,7 @@ const articles = defineCollection({
     description: str(''),
     publishDate: z.coerce.date(),
     updatedDate: optDate,
-    category: str('مقالات'),
+    category: catList('مقالات'),
     tags: strList,
     cover: optString,
     featured: bool(false),
