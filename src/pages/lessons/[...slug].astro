@@ -6,6 +6,7 @@ import LessonCard from '../../components/LessonCard.astro';
 import InlineNewsletter from '../../components/InlineNewsletter.astro';
 import Prose from '../../components/Prose.astro';
 import Comments from '../../components/Comments.astro';
+import DebugHuntLessonCta from '../../components/DebugHuntLessonCta.astro';
 import LikeButton from '../../components/LikeButton.astro';
 import ViewCount from '../../components/ViewCount.astro';
 import { getSite } from '../../lib/site';
@@ -208,6 +209,8 @@ const jsonLd = [
           <span class="done-hint">التتبّع محفوظ بمتصفّحك فقط — بدون حساب ولا تسجيل.</span>
         </div>
       )}
+
+      <DebugHuntLessonCta />
 
       <Comments page={`/lessons/${lesson.id}/`} title={data.title} />
 

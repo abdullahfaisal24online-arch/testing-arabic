@@ -1,0 +1,134 @@
+---
+/**
+ * شريط الأخبار فوق الموقع — بيتحكم فيه من لوحة التحكم (إعدادات الموقع ← شريط الأخبار).
+ * رسالة وحدة كل مرة، بتتبدّل بهدوء، والزائر بيقدر يسكّره (وبيرجع يطلع لما تنضاف رسالة جديدة).
+ * التواريخ بتنفحص بمتصفح الزائر كمان، عشان الرسالة تختفي بوقتها حتى لو ما صار build جديد.
+ */
+import { getEntry } from 'astro:content';
+
+const entry = await getEntry('announcements', 'announcements').catch(() => undefined);
+const cfg = entry?.data;
+const path = Astro.url.pathname;
+// ما بيطلع جوّا صفحات الألعاب
+const hiddenHere = ['/debug-hunt', '/bug-hunter'].some((p) => path.startsWith(p));
+const day = (d?: Date) => (d ? d.toISOString().slice(0, 10) : '');
+const today = new Date().toISOString().slice(0, 10);
+const items = (cfg?.items ?? [])
+  .filter((i) => i.enabled && i.text.trim())
+  .filter((i) => !i.end || day(i.end) >= today)
+  .map((i) => ({ ...i, key: [...`${i.text}|${i.href ?? ''}`].reduce((h, c) => ((h * 31 + c.codePointAt(0)!) >>> 0), 7).toString(36) }));
+const show = cfg?.enabled && !hiddenHere && items.length > 0;
+const interval = Math.max(3, Math.min(20, cfg?.interval ?? 5));
+---
+
+{show && (
+  <div class="ann" id="ann" role="region" aria-label="آخر الأخبار" data-interval={interval}>
+    <div class="ann-in">
+      <div class="ann-track">
+        {items.map((i, n) => {
+          const Tag = i.href ? 'a' : 'div';
+          return (
+            <Tag class:list={['ann-msg', { on: n === 0 }]} href={i.href} data-key={i.key}
+              data-start={day(i.start)} data-end={day(i.end)} aria-hidden={n === 0 ? undefined : 'true'}>
+              {i.badge && <span class:list={['ann-tag', i.tone]}>{i.badge}</span>}
+              <span class="ann-txt">{i.text}</span>
+              {i.href && <span class="ann-go" aria-hidden="true">←</span>}
+            </Tag>
+          );
+        })}
+      </div>
+      {items.length > 1 && (
+        <span class="ann-dots">
+          {items.map((i, n) => <button type="button" class:list={{ on: n === 0 }} data-go={n} aria-label={`الرسالة ${n + 1}`}></button>)}
+        </span>
+      )}
+      <button class="ann-x" type="button" aria-label="إغلاق الشريط">✕</button>
+    </div>
+  </div>
+)}
+{show && (
+  <script is:inline>
+    // يخفي الرسائل المسكّرة أو اللي مش بوقتها قبل ما ينرسم الشريط (بدون ومضة)
+    (function () {
+      var bar = document.getElementById('ann');
+      if (!bar) return;
+      var closed = [];
+      try { closed = JSON.parse(localStorage.getItem('ta-ann-closed') || '[]'); } catch (e) {}
+      var t = new Date(), today = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+      var msgs = bar.querySelectorAll('.ann-msg'), live = 0;
+      msgs.forEach(function (m) {
+        var s = m.getAttribute('data-start'), e = m.getAttribute('data-end');
+        var ok = (!s || s <= today) && (!e || e >= today);
+        if (!ok) m.setAttribute('data-off', '1'); else live++;
+      });
+      var fresh = [].some.call(msgs, function (m) { return !m.hasAttribute('data-off') && closed.indexOf(m.getAttribute('data-key')) < 0; });
+      if (!live || !fresh) bar.hidden = true;
+    })();
+  </script>
+)}
+
+<script>
+  const bar = document.getElementById('ann');
+  if (bar && !bar.hidden) {
+    // الرسائل اللي مش بوقتها بتنشال هي ونقطتها
+    const allMsgs = [...bar.querySelectorAll<HTMLElement>('.ann-msg')];
+    const allDots = [...bar.querySelectorAll<HTMLButtonElement>('.ann-dots button')];
+    allMsgs.forEach((m, i) => { if (m.hasAttribute('data-off')) { m.remove(); allDots[i]?.remove(); } });
+    const msgs = allMsgs.filter((m) => !m.hasAttribute('data-off'));
+    const liveDots = [...bar.querySelectorAll<HTMLButtonElement>('.ann-dots button')];
+    if (liveDots.length < 2) bar.querySelector('.ann-dots')?.remove();
+    let cur = 0, paused = false;
+    const show = (n: number) => {
+      cur = (n + msgs.length) % msgs.length;
+      msgs.forEach((m, i) => { m.classList.toggle('on', i === cur); if (i === cur) m.removeAttribute('aria-hidden'); else m.setAttribute('aria-hidden', 'true'); });
+      liveDots.forEach((d, i) => d.classList.toggle('on', i === cur));
+    };
+    show(0);
+    const every = (Number(bar.dataset.interval) || 5) * 1000;
+    if (msgs.length > 1) setInterval(() => { if (!paused && !document.hidden) show(cur + 1); }, every);
+    bar.addEventListener('mouseenter', () => (paused = true));
+    bar.addEventListener('mouseleave', () => (paused = false));
+    bar.addEventListener('focusin', () => (paused = true));
+    bar.addEventListener('focusout', () => (paused = false));
+    liveDots.forEach((d, i) => d.addEventListener('click', () => show(i)));
+    msgs.forEach((m) => m.addEventListener('click', () => window.taTrack?.('announcement_click', { key: m.dataset.key, href: m.getAttribute('href') || '' })));
+    bar.querySelector('.ann-x')?.addEventListener('click', () => {
+      try {
+        const closed: string[] = JSON.parse(localStorage.getItem('ta-ann-closed') || '[]');
+        msgs.forEach((m) => { if (m.dataset.key && !closed.includes(m.dataset.key)) closed.push(m.dataset.key); });
+        localStorage.setItem('ta-ann-closed', JSON.stringify(closed.slice(-50)));
+      } catch (_) {}
+      bar.hidden = true;
+    });
+  }
+</script>
+
+<style>
+  .ann { position: relative; z-index: 60; color: #eaf3ff; font-size: 14.5px; font-weight: 600; line-height: 1.6;
+    background: linear-gradient(90deg, #0b2a4a, #123a66 50%, #0b2a4a); border-bottom: 1px solid rgba(56, 189, 248, .35); }
+  .ann[hidden] { display: none; }
+  .ann-in { max-width: 1180px; margin: 0 auto; padding: 0 52px; min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 14px; position: relative; }
+  .ann-track { display: grid; min-width: 0; }
+  .ann-msg { grid-area: 1 / 1; display: flex; align-items: center; justify-content: center; gap: 12px; min-width: 0; color: inherit; text-decoration: none;
+    opacity: 0; visibility: hidden; transform: translateY(6px); transition: opacity .45s ease, transform .45s ease, visibility 0s linear .45s; }
+  .ann-msg.on { opacity: 1; visibility: visible; transform: none; transition: opacity .45s ease, transform .45s ease; }
+  a.ann-msg:hover .ann-txt { text-decoration: underline; text-underline-offset: 4px; }
+  .ann-txt { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ann-tag { flex: none; font-size: 12px; font-weight: 700; padding: 1px 10px; border-radius: 999px; background: #f6823b; color: #1a0d04; }
+  .ann-tag.cyan { background: #38bdf8; color: #04121f; }
+  .ann-go { flex: none; color: #7dd3fc; font-weight: 700; }
+  .ann-dots { display: flex; gap: 6px; flex: none; }
+  .ann-dots button { width: 7px; height: 7px; padding: 0; border: 0; border-radius: 50%; background: rgba(234, 243, 255, .3); cursor: pointer; }
+  .ann-dots button.on { background: #38bdf8; }
+  .ann-x { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; border-radius: 8px;
+    background: none; color: #9fb3cf; font-size: 15px; cursor: pointer; }
+  .ann-x:hover { background: rgba(255, 255, 255, .08); color: #fff; }
+  @media (max-width: 700px) {
+    .ann { font-size: 13px; }
+    .ann-in { padding: 0 12px 0 44px; justify-content: flex-start; min-height: 40px; }
+    .ann-msg { justify-content: flex-start; }
+    .ann-dots, .ann-go { display: none; }
+    .ann-x { left: 4px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .ann-msg, .ann-msg.on { transition: none; transform: none; } }
+</style>

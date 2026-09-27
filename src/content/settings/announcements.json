@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "interval": 5,
+  "items": [
+    {
+      "enabled": true,
+      "text": "🎮 جرّب لعبة Debug Hunt — اصطاد الـ bugs قبل ما توصل Production",
+      "href": "/debug-hunt/",
+      "badge": "جديد",
+      "tone": "orange"
+    }
+  ]
+}

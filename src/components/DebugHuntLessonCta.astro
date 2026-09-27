@@ -1,0 +1,50 @@
+---
+/** بلوك "خلصت الدرس؟" بآخر الدرس — نصوصه وتشغيله من لوحة التحكم (لعبة Debug Hunt). */
+import { getEntry } from 'astro:content';
+
+const dh = (await getEntry('debugHunt', 'debug-hunt').catch(() => undefined))?.data;
+const show = dh ? dh.lessonCtaEnabled : true;
+const t = {
+  eyebrow: dh?.lessonCtaEyebrow ?? 'خلصت الدرس؟ 👏',
+  title: dh?.lessonCtaTitle ?? 'خذ استراحة 60 ثانية واصطد bugs',
+  text: dh?.lessonCtaText ?? 'لعبة Debug Hunt — بتلعبها عالموبايل كمان',
+  button: dh?.lessonCtaButton ?? 'العب هسا',
+};
+---
+
+{show && (
+  <a class="dh-cta" href="/debug-hunt/" data-track="lesson_game_cta">
+    <img src="/games/debug-hunt-cover.webp" alt="" width="640" height="360" loading="lazy" decoding="async" />
+    <div class="dh-cta-copy">
+      <span class="dh-cta-eye">{t.eyebrow}</span>
+      <strong>{t.title}</strong>
+      {t.text && <small>{t.text}</small>}
+    </div>
+    <span class="btn btn-primary btn-sm dh-cta-btn">{t.button} <span aria-hidden="true">←</span></span>
+  </a>
+)}
+
+<script>
+  document.querySelectorAll<HTMLAnchorElement>('.dh-cta').forEach((a) =>
+    a.addEventListener('click', () => window.taTrack?.('lesson_game_cta_click', { page: location.pathname })),
+  );
+</script>
+
+<style>
+  .dh-cta { display: grid; grid-template-columns: 180px 1fr auto; gap: 20px; align-items: center; margin: 26px 0; padding: 14px 20px 14px 14px;
+    border-radius: 18px; border: 1.5px solid rgba(56, 189, 248, .35); background: linear-gradient(90deg, #0c1629, #11213f); color: #eaf3ff; text-decoration: none;
+    transition: border-color .2s ease, transform .2s ease; }
+  .dh-cta:hover { border-color: #38bdf8; transform: translateY(-2px); color: #fff; }
+  .dh-cta img { width: 180px; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 12px; display: block; }
+  .dh-cta-copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .dh-cta-eye { color: #ff9b5d; font-weight: 700; font-size: 13.5px; }
+  .dh-cta-copy strong { font-size: 18px; color: #fff; line-height: 1.6; }
+  .dh-cta-copy small { color: #b9c9df; font-size: 14px; line-height: 1.7; }
+  @media (max-width: 700px) {
+    .dh-cta { grid-template-columns: 110px 1fr; gap: 12px 14px; padding: 12px; }
+    .dh-cta img { width: 110px; }
+    .dh-cta-copy strong { font-size: 16px; }
+    .dh-cta-copy small { font-size: 13px; }
+    .dh-cta-btn { grid-column: 1 / -1; justify-content: center; }
+  }
+</style>

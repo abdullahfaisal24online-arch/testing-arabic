@@ -1293,6 +1293,95 @@ collections:
             widget: list
             required: false
             hint: "كل سطر بيطلع كشارة صغيرة (مثلاً: 60 ثانية)"
+          - name: lessonCtaEnabled
+            label: "إظهار بلوك اللعبة بآخر كل درس"
+            widget: boolean
+            default: true
+            hint: "البلوك اللي بيطلع بعد الدرس: خلصت الدرس؟ خذ استراحة…"
+          - name: lessonCtaEyebrow
+            label: "بلوك الدرس — السطر الصغير فوق"
+            widget: string
+            default: "خلصت الدرس؟ 👏"
+          - name: lessonCtaTitle
+            label: "بلوك الدرس — العنوان"
+            widget: string
+            default: "خذ استراحة 60 ثانية واصطد bugs"
+          - name: lessonCtaText
+            label: "بلوك الدرس — الوصف"
+            widget: string
+            default: "لعبة Debug Hunt — بتلعبها عالموبايل كمان"
+          - name: lessonCtaButton
+            label: "بلوك الدرس — نص الزر"
+            widget: string
+            default: "العب هسا"
+
+      - name: announcements
+        label: "شريط الأخبار"
+        file: src/content/settings/announcements.json
+        fields:
+          - name: enabled
+            label: "تشغيل الشريط"
+            widget: boolean
+            default: true
+            hint: "بيطلع فوق كل صفحات الموقع (ما عدا صفحات الألعاب)"
+          - name: interval
+            label: "كل كم ثانية تتبدّل الرسالة"
+            widget: number
+            value_type: int
+            min: 3
+            max: 20
+            default: 5
+          - name: items
+            label: "الرسائل"
+            label_singular: "رسالة"
+            widget: list
+            required: false
+            summary: "{{fields.text}}"
+            hint: "رسالة وحدة بتطلع كل مرة. الزائر بيقدر يسكّر الشريط، وبيرجع يطلع لما تضيف رسالة جديدة"
+            fields:
+              - name: enabled
+                label: "مفعّلة"
+                widget: boolean
+                default: true
+              - name: text
+                label: "النص"
+                widget: string
+                hint: "خليه قصير عشان يبين كامل عالموبايل — مثلاً: 🎮 جرّب لعبة Debug Hunt"
+              - name: href
+                label: "الرابط"
+                widget: string
+                required: false
+                hint: "مثلاً /debug-hunt/ — فاضي = رسالة بدون رابط"
+              - name: badge
+                label: "الشارة"
+                widget: string
+                required: false
+                hint: "كلمة وحدة بتطلع جنب النص (جديد، حصري…). فاضية = بدون شارة"
+              - name: tone
+                label: "لون الشارة"
+                widget: select
+                default: "orange"
+                options:
+                  - { label: "برتقالي", value: "orange" }
+                  - { label: "أزرق", value: "cyan" }
+              - name: start
+                label: "تبدأ تظهر من"
+                widget: datetime
+                required: false
+                format: "YYYY-MM-DD"
+                date_format: "YYYY-MM-DD"
+                time_format: false
+                picker_utc: true
+                hint: "فاضي = من هسا"
+              - name: end
+                label: "بتختفي بعد"
+                widget: datetime
+                required: false
+                format: "YYYY-MM-DD"
+                date_format: "YYYY-MM-DD"
+                time_format: false
+                picker_utc: true
+                hint: "فاضي = بتضل لحد ما توقفها"
 
       - name: start
         label: "صفحة ابدأ من هنا"

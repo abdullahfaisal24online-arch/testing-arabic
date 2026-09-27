@@ -349,6 +349,35 @@ const debugHunt = defineCollection({
     homeText: str('اصطاد الـ bugs قبل ما توصل Production… وانتبه لا تكسر أي feature 😅'),
     homeCta: str('العب Debug Hunt'),
     homeMeta: strList,
+    // بلوك "خلصت الدرس؟" بآخر كل درس
+    lessonCtaEnabled: bool(true),
+    lessonCtaEyebrow: str('خلصت الدرس؟ 👏'),
+    lessonCtaTitle: str('خذ استراحة 60 ثانية واصطد bugs'),
+    lessonCtaText: str('لعبة Debug Hunt — بتلعبها عالموبايل كمان'),
+    lessonCtaButton: str('العب هسا'),
+  }),
+});
+
+/* ===== شريط الأخبار فوق الموقع ===== */
+const announcements = defineCollection({
+  loader: glob({ base: './src/content/settings', pattern: 'announcements.json' }),
+  schema: z.object({
+    enabled: bool(true),
+    interval: num(5),
+    items: z.preprocess(
+      fallback([]),
+      z.array(
+        z.object({
+          enabled: bool(true),
+          text: str(''),
+          href: optString,
+          badge: optString,
+          tone: z.preprocess(fallback('cyan'), z.enum(['cyan', 'orange'])),
+          start: optDate,
+          end: optDate,
+        }),
+      ),
+    ),
   }),
 });
 
@@ -459,4 +488,4 @@ const products = defineCollection({
   }),
 });
 
-export const collections = { products, lessons, articles, courses, news, resources, glossary, questions, pages, site, home, start, chat, bugHunter, bugCases, debugHunt };
+export const collections = { products, lessons, articles, courses, news, resources, glossary, questions, pages, site, home, start, chat, bugHunter, bugCases, debugHunt, announcements };
