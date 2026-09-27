@@ -33,7 +33,7 @@ const shorten = (value: string, max: number) =>
   value.length <= max ? value : `${value.slice(0, max - 1).trimEnd()}…`;
 const cleanTitle = cleanText(title);
 const titleWithBrand = cleanTitle === site.name
-  ? `${site.name} | تعلّم اختبار البرمجيات`
+  ? site.name
   : cleanTitle.includes(site.name) ? cleanTitle : `${cleanTitle} | ${site.name}`;
 const fullTitle = shorten(titleWithBrand, 65);
 const cleanDescription = cleanText(description);
