@@ -54,7 +54,7 @@ const graph = {
       name: site.name,
       alternateName: ['Testing Arabic', 'Testing Bil Arabi'],
       url: `${siteUrl}/`,
-      logo: { '@type': 'ImageObject', url: `${siteUrl}/brand/testing-arabic-logo.jpg` },
+      logo: { '@type': 'ImageObject', url: `${siteUrl}/brand/logo.png` },
       description: site.description,
       inLanguage: 'ar',
       founder: { '@id': `${siteUrl}/#author` },
@@ -99,6 +99,8 @@ const blocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 {noindex && <meta name="robots" content="noindex, follow" />}
 
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="alternate" type="application/rss+xml" title={site.name} href="/rss.xml" />
 <link rel="sitemap" href="/sitemap-index.xml" />
 <link rel="alternate" type="text/markdown" title="llms.txt" href="/llms.txt" />

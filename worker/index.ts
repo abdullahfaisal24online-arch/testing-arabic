@@ -772,6 +772,8 @@ function shell(inner: string, title = 'مراجعة التعليقات') {
 <meta name="robots" content="noindex, nofollow">
 <title>${esc(title)}</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
 <style>
 :root{--bg:#0a1428;--surface:#12213d;--navy:#0d1b33;--line:rgba(56,189,248,.16);--line2:rgba(56,189,248,.32);
