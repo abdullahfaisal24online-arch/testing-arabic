@@ -14,6 +14,7 @@ const { initial = 9, step = 9 } = Astro.props;
   </div>
   <p class="sr-only" data-load-status aria-live="polite"></p>
 </div>
+<noscript><style>[data-load-item][hidden] { display: block !important; }</style></noscript>
 
 <style>
   .more-wrap { display: flex; justify-content: center; margin-top: 32px; }
