@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
+import LoadMoreGrid from '../../components/LoadMoreGrid.astro';
 import { getSite } from '../../lib/site';
 
 const site = await getSite();
@@ -32,7 +33,9 @@ const jsonLd = {
 
   <section class="section">
     <div class="wrap">
-      <div class="grid grid-3">{articles.map((a) => <ArticleCard article={a} />)}</div>
+      <LoadMoreGrid>
+        {articles.map((a) => <div data-load-item><ArticleCard article={a} /></div>)}
+      </LoadMoreGrid>
       {articles.length === 0 && <p class="lead">ما في مقالات منشورة بعد.</p>}
     </div>
   </section>
