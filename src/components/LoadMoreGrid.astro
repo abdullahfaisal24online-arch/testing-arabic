@@ -1,0 +1,48 @@
+---
+interface Props {
+  initial?: number;
+  step?: number;
+}
+
+const { initial = 9, step = 9 } = Astro.props;
+---
+
+<div class="listing" data-card-list data-initial={initial} data-step={step}>
+  <div class="grid grid-3" data-card-grid><slot /></div>
+  <div class="more-wrap">
+    <button class="btn btn-ghost more-btn" type="button" data-load-more hidden>عرض المزيد</button>
+  </div>
+  <p class="sr-only" data-load-status aria-live="polite"></p>
+</div>
+
+<style>
+  .more-wrap { display: flex; justify-content: center; margin-top: 32px; }
+  .more-btn[hidden] { display: none; }
+  .listing :global([data-load-item][hidden]) { display: none; }
+  .listing :global([data-load-item] > .card) { height: 100%; }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-card-list]').forEach((listing) => {
+    const grid = listing.querySelector<HTMLElement>('[data-card-grid]');
+    const button = listing.querySelector<HTMLButtonElement>('[data-load-more]');
+    const status = listing.querySelector<HTMLElement>('[data-load-status]');
+    if (!grid || !button) return;
+
+    const items = Array.from(grid.children).filter((item): item is HTMLElement =>
+      item instanceof HTMLElement && item.hasAttribute('data-load-item'));
+    const initial = Number(listing.dataset.initial) || 9;
+    const step = Number(listing.dataset.step) || 9;
+    let shown = Math.min(initial, items.length);
+    items.slice(shown).forEach((item) => { item.hidden = true; });
+    button.hidden = shown >= items.length;
+
+    button.addEventListener('click', () => {
+      const next = Math.min(shown + step, items.length);
+      items.slice(shown, next).forEach((item) => { item.hidden = false; });
+      shown = next;
+      button.hidden = shown >= items.length;
+      if (status) status.textContent = `يظهر الآن ${shown} من ${items.length}`;
+    });
+  });
+</script>
