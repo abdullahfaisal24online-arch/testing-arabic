@@ -379,14 +379,14 @@ const jsonLd = {
 
   /* Interview room: separate regions keep every control away from the portrait. */
   .interview-wrap { max-width: 1320px; padding-block: 28px 48px; }
-  .interview-shell { --ink: #edf4ff; --ink-2: #c3d1e5; --muted: #9fb2cc; --surface: #0b2137; --line: #244359; --line-strong: #38607a; color: var(--ink); background: #081b2e; border: 1px solid #38607a; border-radius: 20px; overflow: clip; }
+  .interview-shell { --site-header-h: 80px; --interview-toolbar-h: 72px; --ink: #edf4ff; --ink-2: #c3d1e5; --muted: #9fb2cc; --surface: #0b2137; --line: #244359; --line-strong: #38607a; color: var(--ink); background: #081b2e; border: 1px solid #38607a; border-radius: 20px; }
   .interview-shell [hidden] { display: none !important; }
-  .interview-top { padding: 16px 24px; margin: 0; background: #091d30; border-bottom: 1px solid #38607a; flex-wrap: nowrap; }
+  .interview-top { position: sticky; top: var(--site-header-h); z-index: 20; padding: 16px 24px; margin: 0; background: #091d30; border-bottom: 1px solid #38607a; border-radius: 19px 19px 0 0; flex-wrap: nowrap; }
   .interview-top .progtrack { min-width: 24px; }
   .timer-status { font-size: 12px; color: #9fb2cc; white-space: nowrap; }
   .interview-stage { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); direction: ltr; align-items: start; }
-  .interviewer-scene { position: sticky; top: 0; height: min(740px, 80vh); min-height: 540px; overflow: hidden; background: #172333; }
-  .interviewer-scene img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 43% center; }
+  .interviewer-scene { position: sticky; top: calc(var(--site-header-h) + var(--interview-toolbar-h) + 12px); align-self: start; margin: 12px; height: auto; aspect-ratio: 4 / 3; max-height: calc(100svh - var(--site-header-h) - var(--interview-toolbar-h) - 24px); overflow: hidden; border-radius: 12px; background: #0a1929; }
+  .interviewer-scene img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; }
   .interview-content { direction: rtl; padding: 28px; min-width: 0; }
   .interviewer-label { font-size: 15px; color: #55d1fa; margin: 0 0 12px; font-weight: 700; }
   .qcard { background: transparent; border: 0; border-radius: 0; padding: 0 0 22px; margin: 0 0 22px; border-bottom: 1px solid #244359; }
@@ -418,13 +418,13 @@ const jsonLd = {
   @media (max-width: 760px) {
     .interview-wrap { padding-block: 16px 32px; }
     .interview-shell { border-radius: 14px; }
-    .interview-top { padding: 10px; gap: 8px; }
+    .interview-top { padding: 10px; gap: 8px; border-radius: 13px 13px 0 0; }
     .qnum { padding: 4px 6px; font-size: 12px; }
     .end-btn { font-size: 11px; padding: 8px; }
     .timer-status { display: none; }
-    .interview-stage { grid-template-columns: minmax(0,1fr); }
-    .interviewer-scene { position: relative; min-height: 0; height: auto; aspect-ratio: 4/3; max-height: 330px; }
-    .interviewer-scene img { object-position: center 35%; }
+    .interview-stage { display: block; }
+    .interviewer-scene { z-index: 10; margin: 0; top: calc(var(--site-header-h) + var(--interview-toolbar-h)); height: clamp(100px, 25svh, 210px); aspect-ratio: auto; max-height: none; padding-block: 8px; border-radius: 0; border-bottom: 1px solid #244359; background: #081b2e; }
+    .interviewer-scene img { top: 8px; height: calc(100% - 16px); }
     .interview-content { padding: 20px 16px; }
     .qcard { padding-bottom: 16px; margin-bottom: 16px; }
     .qmeta { margin-bottom: 12px; }
@@ -467,6 +467,24 @@ const jsonLd = {
   const belowHero = document.querySelector<HTMLElement>('.below-hero')?.closest('.wrap') ?? null;
   const interviewEl = $('interview');
   const finishedEl = $('finished');
+
+  // Keep the portrait and timer below the real header height, including mobile menus.
+  const interviewShell = document.querySelector<HTMLElement>('.interview-shell');
+  const interviewToolbar = document.querySelector<HTMLElement>('.interview-top');
+  const siteHeader = document.querySelector<HTMLElement>('.site-head');
+  function updateStickyOffsets() {
+    const headerHeight = siteHeader?.getBoundingClientRect().height ?? 0;
+    const toolbarHeight = interviewToolbar?.getBoundingClientRect().height ?? 0;
+    interviewShell?.style.setProperty('--site-header-h', `${Math.ceil(headerHeight)}px`);
+    if (toolbarHeight > 0) interviewShell?.style.setProperty('--interview-toolbar-h', `${Math.ceil(toolbarHeight)}px`);
+  }
+  if ('ResizeObserver' in window) {
+    const stickyObserver = new ResizeObserver(updateStickyOffsets);
+    if (siteHeader) stickyObserver.observe(siteHeader);
+    if (interviewToolbar) stickyObserver.observe(interviewToolbar);
+  } else {
+    window.addEventListener('resize', updateStickyOffsets, { passive: true });
+  }
 
   // ===== اختيار المواضيع قبل بدء المقابلة =====
   const topicChips = Array.from(document.querySelectorAll<HTMLButtonElement>('.topic-chip'));
@@ -656,6 +674,7 @@ const jsonLd = {
     if (belowHero) (belowHero as HTMLElement).hidden = true;
     if (finishedEl) finishedEl.hidden = true;
     if (interviewEl) interviewEl.hidden = false;
+    updateStickyOffsets();
     renderQuestion();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
