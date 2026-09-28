@@ -14,7 +14,7 @@ const cover = item.data.cover;
 <a class="card news" href={`/news/${item.id}/`}>
   {cover && (
     <div class="thumb">
-      <OptimizedImage src={cover} alt="" loading="lazy" width="640" height="360" sizes="(max-width: 720px) 100vw, 50vw" />
+      <OptimizedImage src={cover} alt="" loading="lazy" width="640" height="360" sizes="(max-width: 640px) 100vw, (max-width: 980px) 50vw, 33vw" />
       {item.data.pinned && <span class="pin-float">مثبّت</span>}
     </div>
   )}
