@@ -87,7 +87,7 @@ const jsonLd = {
     <div class="wrap">
       <h1>مقابلة عمل — QA</h1>
       <p class="lead">
-        مجموعة أسئلة حقيقية بتتسأل بمقابلات اختبار البرمجيات، موزّعة على أساسيات الاختبار وأسئلة سلوكية وأتمتة وAPI. جاوب بنفسك الأول قبل ما تشوف الإجابة النموذجية.
+        مجموعة أسئلة حقيقية بتتسأل بمقابلات اختبار البرمجيات، موزّعة على أساسيات الاختبار وأسئلة سلوكية وأتمتة وAPI. جاوب بنفسك الأول، ثم قارن إجابتك بالجواب النموذجي وقيّمها.
       </p>
 
       <p class="topics-lead">اختَر المواضيع اللي بدك تتدرّب عليها (كلها مفعّلة افتراضيًا):</p>
@@ -118,7 +118,7 @@ const jsonLd = {
 
   <div class="wrap">
     <div class="below-hero">
-      <b>كيف تشتغل المقابلة؟</b> بتشوف سؤال واحد بكل مرة، بترتيب متدرّج من الأساسيات للمتقدّم، وعندك 45 ثانية تفكّر فيها متل مقابلة حقيقية. جاوب بصوت عالي أو براسك، وبعدين اضغط «اعرف الجواب» — الإجابة بتطلع تحت نفس السؤال، بدون ما تنقلك لمكان تاني. لو خلص الوقت قبل ما تضغط، الجواب بيطلع تلقائياً وبتترصد كسؤال محتاج مراجعة. بعدها اضغط «السؤال التالي» للمتابعة، وتقدر تضغط «إنهاء المقابلة» بأي لحظة، وبالنهاية فيك تشارك نتيجتك.
+        <b>كيف تشتغل المقابلة؟</b> بتشوف سؤال واحد بكل مرة، بترتيب متدرّج من الأساسيات للمتقدّم، وعندك 45 ثانية تفكّر فيها متل مقابلة حقيقية. جاوب بصوت عالي أو براسك، وبعدين اضغط «اعرف الجواب» — الإجابة بتطلع تحت نفس السؤال. قارن جوابك فيها واختَر «إجابتي صحيحة» أو «تحتاج مراجعة» قبل الانتقال. لو خلص الوقت قبل ما تكشف الجواب، بيظهر تلقائياً وبيتسجّل «لم أجب». تقدر تنهي المقابلة بأي لحظة، وبالنهاية فيك تشارك نتيجتك.
     </div>
   </div>
 
@@ -154,7 +154,17 @@ const jsonLd = {
         <p id="answer-text"></p>
         <div class="full-answer" id="full-answer"></div>
       </div>
-      <button class="btn btn-primary next-btn" type="button" id="next-btn" hidden>
+      <p class="timeout-note" id="timeout-note" hidden>⏱ خلص الوقت — سُجّل السؤال «لم أجب». تقدر تراجع الجواب وتكمل.</p>
+      <div class="self-assessment" id="self-assessment" hidden>
+        <h2>كيف كانت إجابتك؟</h2>
+        <p>قارنها بالجواب اللي فوق، واختَر تقييمًا صادقًا لنفسك.</p>
+        <div class="assessment-choices">
+          <button class="assessment-choice good" type="button" id="rate-known">✓ إجابتي صحيحة</button>
+          <button class="assessment-choice review" type="button" id="rate-review">↻ تحتاج مراجعة</button>
+        </div>
+        <p class="assessment-feedback" id="assessment-feedback" aria-live="polite">كشف الجواب وحده ما بحسبها صحيحة.</p>
+      </div>
+      <button class="btn btn-primary next-btn" type="button" id="next-btn" disabled hidden>
         السؤال التالي <Icon name="arrow" size={16} />
       </button>
     </div>
@@ -168,11 +178,12 @@ const jsonLd = {
       <p id="done-sub"></p>
 
       <div class="score-row">
-        <div class="score-pill ok"><b id="score-known">0</b><span>عرفتها</span></div>
-        <div class="score-pill miss"><b id="score-missed">0</b><span>محتاج مراجعة</span></div>
+        <div class="score-pill ok"><b id="score-known">0</b><span>إجابتي صحيحة</span></div>
+        <div class="score-pill miss"><b id="score-missed">0</b><span>تحتاج مراجعة</span></div>
+        <div class="score-pill"><b id="score-unanswered">0</b><span>لم أجب</span></div>
         <div class="score-pill"><b id="score-pct">0%</b><span>من كل بنك الأسئلة</span></div>
       </div>
-      <p class="scope-note">* النسبة محسوبة من إجمالي عدد الأسئلة بالمقابلة، مش من اللي جاوبته بس</p>
+      <p class="scope-note">* التقييم ذاتي، والنسبة محسوبة من إجمالي الأسئلة المختارة للمقابلة.</p>
 
       <div class="done-actions">
         <button class="btn btn-primary" type="button" id="share-btn">📤 شارك نتيجتك</button>
@@ -297,6 +308,7 @@ const jsonLd = {
     border-radius: var(--r-md); padding: 16px; margin-bottom: 16px;
   }
   .reveal-btn:hover { background: var(--orange-soft, rgba(246,130,59,.08)); }
+  .reveal-btn[hidden], .next-btn[hidden] { display: none; }
 
   .answer-box {
     background: var(--surface); border: 1px solid var(--line); border-inline-start: 3px solid var(--cyan);
@@ -304,6 +316,16 @@ const jsonLd = {
   }
   .answer-box .lbl { font-size: 12.5px; font-weight: 700; color: var(--cyan); margin-bottom: 8px; }
   .answer-box p { margin: 0; font-size: 16.5px; line-height: 1.9; color: var(--ink-2); }
+  .timeout-note { padding: 12px 16px; background: rgba(246,130,59,.1); border: 1px solid rgba(246,130,59,.35); border-radius: var(--r-md); color: var(--ink-2); font-size: 14px; margin: 0 0 16px; }
+  .self-assessment { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: 22px 24px; margin-bottom: 16px; }
+  .self-assessment h2 { font-size: 17px; margin: 0 0 4px; }
+  .self-assessment p { font-size: 13.5px; color: var(--muted); margin: 0 0 16px; }
+  .assessment-choices { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+  .assessment-choice { font: inherit; font-size: 14px; font-weight: 700; color: var(--ink); background: rgba(255,255,255,.05); border: 1px solid var(--line-strong); border-radius: 10px; padding: 13px; cursor: pointer; }
+  .assessment-choice.good.selected { color: #34d399; border-color: #34d399; background: rgba(52,211,153,.13); }
+  .assessment-choice.review.selected { color: #f89a9a; border-color: #f65b5b; background: rgba(246,91,91,.13); }
+  .assessment-choice:disabled { cursor: default; }
+  .self-assessment .assessment-feedback { margin: 14px 0 0; }
 
   .full-answer { margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--line); }
   .full-answer :global(p) { margin: 0 0 12px; font-size: 15.5px; line-height: 1.9; color: var(--ink-2); }
@@ -314,6 +336,7 @@ const jsonLd = {
   .full-answer :global(code) { font-family: 'IBM Plex Mono', monospace; font-size: .9em; background: rgba(255,255,255,.06); padding: 1px 6px; border-radius: 5px; }
 
   .next-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .next-btn:disabled { opacity: .45; cursor: not-allowed; }
   :global(.flip) { transform: scaleX(-1); }
 
   .done-wrap { max-width: 640px; padding-block: 40px 64px; }
@@ -322,12 +345,13 @@ const jsonLd = {
   .done h2 { margin: 0 0 8px; }
   .done p { color: var(--muted); margin: 0 0 24px; }
 
-  .score-row { display: flex; justify-content: center; gap: 10px; margin: 4px 0 28px; flex-wrap: wrap; }
-  .score-pill { background: rgba(255,255,255,.05); border: 1px solid var(--line); border-radius: 12px; padding: 14px 20px; min-width: 100px; }
+  .score-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 4px 0 28px; }
+  .score-pill { background: rgba(255,255,255,.05); border: 1px solid var(--line); border-radius: 12px; padding: 14px 10px; }
   .score-pill b { display: block; font-size: 22px; font-weight: 800; direction: ltr; unicode-bidi: isolate; }
   .score-pill span { font-size: 12.5px; color: var(--muted); }
   .score-pill.ok b { color: var(--ok, #34d399); }
   .score-pill.miss b { color: var(--danger, #f65b5b); }
+  .score-pill:nth-child(3) b { color: var(--muted); }
   .scope-note { font-size: 12.5px; color: var(--muted); margin: -14px 0 26px; }
 
   .done-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
@@ -336,6 +360,9 @@ const jsonLd = {
     .stat-strip { grid-template-columns: 1fr 1fr; }
     .qcard { padding: 24px 20px; }
     .qtext { font-size: 18px; }
+    .self-assessment { padding: 20px; }
+    .assessment-choices { grid-template-columns: 1fr; }
+    .score-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
 </style>
 
@@ -359,9 +386,10 @@ const jsonLd = {
   let answered = 0;
   let known = 0;
   let missed = 0;
+  let unanswered = 0;
   let timeLeft = TIME_PER_Q;
   let timerId: ReturnType<typeof setInterval> | null = null;
-  let revealedByTimeout = false;
+  let questionState: 'thinking' | 'awaiting-rating' | 'rated' | 'timed-out' = 'thinking';
 
   const $ = (id: string) => document.getElementById(id);
   const introEl = document.getElementById('intro');
@@ -452,14 +480,16 @@ const jsonLd = {
   function startTimer() {
     stopTimer();
     timeLeft = TIME_PER_Q;
-    revealedByTimeout = false;
+    questionState = 'thinking';
     updateTimerVisual();
     timerId = setInterval(() => {
       timeLeft--;
       updateTimerVisual();
       if (timeLeft <= 0) {
         stopTimer();
-        revealedByTimeout = true;
+        questionState = 'timed-out';
+        unanswered++;
+        answered++;
         revealAnswer();
         showTimeoutToast();
       }
@@ -472,7 +502,7 @@ const jsonLd = {
     layer.innerHTML = '';
     const t = document.createElement('div');
     t.className = 'toast';
-    t.innerHTML = '<span class="ic">⏱</span><span>خلص الوقت — هاي بتتحسب <b>"محتاج مراجعة"</b>، بس تقدر تراجع الجواب.</span>';
+    t.innerHTML = '<span class="ic">⏱</span><span>خلص الوقت — هاي بتتحسب <b>"لم أجب"</b>، بس تقدر تراجع الجواب.</span>';
     layer.appendChild(t);
     setTimeout(() => { t.remove(); }, 3200);
   }
@@ -481,10 +511,32 @@ const jsonLd = {
     stopTimer();
     const answerBox = $('answer-box') as HTMLElement | null;
     const revealBtn = $('reveal-btn') as HTMLElement | null;
-    const nextBtn = $('next-btn') as HTMLElement | null;
+    const nextBtn = $('next-btn') as HTMLButtonElement | null;
     if (answerBox) answerBox.hidden = false;
     if (revealBtn) revealBtn.hidden = true;
+    if (questionState === 'timed-out') {
+      const note = $('timeout-note'); if (note) note.hidden = false;
+      if (nextBtn) nextBtn.disabled = false;
+    } else {
+      questionState = 'awaiting-rating';
+      const assessment = $('self-assessment'); if (assessment) assessment.hidden = false;
+    }
     if (nextBtn) nextBtn.hidden = false;
+  }
+
+  function rateAnswer(rating: 'known' | 'review') {
+    if (questionState !== 'awaiting-rating') return;
+    questionState = 'rated';
+    answered++;
+    if (rating === 'known') known++; else missed++;
+    const knownBtn = $('rate-known') as HTMLButtonElement | null;
+    const reviewBtn = $('rate-review') as HTMLButtonElement | null;
+    if (knownBtn) { knownBtn.disabled = true; knownBtn.classList.toggle('selected', rating === 'known'); }
+    if (reviewBtn) { reviewBtn.disabled = true; reviewBtn.classList.toggle('selected', rating === 'review'); }
+    const feedback = $('assessment-feedback');
+    if (feedback) feedback.textContent = rating === 'known' ? '✓ تم تسجيلها ضمن إجاباتك الصحيحة.' : '↻ تم تسجيلها للمراجعة.';
+    const nextBtn = $('next-btn') as HTMLButtonElement | null;
+    if (nextBtn) nextBtn.disabled = false;
   }
 
   function renderQuestion() {
@@ -500,7 +552,13 @@ const jsonLd = {
     const fullAnswer = $('full-answer'); if (fullAnswer) fullAnswer.innerHTML = q.full;
     const answerBox = $('answer-box') as HTMLElement | null; if (answerBox) answerBox.hidden = true;
     const revealBtn = $('reveal-btn') as HTMLElement | null; if (revealBtn) revealBtn.hidden = false;
-    const nextBtn = $('next-btn') as HTMLElement | null; if (nextBtn) nextBtn.hidden = true;
+    const timeoutNote = $('timeout-note'); if (timeoutNote) timeoutNote.hidden = true;
+    const assessment = $('self-assessment'); if (assessment) assessment.hidden = true;
+    const knownBtn = $('rate-known') as HTMLButtonElement | null;
+    const reviewBtn = $('rate-review') as HTMLButtonElement | null;
+    for (const btn of [knownBtn, reviewBtn]) { if (btn) { btn.disabled = false; btn.classList.remove('selected'); } }
+    const feedback = $('assessment-feedback'); if (feedback) feedback.textContent = 'كشف الجواب وحده ما بحسبها صحيحة.';
+    const nextBtn = $('next-btn') as HTMLButtonElement | null; if (nextBtn) { nextBtn.hidden = true; nextBtn.disabled = true; }
     startTimer();
     // نضمن إن السؤال الجديد يبلّش من أعلى الصفحة تمامًا دايمًا، حتى لو صفحة السؤال السابق كانت طويلة
     // (الجواب المفصّل بيطوّل الصفحة وينزل بها المستخدم لتحت وقت ما يفتحه)
@@ -513,6 +571,7 @@ const jsonLd = {
     answered = 0;
     known = 0;
     missed = 0;
+    unanswered = 0;
     if (introEl) introEl.hidden = true;
     if (belowHero) (belowHero as HTMLElement).hidden = true;
     if (finishedEl) finishedEl.hidden = true;
@@ -527,9 +586,10 @@ const jsonLd = {
     if (introEl) introEl.hidden = true;
     if (finishedEl) finishedEl.hidden = false;
     const sub = $('done-sub');
-    if (sub) sub.textContent = `جاوبت على ${answered} من ${ORDERED.length} سؤال. جاهز لمحاولة تانية؟`;
+    if (sub) sub.textContent = `أنهيت ${answered} من ${ORDERED.length} سؤال. جاهز لمحاولة تانية؟`;
     const scoreKnown = $('score-known'); if (scoreKnown) scoreKnown.textContent = String(known);
     const scoreMissed = $('score-missed'); if (scoreMissed) scoreMissed.textContent = String(missed);
+    const scoreUnanswered = $('score-unanswered'); if (scoreUnanswered) scoreUnanswered.textContent = String(unanswered);
     const scorePct = $('score-pct');
     // النسبة% دايمًا من إجمالي بنك الأسئلة (ORDERED.length)، مش من عدد الأسئلة اللي جاوبها فقط —
     // هيك لو خلّص المستخدم بدري (مثلاً 3 من 50) ما تظهر نسبة مضلّلة زي 100%
@@ -540,13 +600,15 @@ const jsonLd = {
   $('start-btn')?.addEventListener('click', startInterview);
 
   $('reveal-btn')?.addEventListener('click', () => {
-    revealedByTimeout = false;
+    if (questionState !== 'thinking') return;
     revealAnswer();
   });
 
+  $('rate-known')?.addEventListener('click', () => rateAnswer('known'));
+  $('rate-review')?.addEventListener('click', () => rateAnswer('review'));
+
   $('next-btn')?.addEventListener('click', () => {
-    answered++;
-    if (revealedByTimeout) missed++; else known++;
+    if (questionState !== 'rated' && questionState !== 'timed-out') return;
     if (idx < ORDERED.length - 1) {
       idx++;
       renderQuestion();
@@ -711,17 +773,22 @@ const jsonLd = {
 
     ctx.fillStyle = '#9fb2ce';
     ctx.font = arFont('600', 33);
-    ctx.fillText('خلصت مقابلة QA التجريبية 🎯', cx, 515);
+    ctx.fillText('نتيجتي بمقابلة QA التجريبية 🎯', cx, 515);
+
+    ctx.fillStyle = '#8fa3c4';
+    ctx.font = arFont('500', 23);
+    ctx.fillText('تقييم ذاتي بعد مقارنة الإجابات', cx, 552);
 
     // إحصائيات داخل كبسولات — النسبة% من إجمالي بنك الأسئلة
     const pct = TOTAL > 0 ? Math.round((known / TOTAL) * 100) : 0;
-    const statY = 630, pillW = 250, pillH = 110, gapX = 30;
+    const statY = 630, pillW = 225, pillH = 110, gapX = 20;
     const stats: [string, string, string][] = [
-      [String(known), 'عرفتها ✓', '#34d399'],
-      [String(missed), 'محتاج مراجعة', '#f65b5b'],
+      [String(known), 'إجابتي صحيحة ✓', '#34d399'],
+      [String(missed), 'تحتاج مراجعة', '#f65b5b'],
+      [String(unanswered), 'لم أجب', '#93a4c0'],
       [`${pct}%`, 'من كل البنك', '#38bdf8'],
     ];
-    const totalW = pillW * 3 + gapX * 2;
+    const totalW = pillW * stats.length + gapX * (stats.length - 1);
     const startX = cx - totalW / 2;
     stats.forEach(([val, lbl, color], i) => {
       const px = startX + i * (pillW + gapX);
@@ -736,7 +803,7 @@ const jsonLd = {
       ctx.font = arFont('800', 46);
       ctx.fillText(val, px + pillW / 2, statY + 52);
       ctx.fillStyle = '#93a4c0';
-      ctx.font = arFont('600', 22);
+      ctx.font = arFont('600', 20);
       ctx.fillText(lbl, px + pillW / 2, statY + 85);
     });
 
@@ -768,7 +835,7 @@ const jsonLd = {
       const shareData = {
         files: [file],
         title: 'نتيجتي بمقابلة QA التجريبية',
-        text: `جاوبت على ${known} من ${ORDERED.length || answered} سؤال بمقابلة QA التجريبية على ${SITE.logoTop || 'Testing'} ${SITE.logoBottom || 'بالعربي'} 🎯`,
+        text: `قيّمت إجاباتي بمقابلة QA التجريبية: ${known} صحيحة، ${missed} للمراجعة، ${unanswered} لم أجب، من ${ORDERED.length || answered} سؤال على ${SITE.logoTop || 'Testing'} ${SITE.logoBottom || 'بالعربي'} 🎯`,
       };
       const nav = navigator as Navigator & { canShare?: (data: any) => boolean; share?: (data: any) => Promise<void> };
       if (nav.canShare && nav.canShare(shareData) && nav.share) {
