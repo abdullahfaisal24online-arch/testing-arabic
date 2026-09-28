@@ -145,7 +145,7 @@ const jsonLd = {
       </div>
       <div class="interview-content">
     <div class="qcard">
-      <p class="interviewer-label" id="interviewer-label">المُحاوِر يسألك الآن</p>
+      <p class="interviewer-label" id="interviewer-label" role="status" aria-atomic="true" data-phase="thinking">خذ وقتك، بانتظار إجابتك</p>
       <div class="qmeta">
         <span class="badge badge-outline" id="q-cat"></span>
         <span class="badge" id="q-level"></span>
@@ -388,7 +388,11 @@ const jsonLd = {
   .interviewer-scene { position: sticky; top: calc(var(--site-header-h) + var(--interview-toolbar-h) + 12px); align-self: start; margin: 12px; height: auto; aspect-ratio: 4 / 3; max-height: calc(100svh - var(--site-header-h) - var(--interview-toolbar-h) - 24px); overflow: hidden; border-radius: 12px; background: #0a1929; }
   .interviewer-scene img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; }
   .interview-content { direction: rtl; padding: 28px; min-width: 0; }
-  .interviewer-label { font-size: 15px; color: #55d1fa; margin: 0 0 12px; font-weight: 700; }
+  .interviewer-label { display: flex; align-items: center; gap: 9px; font-size: 15px; color: #55d1fa; margin: 0 0 12px; font-weight: 700; }
+  .interviewer-label::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .interviewer-label[data-phase='thinking']::before { animation: waiting-light 2s ease-in-out 2; }
+  .interviewer-label[data-phase='known'] { color: #34d399; }
+  .interviewer-label[data-phase='review'], .interviewer-label[data-phase='timed-out'] { color: #ff963e; }
   .qcard { background: transparent; border: 0; border-radius: 0; padding: 0 0 22px; margin: 0 0 22px; border-bottom: 1px solid #244359; }
   .qmeta { margin-bottom: 20px; flex-wrap: wrap; }
   .qtext { font-size: clamp(20px, 2vw, 27px); line-height: 1.7; overflow-wrap: anywhere; color: #edf4ff; }
@@ -412,9 +416,14 @@ const jsonLd = {
   .assessment-choice.review, .assessment-choice.review.selected { color: #ff963e; border-color: #ff963e; }
   .assessment-choice.review.selected { background: rgba(255,150,62,.15); }
   .assessment-choice:disabled:not(.selected) { opacity: .45; }
+  .assessment-choice.selected { animation: assessment-confirm .3s ease-out; }
+  .self-assessment .assessment-feedback[data-rating='known'] { color: #34d399; }
+  .self-assessment .assessment-feedback[data-rating='review'] { color: #ff963e; }
   .next-btn { min-height: 48px; }
   .next-btn:disabled { background: #2c465f; border-color: #2c465f; color: #9fb2cc; opacity: 1; }
   @keyframes answer-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes waiting-light { 50% { opacity: .45; box-shadow: 0 0 0 4px rgba(85,209,250,.08); } }
+  @keyframes assessment-confirm { 50% { transform: translateY(-2px); box-shadow: 0 0 0 3px rgba(255,255,255,.06); } }
   @media (max-width: 760px) {
     .interview-wrap { padding-block: 16px 32px; }
     .interview-shell { border-radius: 14px; }
@@ -433,7 +442,7 @@ const jsonLd = {
     .assessment-choices { grid-template-columns: repeat(2,minmax(0,1fr)); }
     .assessment-choice { font-size: 13px; }
   }
-  @media (prefers-reduced-motion: reduce) { .answer-box { animation: none; } .progtrack i, .timer-ring .fill { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .answer-box, .assessment-choice.selected, .interviewer-label::before { animation: none !important; } .progtrack i, .timer-ring .fill { transition: none; } }
 
 </style>
 
@@ -461,12 +470,32 @@ const jsonLd = {
   let timeLeft = TIME_PER_Q;
   let timerId: ReturnType<typeof setInterval> | null = null;
   let questionState: 'thinking' | 'awaiting-rating' | 'rated' | 'timed-out' = 'thinking';
+  let changingQuestion = false;
+  let navigationToken = 0;
 
   const $ = (id: string) => document.getElementById(id);
   const introEl = document.getElementById('intro');
   const belowHero = document.querySelector<HTMLElement>('.below-hero')?.closest('.wrap') ?? null;
   const interviewEl = $('interview');
   const finishedEl = $('finished');
+  const interviewContent = document.querySelector<HTMLElement>('.interview-content');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function setInterviewerState(phase: string, text: string) {
+    const label = $('interviewer-label');
+    if (label) { label.dataset.phase = phase; label.textContent = text; }
+  }
+
+  function animateQuestion(entering: boolean) {
+    if (!interviewContent?.animate || reducedMotion.matches) return null;
+    interviewContent.getAnimations().forEach((animation) => animation.cancel());
+    return interviewContent.animate(
+      entering
+        ? [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'translateY(0)' }]
+        : [{ opacity: 1, transform: 'translateY(0)' }, { opacity: 0, transform: 'translateY(-6px)' }],
+      { duration: entering ? 220 : 120, easing: 'ease-out' },
+    );
+  }
 
   // Keep the portrait and timer below the real header height, including mobile menus.
   const interviewShell = document.querySelector<HTMLElement>('.interview-shell');
@@ -600,7 +629,7 @@ const jsonLd = {
     stopTimer();
     const status = $('timer-status'); if (status) status.textContent = 'توقف المؤقّت';
     const hint = $('thinking-hint'); if (hint) hint.hidden = true;
-    const label = $('interviewer-label'); if (label) label.textContent = 'راجع إجابتك';
+    setInterviewerState(questionState === 'timed-out' ? 'timed-out' : 'answer', questionState === 'timed-out' ? 'انتهى الوقت، خلّينا نراجع الجواب' : 'خلّينا نراجعها سوا');
     const answerBox = $('answer-box') as HTMLElement | null;
     const revealBtn = $('reveal-btn') as HTMLElement | null;
     const nextBtn = $('next-btn') as HTMLButtonElement | null;
@@ -627,7 +656,11 @@ const jsonLd = {
     if (knownBtn) { knownBtn.disabled = true; knownBtn.classList.toggle('selected', rating === 'known'); }
     if (reviewBtn) { reviewBtn.disabled = true; reviewBtn.classList.toggle('selected', rating === 'review'); }
     const feedback = $('assessment-feedback');
-    if (feedback) feedback.textContent = rating === 'known' ? '✓ تم تسجيلها ضمن إجاباتك الصحيحة.' : '↻ تم تسجيلها للمراجعة.';
+    if (feedback) {
+      feedback.dataset.rating = rating;
+      feedback.textContent = rating === 'known' ? '✓ تم تسجيل تقييمك: إجابة صحيحة. جاهز للسؤال الجاي؟' : '↻ سجّلناها للمراجعة، نكمل؟';
+    }
+    setInterviewerState(rating, rating === 'known' ? 'ممتاز، جاهز للسؤال الجاي؟' : 'سجّلناها للمراجعة، نكمل؟');
     const nextBtn = $('next-btn') as HTMLButtonElement | null;
     if (nextBtn) nextBtn.disabled = false;
   }
@@ -635,7 +668,7 @@ const jsonLd = {
   function renderQuestion() {
     const status = $('timer-status'); if (status) status.textContent = 'وقت التفكير';
     const hint = $('thinking-hint'); if (hint) hint.hidden = false;
-    const label = $('interviewer-label'); if (label) label.textContent = 'المُحاوِر يسألك الآن';
+    setInterviewerState('thinking', 'خذ وقتك، بانتظار إجابتك');
     const details = $('answer-details') as HTMLDetailsElement | null; if (details) details.open = false;
     const q = ORDERED[idx];
     const qNum = $('q-num');
@@ -655,9 +688,10 @@ const jsonLd = {
     const knownBtn = $('rate-known') as HTMLButtonElement | null;
     const reviewBtn = $('rate-review') as HTMLButtonElement | null;
     for (const btn of [knownBtn, reviewBtn]) { if (btn) { btn.disabled = false; btn.classList.remove('selected'); } }
-    const feedback = $('assessment-feedback'); if (feedback) feedback.textContent = 'اختر تقييمك للمتابعة.';
+    const feedback = $('assessment-feedback'); if (feedback) { feedback.textContent = 'اختر تقييمك للمتابعة.'; delete feedback.dataset.rating; }
     const nextBtn = $('next-btn') as HTMLButtonElement | null; if (nextBtn) { nextBtn.hidden = true; nextBtn.disabled = true; }
     startTimer();
+    animateQuestion(true);
     // نضمن إن السؤال الجديد يبلّش من أعلى الصفحة تمامًا دايمًا، حتى لو صفحة السؤال السابق كانت طويلة
     // (الجواب المفصّل بيطوّل الصفحة وينزل بها المستخدم لتحت وقت ما يفتحه)
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -665,6 +699,8 @@ const jsonLd = {
 
   function startInterview() {
     if (ORDERED.length === 0) return;
+    navigationToken++;
+    changingQuestion = false;
     idx = 0;
     answered = 0;
     known = 0;
@@ -681,6 +717,9 @@ const jsonLd = {
 
   function finishInterview() {
     stopTimer();
+    navigationToken++;
+    changingQuestion = false;
+    interviewContent?.getAnimations().forEach((animation) => animation.cancel());
     if (interviewEl) interviewEl.hidden = true;
     if (introEl) introEl.hidden = true;
     if (finishedEl) finishedEl.hidden = false;
@@ -706,13 +745,24 @@ const jsonLd = {
   $('rate-known')?.addEventListener('click', () => rateAnswer('known'));
   $('rate-review')?.addEventListener('click', () => rateAnswer('review'));
 
-  $('next-btn')?.addEventListener('click', () => {
-    if (questionState !== 'rated' && questionState !== 'timed-out') return;
-    if (idx < ORDERED.length - 1) {
+  $('next-btn')?.addEventListener('click', async () => {
+    if (changingQuestion || (questionState !== 'rated' && questionState !== 'timed-out')) return;
+    if (idx >= ORDERED.length - 1) {
+      finishInterview();
+      return;
+    }
+    changingQuestion = true;
+    const token = ++navigationToken;
+    try {
+      const exitAnimation = animateQuestion(false);
+      if (exitAnimation) await exitAnimation.finished.catch(() => {});
+      // Ending or restarting during the transition must not start a hidden question.
+      if (token !== navigationToken || interviewEl?.hidden) return;
       idx++;
       renderQuestion();
-    } else {
-      finishInterview();
+      $('q-text')?.focus({ preventScroll: true });
+    } finally {
+      if (token === navigationToken) changingQuestion = false;
     }
   });
 
