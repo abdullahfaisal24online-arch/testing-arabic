@@ -37,7 +37,7 @@ const jsonLd = {
   <section class="section">
     <div class="wrap">
       <LoadMoreGrid>
-        {news.map((n) => <div data-load-item><NewsCard item={n} /></div>)}
+        {news.map((n, i) => <div data-load-item hidden={i >= 9}><NewsCard item={n} /></div>)}
       </LoadMoreGrid>
       {news.length === 0 && <p class="lead">ما في أخبار منشورة بعد.</p>}
     </div>
