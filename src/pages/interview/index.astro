@@ -124,6 +124,7 @@ const jsonLd = {
 
   <!-- ============ 2) وضع المقابلة ============ -->
   <section class="wrap interview-wrap" id="interview" hidden>
+    <div class="interview-shell">
     <div class="interview-top">
       <span class="qnum" id="q-num">1 / {questions.length}</span>
       <div class="progtrack"><i id="prog-fill" style="width:0%"></i></div>
@@ -134,39 +135,50 @@ const jsonLd = {
         </svg>
         <div class="timer-num" id="timer-num">45</div>
       </div>
+      <span class="timer-status" id="timer-status" aria-live="polite">وقت التفكير</span>
       <button class="btn btn-ghost btn-sm end-btn" type="button" id="end-btn">إنهاء المقابلة</button>
     </div>
 
+    <div class="interview-stage">
+      <div class="interviewer-scene" aria-hidden="true">
+        <img src="/images/interview/office-aqsa.webp" width="1200" height="900" alt="" decoding="async" />
+      </div>
+      <div class="interview-content">
     <div class="qcard">
+      <p class="interviewer-label" id="interviewer-label">المُحاوِر يسألك الآن</p>
       <div class="qmeta">
         <span class="badge badge-outline" id="q-cat"></span>
         <span class="badge" id="q-level"></span>
       </div>
-      <p class="qtext" id="q-text"></p>
+      <h2 class="qtext" id="q-text" tabindex="-1"></h2>
     </div>
 
     <div class="answer-zone">
+      <p class="thinking-hint" id="thinking-hint">جاوب بصوت عالٍ، ثم قارن إجابتك بالإجابة النموذجية.</p>
       <button class="reveal-btn" type="button" id="reveal-btn">
         اعرف الجواب <Icon name="check" size={16} />
       </button>
       <div class="answer-box" id="answer-box" hidden>
-        <div class="lbl">✓ خلاصة سريعة</div>
+        <h3 class="lbl" tabindex="-1" id="answer-heading">الإجابة النموذجية</h3>
         <p id="answer-text"></p>
-        <div class="full-answer" id="full-answer"></div>
+        <details class="answer-details" id="answer-details"><summary>اقرأ الشرح المفصّل</summary><div class="full-answer" id="full-answer"></div></details>
       </div>
       <p class="timeout-note" id="timeout-note" hidden>⏱ خلص الوقت — سُجّل السؤال «لم أجب». تقدر تراجع الجواب وتكمل.</p>
       <div class="self-assessment" id="self-assessment" hidden>
-        <h2>كيف كانت إجابتك؟</h2>
+        <h2>قارن إجابتك ثم قيّمها بنفسك</h2>
         <p>قارنها بالجواب اللي فوق، واختَر تقييمًا صادقًا لنفسك.</p>
         <div class="assessment-choices">
           <button class="assessment-choice good" type="button" id="rate-known">✓ إجابتي صحيحة</button>
           <button class="assessment-choice review" type="button" id="rate-review">↻ تحتاج مراجعة</button>
         </div>
-        <p class="assessment-feedback" id="assessment-feedback" aria-live="polite">كشف الجواب وحده ما بحسبها صحيحة.</p>
+        <p class="assessment-feedback" id="assessment-feedback" aria-live="polite">اختر تقييمك للمتابعة.</p>
       </div>
       <button class="btn btn-primary next-btn" type="button" id="next-btn" disabled hidden>
         السؤال التالي <Icon name="arrow" size={16} />
       </button>
+    </div>
+      </div>
+    </div>
     </div>
   </section>
 
@@ -364,6 +376,65 @@ const jsonLd = {
     .assessment-choices { grid-template-columns: 1fr; }
     .score-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
+
+  /* Interview room: separate regions keep every control away from the portrait. */
+  .interview-wrap { max-width: 1320px; padding-block: 28px 48px; }
+  .interview-shell { --ink: #edf4ff; --ink-2: #c3d1e5; --muted: #9fb2cc; --surface: #0b2137; --line: #244359; --line-strong: #38607a; color: var(--ink); background: #081b2e; border: 1px solid #38607a; border-radius: 20px; overflow: clip; }
+  .interview-shell [hidden] { display: none !important; }
+  .interview-top { padding: 16px 24px; margin: 0; background: #091d30; border-bottom: 1px solid #38607a; flex-wrap: nowrap; }
+  .interview-top .progtrack { min-width: 24px; }
+  .timer-status { font-size: 12px; color: #9fb2cc; white-space: nowrap; }
+  .interview-stage { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); direction: ltr; align-items: start; }
+  .interviewer-scene { position: sticky; top: 0; height: min(740px, 80vh); min-height: 540px; overflow: hidden; background: #172333; }
+  .interviewer-scene img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 43% center; }
+  .interview-content { direction: rtl; padding: 28px; min-width: 0; }
+  .interviewer-label { font-size: 15px; color: #55d1fa; margin: 0 0 12px; font-weight: 700; }
+  .qcard { background: transparent; border: 0; border-radius: 0; padding: 0 0 22px; margin: 0 0 22px; border-bottom: 1px solid #244359; }
+  .qmeta { margin-bottom: 20px; flex-wrap: wrap; }
+  .qtext { font-size: clamp(20px, 2vw, 27px); line-height: 1.7; overflow-wrap: anywhere; color: #edf4ff; }
+  .qtext:focus, .answer-box .lbl:focus { outline: none; }
+  .thinking-hint { color: #9fb2cc; font-size: 14px; line-height: 1.9; margin: 0 0 24px; }
+  .reveal-btn { background: #ff852b; color: #071c30; border: 1px solid #ff852b; border-radius: 10px; min-height: 50px; margin: 0; }
+  .reveal-btn:hover { background: #ff9c51; }
+  .answer-box { background: #0b243b; border: 1px solid #287697; padding: 20px; animation: answer-in .25s ease-out; }
+  .answer-box .lbl { font-size: 17px; margin: 0 0 14px; padding-bottom: 12px; border-bottom: 1px solid #244359; }
+  .answer-box p { font-size: 16px; white-space: pre-line; overflow-wrap: anywhere; }
+  .answer-details { margin-top: 16px; border-top: 1px solid #244359; padding-top: 12px; }
+  .answer-details summary { cursor: pointer; color: #55d1fa; font-size: 14px; padding: 6px 0; }
+  .full-answer { margin-top: 12px; padding-top: 0; border: 0; overflow-wrap: anywhere; }
+  .full-answer :global(pre) { overflow-x: auto; max-width: 100%; }
+  .full-answer :global(table) { display: block; overflow-x: auto; max-width: 100%; }
+  .self-assessment { padding: 4px 0; border: 0; background: transparent; text-align: center; }
+  .self-assessment h2 { font-size: 16px; color: #edf4ff; }
+  .self-assessment p { margin: 8px 0 14px; }
+  .assessment-choice { min-height: 48px; padding: 10px 8px; }
+  .assessment-choice.good { color: #34d399; border-color: #34d399; }
+  .assessment-choice.review, .assessment-choice.review.selected { color: #ff963e; border-color: #ff963e; }
+  .assessment-choice.review.selected { background: rgba(255,150,62,.15); }
+  .assessment-choice:disabled:not(.selected) { opacity: .45; }
+  .next-btn { min-height: 48px; }
+  .next-btn:disabled { background: #2c465f; border-color: #2c465f; color: #9fb2cc; opacity: 1; }
+  @keyframes answer-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @media (max-width: 760px) {
+    .interview-wrap { padding-block: 16px 32px; }
+    .interview-shell { border-radius: 14px; }
+    .interview-top { padding: 10px; gap: 8px; }
+    .qnum { padding: 4px 6px; font-size: 12px; }
+    .end-btn { font-size: 11px; padding: 8px; }
+    .timer-status { display: none; }
+    .interview-stage { grid-template-columns: minmax(0,1fr); }
+    .interviewer-scene { position: relative; min-height: 0; height: auto; aspect-ratio: 4/3; max-height: 330px; }
+    .interviewer-scene img { object-position: center 35%; }
+    .interview-content { padding: 20px 16px; }
+    .qcard { padding-bottom: 16px; margin-bottom: 16px; }
+    .qmeta { margin-bottom: 12px; }
+    .qtext { font-size: 20px; }
+    .answer-box { padding: 16px; }
+    .assessment-choices { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .assessment-choice { font-size: 13px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .answer-box { animation: none; } .progtrack i, .timer-ring .fill { transition: none; } }
+
 </style>
 
 <script>
@@ -509,6 +580,9 @@ const jsonLd = {
 
   function revealAnswer() {
     stopTimer();
+    const status = $('timer-status'); if (status) status.textContent = 'توقف المؤقّت';
+    const hint = $('thinking-hint'); if (hint) hint.hidden = true;
+    const label = $('interviewer-label'); if (label) label.textContent = 'راجع إجابتك';
     const answerBox = $('answer-box') as HTMLElement | null;
     const revealBtn = $('reveal-btn') as HTMLElement | null;
     const nextBtn = $('next-btn') as HTMLButtonElement | null;
@@ -522,6 +596,7 @@ const jsonLd = {
       const assessment = $('self-assessment'); if (assessment) assessment.hidden = false;
     }
     if (nextBtn) nextBtn.hidden = false;
+    $('answer-heading')?.focus({ preventScroll: true });
   }
 
   function rateAnswer(rating: 'known' | 'review') {
@@ -540,6 +615,10 @@ const jsonLd = {
   }
 
   function renderQuestion() {
+    const status = $('timer-status'); if (status) status.textContent = 'وقت التفكير';
+    const hint = $('thinking-hint'); if (hint) hint.hidden = false;
+    const label = $('interviewer-label'); if (label) label.textContent = 'المُحاوِر يسألك الآن';
+    const details = $('answer-details') as HTMLDetailsElement | null; if (details) details.open = false;
     const q = ORDERED[idx];
     const qNum = $('q-num');
     const progFill = $('prog-fill') as HTMLElement | null;
@@ -550,6 +629,7 @@ const jsonLd = {
     const qText = $('q-text'); if (qText) qText.textContent = q.t;
     const aText = $('answer-text'); if (aText) aText.textContent = q.a;
     const fullAnswer = $('full-answer'); if (fullAnswer) fullAnswer.innerHTML = q.full;
+    if (details) details.hidden = !q.full.trim();
     const answerBox = $('answer-box') as HTMLElement | null; if (answerBox) answerBox.hidden = true;
     const revealBtn = $('reveal-btn') as HTMLElement | null; if (revealBtn) revealBtn.hidden = false;
     const timeoutNote = $('timeout-note'); if (timeoutNote) timeoutNote.hidden = true;
@@ -557,7 +637,7 @@ const jsonLd = {
     const knownBtn = $('rate-known') as HTMLButtonElement | null;
     const reviewBtn = $('rate-review') as HTMLButtonElement | null;
     for (const btn of [knownBtn, reviewBtn]) { if (btn) { btn.disabled = false; btn.classList.remove('selected'); } }
-    const feedback = $('assessment-feedback'); if (feedback) feedback.textContent = 'كشف الجواب وحده ما بحسبها صحيحة.';
+    const feedback = $('assessment-feedback'); if (feedback) feedback.textContent = 'اختر تقييمك للمتابعة.';
     const nextBtn = $('next-btn') as HTMLButtonElement | null; if (nextBtn) { nextBtn.hidden = true; nextBtn.disabled = true; }
     startTimer();
     // نضمن إن السؤال الجديد يبلّش من أعلى الصفحة تمامًا دايمًا، حتى لو صفحة السؤال السابق كانت طويلة
