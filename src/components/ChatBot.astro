@@ -131,7 +131,10 @@ const WELCOME =
       .tachat-bub li{margin:.15em 0}
       .tachat-bub code{background:rgba(255,255,255,.08);padding:.05em .35em;border-radius:4px;font-size:.9em}
       .tachat-bub a{color:#38bdf8;text-decoration:underline}
-    </style>
+      .tachat-pre { position: relative; margin: 8px 0; padding: 12px; border-radius: 10px; background: #060f1f; border: 1px solid rgba(56,189,248,.2); overflow-x: auto; text-align: left; font-size: 12.5px; line-height: 1.6; white-space: pre; }
+  .tachat-pre code { font-family: 'IBM Plex Mono', monospace; background: none; padding: 0; color: #e2e8f0; }
+  .tachat-lang { display: block; font-size: 11px; color: #7dd3fc; margin-bottom: 6px; font-family: 'IBM Plex Mono', monospace; }
+</style>
 
     <script>
       (function () {
@@ -232,6 +235,14 @@ const WELCOME =
           function closeList(){ if(list){ html += '</'+list+'>'; list=null; } }
           for (var i=0;i<lines.length;i++){
             var t = lines[i].trim(), m;
+            // بلوك كود ``` ... ```
+            if (/^```/.test(t)){
+              closeList();
+              var lang = t.replace(/^```/,'').trim(), code = [];
+              for (i++; i<lines.length && !/^```/.test(lines[i].trim()); i++) code.push(lines[i]);
+              html += '<pre class="tachat-pre" dir="ltr">'+(lang?'<span class="tachat-lang">'+esc(lang)+'</span>':'')+'<code>'+esc(code.join('\n'))+'</code></pre>';
+              continue;
+            }
             if ((m = t.match(/^[-*\u2022]\s+(.*)/))){
               if (list!=='ul'){ closeList(); html+='<ul>'; list='ul'; }
               html += '<li>'+inline(m[1])+'</li>';

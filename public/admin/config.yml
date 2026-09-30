@@ -1519,6 +1519,231 @@ collections:
             widget: text
             required: false
             hint: "{total} = عدد أسئلة البنك. فاضي = بدون سطر"
+          - name: orderTitle
+            label: "طلب الشراء — العنوان"
+            widget: string
+            required: false
+            default: "طلب شراء"
+          - name: orderText
+            label: "طلب الشراء — الشرح"
+            widget: text
+            required: false
+            default: "عبّي معلوماتك، وبعدها بتطلعلك تفاصيل التحويل. ما في حساب ولا كلمة سر."
+          - name: fieldName
+            label: "طلب الشراء — خانة الاسم"
+            widget: string
+            required: false
+            default: "الاسم"
+          - name: fieldEmail
+            label: "طلب الشراء — خانة الإيميل"
+            widget: string
+            required: false
+            default: "الإيميل"
+          - name: fieldEmailHint
+            label: "طلب الشراء — ملاحظة تحت الإيميل"
+            widget: string
+            required: false
+            default: "عليه بيوصلك كود التفعيل، فتأكد إنه صحيح."
+          - name: fieldPhone
+            label: "طلب الشراء — خانة الواتساب"
+            widget: string
+            required: false
+            default: "رقم واتساب (اختياري)"
+          - name: codeLabel
+            label: "طلب الشراء — كود الخصم"
+            widget: string
+            required: false
+            default: "عندك كود خصم؟"
+          - name: codeApply
+            label: "طلب الشراء — زر تطبيق الكود"
+            widget: string
+            required: false
+            default: "تطبيق"
+          - name: codeOk
+            label: "طلب الشراء — لما الكود صح"
+            widget: string
+            required: false
+            default: "✓ تم تطبيق الخصم: {discount}"
+            hint: "{discount} = قيمة الخصم"
+          - name: codeBad
+            label: "طلب الشراء — لما الكود غلط"
+            widget: string
+            required: false
+            default: "الكود مش صحيح أو انتهت صلاحيته."
+          - name: summaryTotal
+            label: "طلب الشراء — كلمة المجموع"
+            widget: string
+            required: false
+            default: "المجموع"
+          - name: orderSubmit
+            label: "طلب الشراء — زر المتابعة"
+            widget: string
+            required: false
+            default: "متابعة للدفع ←"
+          - name: orderAgree
+            label: "طلب الشراء — سطر الموافقة"
+            widget: string
+            required: false
+            default: "بالضغط على «متابعة» إنت موافق على شروط الشراء وسياسة الاسترجاع."
+          - name: orderOpen
+            label: "طلب الشراء — تنبيه طلب سابق"
+            widget: string
+            required: false
+            default: "عندك طلب مفتوح لهاد المنتج —"
+          - name: orderOpenLink
+            label: "طلب الشراء — رابط الطلب السابق"
+            widget: string
+            required: false
+            default: "كمّله من هون"
+          - name: payTitle
+            label: "صفحة الطلب — عنوان الدفع"
+            widget: string
+            required: false
+            default: "حوّل المبلغ"
+          - name: payText
+            label: "صفحة الطلب — شرح الدفع"
+            widget: text
+            required: false
+            default: "رقم طلبك {id} والمبلغ المطلوب {amount}. حوّل بأي طريقة من هدول، وبعدها ارفع صورة الإيصال."
+            hint: "{id} = رقم الطلب، {amount} = المبلغ"
+          - name: cliqTitle
+            label: "صفحة الطلب — عنوان CliQ"
+            widget: string
+            required: false
+            default: "⚡ CliQ (الأسرع)"
+          - name: bankTitle
+            label: "صفحة الطلب — عنوان التحويل البنكي"
+            widget: string
+            required: false
+            default: "🏦 تحويل بنكي"
+          - name: copyLabel
+            label: "صفحة الطلب — زر النسخ"
+            widget: string
+            required: false
+            default: "نسخ"
+          - name: copiedLabel
+            label: "صفحة الطلب — بعد النسخ"
+            widget: string
+            required: false
+            default: "✓ انتسخ"
+          - name: payRefNote
+            label: "صفحة الطلب — تنبيه ملاحظة التحويل"
+            widget: string
+            required: false
+            default: "📝 اكتب {id} بملاحظة التحويل عشان نطابق طلبك بسرعة."
+            hint: "{id} = رقم الطلب"
+          - name: holdText
+            label: "صفحة الطلب — مدة الحجز"
+            widget: string
+            required: false
+            default: "الطلب محجوز لحد {date}."
+            hint: "{date} = آخر موعد"
+          - name: uploadTitle
+            label: "صفحة الطلب — عنوان رفع الإثبات"
+            widget: string
+            required: false
+            default: "ارفع إثبات الدفع"
+          - name: uploadText
+            label: "صفحة الطلب — شرح رفع الإثبات"
+            widget: string
+            required: false
+            default: "صورة شاشة من تطبيق البنك أو CliQ (صورة أو PDF)."
+          - name: uploadPick
+            label: "صفحة الطلب — زر اختيار الملف"
+            widget: string
+            required: false
+            default: "📎 اختار الملف"
+          - name: refLabel
+            label: "صفحة الطلب — خانة المرجع"
+            widget: string
+            required: false
+            default: "رقم مرجع التحويل (اختياري)"
+          - name: uploadSubmit
+            label: "صفحة الطلب — زر الإرسال"
+            widget: string
+            required: false
+            default: "إرسال للمراجعة ←"
+          - name: uploadTooBig
+            label: "صفحة الطلب — ملف كبير"
+            widget: string
+            required: false
+            default: "الملف كبير. جرّب صورة شاشة أصغر أو PDF أقل من 1.9MB."
+          - name: reviewTitle
+            label: "صفحة الطلب — عنوان قيد المراجعة"
+            widget: string
+            required: false
+            default: "وصلنا إثبات الدفع 👌"
+          - name: reviewText
+            label: "صفحة الطلب — شرح قيد المراجعة"
+            widget: text
+            required: false
+            default: "طلبك قيد المراجعة. أول ما نتأكد من التحويل بيطلعلك كود التفعيل هون وبيوصلك على الإيميل."
+          - name: approvedTitle
+            label: "صفحة الطلب — عنوان المفعّل"
+            widget: string
+            required: false
+            default: "طلبك مفعّل 🎉"
+          - name: approvedText
+            label: "صفحة الطلب — شرح المفعّل"
+            widget: text
+            required: false
+            default: "هاد كود التفعيل تبعك. احتفظ فيه، وبتقدر تستعمله على أي جهاز."
+          - name: approvedButton
+            label: "صفحة الطلب — زر التفعيل"
+            widget: string
+            required: false
+            default: "فعّل وافتح موادي ←"
+          - name: rejectedTitle
+            label: "صفحة الطلب — عنوان المرفوض"
+            widget: string
+            required: false
+            default: "ما قدرنا نأكد الدفع"
+          - name: rejectedText
+            label: "صفحة الطلب — شرح المرفوض"
+            widget: text
+            required: false
+            default: "إذا حوّلت فعلاً، تواصل معنا وابعت رقم الطلب."
+          - name: expiredTitle
+            label: "صفحة الطلب — عنوان المنتهي"
+            widget: string
+            required: false
+            default: "انتهت مدة حجز الطلب"
+          - name: expiredText
+            label: "صفحة الطلب — شرح المنتهي"
+            widget: text
+            required: false
+            default: "ما وصلنا إثبات دفع خلال المدة. بتقدر تعمل طلب جديد بأي وقت."
+          - name: saveLinkText
+            label: "صفحة الطلب — تنبيه حفظ الرابط"
+            widget: string
+            required: false
+            default: "احفظ رابط هاي الصفحة — منه بتتابع طلبك وبتلاقي الكود."
+          - name: stepReceived
+            label: "صفحة الطلب — خطوة 1"
+            widget: string
+            required: false
+            default: "استلمنا طلبك"
+          - name: stepProof
+            label: "صفحة الطلب — خطوة 2"
+            widget: string
+            required: false
+            default: "وصل إثبات الدفع"
+          - name: stepReview
+            label: "صفحة الطلب — خطوة 3"
+            widget: string
+            required: false
+            default: "قيد المراجعة"
+          - name: stepDone
+            label: "صفحة الطلب — خطوة 4"
+            widget: string
+            required: false
+            default: "مفعّل ✓"
+          - name: contactText
+            label: "صفحة الطلب — رابط الواتساب"
+            widget: string
+            required: false
+            default: "عندك سؤال؟ راسلنا واتساب"
+            hint: "بيظهر بس إذا عبّيت رقم الواتساب"
           - name: cliqAlias
             label: "الدفع — CliQ Alias"
             widget: string

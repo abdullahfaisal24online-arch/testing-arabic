@@ -14,3 +14,6 @@
 /llms.txt
   Content-Type: text/plain; charset=utf-8
   Cache-Control: public, max-age=3600
+
+/admin/config.yml
+  Content-Type: text/yaml; charset=utf-8

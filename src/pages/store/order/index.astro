@@ -1,0 +1,259 @@
+---
+// متابعة الطلب: /store/order/?t=<رابط سرّي>
+// بتعرض حسب حالة الطلب: تفاصيل الدفع + رفع الإثبات، قيد المراجعة، مفعّل (مع الكود)، مرفوض، منتهي.
+import Base from '../../../layouts/Base.astro';
+import { STORE_OPEN, getStoreSettings } from '../../../lib/store';
+
+const t = STORE_OPEN ? await getStoreSettings() : undefined;
+const wa = (t?.whatsapp || '').replace(/[^\d]/g, '');
+const labels = t
+  ? {
+      payText: t.payText, payRefNote: t.payRefNote, holdText: t.holdText, copy: t.copyLabel, copied: t.copiedLabel,
+      tooBig: t.uploadTooBig, codeOk: t.codeOk,
+    }
+  : {};
+---
+
+{!t ? (
+  <Base title="المتجر — قريباً" noindex><section class="wrap" style="padding:80px 0;text-align:center"><p>قريباً</p></section></Base>
+) : (
+  <Base title={t.orderTitle} description={t.orderText} noindex hideChat>
+    <div class="wrap spage" id="op" data-labels={JSON.stringify(labels)}>
+      <p class="loading" id="loading">لحظة…</p>
+      <p class="missing" id="missing" hidden>ما لقينا هاد الطلب. تأكد من الرابط، أو ارجع <a href="/store/">للمتجر</a>.</p>
+
+      <div id="order" hidden>
+        <header class="ohead">
+          <span class="eyebrow" id="o-product"></span>
+          <h1>طلب <bdi class="mono" id="o-id"></bdi></h1>
+          <p class="amount"><b id="o-amount"></b></p>
+          <p class="disc" id="o-disc" hidden></p>
+        </header>
+
+        <ol class="steps" id="steps">
+          <li data-s="1">{t.stepReceived}</li>
+          <li data-s="2">{t.stepProof}</li>
+          <li data-s="3">{t.stepReview}</li>
+          <li data-s="4">{t.stepDone}</li>
+        </ol>
+
+        <!-- بانتظار الدفع -->
+        <section class="box" data-when="awaiting_payment" hidden>
+          <h2>{t.payTitle}</h2>
+          <p class="muted" data-fill="payText"></p>
+          <div class="pays">
+            {t.cliqAlias && (
+              <div class="pay">
+                <strong>{t.cliqTitle}</strong>
+                <div class="cp"><bdi class="mono" dir="ltr">Alias: {t.cliqAlias}</bdi><button type="button" data-copy={t.cliqAlias}>{t.copyLabel}</button></div>
+              </div>
+            )}
+            {(t.iban || t.accountName || t.bankName) && (
+              <div class="pay">
+                <strong>{t.bankTitle}</strong>
+                {t.bankName && <div class="cp"><span>{t.bankName}</span></div>}
+                {t.accountName && <div class="cp"><span>{t.accountName}</span><button type="button" data-copy={t.accountName}>{t.copyLabel}</button></div>}
+                {t.iban && <div class="cp"><bdi class="mono">{t.iban}</bdi><button type="button" data-copy={t.iban.replace(/\s+/g, '')}>{t.copyLabel}</button></div>}
+              </div>
+            )}
+          </div>
+          <p class="note" data-fill="payRefNote"></p>
+          {t.payNote && <p class="muted small">{t.payNote}</p>}
+          <p class="muted small" data-fill="holdText"></p>
+
+          <form class="up" id="up">
+            <h3>{t.uploadTitle}</h3>
+            <p class="muted small">{t.uploadText}</p>
+            <label class="pick">
+              <input type="file" id="file" accept="image/*,application/pdf" />
+              <span id="pick-label">{t.uploadPick}</span>
+            </label>
+            <label class="ref"><span>{t.refLabel}</span><input id="ref" maxlength="60" dir="ltr" /></label>
+            <p class="err" id="up-err" role="alert" hidden></p>
+            <button class="btn btn-primary" type="submit" id="up-btn" disabled>{t.uploadSubmit}</button>
+          </form>
+        </section>
+
+        <section class="box" data-when="review" hidden>
+          <h2>{t.reviewTitle}</h2>
+          <p class="muted">{t.reviewText}</p>
+        </section>
+
+        <section class="box ok" data-when="approved" hidden>
+          <h2>{t.approvedTitle}</h2>
+          <p class="muted">{t.approvedText}</p>
+          <div class="code-out"><bdi class="mono" id="o-code"></bdi><button type="button" id="copy-code">{t.copyLabel}</button></div>
+          <a class="btn btn-primary" id="activate" href="/pro/unlock/">{t.approvedButton}</a>
+        </section>
+
+        <section class="box bad" data-when="rejected" hidden>
+          <h2>{t.rejectedTitle}</h2>
+          <p class="muted" id="o-reason"></p>
+          <p class="muted">{t.rejectedText}</p>
+        </section>
+
+        <section class="box bad" data-when="expired" hidden>
+          <h2>{t.expiredTitle}</h2>
+          <p class="muted">{t.expiredText}</p>
+          <a class="btn btn-ghost" id="again" href="/store/">{t.heroEyebrow} ←</a>
+        </section>
+
+        <p class="save">{t.saveLinkText}</p>
+        {wa && <p class="save"><a href={`https://wa.me/${wa}`} id="wa" target="_blank" rel="noopener">{t.contactText}</a></p>}
+      </div>
+    </div>
+  </Base>
+)}
+
+<script>
+  const root = document.getElementById('op');
+  if (root) {
+    const L = JSON.parse(root.dataset.labels || '{}');
+    const $ = (id: string) => document.getElementById(id)!;
+    const token = new URLSearchParams(location.search).get('t') || '';
+    const jod = (n: number) => `${Number.isInteger(n) ? n : n.toFixed(2)} د.أ`;
+    const fmt = (ms: number) => new Date(ms).toLocaleString('ar-JO-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'long', hour: 'numeric', minute: '2-digit' });
+    const fill = (s: string, v: Record<string, string>) => s.replace(/\{(\w+)\}/g, (m, k) => (k in v ? v[k] : m));
+    let proof: Blob | null = null;
+
+    const render = (o: any) => {
+      $('loading').hidden = true;
+      $('order').hidden = false;
+      $('o-product').textContent = o.productTitle || o.product;
+      $('o-id').textContent = o.id;
+      $('o-amount').textContent = jod(o.amount);
+      const dEl = $('o-disc'); dEl.hidden = !o.discount; dEl.textContent = o.discount ? `خصم ${o.discountCode}: − ${jod(o.discount)}` : '';
+      const vars = { id: o.id, amount: jod(o.amount), date: fmt(o.expiresAt) };
+      document.querySelectorAll<HTMLElement>('[data-fill]').forEach((el) => (el.textContent = fill(L[el.dataset.fill!] || '', vars)));
+      document.querySelectorAll<HTMLElement>('[data-when]').forEach((el) => (el.hidden = el.dataset.when !== o.status));
+      const stage = { awaiting_payment: 1, review: 3, approved: 4 }[o.status as string] ?? 1;
+      document.querySelectorAll<HTMLElement>('#steps li').forEach((li) => {
+        const s = Number(li.dataset.s);
+        li.className = s < stage || o.status === 'approved' ? 'done' : s === stage ? 'cur' : '';
+      });
+      $('steps').hidden = o.status === 'rejected' || o.status === 'expired';
+      if (o.status === 'approved' && o.code) {
+        $('o-code').textContent = o.code;
+        ($('activate') as HTMLAnchorElement).href = `/pro/unlock/?code=${encodeURIComponent(o.code)}`;
+      }
+      if (o.status === 'rejected') $('o-reason').textContent = o.rejectReason || '';
+      if (o.status === 'expired') ($('again') as HTMLAnchorElement).href = `/store/${o.product}/`;
+      const wa = document.getElementById('wa') as HTMLAnchorElement | null;
+      if (wa) wa.href = wa.href.split('?')[0] + '?text=' + encodeURIComponent(`مرحبا، بخصوص الطلب ${o.id}`);
+    };
+
+    const load = async () => {
+      if (!/^[a-f0-9]{40}$/.test(token)) { $('loading').hidden = true; $('missing').hidden = false; return; }
+      try {
+        const r = await fetch(`/api/store/order?t=${token}`, { cache: 'no-store' });
+        const d = await r.json();
+        if (!d.ok) throw new Error();
+        render(d.order);
+      } catch (_) { $('loading').hidden = true; $('missing').hidden = false; }
+    };
+
+    // نسخ
+    document.addEventListener('click', async (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-copy], #copy-code');
+      if (!b) return;
+      const text = b.id === 'copy-code' ? $('o-code').textContent || '' : b.dataset.copy || '';
+      try { await navigator.clipboard.writeText(text); } catch (_) {}
+      const old = b.textContent; b.textContent = L.copied; setTimeout(() => (b.textContent = old), 1500);
+    });
+
+    // تصغير صور الإيصال قبل الرفع (الحد 1.9MB)
+    const shrink = (file: File): Promise<Blob> => new Promise((res, rej) => {
+      const img = new Image();
+      img.onload = () => {
+        const max = 1800, k = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+        c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height);
+        const tryQ = (q: number) => c.toBlob((b) => (b && (b.size <= 1_900_000 || q < 0.5) ? res(b) : tryQ(q - 0.15)), 'image/jpeg', q);
+        tryQ(0.85);
+        URL.revokeObjectURL(img.src);
+      };
+      img.onerror = rej;
+      img.src = URL.createObjectURL(file);
+    });
+
+    const file = document.getElementById('file') as HTMLInputElement | null;
+    file?.addEventListener('change', async () => {
+      const f = file.files?.[0];
+      const err = $('up-err'); err.hidden = true; proof = null;
+      ($('up-btn') as HTMLButtonElement).disabled = true;
+      if (!f) return;
+      try {
+        proof = f.type === 'application/pdf' ? f : await shrink(f);
+        if (proof.size > 1_900_000) { proof = null; err.textContent = L.tooBig; err.hidden = false; return; }
+        $('pick-label').textContent = `✓ ${f.name}`;
+        ($('up-btn') as HTMLButtonElement).disabled = false;
+      } catch (_) { err.textContent = L.tooBig; err.hidden = false; }
+    });
+
+    document.getElementById('up')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!proof) return;
+      const btn = $('up-btn') as HTMLButtonElement; btn.disabled = true;
+      const err = $('up-err'); err.hidden = true;
+      try {
+        const ref = ($('ref') as HTMLInputElement).value.trim();
+        const r = await fetch(`/api/store/proof?t=${token}&ref=${encodeURIComponent(ref)}`, {
+          method: 'POST', headers: { 'content-type': proof.type || 'image/jpeg' }, body: proof,
+        });
+        const d = await r.json();
+        if (!d.ok) throw new Error(d.error);
+        window.taTrack?.('store_proof_uploaded', {});
+        render(d.order);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (x) {
+        err.textContent = (x as Error).message === 'too_big' ? L.tooBig : 'صار خطأ بالرفع. جرّب كمان مرة.';
+        err.hidden = false; btn.disabled = false;
+      }
+    });
+
+    load();
+    // تحديث تلقائي وهو بانتظار المراجعة
+    setInterval(() => { if (!document.hidden && document.querySelector('[data-when="review"]:not([hidden])')) load(); }, 60_000);
+  }
+</script>
+
+<style>
+  .spage { max-width: 760px; padding-block: 30px 70px; }
+  .loading, .missing { text-align: center; color: var(--muted); padding: 60px 0; }
+  [hidden] { display: none !important; }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+  .ohead h1 { font-size: clamp(24px, 3vw, 32px); margin: 6px 0; }
+  .amount { margin: 0; color: var(--muted); }
+  .disc { margin: 4px 0 0; color: #34d399; font-size: 14px; }
+  .ohead { margin-bottom: 18px; }
+  .amount b { color: var(--orange); font-size: 24px; }
+  .steps { list-style: none; padding: 0; margin: 0 0 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .steps li { position: relative; font-size: 13px; color: var(--faint); padding-top: 14px; text-align: center; }
+  .steps li::before { content: ''; position: absolute; top: 0; inset-inline: 0; height: 5px; border-radius: 3px; background: var(--line); }
+  .steps li.done { color: #34d399; } .steps li.done::before { background: #34d399; }
+  .steps li.cur { color: #fbbf24; font-weight: 700; } .steps li.cur::before { background: #fbbf24; }
+  .box { grid-template-columns: minmax(0, 1fr); min-width: 0; overflow-wrap: anywhere; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px; display: grid; gap: 12px; }
+  .box.ok { border-color: rgba(52, 211, 153, .5); } .box.bad { border-color: rgba(248, 113, 113, .45); }
+  .box h2 { font-size: 21px; margin: 0; } .box h3 { font-size: 17px; margin: 0; }
+  .muted { color: var(--muted); line-height: 1.9; margin: 0; } .small { font-size: 13.5px; }
+  .pays, .pay, .up { grid-template-columns: minmax(0, 1fr); }
+  .pays { display: grid; gap: 12px; }
+  .pay { background: var(--navy); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 8px; }
+  .cp { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 14.5px; }
+  .cp > * { min-width: 0; }
+  .cp bdi { overflow-wrap: anywhere; }
+  .cp button, .code-out button { font: inherit; font-size: 12.5px; border: 1px solid var(--line-strong); background: none; color: var(--cyan); border-radius: 8px; padding: 2px 12px; cursor: pointer; flex: none; }
+  .note { margin: 0; font-size: 14px; background: rgba(251, 191, 36, .08); border: 1px solid rgba(251, 191, 36, .35); color: #fde68a; border-radius: 10px; padding: 9px 12px; }
+  .up { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 10px; }
+  .pick { display: block; border: 2px dashed var(--line-strong); border-radius: 14px; padding: 22px 12px; text-align: center; cursor: pointer; color: var(--muted); }
+  .pick:hover { border-color: var(--cyan); color: var(--ink); }
+  .pick input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .ref { display: grid; gap: 5px; font-size: 14px; }
+  .ref input { width: 100%; min-width: 0; box-sizing: border-box; font: inherit; font-size: 16px; background: var(--navy); border: 1.5px solid var(--line-strong); border-radius: 12px; padding: 10px 12px; color: var(--ink); }
+  .err { color: #f87171; margin: 0; }
+  .up .btn, .box > .btn { width: 100%; justify-content: center; }
+  .code-out { display: flex; justify-content: space-between; align-items: center; gap: 12px; background: var(--navy); border: 1.5px solid #34d399; border-radius: 12px; padding: 12px 16px; }
+  .code-out bdi { font-size: 22px; letter-spacing: 2px; color: #a7f3d0; }
+  .save { text-align: center; color: var(--muted); font-size: 13.5px; margin: 16px 0 0; }
+  @media (max-width: 520px) { .steps li { font-size: 11.5px; } }
+</style>

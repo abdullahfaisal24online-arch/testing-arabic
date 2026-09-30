@@ -1,0 +1,175 @@
+---
+// طلب الشراء: معلومات المشتري + كود خصم ← بيعمل الطلب وبيحوّل على صفحة متابعة الطلب.
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import { STORE_OPEN, jod, getStoreSettings } from '../../../lib/store';
+
+export async function getStaticPaths() {
+  if (!STORE_OPEN) return [];
+  const products = (await getCollection('products')).filter((p) => !p.data.draft);
+  return products.map((product) => ({ params: { slug: product.id }, props: { product } }));
+}
+
+const { product } = Astro.props;
+const { data } = product;
+const t = await getStoreSettings();
+const price = data.offerPrice ?? data.price;
+const L = { codeOk: t.codeOk, codeBad: t.codeBad };
+---
+
+<Base title={`${t.orderTitle} — ${data.title}`} description={t.orderText} noindex hideChat>
+  <div class="wrap opage">
+    <a class="back" href={`/store/${product.id}/`}>{t.sampleBack}</a>
+    <h1>{t.orderTitle}</h1>
+    <p class="lead">{t.orderText}</p>
+
+    <p class="open-order" id="open-order" hidden>{t.orderOpen} <a href="#" id="open-order-link">{t.orderOpenLink}</a></p>
+
+    <div class="ogrid">
+      <form class="oform" id="oform" novalidate data-product={product.id} data-price={price} data-labels={JSON.stringify(L)}>
+        <label>
+          <span>{t.fieldName}</span>
+          <input name="name" required minlength="2" maxlength="80" autocomplete="name" />
+        </label>
+        <label>
+          <span>{t.fieldEmail}</span>
+          <input name="email" type="email" required maxlength="254" autocomplete="email" dir="ltr" />
+          {t.fieldEmailHint && <small>{t.fieldEmailHint}</small>}
+        </label>
+        <label>
+          <span>{t.fieldPhone}</span>
+          <input name="phone" type="tel" maxlength="30" autocomplete="tel" dir="ltr" />
+        </label>
+        <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+        <div class="code">
+          <span>{t.codeLabel}</span>
+          <div class="crow">
+            <input name="code" maxlength="40" dir="ltr" autocomplete="off" />
+            <button type="button" class="btn btn-ghost btn-sm" id="apply">{t.codeApply}</button>
+          </div>
+          <small id="code-msg" aria-live="polite"></small>
+        </div>
+
+        <p class="err" id="err" role="alert" hidden></p>
+        <button class="btn btn-primary" type="submit" id="submit">{t.orderSubmit}</button>
+        {t.orderAgree && <p class="agree">{t.orderAgree}</p>}
+      </form>
+
+      <aside class="osum">
+        {data.cover && <img src={data.cover} alt="" width="1280" height="720" loading="lazy" />}
+        <strong>{data.title}</strong>
+        <div class="srow"><span>{data.kind}</span><span>{jod(price)}{data.offerPrice != null && <s> {jod(data.price)}</s>}</span></div>
+        <div class="srow disc" id="disc-row" hidden><span id="disc-name"></span><span id="disc-val"></span></div>
+        <div class="srow total"><b>{t.summaryTotal}</b><b id="total">{jod(price)}</b></div>
+      </aside>
+    </div>
+  </div>
+</Base>
+
+<script>
+  const form = document.getElementById('oform') as HTMLFormElement;
+  const product = form.dataset.product!;
+  const price = Number(form.dataset.price);
+  const L = JSON.parse(form.dataset.labels!);
+  const $ = (id: string) => document.getElementById(id)!;
+  const jod = (n: number) => `${Number.isInteger(n) ? n : n.toFixed(2)} د.أ`;
+  const ERR: Record<string, string> = {
+    bad_name: 'اكتب اسمك.', bad_email: 'الإيميل مش مكتوب صح.', too_many: 'طلبات كثيرة بوقت قصير. استنى شوي وجرّب.',
+    code_invalid: L.codeBad, code_expired: L.codeBad, code_product: L.codeBad, code_used_up: L.codeBad,
+    store_closed: 'المتجر مسكّر حالياً.', network: 'صار خطأ بالاتصال. جرّب كمان مرة.',
+  };
+  let applied = '';
+
+  // طلب مفتوح سابق لنفس المنتج على هاد الجهاز؟
+  try {
+    const list = JSON.parse(localStorage.getItem('ta-orders') || '[]') as { p: string; t: string; at: number }[];
+    const open = list.find((o) => o.p === product && Date.now() - o.at < 72 * 3600_000);
+    if (open) { ($('open-order-link') as HTMLAnchorElement).href = `/store/order/?t=${open.t}`; $('open-order').hidden = false; }
+  } catch (_) {}
+
+  const setDiscount = (code: string, discount: number) => {
+    applied = code;
+    $('disc-row').hidden = !code;
+    $('disc-name').textContent = code;
+    $('disc-val').textContent = `− ${jod(discount)}`;
+    $('total').textContent = jod(Math.round((price - discount) * 100) / 100);
+  };
+
+  $('apply').addEventListener('click', async () => {
+    const code = (form.elements.namedItem('code') as HTMLInputElement).value.trim();
+    const msg = $('code-msg');
+    msg.className = '';
+    if (!code) { setDiscount('', 0); msg.textContent = ''; return; }
+    try {
+      const r = await fetch('/api/store/discount', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ product, code }) });
+      const d = await r.json();
+      if (d.ok) { setDiscount(d.code, d.discount); msg.textContent = L.codeOk.replace('{discount}', jod(d.discount)); msg.className = 'ok'; }
+      else { setDiscount('', 0); msg.textContent = ERR[d.error] || L.codeBad; msg.className = 'bad'; }
+    } catch (_) { msg.textContent = ERR.network; msg.className = 'bad'; }
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const err = $('err');
+    err.hidden = true;
+    const btn = $('submit') as HTMLButtonElement;
+    btn.disabled = true;
+    try {
+      const r = await fetch('/api/store/order', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ product, name: fd.get('name'), email: fd.get('email'), phone: fd.get('phone'), code: applied || fd.get('code'), website: fd.get('website') }),
+      });
+      const d = await r.json();
+      if (!d.ok || !d.token) throw new Error(d.error || 'network');
+      try {
+        const list = JSON.parse(localStorage.getItem('ta-orders') || '[]');
+        list.unshift({ p: product, t: d.token, id: d.id, at: Date.now() });
+        localStorage.setItem('ta-orders', JSON.stringify(list.slice(0, 10)));
+      } catch (_) {}
+      window.taTrack?.('store_order_created', { product });
+      location.href = `/store/order/?t=${d.token}`;
+    } catch (x) {
+      err.textContent = ERR[(x as Error).message] || ERR.network;
+      err.hidden = false;
+      btn.disabled = false;
+    }
+  });
+</script>
+
+<style>
+  .opage { max-width: 980px; padding-block: 24px 70px; }
+  .back { display: inline-block; font-size: 14.5px; color: var(--muted); margin-bottom: 16px; }
+  .opage h1 { font-size: clamp(24px, 3vw, 32px); margin: 0 0 6px; }
+  .lead { color: var(--muted); line-height: 1.9; margin: 0 0 20px; }
+  .open-order { background: var(--cyan-soft); border: 1px solid var(--line-strong); border-radius: 12px; padding: 10px 14px; margin: 0 0 18px; }
+  .open-order[hidden] { display: none; }
+  .ogrid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; align-items: start; }
+  .oform, .osum { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
+  .oform { display: grid; gap: 16px; }
+  .oform label, .code { display: grid; gap: 6px; }
+  .oform label span, .code > span { font-weight: 700; font-size: 14.5px; }
+  .oform input { font: inherit; font-size: 16px; background: var(--navy); border: 1.5px solid var(--line-strong); border-radius: 12px; padding: 11px 14px; color: var(--ink); width: 100%; }
+  .oform input:focus { outline: none; border-color: var(--cyan); }
+  .oform small { color: var(--muted); font-size: 13px; }
+  .crow { display: flex; gap: 8px; }
+  .crow .btn { flex: none; }
+  .crow input { flex: 1; min-width: 0; }
+  .ogrid > * { min-width: 0; }
+  #code-msg.ok { color: #34d399; } #code-msg.bad { color: #f87171; }
+  .oform { position: relative; }
+  .oform .hp { position: absolute; inset-inline-start: 0; top: 0; width: 1px; height: 1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); opacity: 0; pointer-events: none; }
+  .err { color: #f87171; margin: 0; } .err[hidden] { display: none; }
+  .oform .btn-primary { width: 100%; justify-content: center; }
+  .agree { color: var(--muted); font-size: 13px; margin: 0; text-align: center; }
+  .osum { display: grid; gap: 10px; position: sticky; top: 90px; }
+  .osum img { width: 100%; border-radius: 12px; display: block; }
+  .srow { display: flex; justify-content: space-between; gap: 10px; font-size: 14.5px; color: var(--muted); }
+  .srow s { color: var(--faint); font-size: 13px; }
+  .srow.disc { color: #34d399; } .srow[hidden] { display: none; }
+  .srow.total { border-top: 1px solid var(--line); padding-top: 10px; color: var(--ink); font-size: 17px; }
+  .srow.total b:last-child { color: var(--orange); }
+  @media (max-width: 800px) { .ogrid { grid-template-columns: 1fr; } .osum { position: static; order: -1; } .osum img { display: none; } }
+</style>

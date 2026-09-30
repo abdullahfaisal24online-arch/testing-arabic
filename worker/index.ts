@@ -13,9 +13,11 @@
  *   POST /api/subscribe       نسخة احتياطية محلية لمشتركي النشرة (جدول subscribers)
  *   POST /api/contact         نموذج التواصل وإرسال الرسالة إلى بريد المنصة
  *   GET  /admin/comments      صفحة المراجعة (محمية بكلمة سر)
+ *   /api/store/*              مسار الشراء بالمتجر — شوف worker/store.ts
  */
 
 import { EmailMessage } from 'cloudflare:email';
+import { handleStore } from './store';
 
 interface Env {
   DB: D1Database;
@@ -981,6 +983,9 @@ async function router(req: Request, env: Env): Promise<Response> {
   if ((path === '/questions' || path === '/questions/') && (req.method === 'GET' || req.method === 'HEAD')) {
     return Response.redirect(new URL('/interview/', req.url).toString(), 301);
   }
+
+  // ---------- المتجر (مسار الشراء) ----------
+  if (path.startsWith('/api/store/')) return handleStore(req, env, url);
 
   // ---------- واجهة التعليقات ----------
   if (path === '/api/comments') {

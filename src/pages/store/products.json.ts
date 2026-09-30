@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
+import { STORE_OPEN, getStoreSettings } from '../../lib/store';
 
 /**
  * كاتالوج المنتجات المدفوعة — بيتبنى من لوحة المحتوى.
@@ -22,8 +23,12 @@ export const GET: APIRoute = async () => {
     }
   }
 
+  const st = STORE_OPEN ? await getStoreSettings() : undefined;
   const body = JSON.stringify({
     v: 1,
+    // الـ Worker بيرفض الطلبات إذا المتجر مسكّر بهاد البناء
+    open: STORE_OPEN,
+    store: { holdHours: st?.holdHours ?? 48 },
     products: products.map((p) => ({
       slug: p.id,
       title: p.data.title,
