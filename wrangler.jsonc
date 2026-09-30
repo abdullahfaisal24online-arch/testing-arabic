@@ -36,5 +36,38 @@
   ],
   "observability": {
     "enabled": true
+  },
+
+  // ===== النسخة التجريبية (staging) =====
+  // بتنبني من فرع staging على Worker منفصل: testing-arabic-staging
+  // الرابط: staging.testing-arabic.com — محمي بـ Cloudflare Access، وإله قاعدة بيانات لحاله
+  // النشر: npx wrangler deploy --env staging  (الموقع الحقيقي ما بيتأثر بهاد القسم)
+  "env": {
+    "staging": {
+      "name": "testing-arabic-staging",
+      "workers_dev": false,
+      "preview_urls": false,
+      "routes": [
+        { "pattern": "staging.testing-arabic.com", "custom_domain": true }
+      ],
+      "ai": { "binding": "AI" },
+      "assets": {
+        "directory": "./dist",
+        "binding": "ASSETS",
+        "not_found_handling": "404-page",
+        "run_worker_first": ["/questions", "/questions/", "/lessons/bug-report-that-works/", "/articles/manual-vs-automation/", "/lessons/what-is-software-testing/", "/courses/jira-agile/", "/lessons/maestro-setup/", "/courses/maestro-automation/", "/api/comments", "/api/comments/*", "/api/likes", "/api/likes/*", "/api/views", "/api/views/*", "/api/chat", "/api/chat/*", "/api/subscribe", "/api/subscribe/*", "/api/contact", "/api/contact/*", "/admin/comments", "/admin/comments/*"]
+      },
+      "send_email": [
+        { "name": "EMAIL", "destination_address": "abdullahqafaisal@gmail.com" }
+      ],
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "testing-arabic-staging",
+          "database_id": "PASTE_STAGING_D1_ID"
+        }
+      ],
+      "observability": { "enabled": true }
+    }
   }
 }
