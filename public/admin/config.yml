@@ -1787,7 +1787,7 @@ collections:
             required: false
             default: "أهلاً {name} 🎉\n\nتأكدنا من الدفع وطلبك {id} صار مفعّل.\n\nهاد كود التفعيل تبعك لـ «{product}». احتفظ فيه، وبتقدر تستعمله على أي جهاز:"
             hint: "الكود بيظهر تحت النص بصندوق لحاله"
-          - name: approvedButton
+          - name: mailApprovedButton
             label: "إيميل التفعيل — نص الزر"
             widget: string
             required: false
