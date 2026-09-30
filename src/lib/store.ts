@@ -1,3 +1,4 @@
+import { getEntry } from 'astro:content';
 /**
  * هل المتجر مفتوح؟
  * بيتحدد وقت البناء من متغير STORE_OPEN:
@@ -9,12 +10,26 @@ export const STORE_OPEN: boolean =
   (typeof process !== 'undefined' && process.env?.STORE_OPEN === '1') ||
   import.meta.env.STORE_OPEN === '1';
 
-/** ترتيب التصنيفات بالمتجر وأسماؤها الظاهرة */
-export const STORE_GROUPS: { key: string; title: string; kinds: string[] }[] = [
-  { key: 'courses', title: 'دورات', kinds: ['دورة'] },
-  { key: 'banks', title: 'بنوك أسئلة', kinds: ['بنك أسئلة'] },
-  { key: 'summaries', title: 'ملخصات', kinds: ['ملخصات'] },
-  { key: 'more', title: 'قوالب وحزم', kinds: ['قوالب', 'حزمة'] },
-];
+/** ترتيب التصنيفات بالمتجر */
+// title = اسم الخانة بإعدادات المتجر اللي فيها اسم التصنيف
+export const STORE_GROUPS = [
+  { key: 'courses', title: 'groupCourses', kinds: ['دورة'] },
+  { key: 'banks', title: 'groupBanks', kinds: ['بنك أسئلة'] },
+  { key: 'summaries', title: 'groupSummaries', kinds: ['ملخصات'] },
+  { key: 'more', title: 'groupMore', kinds: ['قوالب', 'حزمة'] },
+] as const;
 
 export const jod = (n: number) => `${Number.isInteger(n) ? n : n.toFixed(2)} د.أ`;
+
+
+/** إعدادات المتجر من لوحة التحكم (إعدادات الموقع ← المتجر) */
+export async function getStoreSettings() {
+  const e = await getEntry('storeSettings', 'store').catch(() => undefined);
+  if (e) return e.data;
+  throw new Error('src/content/settings/store.json مفقود');
+}
+
+/** بيعبّي {n} و{score}… بالنص */
+export const tpl = (s: string | undefined, vars: Record<string, string | number>) =>
+  (s ?? '').replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m));
+

@@ -485,7 +485,85 @@ const products = defineCollection({
     order: num(0),
     featured: bool(false),
     draft: bool(false),
+    // ===== نصوص المنتج — أي خانة فاضية بتاخد النص العام من «إعدادات المتجر» =====
+    // الكارد بصفحة المتجر
+    cardTitle: optString,
+    cardText: optString,
+    cardBadge: optString,
+    cardButton: optString,
+    // أعلى صفحة المنتج
+    eyebrow: optString,
+    heroTitle: optString,
+    seoDescription: optString,
+    // صندوق السعر
+    buyButton: optString,
+    sampleButton: optString,
+    trust: strList,
+    // شو بتاخد
+    includesTitle: optString,
+    // العيّنة المجانية (الأسئلة بتنسحب من بنك المنتج)
+    sampleEnabled: bool(true),
+    sampleCount: num(10),
+    sampleEyebrow: optString,
+    sampleTitle: optString,
+    sampleText: optString,
+    // الختام
+    endTitle: optString,
+    endButton: optString,
   }),
 });
 
-export const collections = { products, lessons, articles, courses, news, resources, glossary, questions, pages, site, home, start, chat, bugHunter, bugCases, debugHunt, announcements };
+/* ===== إعدادات المتجر: نصوص صفحة المتجر + النصوص الافتراضية لكل المنتجات + بيانات الدفع ===== */
+const storeSettings = defineCollection({
+  loader: glob({ base: './src/content/settings', pattern: 'store.json' }),
+  schema: z.object({
+    // صفحة المتجر
+    heroEyebrow: str('المتجر'),
+    heroTitle: str('مواد بتختصر عليك الطريق'),
+    heroText: str('بنوك أسئلة وملخّصات ودورات متقدمة، كلها بالعربي وجوّا المنصة. بتشتري مرة، وبتضل مفتوحة إلك على أي جهاز.'),
+    allLabel: str('الكل'),
+    groupCourses: str('دورات'),
+    groupBanks: str('بنوك أسئلة'),
+    groupSummaries: str('ملخصات'),
+    groupMore: str('قوالب وحزم'),
+    emptyText: str('ما في منتجات لسا. ارجع قريباً 👀'),
+    haveCodeText: str('عندك كود؟'),
+    haveCodeLink: str('فعّله من هون'),
+    myItemsLink: str('موادي'),
+    // الكارد
+    cardButton: str('التفاصيل ←'),
+    offerBadge: str('عرض'),
+    // صفحة المنتج
+    buyButton: str('اطلب الآن ←'),
+    sampleButton: str('🎁 جرّب {n} أسئلة مجاناً'),
+    saveLabel: str('وفّر {p}%'),
+    trust: z.preprocess(fallback(['دفع بـ CliQ أو تحويل بنكي', 'كود تفعيل خاص فيك، على أي جهاز', 'المحتوى جوّا المنصة، مش ملف بينتقل']), z.array(str(''))),
+    includesTitle: str('شو بتاخد؟'),
+    endTitle: str('جاهز تبلّش؟'),
+    endButton: str('اطلب الآن ←'),
+    boughtText: str('اشتريت قبل؟'),
+    boughtLink: str('فعّل الكود من هون'),
+    // صفحة العيّنة
+    sampleEyebrow: str('عيّنة مجانية'),
+    sampleTitle: str('جرّب قبل ما تشتري'),
+    sampleText: str('أول {n} أسئلة من البنك، بنفس الشكل اللي بتلاقيه بعد الشراء. اختار جوابك وبتعرف فوراً إذا صح وليش.'),
+    sampleBack: str('→ رجوع لتفاصيل المنتج'),
+    sampleNext: str('السؤال التالي ←'),
+    sampleFinish: str('خلصت ←'),
+    sampleCorrect: str('✓ جوابك صح'),
+    sampleWrong: str('✗ الجواب الصح هو {a}'),
+    sampleEnglish: str('الشرح بالإنجليزي'),
+    sampleDone: str('خلصت العيّنة! جاوبت صح على {score} من {n}.'),
+    sampleDoneText: str('البنك الكامل فيه {total} سؤال، مع امتحان تجريبي وتدريب حسب الفصل.'),
+    // بيانات الدفع (بتظهر للمشتري بعد ما يطلب)
+    cliqAlias: optString,
+    bankName: optString,
+    accountName: optString,
+    iban: optString,
+    whatsapp: optString,
+    holdHours: num(48),
+    payNote: optString,
+  }),
+});
+
+export const collections = { products, storeSettings, lessons, articles, courses, news, resources, glossary, questions, pages, site, home, start, chat, bugHunter, bugCases, debugHunt, announcements };

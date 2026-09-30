@@ -16,6 +16,8 @@ cover: /uploads/store/ctfl-questions.webp
 order: 1
 featured: true
 draft: false
+sampleEnabled: true
+sampleCount: 10
 ---
 
 ## لمين هاد البنك؟

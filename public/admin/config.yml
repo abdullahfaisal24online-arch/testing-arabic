@@ -72,10 +72,6 @@ collections:
         widget: list
         required: false
         hint: "slug كل منتج بتفتحه الحزمة — للحزم فقط"
-      - name: sampleHref
-        label: "رابط النموذج المجاني"
-        widget: string
-        required: false
       - name: cover
         label: "صورة المنتج"
         widget: image
@@ -94,6 +90,99 @@ collections:
         label: "مسودّة لا تُنشر"
         widget: boolean
         default: false
+      - name: cardTitle
+        label: "الكارد بالمتجر — العنوان"
+        widget: string
+        required: false
+        hint: "فاضي = اسم المنتج"
+      - name: cardText
+        label: "الكارد بالمتجر — الوصف القصير"
+        widget: text
+        required: false
+        hint: "فاضي = السطر اللي بيشرح المادة"
+      - name: cardBadge
+        label: "الكارد بالمتجر — الشارة على الصورة"
+        widget: string
+        required: false
+        hint: "مثلاً: جديد، الأكثر طلباً. فاضي = «عرض» إذا في سعر عرض"
+      - name: cardButton
+        label: "الكارد بالمتجر — نص الرابط"
+        widget: string
+        required: false
+        hint: "اتركها فاضية = النص العام من «إعدادات المتجر»"
+      - name: eyebrow
+        label: "صفحة المنتج — الكلمة الصغيرة فوق العنوان"
+        widget: string
+        required: false
+        hint: "فاضي = النوع (بنك أسئلة…)"
+      - name: heroTitle
+        label: "صفحة المنتج — العنوان الكبير"
+        widget: string
+        required: false
+        hint: "فاضي = اسم المنتج"
+      - name: seoDescription
+        label: "صفحة المنتج — وصف Google"
+        widget: text
+        required: false
+        hint: "فاضي = السطر اللي بيشرح المادة"
+      - name: buyButton
+        label: "صندوق السعر — زر الشراء"
+        widget: string
+        required: false
+        hint: "اتركها فاضية = النص العام من «إعدادات المتجر»"
+      - name: sampleButton
+        label: "صندوق السعر — زر العيّنة"
+        widget: string
+        required: false
+        hint: "{n} = عدد أسئلة العيّنة. اتركها فاضية = النص العام من «إعدادات المتجر»"
+      - name: trust
+        label: "صندوق السعر — النقاط تحت الأزرار"
+        widget: list
+        required: false
+        hint: "نقطة بكل سطر. اتركها فاضية = النص العام من «إعدادات المتجر»"
+      - name: includesTitle
+        label: "«شو بتاخد؟» — العنوان"
+        widget: string
+        required: false
+        hint: "اتركها فاضية = النص العام من «إعدادات المتجر»"
+      - name: sampleEnabled
+        label: "العيّنة المجانية — مفعّلة"
+        widget: boolean
+        default: true
+        hint: "بتظهر بس إذا المنتج إله بنك أسئلة"
+      - name: sampleCount
+        label: "العيّنة المجانية — عدد الأسئلة"
+        widget: number
+        value_type: int
+        min: 1
+        max: 20
+        default: 10
+        hint: "أول كم سؤال من البنك بيطلعوا بالعيّنة"
+      - name: sampleEyebrow
+        label: "صفحة العيّنة — الكلمة الصغيرة فوق العنوان"
+        widget: string
+        required: false
+        hint: "اتركها فاضية = النص العام من «إعدادات المتجر»"
+      - name: sampleTitle
+        label: "صفحة العيّنة — العنوان"
+        widget: string
+        required: false
+        hint: "اتركها فاضية = النص العام من «إعدادات المتجر»"
+      - name: sampleText
+        label: "صفحة العيّنة — الشرح"
+        widget: text
+        required: false
+        hint: "{n} = عدد أسئلة العيّنة، {total} = عدد أسئلة البنك. اتركها فاضية = النص العام من «إعدادات المتجر»"
+      - name: endTitle
+        label: "آخر الصفحة — العنوان"
+        widget: string
+        required: false
+        hint: "اتركها فاضية = النص العام من «إعدادات المتجر»"
+      - name: endButton
+        label: "آخر الصفحة — زر الشراء"
+        widget: string
+        required: false
+        hint: "اتركها فاضية = النص العام من «إعدادات المتجر»"
       - name: body
         label: "الوصف الكامل بصفحة البيع"
         widget: markdown
@@ -1314,6 +1403,153 @@ collections:
             label: "بلوك الدرس — نص الزر"
             widget: string
             default: "العب هسا"
+
+      - name: store
+        label: "المتجر"
+        file: src/content/settings/store.json
+        fields:
+          - name: heroEyebrow
+            label: "صفحة المتجر — الكلمة الصغيرة فوق العنوان"
+            widget: string
+          - name: heroTitle
+            label: "صفحة المتجر — العنوان"
+            widget: string
+          - name: heroText
+            label: "صفحة المتجر — الشرح"
+            widget: text
+          - name: allLabel
+            label: "صفحة المتجر — زر «الكل»"
+            widget: string
+          - name: groupCourses
+            label: "اسم تصنيف الدورات"
+            widget: string
+          - name: groupBanks
+            label: "اسم تصنيف بنوك الأسئلة"
+            widget: string
+          - name: groupSummaries
+            label: "اسم تصنيف الملخصات"
+            widget: string
+          - name: groupMore
+            label: "اسم تصنيف القوالب والحزم"
+            widget: string
+          - name: emptyText
+            label: "صفحة المتجر — لما ما يكون في منتجات"
+            widget: string
+          - name: haveCodeText
+            label: "صفحة المتجر — «عندك كود؟»"
+            widget: string
+          - name: haveCodeLink
+            label: "صفحة المتجر — رابط تفعيل الكود"
+            widget: string
+          - name: myItemsLink
+            label: "صفحة المتجر — رابط «موادي»"
+            widget: string
+          - name: cardButton
+            label: "الكارد — نص الرابط (لكل المنتجات)"
+            widget: string
+          - name: offerBadge
+            label: "الكارد — الشارة لما يكون في عرض"
+            widget: string
+          - name: buyButton
+            label: "صفحة المنتج — زر الشراء"
+            widget: string
+          - name: sampleButton
+            label: "صفحة المنتج — زر العيّنة"
+            widget: string
+            hint: "{n} = عدد أسئلة العيّنة"
+          - name: saveLabel
+            label: "صفحة المنتج — شارة التوفير"
+            widget: string
+            required: false
+            hint: "{p} = نسبة الخصم. فاضي = بدون شارة"
+          - name: trust
+            label: "صفحة المنتج — النقاط تحت الأزرار"
+            widget: list
+            hint: "نقطة بكل سطر"
+          - name: includesTitle
+            label: "صفحة المنتج — عنوان «شو بتاخد؟»"
+            widget: string
+          - name: endTitle
+            label: "صفحة المنتج — عنوان آخر الصفحة"
+            widget: string
+          - name: endButton
+            label: "صفحة المنتج — زر آخر الصفحة"
+            widget: string
+          - name: boughtText
+            label: "صفحة المنتج — «اشتريت قبل؟»"
+            widget: string
+          - name: boughtLink
+            label: "صفحة المنتج — رابط تفعيل الكود"
+            widget: string
+          - name: sampleEyebrow
+            label: "صفحة العيّنة — الكلمة الصغيرة"
+            widget: string
+          - name: sampleTitle
+            label: "صفحة العيّنة — العنوان"
+            widget: string
+          - name: sampleText
+            label: "صفحة العيّنة — الشرح"
+            widget: text
+            hint: "{n} = عدد أسئلة العيّنة، {total} = عدد أسئلة البنك"
+          - name: sampleBack
+            label: "صفحة العيّنة — رابط الرجوع"
+            widget: string
+          - name: sampleNext
+            label: "صفحة العيّنة — زر السؤال التالي"
+            widget: string
+          - name: sampleFinish
+            label: "صفحة العيّنة — زر آخر سؤال"
+            widget: string
+          - name: sampleCorrect
+            label: "صفحة العيّنة — لما الجواب صح"
+            widget: string
+          - name: sampleWrong
+            label: "صفحة العيّنة — لما الجواب غلط"
+            widget: string
+            hint: "{a} = حرف الجواب الصح"
+          - name: sampleEnglish
+            label: "صفحة العيّنة — رابط الشرح بالإنجليزي"
+            widget: string
+          - name: sampleDone
+            label: "صفحة العيّنة — رسالة النهاية"
+            widget: string
+            hint: "{score} = عدد الإجابات الصح، {n} = عدد أسئلة العيّنة"
+          - name: sampleDoneText
+            label: "صفحة العيّنة — سطر تحت رسالة النهاية"
+            widget: text
+            required: false
+            hint: "{total} = عدد أسئلة البنك. فاضي = بدون سطر"
+          - name: cliqAlias
+            label: "الدفع — CliQ Alias"
+            widget: string
+            required: false
+          - name: bankName
+            label: "الدفع — اسم البنك"
+            widget: string
+            required: false
+          - name: accountName
+            label: "الدفع — اسم صاحب الحساب"
+            widget: string
+            required: false
+          - name: iban
+            label: "الدفع — IBAN"
+            widget: string
+            required: false
+          - name: whatsapp
+            label: "الدفع — رقم واتساب للتواصل (اختياري)"
+            widget: string
+            required: false
+            hint: "بالصيغة الدولية، مثلاً 9627XXXXXXXX"
+          - name: holdHours
+            label: "الدفع — كم ساعة بيضل الطلب محجوز بدون إثبات"
+            widget: number
+            value_type: int
+            min: 1
+            default: 48
+          - name: payNote
+            label: "الدفع — ملاحظة إضافية للمشتري"
+            widget: text
+            required: false
 
       - name: announcements
         label: "شريط الأخبار"

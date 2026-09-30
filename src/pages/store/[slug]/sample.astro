@@ -1,0 +1,77 @@
+---
+// صفحة العيّنة المجانية: أول N أسئلة من بنك المنتج (N من لوحة التحكم) + شريط سعر ثابت.
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import SampleQuiz from '../../../components/store/SampleQuiz.astro';
+import { STORE_OPEN, jod, getStoreSettings, tpl } from '../../../lib/store';
+import { getBank } from '../../../lib/banks';
+
+export async function getStaticPaths() {
+  if (!STORE_OPEN) return [];
+  const products = (await getCollection('products')).filter((p) => !p.data.draft && p.data.sampleEnabled);
+  return products
+    .filter((p) => getBank(p.id).length > 0)
+    .map((product) => ({ params: { slug: product.id }, props: { product } }));
+}
+
+const { product } = Astro.props;
+const { data } = product;
+const t = await getStoreSettings();
+const bank = getBank(product.id);
+const n = Math.min(Math.max(1, Math.round(data.sampleCount)), bank.length);
+const items = bank.slice(0, n);
+const finalPrice = data.offerPrice ?? data.price;
+const orderHref = `/store/${product.id}/order/`;
+---
+
+<Base title={`${data.sampleTitle || t.sampleTitle} — ${data.title}`} description={tpl(data.sampleText || t.sampleText, { n, total: bank.length })} image={data.cover} noindex hideChat>
+  <div class="wrap spage">
+    <a class="back" href={`/store/${product.id}/`}>{t.sampleBack}</a>
+    <header class="shead">
+      <span class="eyebrow">{data.sampleEyebrow || t.sampleEyebrow}</span>
+      <h1>{data.sampleTitle || t.sampleTitle}</h1>
+      <p class="pname">{data.title}</p>
+      <p class="stext">{tpl(data.sampleText || t.sampleText, { n, total: bank.length })}</p>
+    </header>
+
+    <SampleQuiz
+      items={items}
+      total={bank.length}
+      labels={{ next: t.sampleNext, finish: t.sampleFinish, correct: t.sampleCorrect, wrong: t.sampleWrong, english: t.sampleEnglish, done: t.sampleDone, doneText: t.sampleDoneText }}
+    />
+  </div>
+
+  <div class="buybar" role="region" aria-label={data.title}>
+    <div class="wrap buyin">
+      <div class="bb-info">
+        <strong>{data.cardTitle || data.title}</strong>
+        <span><b>{jod(finalPrice)}</b>{data.offerPrice != null && <s>{jod(data.price)}</s>}</span>
+      </div>
+      <a class="btn btn-primary btn-sm" href={orderHref} data-track="store_sample_buy">{data.buyButton || t.buyButton}</a>
+    </div>
+  </div>
+</Base>
+
+<script>
+  document.querySelector<HTMLAnchorElement>('[data-track="store_sample_buy"]')?.addEventListener('click', () =>
+    window.taTrack?.('store_sample_buy', { page: location.pathname }),
+  );
+</script>
+
+<style>
+  .spage { max-width: 860px; padding-block: 24px 130px; }
+  .back { display: inline-block; font-size: 14.5px; color: var(--muted); margin-bottom: 18px; }
+  .back:hover { color: var(--cyan); }
+  .shead { margin-bottom: 18px; }
+  .shead h1 { font-size: clamp(24px, 3vw, 32px); margin: 6px 0 4px; }
+  .pname { color: var(--cyan); font-weight: 700; margin: 0 0 8px; }
+  .stext { color: var(--muted); line-height: 1.9; margin: 0; }
+  .buybar { position: fixed; inset-inline: 0; bottom: 0; z-index: 50; background: var(--head-bg); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line-strong); padding-bottom: env(safe-area-inset-bottom); }
+  .buyin { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 68px; }
+  .bb-info { display: flex; flex-direction: column; min-width: 0; }
+  .bb-info strong { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bb-info b { color: var(--orange); font-size: 18px; }
+  .bb-info s { color: var(--faint); font-size: 13.5px; margin-inline-start: 8px; }
+  .buyin .btn { flex: none; }
+</style>

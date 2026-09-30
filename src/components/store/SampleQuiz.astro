@@ -1,25 +1,30 @@
 ---
 /**
- * عيّنة مجانية تفاعلية من بنك الأسئلة (أول 10 أسئلة بس — الباقي ما بيوصل للمتصفح).
- * السؤال بالإنجليزي زي الامتحان، والترجمة والشرح بالعربي.
+ * أسئلة العيّنة التفاعلية. بتوصلها بس أسئلة العيّنة (الباقي ما بيوصل للمتصفح).
+ * كل النصوص جاية من «إعدادات المتجر» بلوحة التحكم.
  */
-interface Item { n: number; ch: number; q: string; qAr: string; o: Record<string, string>; a: string; exAr: string; exEn: string }
-interface Props { items: Item[]; total: number; buyHref: string }
-const { items, total, buyHref } = Astro.props;
+import type { BankItem } from '../../lib/banks';
+import { tpl } from '../../lib/store';
+
+interface Labels { next: string; finish: string; correct: string; wrong: string; english: string; done: string; doneText: string }
+interface Props { items: BankItem[]; total: number; labels: Labels }
+const { items, total, labels } = Astro.props;
+const n = items.length;
 ---
 
-<div class="sq" data-sq>
+<div class="sq" data-sq data-wrong={labels.wrong} data-next={labels.next} data-finish={labels.finish}
+  data-done={tpl(labels.done, { n, total })} data-correct={labels.correct}>
   <div class="sq-top">
-    <span class="sq-num" data-num>1 / {items.length}</span>
+    <span class="sq-num" data-num>1 / {n}</span>
     <div class="sq-bar"><i data-bar></i></div>
-    <span class="sq-score" data-score>0 صح</span>
+    <span class="sq-score"><b data-score>0</b> ✓</span>
   </div>
 
   {items.map((it, i) => (
     <article class="sq-q" data-q={i} data-a={it.a} hidden={i !== 0}>
       <span class="sq-ch">Chapter {it.ch}</span>
-      <h3 class="sq-en" dir="ltr">{it.q}</h3>
-      <p class="sq-ar">{it.qAr}</p>
+      <h2 class="sq-en" dir="ltr">{it.q}</h2>
+      {it.qAr && <p class="sq-ar">{it.qAr}</p>}
       <div class="sq-opts" dir="ltr">
         {Object.entries(it.o).map(([k, v]) => (
           <button type="button" class="sq-opt" data-k={k}><b>{k}</b><span>{v}</span></button>
@@ -27,45 +32,41 @@ const { items, total, buyHref } = Astro.props;
       </div>
       <div class="sq-ex" data-ex hidden>
         <p class="sq-verdict" data-verdict></p>
-        <p class="sq-exar">{it.exAr}</p>
-        <details><summary>الشرح بالإنجليزي</summary><p dir="ltr">{it.exEn}</p></details>
+        {it.exAr ? <p class="sq-exar">{it.exAr}</p> : <p class="sq-exar" dir="ltr">{it.exEn}</p>}
+        {it.exAr && <details><summary>{labels.english}</summary><p dir="ltr">{it.exEn}</p></details>}
       </div>
     </article>
   ))}
 
   <div class="sq-nav">
-    <button type="button" class="btn btn-primary btn-sm" data-next disabled>السؤال التالي ←</button>
+    <button type="button" class="btn btn-primary btn-sm" data-go disabled>{n > 1 ? labels.next : labels.finish}</button>
   </div>
 
   <div class="sq-end" data-end hidden>
-    <p class="sq-big"><b data-final>0</b> / {items.length}</p>
-    <p class="sq-msg" data-msg></p>
-    <p class="sq-more">هاي أول {items.length} أسئلة من أصل <b>{total}</b>، مع امتحان تجريبي كامل وتدريب حسب الفصل.</p>
-    <div class="sq-acts">
-      <a class="btn btn-primary" href={buyHref}>بدي البنك كامل ←</a>
-      <button type="button" class="btn btn-ghost" data-retry>أعد العيّنة</button>
-    </div>
+    <p class="sq-done" data-donemsg></p>
+    {labels.doneText && <p class="sq-more">{tpl(labels.doneText, { n, total })}</p>}
   </div>
 </div>
 
 <script>
   document.querySelectorAll<HTMLElement>('[data-sq]').forEach((root) => {
     const qs = [...root.querySelectorAll<HTMLElement>('.sq-q')];
-    const next = root.querySelector<HTMLButtonElement>('[data-next]')!;
+    const go = root.querySelector<HTMLButtonElement>('[data-go]')!;
     const num = root.querySelector<HTMLElement>('[data-num]')!;
     const bar = root.querySelector<HTMLElement>('[data-bar]')!;
     const scoreEl = root.querySelector<HTMLElement>('[data-score]')!;
     const end = root.querySelector<HTMLElement>('[data-end]')!;
     const nav = root.querySelector<HTMLElement>('.sq-nav')!;
+    const L = root.dataset;
     let cur = 0, score = 0;
 
     const paint = () => {
       num.textContent = `${Math.min(cur + 1, qs.length)} / ${qs.length}`;
-      bar.style.width = `${(cur / qs.length) * 100}%`;
-      scoreEl.textContent = `${score} صح`;
+      bar.style.width = `${(Math.min(cur + (qs[cur]?.dataset.done ? 1 : 0), qs.length) / qs.length) * 100}%`;
+      scoreEl.textContent = String(score);
     };
 
-    qs.forEach((q) => {
+    qs.forEach((q) =>
       q.querySelectorAll<HTMLButtonElement>('.sq-opt').forEach((b) =>
         b.addEventListener('click', () => {
           if (q.dataset.done) return;
@@ -78,47 +79,31 @@ const { items, total, buyHref } = Astro.props;
             else if (o === b) o.classList.add('bad');
           });
           const v = q.querySelector<HTMLElement>('[data-verdict]')!;
-          v.textContent = ok ? '✓ جوابك صح' : `✗ الجواب الصح هو ${q.dataset.a}`;
+          v.textContent = ok ? L.correct! : L.wrong!.replace('{a}', q.dataset.a!);
           v.className = 'sq-verdict ' + (ok ? 'ok' : 'bad');
           q.querySelector<HTMLElement>('[data-ex]')!.hidden = false;
-          next.disabled = false;
-          next.textContent = cur === qs.length - 1 ? 'شوف نتيجتك ←' : 'السؤال التالي ←';
+          go.disabled = false;
+          go.textContent = cur === qs.length - 1 ? L.finish! : L.next!;
           paint();
           window.taTrack?.('store_sample_answer', { q: cur + 1, ok });
         }),
-      );
-    });
+      ),
+    );
 
-    next.addEventListener('click', () => {
+    go.addEventListener('click', () => {
       qs[cur].hidden = true;
       cur++;
-      next.disabled = true;
+      go.disabled = true;
       if (cur >= qs.length) {
         nav.hidden = true;
         end.hidden = false;
-        bar.style.width = '100%';
-        root.querySelector<HTMLElement>('[data-final]')!.textContent = String(score);
-        const r = score / qs.length;
-        root.querySelector<HTMLElement>('[data-msg]')!.textContent =
-          r >= 0.8 ? 'ممتاز! إنت بالطريق الصح 🎯' : r >= 0.65 ? 'منيح، بس بدها شوية تدريب كمان 💪' : 'لا تقلق، هون بالضبط بيفرق التدريب 📚';
+        root.querySelector<HTMLElement>('[data-donemsg]')!.textContent = L.done!.replace('{score}', String(score));
         window.taTrack?.('store_sample_done', { score });
       } else {
         qs[cur].hidden = false;
       }
       paint();
       root.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-
-    root.querySelector('[data-retry]')?.addEventListener('click', () => {
-      cur = 0; score = 0;
-      qs.forEach((q, i) => {
-        delete q.dataset.done;
-        q.hidden = i !== 0;
-        q.querySelector<HTMLElement>('[data-ex]')!.hidden = true;
-        q.querySelectorAll<HTMLButtonElement>('.sq-opt').forEach((o) => { o.disabled = false; o.classList.remove('ok', 'bad'); });
-      });
-      end.hidden = true; nav.hidden = false; next.disabled = true;
-      paint();
     });
     paint();
   });
@@ -135,7 +120,7 @@ const { items, total, buyHref } = Astro.props;
   .sq-ch { display: inline-block; font-size: 12.5px; font-weight: 700; color: var(--cyan); background: var(--cyan-soft); padding: 2px 12px; border-radius: 999px; direction: ltr; }
   .sq-en { font-size: 19px; line-height: 1.55; margin: 12px 0 6px; text-align: left; }
   .sq-ar { color: var(--muted); font-size: 15px; line-height: 1.8; margin: 0 0 16px; }
-  .sq-opts { display: grid; gap: 10px; }
+  .sq-opts { display: grid; gap: 10px; margin-top: 12px; }
   .sq-opt { font: inherit; display: flex; gap: 12px; align-items: flex-start; text-align: left; width: 100%; padding: 12px 14px; border-radius: 12px;
     border: 1.5px solid var(--line-strong); background: transparent; color: var(--ink); cursor: pointer; font-size: 15px; line-height: 1.6; transition: border-color .15s, background .15s; }
   .sq-opt b { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--faint); display: grid; place-items: center; font-size: 13px; }
@@ -155,11 +140,8 @@ const { items, total, buyHref } = Astro.props;
   .sq-nav { display: flex; justify-content: flex-end; margin-top: 16px; }
   .sq-nav[hidden], .sq-end[hidden], .sq-ex[hidden], .sq-q[hidden] { display: none; }
   .sq-nav .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
-  .sq-end { text-align: center; padding: 10px 0; }
-  .sq-big { font-size: 22px; color: var(--muted); margin: 0; direction: ltr; }
-  .sq-big b { font-size: 54px; color: var(--ink); }
-  .sq-msg { font-size: 18px; font-weight: 700; margin: 6px 0; }
-  .sq-more { color: var(--muted); line-height: 1.8; }
-  .sq-acts { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+  .sq-end { text-align: center; padding: 18px 0 6px; }
+  .sq-done { font-size: 20px; font-weight: 700; margin: 0 0 6px; }
+  .sq-more { color: var(--muted); line-height: 1.8; margin: 0; }
   @media (max-width: 600px) { .sq { padding: 16px; } .sq-en { font-size: 17px; } .sq-opt { font-size: 14.5px; } }
 </style>

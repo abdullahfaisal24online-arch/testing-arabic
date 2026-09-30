@@ -1,0 +1,1325 @@
+{
+ "product": "ctfl-questions",
+ "items": [
+  {
+   "n": 1,
+   "ch": 1,
+   "q": "Which of the following statements best describes a primary objective of testing?",
+   "o": {
+    "A": "Proving that the software contains no remaining defects",
+    "B": "Preventing defects by evaluating work products such as requirements and designs",
+    "C": "Producing the highest possible failure rate so developers can be assessed",
+    "D": "Giving stakeholders full certainty that the product is free of bugs"
+   },
+   "a": "B",
+   "exEn": "Testing is not only dynamic execution: evaluating work products early prevents defects before they reach the code.",
+   "qAr": "أي عبارة تصف بشكل أفضل أحد الأهداف الرئيسية للاختبار؟",
+   "exAr": "الاختبار ليس تنفيذاً للكود فقط؛ تقييم مخرجات العمل مبكراً يمنع الـ defects قبل أن تصل إلى الكود."
+  },
+  {
+   "n": 2,
+   "ch": 1,
+   "q": "What is the key difference between testing and debugging?",
+   "o": {
+    "A": "Testing reveals failures caused by defects, while debugging locates, analyzes and fixes the cause",
+    "B": "Testing is performed only by developers, while debugging is performed only by testers",
+    "C": "Testing prevents defects, while debugging checks whether requirements are satisfied",
+    "D": "Testing is a reactive activity, while debugging is a preventive quality assurance activity"
+   },
+   "a": "A",
+   "exEn": "Dynamic testing shows failures caused by defects; debugging is the development activity that finds, fixes and verifies the cause.",
+   "qAr": "ما الفرق الرئيسي بين الـ testing والـ debugging؟",
+   "exAr": "الاختبار الديناميكي يُظهر الأعطال الناتجة عن الـ defects، بينما الـ debugging نشاط تطويري يحدد السبب ويصلحه ويتحقق من الإصلاح."
+  },
+  {
+   "n": 3,
+   "ch": 1,
+   "q": "Why is testing necessary in software development?",
+   "o": {
+    "A": "It ensures the software will never experience an operational failure",
+    "B": "It completely replaces code reviews and architecture inspections",
+    "C": "It reduces the risk of failure during operation and helps satisfy contractual and regulatory requirements",
+    "D": "It guarantees that the software is released ahead of schedule"
+   },
+   "a": "C",
+   "exEn": "Testing lowers risk, gives information about quality, and can be required by contracts or regulations.",
+   "qAr": "لماذا يُعدّ الاختبار ضرورياً في تطوير البرمجيات؟",
+   "exAr": "الاختبار يقلل المخاطر ويوفّر معلومات عن الجودة، وقد يكون مطلوباً تعاقدياً أو تنظيمياً."
+  },
+  {
+   "n": 4,
+   "ch": 1,
+   "q": "Which testing principle states that testing can show that defects are present, but cannot prove that there are no defects?",
+   "o": {
+    "A": "Exhaustive testing is impossible",
+    "B": "Defects cluster together",
+    "C": "The absence-of-errors fallacy",
+    "D": "Testing shows the presence of defects, not their absence"
+   },
+   "a": "D",
+   "exEn": "This principle states that testing reduces the probability of undiscovered defects but can never prove correctness.",
+   "qAr": "أي مبدأ من مبادئ الاختبار ينص على أن الاختبار يُظهر وجود الـ defects ولا يمكنه إثبات عدم وجودها؟",
+   "exAr": "هذا المبدأ ينص على أن الاختبار يقلل احتمال وجود defects غير مكتشفة، لكنه لا يثبت خلو النظام منها."
+  },
+  {
+   "n": 5,
+   "ch": 1,
+   "q": "What is meant by the principle 'Exhaustive testing is impossible'?",
+   "o": {
+    "A": "Testing every combination of inputs and preconditions is not feasible except in trivial cases",
+    "B": "Automated tools cannot execute more than a fixed number of test cases per day",
+    "C": "Testing all combinations is feasible only for safety-critical systems",
+    "D": "Testing must stop as soon as the project budget is used up"
+   },
+   "a": "A",
+   "exEn": "Except for trivial software, the number of input and precondition combinations is far too large to cover; risk and priorities guide the effort instead.",
+   "qAr": "ما المقصود بمبدأ «الاختبار الشامل مستحيل» (exhaustive testing is impossible)؟",
+   "exAr": "باستثناء الحالات البسيطة جداً، عدد تركيبات المدخلات والشروط المسبقة أكبر من أن يُغطّى، لذا تُوجَّه الجهود حسب المخاطر والأولويات."
+  },
+  {
+   "n": 6,
+   "ch": 1,
+   "q": "Which of the following describes the 'Absence-of-errors fallacy'?",
+   "o": {
+    "A": "Assuming that finding and fixing defects guarantees success even if the system is unusable",
+    "B": "Assuming developers will not introduce defects if static analysis is performed",
+    "C": "Assuming that finding no defects means the system fits user needs and business goals",
+    "D": "Assuming automated tests will detect every regression"
+   },
+   "a": "C",
+   "exEn": "Even a defect-free build fails if it does not meet user needs and business objectives.",
+   "qAr": "أي مما يلي يصف مغالطة «غياب الأخطاء» (absence-of-errors fallacy)؟",
+   "exAr": "حتى النسخة الخالية من الـ defects تفشل إذا لم تلبِّ احتياجات المستخدمين وأهداف الأعمال."
+  },
+  {
+   "n": 7,
+   "ch": 1,
+   "q": "What is the relationship between an error, a defect, and a failure?",
+   "o": {
+    "A": "A failure made by a developer causes an error, which results in a defect",
+    "B": "A human error introduces a defect in the work product, and executing that defect may cause a failure",
+    "C": "A defect leads to an error, which then produces an operational failure",
+    "D": "An error is an operational flaw, while a failure is a flaw in the design documentation"
+   },
+   "a": "B",
+   "exEn": "Error (human mistake) → defect (in code or document) → failure (observed during execution).",
+   "qAr": "ما العلاقة بين الـ error والـ defect والـ failure؟",
+   "exAr": "خطأ بشري (error) ← يُنتج defect في الكود أو الوثيقة ← قد يؤدي إلى عطل (failure) أثناء التنفيذ."
+  },
+  {
+   "n": 8,
+   "ch": 1,
+   "q": "Which of the following is a key activity in the ISTQB test process?",
+   "o": {
+    "A": "Writing the production application code",
+    "B": "Negotiating the customer contract",
+    "C": "Procuring the hardware for the servers",
+    "D": "Test planning and test completion"
+   },
+   "a": "D",
+   "exEn": "The test process covers planning, monitoring and control, analysis, design, implementation, execution and completion.",
+   "qAr": "أي مما يلي يُعدّ نشاطاً أساسياً في عملية الاختبار وفقاً لـ ISTQB؟",
+   "exAr": "تشمل عملية الاختبار: التخطيط، المراقبة والتحكم، التحليل، التصميم، التنفيذ الفعلي والإعداد له، ثم الإنهاء."
+  },
+  {
+   "n": 9,
+   "ch": 1,
+   "q": "What is the primary role of 'Test Analysis' in the test process?",
+   "o": {
+    "A": "Determining HOW the tests will be executed",
+    "B": "Creating the execution schedule and assigning testers",
+    "C": "Writing the automated test scripts",
+    "D": "Determining WHAT to test by identifying and prioritizing test conditions"
+   },
+   "a": "D",
+   "exEn": "Test analysis examines the test basis to identify testable features and derive test conditions.",
+   "qAr": "ما الدور الرئيسي لـ test analysis في عملية الاختبار؟",
+   "exAr": "يحلل الـ test analysis أساس الاختبار لتحديد الخصائص القابلة للاختبار واشتقاق شروط الاختبار."
+  },
+  {
+   "n": 10,
+   "ch": 1,
+   "q": "Which activity is performed during 'Test Design'?",
+   "o": {
+    "A": "Elaborating test conditions into test cases and other testware",
+    "B": "Evaluating the testability of the requirements",
+    "C": "Assembling test suites and preparing the test data and environment",
+    "D": "Logging defect reports in a tracking tool"
+   },
+   "a": "A",
+   "exEn": "Test design answers HOW to test by turning test conditions into concrete test cases and test data requirements.",
+   "qAr": "ما النشاط الذي يُنفَّذ خلال مرحلة الـ test design؟",
+   "exAr": "يجيب الـ test design عن «كيف نختبر» بتحويل شروط الاختبار إلى حالات اختبار ومتطلبات بيانات."
+  },
+  {
+   "n": 11,
+   "ch": 1,
+   "q": "Which skill is essential for a software tester?",
+   "o": {
+    "A": "Deep expertise in graphic design",
+    "B": "Authority to approve legal contracts",
+    "C": "Expertise in network cabling infrastructure",
+    "D": "Critical thinking combined with domain knowledge"
+   },
+   "a": "D",
+   "exEn": "Testers need critical thinking, curiosity, attention to detail, communication and domain knowledge."
+  },
+  {
+   "n": 12,
+   "ch": 1,
+   "q": "What is an advantage of independent testing?",
+   "o": {
+    "A": "Independent testers do not need any domain knowledge",
+    "B": "Independent testing removes the need for developer component testing",
+    "C": "Independent testers take ownership of product management decisions",
+    "D": "Independent testers are unbiased and tend to notice different types of defects"
+   },
+   "a": "D",
+   "exEn": "Independence brings objectivity and challenges the assumptions made by the authors of the work product."
+  },
+  {
+   "n": 13,
+   "ch": 1,
+   "q": "Which statement describes the 'Pesticide Paradox'?",
+   "o": {
+    "A": "Repeating the same tests will eventually stop finding new defects",
+    "B": "Automated tests always find more defects than manual tests",
+    "C": "Defects are always concentrated in a single module of the application",
+    "D": "Early testing prevents the occurrence of fatal system crashes"
+   },
+   "a": "A",
+   "exEn": "Test cases need to be reviewed and revised regularly, and new tests written, to keep finding defects."
+  },
+  {
+   "n": 14,
+   "ch": 1,
+   "q": "What is the difference between Quality Assurance (QA) and testing?",
+   "o": {
+    "A": "QA is dynamic execution, while testing is static review",
+    "B": "QA is performed only after deployment, while testing is performed during development",
+    "C": "QA is done only by external auditors, while testing is done by internal teams",
+    "D": "QA focuses on the process and on preventing defects, while testing is a form of quality control focused on detecting them"
+   },
+   "a": "D",
+   "exEn": "QA is process-oriented and preventive; testing is part of quality control and is product-oriented."
+  },
+  {
+   "n": 15,
+   "ch": 1,
+   "q": "Traceability between the test basis and the test work products helps to:",
+   "o": {
+    "A": "Remove the need to keep test execution logs",
+    "B": "Determine test coverage and assess the impact of changes to the requirements",
+    "C": "Guarantee fully automated regression testing",
+    "D": "Shorten the project schedule automatically"
+   },
+   "a": "B",
+   "exEn": "Traceability supports coverage analysis, impact analysis, auditability and clearer status reporting."
+  },
+  {
+   "n": 16,
+   "ch": 2,
+   "q": "In any Software Development Lifecycle (SDLC) model, good testing practice dictates that:",
+   "o": {
+    "A": "Dynamic test execution begins during requirements gathering",
+    "B": "Every development activity has a corresponding test activity",
+    "C": "Testers review the code only after system integration",
+    "D": "Test design starts only after all coding is complete"
+   },
+   "a": "B",
+   "exEn": "Each development activity should be matched by a test activity so that defects are found as early as possible."
+  },
+  {
+   "n": 17,
+   "ch": 2,
+   "q": "Which of the following is a core principle of shift-left in software testing?",
+   "o": {
+    "A": "Postponing acceptance testing until end users request it",
+    "B": "Moving test execution to night shifts to save server resources",
+    "C": "Replacing dynamic functional testing with user surveys",
+    "D": "Starting test activities early in the SDLC so defects are found before the code is executed"
+   },
+   "a": "D",
+   "exEn": "Shift-left moves testing activities earlier, including reviews of requirements and designs, to catch defects sooner and cheaper."
+  },
+  {
+   "n": 18,
+   "ch": 2,
+   "q": "In Agile software development, how are testing activities typically integrated?",
+   "o": {
+    "A": "Testing takes place in a separate sprint at the end of the release cycle",
+    "B": "Testing is integrated continuously within each iteration using a whole-team approach",
+    "C": "Testing is performed only by external agencies after deployment",
+    "D": "Testing is skipped when user stories pass developer peer review"
+   },
+   "a": "B",
+   "exEn": "Agile relies on a whole-team approach in which testing runs continuously inside every iteration."
+  },
+  {
+   "n": 19,
+   "ch": 2,
+   "q": "What is the primary focus of component (unit) testing?",
+   "o": {
+    "A": "Testing individually testable components or modules in isolation",
+    "B": "Verifying end-to-end business workflows across several external systems",
+    "C": "Assessing system behavior under extreme load",
+    "D": "Verifying installation procedures on the target hardware"
+   },
+   "a": "A",
+   "exEn": "Component testing targets components that can be tested separately, such as functions, classes and modules."
+  },
+  {
+   "n": 20,
+   "ch": 2,
+   "q": "Component integration testing focuses on:",
+   "o": {
+    "A": "The resilience of third-party cloud data centers",
+    "B": "User satisfaction with the interface layout",
+    "C": "Backup and disaster recovery procedures",
+    "D": "The interactions and interfaces between integrated components"
+   },
+   "a": "D",
+   "exEn": "It verifies the interfaces and interactions between components after they have been tested individually."
+  },
+  {
+   "n": 21,
+   "ch": 2,
+   "q": "Which test level focuses on verifying that the complete integrated system meets the specified system requirements?",
+   "o": {
+    "A": "Component testing",
+    "B": "Component integration testing",
+    "C": "Acceptance testing",
+    "D": "System testing"
+   },
+   "a": "D",
+   "exEn": "System testing evaluates the behavior and capabilities of the whole integrated system against system requirements."
+  },
+  {
+   "n": 22,
+   "ch": 2,
+   "q": "What is the main objective of acceptance testing?",
+   "o": {
+    "A": "Finding hidden memory leaks in low-level algorithms",
+    "B": "Establishing confidence that the system is ready for release and meets the business needs",
+    "C": "Verifying that API payloads match the schema specification",
+    "D": "Ensuring code coverage reaches its target across all classes"
+   },
+   "a": "B",
+   "exEn": "Acceptance testing builds confidence in release readiness rather than aiming primarily to find defects."
+  },
+  {
+   "n": 23,
+   "ch": 2,
+   "q": "Which form of acceptance testing is conducted by potential customers at the developing organization's site?",
+   "o": {
+    "A": "Alpha testing",
+    "B": "Beta testing",
+    "C": "Operational acceptance testing",
+    "D": "Contractual acceptance testing"
+   },
+   "a": "A",
+   "exEn": "Alpha testing happens at the developer's site; beta testing happens at the customer's own site."
+  },
+  {
+   "n": 24,
+   "ch": 2,
+   "q": "What is functional testing primarily concerned with?",
+   "o": {
+    "A": "How fast the system performs a task and how quickly it responds",
+    "B": "What the system should do, based on its functions and user requirements",
+    "C": "How easy the software is to learn and operate",
+    "D": "How easily the software can be moved to another environment"
+   },
+   "a": "B",
+   "exEn": "Functional testing evaluates the functions the system should perform — the 'what'."
+  },
+  {
+   "n": 25,
+   "ch": 2,
+   "q": "Non-functional testing includes evaluating which of the following characteristics?",
+   "o": {
+    "A": "Business rules and boundary values",
+    "B": "Acceptance criteria of user stories",
+    "C": "Performance efficiency, usability, security and reliability",
+    "D": "Database column definitions"
+   },
+   "a": "C",
+   "exEn": "Non-functional testing measures quality characteristics — how well the system behaves rather than what it does."
+  },
+  {
+   "n": 26,
+   "ch": 2,
+   "q": "What is the primary purpose of regression testing?",
+   "o": {
+    "A": "Verifying that a previously reported defect has been fixed",
+    "B": "Detecting unintended side effects introduced into unchanged parts of the software by recent changes",
+    "C": "Evaluating interface layout options for better accessibility",
+    "D": "Training new testers on the system"
+   },
+   "a": "B",
+   "exEn": "Regression testing looks for side effects in areas that were not changed; confirming a specific fix is confirmation testing. .confirmation testing"
+  },
+  {
+   "n": 27,
+   "ch": 2,
+   "q": "What is confirmation testing (re-testing)?",
+   "o": {
+    "A": "Re-running the entire test suite on every nightly build",
+    "B": "Reviewing features with business owners to confirm the requirements",
+    "C": "Running load tests to confirm server capacity",
+    "D": "Testing performed after a defect is fixed to confirm that the original defect is resolved"
+   },
+   "a": "D",
+   "exEn": "Confirmation testing re-executes the failing test to verify that the reported defect has actually been fixed."
+  },
+  {
+   "n": 28,
+   "ch": 2,
+   "q": "Maintenance testing is triggered by which of the following events?",
+   "o": {
+    "A": "The initial drafting of the software architecture document",
+    "B": "Modification, upgrade, migration or retirement of an existing operational system",
+    "C": "The execution of component tests during initial development",
+    "D": "Hiring new developers in the engineering department"
+   },
+   "a": "B",
+   "exEn": "Maintenance testing applies to a system already in operation when it is changed, migrated or retired."
+  },
+  {
+   "n": 29,
+   "ch": 2,
+   "q": "Impact analysis is used during maintenance testing to:",
+   "o": {
+    "A": "Estimate the cost of the maintenance team",
+    "B": "Assess the changes and determine the extent of regression testing required",
+    "C": "Evaluate the response time of the production database",
+    "D": "Generate user manuals automatically"
+   },
+   "a": "B",
+   "exEn": "Impact analysis identifies the areas affected by a change so the right amount of regression testing can be planned."
+  },
+  {
+   "n": 30,
+   "ch": 2,
+   "q": "Which statement about test levels and test types is TRUE?",
+   "o": {
+    "A": "Functional testing can be performed only at the system test level",
+    "B": "Regression testing applies exclusively to component testing",
+    "C": "Acceptance testing should never include non-functional evaluation",
+    "D": "Non-functional testing can be performed at every test level"
+   },
+   "a": "D",
+   "exEn": "Any test type — functional, non-functional, black-box or white-box — can be applied at any test level."
+  },
+  {
+   "n": 31,
+   "ch": 2,
+   "q": "What is the effect of DevOps on testing?",
+   "o": {
+    "A": "It removes the need for automated continuous integration builds",
+    "B": "It restricts testing to manual user testing performed quarterly",
+    "C": "It replaces quality assurance with system administration",
+    "D": "It promotes automated, continuous testing integrated into the CI/CD pipeline"
+   },
+   "a": "D",
+   "exEn": "DevOps relies on continuous integration and delivery, so tests run automatically on every change to give fast feedback."
+  },
+  {
+   "n": 32,
+   "ch": 3,
+   "q": "Which work products can be evaluated using static testing techniques?",
+   "o": {
+    "A": "Executable binaries during system runtime only",
+    "B": "The physical hardware of the network servers",
+    "C": "Requirements specifications, architecture designs, user stories, test cases and source code",
+    "D": "CPU performance under stress conditions"
+   },
+   "a": "C",
+   "exEn": "Static testing can evaluate almost any readable work product, without executing the software."
+  },
+  {
+   "n": 33,
+   "ch": 3,
+   "q": "What is a major advantage of static testing compared to dynamic testing?",
+   "o": {
+    "A": "It executes the code faster than dynamic test tools",
+    "B": "It detects defects early, when they are cheaper to fix",
+    "C": "It guarantees full automation coverage",
+    "D": "It removes the need for acceptance testing"
+   },
+   "a": "B",
+   "exEn": "Defects found by reviews and static analysis are removed before execution, which is significantly cheaper."
+  },
+  {
+   "n": 34,
+   "ch": 3,
+   "q": "Which of the following defect types is easier to discover using static testing than dynamic testing?",
+   "o": {
+    "A": "Database bottlenecks appearing under heavy load",
+    "B": "Memory leaks that appear after long execution",
+    "C": "Inconsistencies, omissions and contradictions in the requirements",
+    "D": "Hardware driver compatibility crashes"
+   },
+   "a": "C",
+   "exEn": "Requirement defects, ambiguities and standard violations are naturally exposed by reviews, not by execution."
+  },
+  {
+   "n": 35,
+   "ch": 3,
+   "q": "Which review type is informal, has no formal documented process, and is commonly used between peers for quick feedback?",
+   "o": {
+    "A": "Inspection",
+    "B": "Technical review",
+    "C": "Walkthrough",
+    "D": "Informal review"
+   },
+   "a": "D",
+   "exEn": "An informal review follows no defined process and produces no mandatory documented output."
+  },
+  {
+   "n": 36,
+   "ch": 3,
+   "q": "Which formal review role leads the review meeting and is responsible for the overall success of the review?",
+   "o": {
+    "A": "The facilitator (moderator)",
+    "B": "The author",
+    "C": "The scribe (recorder)",
+    "D": "The management representative"
+   },
+   "a": "A",
+   "exEn": "The facilitator runs the meeting, manages the time and mediates between the participants."
+  },
+  {
+   "n": 37,
+   "ch": 3,
+   "q": "What is the primary role of the scribe (recorder) during a review meeting?",
+   "o": {
+    "A": "Recording the findings, defects and open decisions raised during the meeting",
+    "B": "Presenting the document to the review team",
+    "C": "Approving the budget needed to fix the defects",
+    "D": "Running the static analysis tools"
+   },
+   "a": "A",
+   "exEn": "The scribe collects the anomalies, decisions and recommendations raised in the meeting."
+  },
+  {
+   "n": 38,
+   "ch": 3,
+   "q": "Which review type is the most formal, is led by a trained moderator, and uses entry/exit criteria and metrics?",
+   "o": {
+    "A": "Walkthrough",
+    "B": "Informal review",
+    "C": "Inspection",
+    "D": "Technical review"
+   },
+   "a": "C",
+   "exEn": "Inspection is the most formal review type, based on rules, checklists, defined roles, metrics and entry/exit criteria."
+  },
+  {
+   "n": 39,
+   "ch": 3,
+   "q": "In a review process, what happens during the individual review (preparation) phase?",
+   "o": {
+    "A": "The author fixes all the defects found so far",
+    "B": "The facilitator decides whether the project should continue",
+    "C": "Reviewers examine the work product individually and record potential defects and questions",
+    "D": "The scribe logs the defects into the tracking tool"
+   },
+   "a": "C",
+   "exEn": "Each reviewer studies the work product alone and notes anomalies before the review meeting takes place."
+  },
+  {
+   "n": 40,
+   "ch": 3,
+   "q": "Which factor is critical for the success of reviews in an organization?",
+   "o": {
+    "A": "Using review results to evaluate the performance of individual staff",
+    "B": "Eliminating dynamic testing once reviews are in place",
+    "C": "Reviewing only software that has already been deployed",
+    "D": "Clear objectives, active management support and a culture that makes participants feel safe"
+   },
+   "a": "D",
+   "exEn": "Reviews succeed when the goals are clear, management supports them, and people are not punished for what is found."
+  },
+  {
+   "n": 41,
+   "ch": 3,
+   "q": "What is a main characteristic of a walkthrough?",
+   "o": {
+    "A": "It is led by the author, who guides participants through the work product to gather feedback",
+    "B": "It is led by an external auditor to evaluate team compliance",
+    "C": "It is an unstructured meeting held without the author",
+    "D": "It is carried out exclusively by static analysis tools"
+   },
+   "a": "A",
+   "exEn": "In a walkthrough the author presents the work product and the participants raise questions and comments."
+  },
+  {
+   "n": 42,
+   "ch": 3,
+   "q": "Which static technique reviews a work product from a specific stakeholder viewpoint, such as end user, maintainer or tester?",
+   "o": {
+    "A": "Checklist-based review",
+    "B": "Ad-hoc review",
+    "C": "Perspective-based (role-based) reading",
+    "D": "Decision table review"
+   },
+   "a": "C",
+   "exEn": "Perspective-based reading asks each reviewer to evaluate the document as one specific stakeholder would."
+  },
+  {
+   "n": 43,
+   "ch": 4,
+   "q": "Black-box test techniques are primarily based on:",
+   "o": {
+    "A": "Analysis of the internal structure and source code of the system",
+    "B": "The experience and intuition of senior QA engineers",
+    "C": "System architecture diagrams and database schemas",
+    "D": "Analysis of the specified requirements, interfaces and functional specifications, without looking at the code"
+   },
+   "a": "D",
+   "exEn": "Black-box techniques derive test cases from the specification, independently of the internal implementation."
+  },
+  {
+   "n": 44,
+   "ch": 4,
+   "q": "White-box test techniques focus on:",
+   "o": {
+    "A": "Business process models and acceptance criteria",
+    "B": "Accessibility standards for the user interface",
+    "C": "The internal structure of the code, its control flows and data flows",
+    "D": "Feedback collected from users during beta testing"
+   },
+   "a": "C",
+   "exEn": "White-box techniques derive tests from the internal structure and measure structural coverage."
+  },
+  {
+   "n": 45,
+   "ch": 4,
+   "q": "Experience-based test techniques rely heavily on:",
+   "o": {
+    "A": "Formal decision tables and state transition matrices",
+    "B": "Code coverage measurement tools",
+    "C": "Automated regression execution logs",
+    "D": "The knowledge, background and intuition of the tester"
+   },
+   "a": "D",
+   "exEn": "They use the tester's skill, domain knowledge and awareness of likely defects to design tests."
+  },
+  {
+   "n": 46,
+   "ch": 4,
+   "q": "In equivalence partitioning, partitions are divided into:",
+   "o": {
+    "A": "Both valid and invalid partitions",
+    "B": "Valid partitions only",
+    "C": "Invalid partitions only",
+    "D": "Dynamic and static partitions"
+   },
+   "a": "A",
+   "exEn": "Equivalence partitioning covers accepted (valid) values and rejected (invalid) values alike."
+  },
+  {
+   "n": 47,
+   "ch": 4,
+   "q": "An input field accepts integer values from 1 to 10 inclusive. Which values are tested in 2-value Boundary Value Analysis?",
+   "o": {
+    "A": "1, 10",
+    "B": "0, 1, 10, 11",
+    "C": "0, 1, 2, 9, 10, 11",
+    "D": "1, 5, 10"
+   },
+   "a": "B",
+   "exEn": "2-value BVA tests each boundary and its closest neighbour outside the partition: 1 and 10 with 0 and 11."
+  },
+  {
+   "n": 48,
+   "ch": 4,
+   "q": "What is a major strength of decision table testing?",
+   "o": {
+    "A": "It provides high statement coverage for object-oriented code",
+    "B": "It systematically captures complex business logic made of combinations of conditions and actions",
+    "C": "It measures the response time of API requests",
+    "D": "It identifies missing database indexes"
+   },
+   "a": "B",
+   "exEn": "Decision tables make combinations of conditions explicit, so no important combination is silently missed."
+  },
+  {
+   "n": 49,
+   "ch": 4,
+   "q": "State transition testing is best suited for systems that:",
+   "o": {
+    "A": "Move between different states depending on events and current state",
+    "B": "Contain independent mathematical algorithms with no stored state",
+    "C": "Consist only of static pages with text content",
+    "D": "Process bulk batch files sequentially"
+   },
+   "a": "A",
+   "exEn": "The technique models states, events, transitions and actions, so it fits systems whose behavior depends on history."
+  },
+  {
+   "n": 50,
+   "ch": 4,
+   "q": "In statement testing, what represents 100% statement coverage?",
+   "o": {
+    "A": "Executing both outcomes of every decision point",
+    "B": "Executing every executable statement in the code at least once",
+    "C": "Testing every combination of input values in the interface",
+    "D": "Executing a test for every user story in the backlog"
+   },
+   "a": "B",
+   "exEn": "Statement coverage counts executable statements exercised at least once, and is weaker than branch coverage."
+  },
+  {
+   "n": 51,
+   "ch": 4,
+   "q": "If a module achieves 100% branch coverage, what can be guaranteed about statement coverage?",
+   "o": {
+    "A": "Statement coverage is exactly 50%",
+    "B": "Statement coverage cannot be determined",
+    "C": "Statement coverage is also 100%",
+    "D": "Statement coverage is 0%"
+   },
+   "a": "C",
+   "exEn": "Branch coverage subsumes statement coverage: covering all branches necessarily executes all statements."
+  },
+  {
+   "n": 52,
+   "ch": 4,
+   "q": "Which statement best describes error guessing?",
+   "o": {
+    "A": "Test inputs are selected completely at random",
+    "B": "Tests are derived strictly from deployment diagrams",
+    "C": "It is a mathematical technique for calculating code complexity",
+    "D": "Testers anticipate likely mistakes based on experience and knowledge of common failures"
+   },
+   "a": "D",
+   "exEn": "Error guessing uses past experience with defects to target the places where they are most likely to occur."
+  },
+  {
+   "n": 53,
+   "ch": 4,
+   "q": "Exploratory testing is characterized by:",
+   "o": {
+    "A": "Writing all test cases months before the design phase",
+    "B": "Automated execution using commercial tools",
+    "C": "Simultaneous learning, test design and test execution",
+    "D": "Complete reliance on formal requirement specifications"
+   },
+   "a": "C",
+   "exEn": "In exploratory testing the tester learns about the product, designs and runs tests at the same time."
+  },
+  {
+   "n": 54,
+   "ch": 4,
+   "q": "Checklist-based testing involves:",
+   "o": {
+    "A": "Designing tests using mathematical combination rules",
+    "B": "Closing completed tickets in the project tool",
+    "C": "Designing and executing tests based on a high-level list of items to be checked",
+    "D": "Compiling the code automatically using build tools"
+   },
+   "a": "C",
+   "exEn": "The checklist captures lessons learned and common risks, giving consistent coverage without detailed scripts."
+  },
+  {
+   "n": 55,
+   "ch": 4,
+   "q": "How do user story acceptance criteria relate to test design?",
+   "o": {
+    "A": "They serve as a primary test basis for acceptance and system tests",
+    "B": "They are used only by interface designers",
+    "C": "They replace the need for test conditions",
+    "D": "They apply only to non-functional testing"
+   },
+   "a": "A",
+   "exEn": "Acceptance criteria describe the expected behavior, so test cases can be derived directly from them."
+  },
+  {
+   "n": 56,
+   "ch": 4,
+   "q": "In 3-value Boundary Value Analysis, which values are tested for the range [10, 50]?",
+   "o": {
+    "A": "10, 50",
+    "B": "0, 10, 50",
+    "C": "10, 25, 50",
+    "D": "9, 10, 11 and 49, 50, 51"
+   },
+   "a": "D",
+   "exEn": "3-value BVA tests each boundary together with the value before it and the value after it."
+  },
+  {
+   "n": 57,
+   "ch": 4,
+   "q": "Which black-box technique efficiently tests valid and invalid combinations of conditions?",
+   "o": {
+    "A": "Decision table testing",
+    "B": "Equivalence partitioning",
+    "C": "Statement testing",
+    "D": "Boundary value analysis"
+   },
+   "a": "A",
+   "exEn": "Decision tables are built specifically to handle combinations of conditions and their resulting actions."
+  },
+  {
+   "n": 58,
+   "ch": 4,
+   "q": "What is the primary objective of white-box test techniques?",
+   "o": {
+    "A": "Measuring the usability of the software for non-technical users",
+    "B": "Achieving a defined level of structural coverage of the code and its control flows",
+    "C": "Verifying third-party payment gateway protocols",
+    "D": "Evaluating system behavior against user persona expectations"
+   },
+   "a": "B",
+   "exEn": "White-box techniques aim at structural coverage criteria derived from the internal implementation."
+  },
+  {
+   "n": 59,
+   "ch": 4,
+   "q": "Which of the following is an example of an invalid equivalence partition for a field that accepts ages from 18 to 65?",
+   "o": {
+    "A": "18",
+    "B": "17",
+    "C": "25",
+    "D": "65"
+   },
+   "a": "B",
+   "exEn": "Values below 18 or above 65 fall outside the accepted range and therefore lie in an invalid partition."
+  },
+  {
+   "n": 60,
+   "ch": 4,
+   "q": "What is the main advantage of collaboration-based approaches such as ATDD?",
+   "o": {
+    "A": "They build a shared understanding of the requirements between business, developers and testers before coding starts",
+    "B": "They remove developers from test execution",
+    "C": "They replace code reviews with end-to-end automated tests",
+    "D": "They guarantee a defect-free release"
+   },
+   "a": "A",
+   "exEn": "ATDD brings the three perspectives together to agree on acceptance criteria and examples before development."
+  },
+  {
+   "n": 61,
+   "ch": 4,
+   "q": "Which statement regarding equivalence partitioning is correct?",
+   "o": {
+    "A": "It applies only to numeric input parameters",
+    "B": "It requires full knowledge of the source code",
+    "C": "All members of the same partition are expected to be processed in the same way by the software",
+    "D": "It removes the need for boundary value analysis"
+   },
+   "a": "C",
+   "exEn": "Because members of a partition are treated alike, testing one representative value normally suffices."
+  },
+  {
+   "n": 62,
+   "ch": 4,
+   "q": "How is statement coverage calculated?",
+   "o": {
+    "A": "(Passed test cases / total test cases) × 100",
+    "B": "(Fixed defects / total reported defects) × 100",
+    "C": "(Lines of code / total project hours) × 100",
+    "D": "(Executed statements / total executable statements) × 100"
+   },
+   "a": "D",
+   "exEn": "Coverage is the proportion of executable statements exercised by the tests, expressed as a percentage."
+  },
+  {
+   "n": 63,
+   "ch": 4,
+   "q": "When using exploratory testing, test execution is guided by:",
+   "o": {
+    "A": "Test charters that define the objectives and scope of the session",
+    "B": "Rigid step-by-step scripts stored in a test management tool",
+    "C": "Automated pipeline triggers",
+    "D": "The project Gantt chart"
+   },
+   "a": "A",
+   "exEn": "A charter defines the mission, scope and focus of a time-boxed exploratory session."
+  },
+  {
+   "n": 64,
+   "ch": 4,
+   "q": "Which factor most influences the choice of test techniques?",
+   "o": {
+    "A": "The color scheme of the user interface",
+    "B": "The number of developers working remotely",
+    "C": "The brand of the laptops used by the team",
+    "D": "The type of system, applicable standards, risk level, contractual requirements and tester skills"
+   },
+   "a": "D",
+   "exEn": "Technique selection depends on the context: system type, risk, regulations, documentation available and team experience."
+  },
+  {
+   "n": 65,
+   "ch": 4,
+   "q": "In a state transition diagram, what does a transition represent?",
+   "o": {
+    "A": "A static page layout",
+    "B": "A database table definition",
+    "C": "A change from one state to another triggered by an event",
+    "D": "An unhandled exception in the code"
+   },
+   "a": "C",
+   "exEn": "A transition links a source state to a target state and is caused by an event, possibly with a resulting action."
+  },
+  {
+   "n": 66,
+   "ch": 4,
+   "q": "What is the main benefit of using checklist-based testing?",
+   "o": {
+    "A": "A guarantee of full statement coverage",
+    "B": "Removing the need for static testing",
+    "C": "Consistent coverage of known checks and common failure modes across sessions and testers",
+    "D": "Removing the need for requirement documentation"
+   },
+   "a": "C",
+   "exEn": "The checklist keeps important aspects from being overlooked and keeps coverage repeatable between testers."
+  },
+  {
+   "n": 67,
+   "ch": 5,
+   "q": "What is the primary purpose of a test strategy?",
+   "o": {
+    "A": "Detailing the daily assignments of individual testers",
+    "B": "Tracking the status of defects during a sprint",
+    "C": "Documenting the parameters of individual code functions",
+    "D": "Describing the general, high-level approach to testing across an organization or programme"
+   },
+   "a": "D",
+   "exEn": "A test strategy is generic and long-lived; a test plan applies that strategy to one specific project or release."
+  },
+  {
+   "n": 68,
+   "ch": 5,
+   "q": "What is included in a test plan?",
+   "o": {
+    "A": "Source code algorithms and database indexes",
+    "B": "Scope, objectives, schedule, resources, risks and the test approach for a specific test effort",
+    "C": "The salary breakdown of the QA team",
+    "D": "Hardware vendor purchase agreements"
+   },
+   "a": "B",
+   "exEn": "The test plan documents what will be tested, how, by whom, when, and under which conditions testing starts and stops."
+  },
+  {
+   "n": 69,
+   "ch": 5,
+   "q": "Which of the following is an example of an entry criterion for testing?",
+   "o": {
+    "A": "The test environment is available and the build has been successfully deployed",
+    "B": "95% of the planned test cases have passed",
+    "C": "All high-severity defects have been closed",
+    "D": "The test completion report has been signed off"
+   },
+   "a": "A",
+   "exEn": "Entry criteria are the conditions that must be met before test execution can meaningfully start."
+  },
+  {
+   "n": 70,
+   "ch": 5,
+   "q": "Which of the following is an example of an exit criterion for testing?",
+   "o": {
+    "A": "The requirements documents have been approved by stakeholders",
+    "B": "The test management tool licences have been renewed",
+    "C": "The planned coverage has been achieved and no high-priority defects remain open",
+    "D": "The development backlog for the sprint has been planned"
+   },
+   "a": "C",
+   "exEn": "Exit criteria define when a test activity or level can be considered complete."
+  },
+  {
+   "n": 71,
+   "ch": 5,
+   "q": "What is the purpose of risk-based testing?",
+   "o": {
+    "A": "Giving every test case exactly the same priority",
+    "B": "Allocating and prioritizing test effort according to the assessed product risks",
+    "C": "Calculating compensation for system downtime",
+    "D": "Transferring all project risks to external vendors"
+   },
+   "a": "B",
+   "exEn": "Risk analysis decides what to test first, how deeply, and what may be left untested."
+  },
+  {
+   "n": 72,
+   "ch": 5,
+   "q": "Product risk is defined as:",
+   "o": {
+    "A": "A risk related directly to the project schedule or to staff turnover",
+    "B": "A budget overrun caused by delayed hardware delivery",
+    "C": "The possibility that a work product fails to satisfy the functional or non-functional needs of its users",
+    "D": "A shortage of training among team members"
+   },
+   "a": "C",
+   "exEn": "Product risk concerns the quality of the deliverable itself, such as wrong calculations or poor performance."
+  },
+  {
+   "n": 73,
+   "ch": 5,
+   "q": "Project risk is defined as:",
+   "o": {
+    "A": "The possibility that a calculation routine produces wrong results",
+    "B": "Vulnerability of the application to injection attacks",
+    "C": "Slow system response time during peak hours",
+    "D": "A risk related to project management, schedule, budget, resources or organizational issues"
+   },
+   "a": "D",
+   "exEn": "Project risks threaten the ability to deliver; product risks threaten the quality of what is delivered."
+  },
+  {
+   "n": 74,
+   "ch": 5,
+   "q": "In software testing, risk level is evaluated as a combination of:",
+   "o": {
+    "A": "The likelihood of occurrence and the impact if it occurs",
+    "B": "The execution speed of the tests and the cost of the team",
+    "C": "The number of lines of code and the size of the database",
+    "D": "The sprint duration and the size of the team"
+   },
+   "a": "A",
+   "exEn": "Risk level = likelihood × impact, and it drives prioritization of the test effort."
+  },
+  {
+   "n": 75,
+   "ch": 5,
+   "q": "Which metric provides valuable information about test execution progress?",
+   "o": {
+    "A": "The total number of lines of application code written",
+    "B": "The number of meetings held during the sprint",
+    "C": "The percentage of executed test cases that passed, failed or are blocked",
+    "D": "The number of documents stored on the shared drive"
+   },
+   "a": "C",
+   "exEn": "Pass, fail and blocked rates against the plan show whether execution is on track."
+  },
+  {
+   "n": 76,
+   "ch": 5,
+   "q": "What is configuration management primarily responsible for in software testing?",
+   "o": {
+    "A": "Managing payroll and employee benefits",
+    "B": "Scheduling the project meetings",
+    "C": "Maintaining the integrity and traceability of test items, environments and testware versions",
+    "D": "Purchasing cloud server instances"
+   },
+   "a": "C",
+   "exEn": "Configuration management makes results reproducible: every test knows which version of which item it ran against."
+  },
+  {
+   "n": 77,
+   "ch": 5,
+   "q": "What is the main objective of a defect report?",
+   "o": {
+    "A": "Assigning blame to the developer responsible",
+    "B": "Communicating the defect clearly enough for developers to reproduce, analyze and fix it",
+    "C": "Justifying a request for a larger QA budget",
+    "D": "Documenting the visual guidelines of the interface"
+   },
+   "a": "B",
+   "exEn": "A defect report is a communication tool; its value is measured by how easily the issue can be reproduced and fixed."
+  },
+  {
+   "n": 78,
+   "ch": 5,
+   "q": "Which of the following information MUST be included in a well-written defect report?",
+   "o": {
+    "A": "Steps to reproduce, expected versus actual result, severity and environment details",
+    "B": "A performance evaluation score for the developer",
+    "C": "The full source code of the affected module",
+    "D": "The roadmap of future features"
+   },
+   "a": "A",
+   "exEn": "Without reproduction steps and the expected/actual comparison, the report cannot be acted on reliably."
+  },
+  {
+   "n": 79,
+   "ch": 5,
+   "q": "What is the difference between defect severity and defect priority?",
+   "o": {
+    "A": "Severity is the business urgency, while priority is the technical impact on the code",
+    "B": "Severity is assigned by managers, while priority is assigned by developers",
+    "C": "Severity is the degree of impact on the system, while priority is the urgency of fixing it from a business perspective",
+    "D": "The two terms describe exactly the same thing"
+   },
+   "a": "C",
+   "exEn": "A defect can be highly severe but low priority, or cosmetic yet urgent — for example a misspelled company name on the home page."
+  },
+  {
+   "n": 80,
+   "ch": 5,
+   "q": "Test monitoring involves which activity?",
+   "o": {
+    "A": "Taking corrective action when testing falls behind schedule",
+    "B": "Continuously comparing actual progress against the plan using metrics",
+    "C": "Redesigning the database schema",
+    "D": "Authoring the original user requirements"
+   },
+   "a": "B",
+   "exEn": "Monitoring gathers and reports information; acting on that information is test control."
+  },
+  {
+   "n": 81,
+   "ch": 5,
+   "q": "Test control refers to:",
+   "o": {
+    "A": "Measuring pass and fail execution ratios",
+    "B": "Taking corrective actions to bring testing back on track based on monitoring information",
+    "C": "Terminating the contracts of testers",
+    "D": "Selecting the development tools for the team"
+   },
+   "a": "B",
+   "exEn": "Control is the reaction: re-prioritizing, re-allocating effort or adjusting the schedule when monitoring shows deviations."
+  },
+  {
+   "n": 82,
+   "ch": 5,
+   "q": "Which estimation technique asks individual experts for estimates anonymously across several rounds until consensus is reached?",
+   "o": {
+    "A": "Function point analysis",
+    "B": "Three-point estimation",
+    "C": "Estimation based on lines of code",
+    "D": "Wideband Delphi (and Planning Poker in Agile)"
+   },
+   "a": "D",
+   "exEn": "Wideband Delphi reaches a group estimate iteratively while limiting the influence of dominant participants."
+  },
+  {
+   "n": 83,
+   "ch": 5,
+   "q": "In a test completion report, which key information should be presented to stakeholders?",
+   "o": {
+    "A": "The individual timesheets of the development team",
+    "B": "The revision history of the source code",
+    "C": "A summary of the testing performed, evaluation against the exit criteria, residual risks and key metrics",
+    "D": "A price list of hardware components"
+   },
+   "a": "C",
+   "exEn": "The report supports a release decision: what was tested, what was found, and what risk remains."
+  },
+  {
+   "n": 84,
+   "ch": 5,
+   "q": "Which of the following is a product risk rather than a project risk?",
+   "o": {
+    "A": "A key tester resigns during the peak of the execution phase",
+    "B": "Delivery of the test environment hardware is delayed by the vendor",
+    "C": "The QA budget is reduced by executive management",
+    "D": "The software calculates incorrect interest rates for loan applications"
+   },
+   "a": "D",
+   "exEn": "An incorrect calculation is a defect in the delivered product, so it belongs to product risk."
+  },
+  {
+   "n": 85,
+   "ch": 5,
+   "q": "Which role is responsible for creating test plans and test strategies?",
+   "o": {
+    "A": "The test manager (test lead)",
+    "B": "The test execution engineer",
+    "C": "The database administrator",
+    "D": "The technical support specialist"
+   },
+   "a": "A",
+   "exEn": "The test manager owns planning, monitoring, control and reporting of the test effort."
+  },
+  {
+   "n": 86,
+   "ch": 6,
+   "q": "Which of the following is a primary objective of test automation tools?",
+   "o": {
+    "A": "Increasing efficiency by automating repetitive tasks and regression suites",
+    "B": "Completely replacing the need for human testers",
+    "C": "Automatically eliminating all defects in production code",
+    "D": "Making requirement specifications unnecessary"
+   },
+   "a": "A",
+   "exEn": "Tools support the process; they free tester time from repetitive execution rather than replacing testing itself."
+  },
+  {
+   "n": 87,
+   "ch": 6,
+   "q": "What is a major risk associated with introducing test automation tools?",
+   "o": {
+    "A": "Test execution running too fast for the servers to handle",
+    "B": "Unrealistic expectations about the tool's capabilities and the maintenance effort it requires",
+    "C": "A reduction in the number of automated builds",
+    "D": "Developers refusing to write production code"
+   },
+   "a": "B",
+   "exEn": "Automation has ongoing costs: scripts must be maintained as the product changes, and benefits take time to appear."
+  },
+  {
+   "n": 88,
+   "ch": 6,
+   "q": "Which tool category supports static testing activities?",
+   "o": {
+    "A": "Static analysis tools and code linters",
+    "B": "Performance testing tools",
+    "C": "Test execution drivers",
+    "D": "Network monitoring tools"
+   },
+   "a": "A",
+   "exEn": "Static analysis tools examine code and documents without executing them, often against coding standards."
+  },
+  {
+   "n": 89,
+   "ch": 6,
+   "q": "Which tool category directly assists in test design and test case generation?",
+   "o": {
+    "A": "Defect tracking systems",
+    "B": "Continuous integration servers",
+    "C": "Model-based testing tools",
+    "D": "Screen recording software"
+   },
+   "a": "C",
+   "exEn": "Model-based testing tools derive test cases automatically from a model of the expected system behavior."
+  },
+  {
+   "n": 90,
+   "ch": 6,
+   "q": "What is a key benefit of using defect management tools?",
+   "o": {
+    "A": "Tracking the defect lifecycle, ownership and metrics across the whole team",
+    "B": "Executing unit test scripts automatically",
+    "C": "Generating API payloads for integration tests",
+    "D": "Compiling the application source code"
+   },
+   "a": "A",
+   "exEn": "They keep the status, history and assignment of every defect visible, and produce the metrics used in reporting."
+  },
+  {
+   "n": 91,
+   "ch": 6,
+   "q": "Which tool type simulates high user load in order to measure application response times?",
+   "o": {
+    "A": "Performance and load testing tools",
+    "B": "Static analysis tools",
+    "C": "Continuous integration servers",
+    "D": "Defect tracking systems"
+   },
+   "a": "A",
+   "exEn": "Load and performance tools generate concurrent virtual users and measure response times and resource usage."
+  },
+  {
+   "n": 92,
+   "ch": 6,
+   "q": "What does a test execution harness (test driver) do?",
+   "o": {
+    "A": "Reviews requirement documents for language errors",
+    "B": "Executes tests automatically by calling the interfaces of the code under test and capturing the results",
+    "C": "Generates user interface designs automatically",
+    "D": "Monitors the physical temperature of the servers"
+   },
+   "a": "B",
+   "exEn": "A harness drives the component under test and compares actual results with expected ones."
+  },
+  {
+   "n": 93,
+   "ch": 6,
+   "q": "What is a recommended practice when introducing a new tool into an organization?",
+   "o": {
+    "A": "Rolling the tool out to all projects at once without prior evaluation",
+    "B": "Replacing the manual testing staff immediately",
+    "C": "Running a proof of concept and a pilot project to assess how well the tool fits",
+    "D": "Customizing the tool's source code before defining the requirements"
+   },
+   "a": "C",
+   "exEn": "A pilot verifies fit with the existing process, reveals the real effort needed and builds internal expertise."
+  },
+  {
+   "n": 94,
+   "ch": 6,
+   "q": "Which tool type supports test management, requirement mapping and execution reporting?",
+   "o": {
+    "A": "Unit test frameworks",
+    "B": "Test data generators",
+    "C": "Test management tools",
+    "D": "Static analysis linters"
+   },
+   "a": "C",
+   "exEn": "Test management tools hold the testware, link it to requirements, and record execution results and progress."
+  },
+  {
+   "n": 95,
+   "ch": 6,
+   "q": "Dynamic analysis tools are used to:",
+   "o": {
+    "A": "Detect problems such as memory leaks and unhandled pointers while the code is running",
+    "B": "Inspect requirement documents for missing descriptions",
+    "C": "Design graphical wireframes",
+    "D": "Conduct interviews with users"
+   },
+   "a": "A",
+   "exEn": "Dynamic analysis observes the software during execution to find defects that only appear at runtime."
+  },
+  {
+   "n": 96,
+   "ch": 6,
+   "q": "What is a primary objective of dynamic test execution tools?",
+   "o": {
+    "A": "Running tests without needing an execution environment",
+    "B": "Writing project status emails automatically",
+    "C": "Automating repetitive execution steps in order to save execution time and effort",
+    "D": "Managing employee payroll records"
+   },
+   "a": "C",
+   "exEn": "Execution tools repeat defined tests reliably, which is most valuable for regression cycles."
+  },
+  {
+   "n": 97,
+   "ch": 6,
+   "q": "What is a potential risk of over-relying on automated test scripts?",
+   "o": {
+    "A": "High maintenance cost whenever the requirements or the interface change frequently",
+    "B": "Automated scripts always run more slowly than manual testing",
+    "C": "Test execution becomes completely unpredictable",
+    "D": "Developers stop fixing defects"
+   },
+   "a": "A",
+   "exEn": "Automated scripts are software too: every change to the product may require updating them."
+  },
+  {
+   "n": 98,
+   "ch": 6,
+   "q": "Which tool category is most useful for automated testing within a CI/CD pipeline?",
+   "o": {
+    "A": "Spreadsheet software used manually",
+    "B": "Word processing software",
+    "C": "Image editing tools",
+    "D": "Build and deployment automation tools such as Jenkins or GitHub Actions"
+   },
+   "a": "D",
+   "exEn": "CI tools trigger the test suites automatically whenever code is committed, giving fast feedback on every change."
+  },
+  {
+   "n": 99,
+   "ch": 6,
+   "q": "What role do test data generation tools play in testing?",
+   "o": {
+    "A": "They correct syntax errors in the code in real time",
+    "B": "They create the realistic, high-volume datasets needed to execute test scenarios",
+    "C": "They generate user story tickets for project managers",
+    "D": "They configure the server hardware"
+   },
+   "a": "B",
+   "exEn": "Generating representative data at volume is often the slowest part of preparing an execution environment."
+  },
+  {
+   "n": 100,
+   "ch": 6,
+   "q": "What is the primary criterion for selecting a test tool for an organization?",
+   "o": {
+    "A": "Choosing the most expensive tool on the market",
+    "B": "How well the tool's capabilities match the organization's needs, technology stack and team skills",
+    "C": "Choosing a tool that requires no training at all",
+    "D": "Choosing a tool based on its visual appearance"
+   },
+   "a": "B",
+   "exEn": "Tool selection is a fit question: process, technology, budget, skills and support all weigh in."
+  }
+ ]
+}

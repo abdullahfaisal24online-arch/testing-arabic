@@ -3,12 +3,13 @@
 // بالموقع الحقيقي بيضل يعرض «قريباً» لحد يوم الإطلاق — شوف src/lib/store.ts
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import { STORE_OPEN, STORE_GROUPS, jod } from '../../lib/store';
+import { STORE_OPEN, STORE_GROUPS, jod, getStoreSettings } from '../../lib/store';
 
 const products = STORE_OPEN
   ? (await getCollection('products')).filter((p) => !p.data.draft).sort((a, b) => a.data.order - b.data.order)
   : [];
-const groups = STORE_GROUPS.map((g) => ({ ...g, items: products.filter((p) => g.kinds.includes(p.data.kind)) })).filter(
+const t = STORE_OPEN ? await getStoreSettings() : undefined;
+const groups = STORE_GROUPS.map((g) => ({ ...g, title: t ? t[g.title] : '', items: products.filter((p) => (g.kinds as readonly string[]).includes(p.data.kind)) })).filter(
   (g) => g.items.length > 0,
 );
 ---
@@ -29,15 +30,15 @@ const groups = STORE_GROUPS.map((g) => ({ ...g, items: products.filter((p) => g.
     </section>
   </Base>
 ) : (
-  <Base title="المتجر" description="بنوك أسئلة وملخّصات ودورات متقدمة لاختبار البرمجيات — بالعربي، على منصة Testing بالعربي.">
+  <Base title={t!.heroEyebrow} description={t!.heroText}>
     <section class="store-head dots">
       <div class="wrap">
-        <span class="eyebrow">المتجر</span>
-        <h1>مواد بتختصر عليك الطريق</h1>
-        <p class="lead">بنوك أسئلة وملخّصات ودورات متقدمة، كلها بالعربي وجوّا المنصة. بتشتري مرة، وبتضل مفتوحة إلك على أي جهاز.</p>
+        <span class="eyebrow">{t!.heroEyebrow}</span>
+        <h1>{t!.heroTitle}</h1>
+        <p class="lead">{t!.heroText}</p>
         {groups.length > 1 && (
           <div class="chips" role="tablist" aria-label="التصنيفات">
-            <button type="button" class="chip on" data-f="all">الكل</button>
+            <button type="button" class="chip on" data-f="all">{t!.allLabel}</button>
             {groups.map((g) => <button type="button" class="chip" data-f={g.key}>{g.title}</button>)}
           </div>
         )}
@@ -45,7 +46,7 @@ const groups = STORE_GROUPS.map((g) => ({ ...g, items: products.filter((p) => g.
     </section>
 
     <div class="wrap store-body">
-      {groups.length === 0 && <p class="empty">ما في منتجات لسا. ارجع قريباً 👀</p>}
+      {groups.length === 0 && <p class="empty">{t!.emptyText}</p>}
       {groups.map((g) => (
         <section class="group" data-g={g.key}>
           <h2>{g.title}</h2>
@@ -54,18 +55,18 @@ const groups = STORE_GROUPS.map((g) => ({ ...g, items: products.filter((p) => g.
               <a class="pcard" href={`/store/${p.id}/`}>
                 <div class="thumb">
                   {p.data.cover ? <img src={p.data.cover} alt="" width="1280" height="720" loading="lazy" decoding="async" /> : <span class="ph">🔻</span>}
-                  {p.data.offerPrice != null && <span class="flag">عرض</span>}
+                  {(p.data.cardBadge || (p.data.offerPrice != null && t!.offerBadge)) && <span class="flag">{p.data.cardBadge || t!.offerBadge}</span>}
                 </div>
                 <div class="body">
                   <span class="kind">{p.data.kind}</span>
-                  <h3>{p.data.title}</h3>
-                  {p.data.pitch && <p>{p.data.pitch}</p>}
+                  <h3>{p.data.cardTitle || p.data.title}</h3>
+                  {(p.data.cardText || p.data.pitch) && <p>{p.data.cardText || p.data.pitch}</p>}
                   <div class="foot">
                     <span class="price">
                       <b>{jod(p.data.offerPrice ?? p.data.price)}</b>
                       {p.data.offerPrice != null && <s>{jod(p.data.price)}</s>}
                     </span>
-                    <span class="go">التفاصيل ←</span>
+                    <span class="go">{p.data.cardButton || t!.cardButton}</span>
                   </div>
                 </div>
               </a>
@@ -74,7 +75,7 @@ const groups = STORE_GROUPS.map((g) => ({ ...g, items: products.filter((p) => g.
         </section>
       ))}
 
-      <p class="have">عندك كود؟ <a href="/pro/unlock/">فعّله من هون</a> · <a href="/pro/">موادي</a></p>
+      <p class="have">{t!.haveCodeText} <a href="/pro/unlock/">{t!.haveCodeLink}</a> · <a href="/pro/">{t!.myItemsLink}</a></p>
     </div>
   </Base>
 )}

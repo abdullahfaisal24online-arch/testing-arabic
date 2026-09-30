@@ -32,6 +32,8 @@ interface Props {
   publishDate?: Date;
   updatedDate?: Date;
   noindex?: boolean;
+  /** يخبّي زر Testo (صفحات الشراء) */
+  hideChat?: boolean;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 const props = Astro.props;
@@ -66,7 +68,7 @@ const props = Astro.props;
     <BgFx />
     {!STORE_OPEN && <StoreSoon />}
     <VideoFacade poster={props.type === 'video.other' ? props.image : undefined} />
-    <ChatBot />
+    {!props.hideChat && <ChatBot />}
     <Analytics />
     <!-- نسخة احتياطية من إيميلات المشتركين بقاعدة البيانات عندنا — ما بتلمس مسار الاشتراك نفسه -->
     <script is:inline>
