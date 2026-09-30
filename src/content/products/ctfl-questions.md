@@ -1,9 +1,10 @@
 ---
 title: بنك أسئلة ISTQB CTFL v4.0
+slug: /store/ctfl-questions/
 kind: بنك أسئلة
 pitch: 100 سؤال تدريبي على منهج CTFL v4.0. السؤال بالإنجليزي زي الامتحان الحقيقي، ومعه ترجمته وشرح لكل جواب بالعربي.
-price: 29
-offerPrice: 19
+price: 30
+offerPrice: 20
 offerNote: سعر الإطلاق لأول 50 مشتري
 includes:
   - 100 سؤال اختيار من متعدد، موزّعة على فصول المنهج الستة
@@ -12,15 +13,33 @@ includes:
   - امتحان تجريبي من 40 سؤال خلال 65 دقيقة، مع نتيجتك بالآخر
   - تدريب حسب الفصل عشان تعرف وين بتحتاج مراجعة
   - بيضل مفتوح إلك على أي جهاز
+course: ''
+bundleOf: []
 cover: /uploads/store/ctfl-questions.webp
 order: 1
 featured: true
 draft: false
+cardTitle: ''
+cardText: ''
+cardBadge: ''
+cardButton: ''
+eyebrow: ''
+heroTitle: ''
+seoDescription: ''
+buyButton: ''
+sampleButton: ''
+trust: []
+includesTitle: ''
 sampleEnabled: true
-sampleCount: 10
+sampleCount: 5
+sampleEyebrow: ''
+sampleTitle: ''
+sampleText: ''
+endTitle: ''
+endButton: ''
 ---
 
-## لمين هاد البنك؟
+## لمين هذا البنك؟
 
 لأي حدا بيحضّر لشهادة **ISTQB CTFL v4.0** وبده يتدرّب على أسئلة بنفس أسلوب الامتحان قبل ما يحجز موعده.
 
