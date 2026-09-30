@@ -1,6 +1,6 @@
 ---
 title: بنك أسئلة ISTQB CTFL v4.0
-slug: /store/ctfl-questions/
+slug: ctfl-questions
 kind: بنك أسئلة
 pitch: 100 سؤال تدريبي على منهج CTFL v4.0. السؤال بالإنجليزي زي الامتحان الحقيقي، ومعه ترجمته وشرح لكل جواب بالعربي.
 price: 30
