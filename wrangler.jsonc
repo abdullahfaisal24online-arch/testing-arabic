@@ -64,7 +64,7 @@
         {
           "binding": "DB",
           "database_name": "testing-arabic-staging",
-          "database_id": "PASTE_STAGING_D1_ID"
+          "database_id": "694e393a-5371-4f34-8e31-188168447c11"
         }
       ],
       "observability": { "enabled": true }
