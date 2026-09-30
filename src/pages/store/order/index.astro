@@ -6,6 +6,13 @@ import { STORE_OPEN, getStoreSettings } from '../../../lib/store';
 
 const t = STORE_OPEN ? await getStoreSettings() : undefined;
 const wa = (t?.whatsapp || '').replace(/[^\d]/g, '');
+const hasPay = !!(t && (t.cliqAlias || t.iban));
+if (t && !hasPay) {
+  const msg = 'المتجر مفتوح بس ما في ولا طريقة دفع معبّاة بـ «إعدادات الموقع ← المتجر» (CliQ أو IBAN)';
+  // بالموقع الحقيقي بنوقف البناء عشان ما ينطلق المتجر بدون طرق تحويل. بالنسخة التجريبية بس تنبيه.
+  if (!process.env.CMS_BRANCH) throw new Error(msg);
+  console.warn('⚠️ ' + msg);
+}
 const labels = t
   ? {
       payText: t.payText, payRefNote: t.payRefNote, holdText: t.holdText, copy: t.copyLabel, copied: t.copiedLabel,
@@ -41,6 +48,7 @@ const labels = t
         <section class="box" data-when="awaiting_payment" hidden>
           <h2>{t.payTitle}</h2>
           <p class="muted" data-fill="payText"></p>
+          {!hasPay && <p class="note">{t.payFallback}</p>}
           <div class="pays">
             {t.cliqAlias && (
               <div class="pay">

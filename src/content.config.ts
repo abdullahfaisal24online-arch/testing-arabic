@@ -600,6 +600,17 @@ const storeSettings = defineCollection({
     stepReview: str("قيد المراجعة"),
     stepDone: str("مفعّل ✓"),
     contactText: str("عندك سؤال؟ راسلنا واتساب"),
+    // التفعيل والإيميلات
+    maxDevices: num(3),
+    payFallback: str("تواصل معنا لتفاصيل التحويل."),
+    orderSubject: str("استلمنا طلبك {id} — Testing بالعربي"),
+    orderBody: str("أهلاً {name} 👋\n\nاستلمنا طلبك {id} على «{product}» والمبلغ المطلوب {amount}.\n\nمن الرابط تحت بتلاقي تفاصيل التحويل (CliQ أو بنكي) وبترفع صورة الإيصال. الطلب محجوز إلك {hours} ساعة.\n\nاحتفظ بهاد الإيميل — منه بتتابع طلبك."),
+    orderButton: str("تفاصيل الطلب والدفع"),
+    approvedSubject: str("🎉 طلبك {id} مفعّل — كود التفعيل"),
+    approvedBody: str("أهلاً {name} 🎉\n\nتأكدنا من الدفع وطلبك {id} صار مفعّل.\n\nهاد كود التفعيل تبعك لـ «{product}». احتفظ فيه، وبتقدر تستعمله على أي جهاز:"),
+    approvedButton: str("فعّل وافتح المحتوى"),
+    rejectedSubject: str("بخصوص طلبك {id}"),
+    rejectedBody: str("أهلاً {name}،\n\nما قدرنا نأكد الدفع لطلبك {id}.\nالسبب: {reason}\n\nإذا حوّلت فعلاً، رد على هاد الإيميل أو راسلنا وابعت رقم الطلب."),
     // بيانات الدفع (بتظهر للمشتري بعد ما يطلب)
     cliqAlias: optString,
     bankName: optString,

@@ -24,7 +24,8 @@ collections:
       - name: slug
         label: "الرابط بالإنجليزي بدون مسافات"
         widget: string
-        hint: "مثال: ctfl-questions — صفحة البيع بتصير /store/ctfl-questions/ والمحتوى المدفوع /pro/ctfl-questions/"
+        pattern: ["^[a-z0-9][a-z0-9-]*$", "بس حروف إنجليزية صغيرة وأرقام و - (مثال: ctfl-questions) — بدون / وبدون مسافات"]
+        hint: "اكتب الاسم القصير بس، مثال: ctfl-questions (مش /store/ctfl-questions/). ما تغيّره بعد النشر."
       - name: kind
         label: "النوع"
         widget: select
@@ -1744,6 +1745,64 @@ collections:
             required: false
             default: "عندك سؤال؟ راسلنا واتساب"
             hint: "بيظهر بس إذا عبّيت رقم الواتساب"
+          - name: maxDevices
+            label: "التفعيل — عدد الأجهزة لكل كود"
+            widget: number
+            required: false
+            value_type: int
+            min: 1
+            max: 10
+            default: 3
+          - name: payFallback
+            label: "صفحة الطلب — لما ما في طرق دفع معبّاة"
+            widget: string
+            required: false
+            default: "تواصل معنا لتفاصيل التحويل."
+          - name: orderSubject
+            label: "إيميل الطلب — العنوان"
+            widget: string
+            required: false
+            default: "استلمنا طلبك {id} — Testing بالعربي"
+            hint: "{id} رقم الطلب، {name} الاسم، {amount} المبلغ، {product} المنتج، {hours} مدة الحجز"
+          - name: orderBody
+            label: "إيميل الطلب — النص"
+            widget: text
+            required: false
+            default: "أهلاً {name} 👋\n\nاستلمنا طلبك {id} على «{product}» والمبلغ المطلوب {amount}.\n\nمن الرابط تحت بتلاقي تفاصيل التحويل (CliQ أو بنكي) وبترفع صورة الإيصال. الطلب محجوز إلك {hours} ساعة.\n\nاحتفظ بهاد الإيميل — منه بتتابع طلبك."
+            hint: "{link} رابط الطلب"
+          - name: orderButton
+            label: "إيميل الطلب — نص الزر"
+            widget: string
+            required: false
+            default: "تفاصيل الطلب والدفع"
+          - name: approvedSubject
+            label: "إيميل التفعيل — العنوان"
+            widget: string
+            required: false
+            default: "🎉 طلبك {id} مفعّل — كود التفعيل"
+            hint: "{code} كود التفعيل"
+          - name: approvedBody
+            label: "إيميل التفعيل — النص"
+            widget: text
+            required: false
+            default: "أهلاً {name} 🎉\n\nتأكدنا من الدفع وطلبك {id} صار مفعّل.\n\nهاد كود التفعيل تبعك لـ «{product}». احتفظ فيه، وبتقدر تستعمله على أي جهاز:"
+            hint: "الكود بيظهر تحت النص بصندوق لحاله"
+          - name: approvedButton
+            label: "إيميل التفعيل — نص الزر"
+            widget: string
+            required: false
+            default: "فعّل وافتح المحتوى"
+          - name: rejectedSubject
+            label: "إيميل الرفض — العنوان"
+            widget: string
+            required: false
+            default: "بخصوص طلبك {id}"
+          - name: rejectedBody
+            label: "إيميل الرفض — النص"
+            widget: text
+            required: false
+            default: "أهلاً {name}،\n\nما قدرنا نأكد الدفع لطلبك {id}.\nالسبب: {reason}\n\nإذا حوّلت فعلاً، رد على هاد الإيميل أو راسلنا وابعت رقم الطلب."
+            hint: "{reason} سبب الرفض"
           - name: cliqAlias
             label: "الدفع — CliQ Alias"
             widget: string

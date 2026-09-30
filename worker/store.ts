@@ -11,8 +11,9 @@
  * الـ API بيشتغل بس لما المتجر مفتوح بالبناء (STORE_OPEN=1) — غير هيك بيرجع store_closed.
  */
 import { EmailMessage } from 'cloudflare:email';
+import { sendBuyerMail, type MailEnv, type MailTexts } from './store-mail';
 
-export interface StoreEnv {
+export interface StoreEnv extends MailEnv {
   DB: D1Database;
   ASSETS: Fetcher;
   ADMIN_PASSWORD: string;
@@ -45,7 +46,7 @@ const randHex = (bytes: number) => [...crypto.getRandomValues(new Uint8Array(byt
 
 /* ---------- الجداول ---------- */
 let READY = false;
-async function ensureTables(env: StoreEnv) {
+export async function ensureTables(env: StoreEnv) {
   if (READY) return;
   await env.DB.batch([
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS store_orders (
@@ -64,19 +65,30 @@ async function ensureTables(env: StoreEnv) {
       code TEXT PRIMARY KEY, kind TEXT NOT NULL DEFAULT 'pct', value REAL NOT NULL,
       products TEXT NOT NULL DEFAULT '', max_uses INTEGER NOT NULL DEFAULT 0, expires_at INTEGER NOT NULL DEFAULT 0,
       active INTEGER NOT NULL DEFAULT 1, note TEXT, created_at INTEGER NOT NULL DEFAULT 0)`),
+    // أكواد التفعيل (نفس جدول القسم المدفوع القديم — المرحلة 4 بتفتح المحتوى منه)
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS pro_codes (
+      code TEXT PRIMARY KEY, name TEXT, email TEXT, payment_ref TEXT, price_jod REAL, products TEXT,
+      max_devices INTEGER NOT NULL DEFAULT 3, status TEXT NOT NULL DEFAULT 'active', created_at INTEGER NOT NULL, expires_at INTEGER)`),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS pro_activations (id TEXT PRIMARY KEY, code TEXT NOT NULL, device_hash TEXT NOT NULL, created_at INTEGER NOT NULL, last_seen_at INTEGER)`),
   ]);
   READY = true;
 }
 
 /* ---------- الكاتالوج ---------- */
 interface Product { slug: string; title: string; price: number; offerPrice: number | null }
-interface Catalog { open: boolean; holdHours: number; products: Product[] }
+export interface Catalog { open: boolean; holdHours: number; maxDevices: number; mail: MailTexts; products: Product[] }
 
-async function catalog(req: Request, env: StoreEnv): Promise<Catalog> {
+export async function catalog(req: Request, env: StoreEnv): Promise<Catalog> {
   const res = await env.ASSETS.fetch(new Request(new URL('/store/products.json', req.url)));
-  if (!res.ok) return { open: false, holdHours: 48, products: [] };
-  const data = (await res.json()) as { open?: boolean; store?: { holdHours?: number }; products?: Product[] };
-  return { open: !!data.open, holdHours: Math.max(1, Number(data.store?.holdHours) || 48), products: data.products ?? [] };
+  if (!res.ok) return { open: false, holdHours: 48, maxDevices: 3, mail: {}, products: [] };
+  const data = (await res.json()) as { open?: boolean; store?: { holdHours?: number; maxDevices?: number; mail?: MailTexts }; products?: Product[] };
+  return {
+    open: !!data.open,
+    holdHours: Math.max(1, Number(data.store?.holdHours) || 48),
+    maxDevices: Math.max(1, Number(data.store?.maxDevices) || 3),
+    mail: data.store?.mail ?? {},
+    products: data.products ?? [],
+  };
 }
 
 /* ---------- الخصم ---------- */
@@ -101,7 +113,7 @@ async function applyDiscount(env: StoreEnv, rawCode: string, product: string, pr
 }
 
 /* ---------- عرض الطلب للمشتري ---------- */
-type Order = {
+export type Order = {
   id: string; token: string; product: string; product_title: string | null; name: string; email: string;
   price: number; discount_code: string | null; discount: number; amount: number; status: string;
   created_at: number; expires_at: number; proof_at: number | null; code: string | null; reject_reason: string | null;
@@ -207,6 +219,9 @@ export async function handleStore(req: Request, env: StoreEnv, url: URL): Promis
           `INSERT INTO store_orders (id, token, product, product_title, name, email, phone, price, discount_code, discount, amount, status, created_at, expires_at, ip_hash)
            VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, 'awaiting_payment', ?12, ?13, ?14)`,
         ).bind(id, token, p.slug, p.title, name, email, phone || null, price, d.code || null, d.discount, amount, now, now + cat.holdHours * 3600_000, ipHash).run();
+        const link = `${url.origin}/store/order/?t=${token}`;
+        const mailing = sendBuyerMail(env, email, 'order', cat.mail, { name, id, amount: `${amount} JOD`, product: p.title, link, hours: String(cat.holdHours) }, { href: link, label: cat.mail.orderButton || 'تفاصيل الطلب' });
+        await mailing;
         return json({ ok: true, id, token, amount });
       } catch (e) {
         if (!String(e).includes('UNIQUE')) throw e; // رقم طلب مكرر؟ جرّب رقم غيره

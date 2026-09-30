@@ -14,10 +14,12 @@
  *   POST /api/contact         نموذج التواصل وإرسال الرسالة إلى بريد المنصة
  *   GET  /admin/comments      صفحة المراجعة (محمية بكلمة سر)
  *   /api/store/*              مسار الشراء بالمتجر — شوف worker/store.ts
+ *   /admin/store              إدارة طلبات المتجر وأكواد الخصم — worker/store-admin.ts
  */
 
 import { EmailMessage } from 'cloudflare:email';
 import { handleStore } from './store';
+import { handleStoreAdmin } from './store-admin';
 
 interface Env {
   DB: D1Database;
@@ -25,6 +27,9 @@ interface Env {
   ADMIN_PASSWORD: string;
   // Cloudflare Email Sending binding — يوصل رسائل نموذج التواصل إلى بريد المنصة.
   EMAIL: { send(message: EmailMessage): Promise<void> };
+  // إيميلات المتجر للمشتري (Resend) — اختياري
+  RESEND_API_KEY?: string;
+  STORE_MAIL_FROM?: string;
   // Workers AI — الخطة المجانية
   AI: { run(model: string, input: unknown): Promise<any> };
 }
@@ -986,6 +991,7 @@ async function router(req: Request, env: Env): Promise<Response> {
 
   // ---------- المتجر (مسار الشراء) ----------
   if (path.startsWith('/api/store/')) return handleStore(req, env, url);
+  if (path === '/admin/store' || path.startsWith('/admin/store/')) return handleStoreAdmin(req, env, url);
 
   // ---------- واجهة التعليقات ----------
   if (path === '/api/comments') {

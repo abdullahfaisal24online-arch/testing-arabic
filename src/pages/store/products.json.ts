@@ -28,7 +28,14 @@ export const GET: APIRoute = async () => {
     v: 1,
     // الـ Worker بيرفض الطلبات إذا المتجر مسكّر بهاد البناء
     open: STORE_OPEN,
-    store: { holdHours: st?.holdHours ?? 48 },
+    store: {
+      holdHours: st?.holdHours ?? 48,
+      maxDevices: st?.maxDevices ?? 3,
+      mail: st
+        ? { orderSubject: st.orderSubject, orderBody: st.orderBody, orderButton: st.orderButton, approvedSubject: st.approvedSubject,
+            approvedBody: st.approvedBody, approvedButton: st.approvedButton, rejectedSubject: st.rejectedSubject, rejectedBody: st.rejectedBody }
+        : {},
+    },
     products: products.map((p) => ({
       slug: p.id,
       title: p.data.title,
