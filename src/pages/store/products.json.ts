@@ -33,7 +33,7 @@ export const GET: APIRoute = async () => {
       maxDevices: st?.maxDevices ?? 3,
       mail: st
         ? { orderSubject: st.orderSubject, orderBody: st.orderBody, orderButton: st.orderButton, approvedSubject: st.approvedSubject,
-            approvedBody: st.approvedBody, approvedButton: st.approvedButton, rejectedSubject: st.rejectedSubject, rejectedBody: st.rejectedBody }
+            approvedBody: st.approvedBody, approvedButton: st.mailApprovedButton, rejectedSubject: st.rejectedSubject, rejectedBody: st.rejectedBody }
         : {},
     },
     products: products.map((p) => ({
