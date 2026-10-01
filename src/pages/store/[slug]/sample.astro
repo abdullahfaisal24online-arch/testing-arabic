@@ -4,7 +4,7 @@ import { getCollection } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
 import SampleQuiz from '../../../components/store/SampleQuiz.astro';
 import { STORE_OPEN, usd, getStoreSettings, tpl } from '../../../lib/store';
-import { getBank } from '../../../lib/banks';
+import { getBank, getSample } from '../../../lib/banks';
 
 export async function getStaticPaths() {
   if (!STORE_OPEN) return [];
@@ -19,7 +19,7 @@ const { data } = product;
 const t = await getStoreSettings();
 const bank = getBank(product.id);
 const n = Math.min(Math.max(1, Math.round(data.sampleCount)), bank.length);
-const items = bank.slice(0, n);
+const items = getSample(product.id, n);
 const finalPrice = data.offerPrice ?? data.price;
 const orderHref = `/store/${product.id}/order/`;
 ---

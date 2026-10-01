@@ -52,7 +52,7 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
 <script>
   type Item = { n: number; ch: number; p?: number; q: string; qAr?: string; o: Record<string, string>; a: string; exEn: string; exAr?: string };
   type Chapter = { n: number; en: string; ar: string };
-  type Bank = { items: Item[]; chapters?: Chapter[]; exam?: Record<string, number>; examPractical?: Record<string, number> };
+  type Bank = { items: Item[]; chapters?: Chapter[]; exam?: Record<string, number>; examPractical?: Record<string, number>; examConfig?: { count?: number; minutes?: number; pass?: number } };
   type Exam = { ids: number[]; ans: Record<number, string>; flags: number[]; endsAt: number; total: number; said: string[] };
   type Saved = { ans: Record<number, string>; exam?: Exam; last?: { score: number; total: number; at: number } };
 
@@ -60,7 +60,8 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
   const slug = root.dataset.slug!;
   const productTitle = root.dataset.title!;
   const L = JSON.parse(root.dataset.labels!) as Record<string, string>;
-  const EX = JSON.parse(root.dataset.exam!) as { count: number; minutes: number; pass: number };
+  // القيم العامة من لوحة التحكم، وكل بنك بيقدر يغيّرها بـ examConfig بملفّه (امتحانات بعدد/وقت/نجاح مختلف)
+  let EX = JSON.parse(root.dataset.exam!) as { count: number; minutes: number; pass: number };
   const view = document.getElementById('bview')!;
   const KEY = `ta-bank:${slug}`;
   const fill = (s: string, v: Record<string, string | number>) => (s || '').replace(/\{(\w+)\}/g, (m, k) => (k in v ? String(v[k]) : m));
@@ -607,6 +608,7 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
       if (!d.ok) { document.getElementById('blocked')!.hidden = false; return; }
       B = d.bank as Bank;
       byN = new Map(B.items.map((i) => [i.n, i]));
+      if (B.examConfig) EX = { ...EX, ...B.examConfig };
       buyer = (me && me.name) || '';
       if (S.exam && S.exam.endsAt > Date.now()) runExam();
       else if (S.exam) submitExam(true);
