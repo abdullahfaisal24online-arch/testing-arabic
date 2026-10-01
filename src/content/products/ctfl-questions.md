@@ -15,7 +15,7 @@ includes:
   - بيضل مفتوح إلك على أي جهاز
 course: ''
 bundleOf: []
-cover: /uploads/store/ctfl-questions.webp
+cover: /uploads/store/ctfl-questions-v120.webp
 order: 1
 featured: true
 draft: false
