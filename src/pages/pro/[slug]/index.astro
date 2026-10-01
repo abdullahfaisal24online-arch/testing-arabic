@@ -276,9 +276,11 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
     const shuffle = (a: number[]) => { for (let j = a.length - 1; j > 0; j--) { const k = rnd(j + 1); [a[j], a[k]] = [a[k], a[j]]; } return a; };
     for (const r of take) {
       // الأسئلة العملية (p) إلها حد بكل فصل (examPractical) ضمن حصة الفصل، والباقي من أسئلة الفصل العادية
-      const cap = Math.min(r.k, B.examPractical?.[r.c] ?? r.k);
-      const prac = shuffle(B.items.filter((i) => i.ch === r.c && i.p).map((i) => i.n)).slice(0, cap);
-      const rest = shuffle(B.items.filter((i) => i.ch === r.c && !i.p).map((i) => i.n));
+      // فصل ما إله حد بـ examPractical: كل أسئلته متساوية بالسحب
+      const capDef = B.examPractical?.[r.c];
+      const cap = capDef == null ? 0 : Math.min(r.k, capDef);
+      const prac = capDef == null ? [] : shuffle(B.items.filter((i) => i.ch === r.c && i.p).map((i) => i.n)).slice(0, cap);
+      const rest = shuffle(B.items.filter((i) => i.ch === r.c && (capDef == null || !i.p)).map((i) => i.n));
       const picked = [...prac, ...rest].slice(0, r.k);
       while (picked.length < r.k) { const extra = B.items.find((i) => i.ch === r.c && !picked.includes(i.n)); if (!extra) break; picked.push(extra.n); }
       ids.push(...shuffle(picked));

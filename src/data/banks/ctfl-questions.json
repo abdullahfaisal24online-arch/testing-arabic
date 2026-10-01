@@ -1514,8 +1514,8 @@
    },
    "a": "B",
    "exEn": "There are three valid partitions (0–99, 100–499, ≥500) and one invalid partition (<0), so four values are enough.",
-   "qAr": "تطبيق ولاء بيحسب الخصم من عدد نقاط صحيح: 0–99 بدون خصم، 100–499 خصم 5%، و500 فأكثر خصم 10%. القيم السالبة مرفوضة. ما أقل عدد test cases لتغطية كل الـ equivalence partitions الصالحة وغير الصالحة؟",
-   "exAr": "في ثلاث partitions صالحة (0–99، 100–499، 500 فأكثر) وواحد غير صالح (أقل من 0)، فأربع قيم بتكفي."
+   "qAr": "يحسب تطبيق ولاء الخصم بناءً على عدد صحيح من النقاط: 0–99 بلا خصم، و100–499 خصم 5%، و500 فأكثر خصم 10%. وتُرفض القيم السالبة. ما أقل عدد من الـ test cases لتغطية جميع الـ equivalence partitions الصالحة وغير الصالحة؟",
+   "exAr": "توجد ثلاثة partitions صالحة (0–99، 100–499، 500 فأكثر) وواحد غير صالح (أقل من 0)، لذا تكفي أربع قيم."
   },
   {
    "n": 102,
@@ -1530,8 +1530,8 @@
    },
    "a": "D",
    "exEn": "Five partitions exist (<1, 1–5, 6–20, 21–30, >30); only this set hits each one exactly once.",
-   "qAr": "شركة توصيل بتحسب السعر حسب وزن الطرد بالكيلو (أعداد صحيحة): 1–5 كغ بـ $5، و6–20 كغ بـ $12، و21–30 كغ بـ $20. الوزن أقل من 1 أو أكثر من 30 مرفوض. أي مجموعة قيم بتحقق 100% equivalence partition coverage بأقل عدد قيم؟",
-   "exAr": "في خمس partitions (أقل من 1، 1–5، 6–20، 21–30، أكثر من 30)، وهاي المجموعة الوحيدة اللي بتغطي كل واحد مرة وحدة."
+   "qAr": "تحسب شركة توصيل السعر وفق وزن الطرد بالكيلوغرام (أعداد صحيحة): 1–5 كغ بـ $5، و6–20 كغ بـ $12، و21–30 كغ بـ $20. ويُرفض الوزن الأقل من 1 أو الأكثر من 30. أي مجموعة قيم تحقق 100% equivalence partition coverage بأقل عدد من القيم؟",
+   "exAr": "توجد خمسة partitions (أقل من 1، 1–5، 6–20، 21–30، أكثر من 30)، وهذه هي المجموعة الوحيدة التي تغطي كل partition مرة واحدة."
   },
   {
    "n": 103,
@@ -1546,8 +1546,8 @@
    },
    "a": "D",
    "exEn": "'abcdefghij' has a valid length but no digit, so it falls in the invalid 'no digit' partition.",
-   "qAr": "كلمة السر لازم يكون طولها من 8 لـ 16 حرف وفيها رقم واحد على الأقل. أي قيمة بتنتمي لـ equivalence partition غير صالح؟",
-   "exAr": "‏'abcdefghij' طولها صالح بس ما فيها ولا رقم، فهي من الـ partition غير الصالح «بدون رقم»."
+   "qAr": "يجب أن يتراوح طول كلمة المرور بين 8 و16 حرفًا وأن تحتوي على رقم واحد على الأقل. أي قيمة تنتمي إلى equivalence partition غير صالح؟",
+   "exAr": "‏'abcdefghij' طولها صالح لكنها لا تحتوي على أي رقم، فهي تنتمي إلى الـ partition غير الصالح «بدون رقم»."
   },
   {
    "n": 104,
@@ -1562,8 +1562,8 @@
    },
    "a": "C",
    "exEn": "The existing tests cover 'Cold' and 'Comfortable'; only a value of 25 or more covers the missing 'Hot' partition.",
-   "qAr": "ترموستات بيعرض «Cold» تحت 15°، و«Comfortable» من 15° لـ 24°، و«Hot» من 25° وطالع (درجات صحيحة). في tests جاهزة لـ 10° و20°. أي قيمة إضافية لازم عشان نوصل 100% equivalence partition coverage للمخرجات؟",
-   "exAr": "الـ tests الموجودة بتغطي «Cold» و«Comfortable»، وبس قيمة 25 أو أكثر بتغطي الـ partition الناقص «Hot»."
+   "qAr": "يعرض ترموستات «Cold» تحت 15°، و«Comfortable» من 15° إلى 24°، و«Hot» من 25° فأعلى (درجات صحيحة). توجد tests جاهزة للقيمتين 10° و20°. ما القيمة الإضافية اللازمة للوصول إلى 100% equivalence partition coverage للمخرجات؟",
+   "exAr": "تغطي الـ tests الحالية «Cold» و«Comfortable»، ولا يغطي الـ partition الناقص «Hot» إلا قيمة 25 أو أكثر."
   },
   {
    "n": 105,
@@ -1578,8 +1578,8 @@
    },
    "a": "D",
    "exEn": "2-value BVA tests each boundary and its closest neighbour in the adjacent partition: 7, 8, 20 and 21.",
-   "qAr": "اسم المستخدم لازم يكون طوله 8 أحرف على الأقل و20 على الأكثر. باستخدام 2-value boundary value analysis، كم test case بنحتاج لتغطية كل الـ boundary coverage items للطول؟",
-   "exAr": "الـ 2-value BVA بتفحص كل حد مع أقرب قيمة إله بالـ partition المجاور: 7 و8 و20 و21."
+   "qAr": "يجب ألا يقل طول اسم المستخدم عن 8 أحرف وألا يزيد على 20 حرفًا. باستخدام 2-value boundary value analysis، كم test case نحتاج لتغطية جميع الـ boundary coverage items الخاصة بالطول؟",
+   "exAr": "تفحص الـ 2-value BVA كل حد مع أقرب قيمة إليه في الـ partition المجاور: 7 و8 و20 و21."
   },
   {
    "n": 106,
@@ -1594,8 +1594,8 @@
    },
    "a": "C",
    "exEn": "Both 64 and 65 are boundary values; 3-value BVA tests each with its two neighbours, giving 63, 64, 65 and 66.",
-   "qAr": "نتيجة الامتحان «Fail» للعلامات 0–64 و«Pass» للعلامات 65–100 (أعداد صحيحة). باستخدام 3-value boundary value analysis، أي قيم لازم نفحصها للحد بين Fail وPass؟",
-   "exAr": "‏64 و65 الاثنين قيم حدية، والـ 3-value BVA بتفحص كل وحدة مع جيرانها الاثنين، فبيطلع 63 و64 و65 و66."
+   "qAr": "تكون نتيجة الامتحان «Fail» للعلامات 0–64 و«Pass» للعلامات 65–100 (أعداد صحيحة). باستخدام 3-value boundary value analysis، ما القيم التي يجب فحصها للحد بين Fail وPass؟",
+   "exAr": "كلٌّ من 64 و65 قيمة حدية، والـ 3-value BVA تفحص كل قيمة مع جارتيها، فتكون القيم 63 و64 و65 و66."
   },
   {
    "n": 107,
@@ -1610,8 +1610,8 @@
    },
    "a": "D",
    "exEn": "With a step of 0.1, the closest invalid neighbour of 5.0 is 5.1, so 2-value BVA uses 5.0 and 5.1.",
-   "qAr": "حقل نسبة فائدة بيقبل قيم من 0.5% لـ 5.0% بخطوات 0.1. باستخدام 2-value boundary value analysis، أي قيم بتفحص الحد الأعلى؟",
-   "exAr": "لما الخطوة 0.1، أقرب جار غير صالح لـ 5.0 هو 5.1، فالـ 2-value BVA بتستعمل 5.0 و5.1."
+   "qAr": "يقبل حقل نسبة الفائدة قيمًا من 0.5% إلى 5.0% بخطوات مقدارها 0.1. باستخدام 2-value boundary value analysis، ما القيم التي تفحص الحد الأعلى؟",
+   "exAr": "بما أن الخطوة 0.1، فإن أقرب جار غير صالح للقيمة 5.0 هو 5.1، لذا تستخدم الـ 2-value BVA القيمتين 5.0 و5.1."
   },
   {
    "n": 108,
@@ -1626,8 +1626,8 @@
    },
    "a": "D",
    "exEn": "The coverage items are 9, 10, 30 and 31; the tests hit only 10 and 31, so 2 of 4 items are covered.",
-   "qAr": "حقل بيقبل أعداد صحيحة من 10 لـ 30. مختبِر طبّق 2-value boundary value analysis ونفّذ tests بالقيم 10 و20 و31. قديش الـ boundary value coverage اللي تحققت؟",
-   "exAr": "الـ coverage items هي 9 و10 و30 و31، والـ tests غطّت بس 10 و31، يعني 2 من 4."
+   "qAr": "يقبل حقل أعدادًا صحيحة من 10 إلى 30. طبّق مختبِر 2-value boundary value analysis ونفّذ tests بالقيم 10 و20 و31. ما مقدار الـ boundary value coverage المتحققة؟",
+   "exAr": "الـ coverage items هي 9 و10 و30 و31، ولم تغطِّ الـ tests إلا 10 و31، أي 2 من 4."
   },
   {
    "n": 109,
@@ -1642,8 +1642,8 @@
    },
    "a": "C",
    "exEn": "A full decision table lists every combination of the conditions: 2 × 2 × 2 = 8 columns.",
-   "qAr": "قاعدة الشحن بمتجر أونلاين إلها ثلاث شروط: الزبون member (Y/N)، والطلب $100 أو أكثر (Y/N)، ومطبّق كوبون شحن مجاني (Y/N). كم عمود بيكون بالـ decision table الكامل؟",
-   "exAr": "الـ decision table الكامل بيعرض كل احتمالات الشروط: 2 × 2 × 2 = 8 أعمدة."
+   "qAr": "لقاعدة الشحن في متجر إلكتروني ثلاثة شروط: الزبون member (Y/N)، وقيمة الطلب $100 أو أكثر (Y/N)، وتطبيق كوبون شحن مجاني (Y/N). كم عمودًا يحتوي الـ decision table الكامل؟",
+   "exAr": "يعرض الـ decision table الكامل جميع احتمالات الشروط: 2 × 2 × 2 = 8 أعمدة."
   },
   {
    "n": 110,
@@ -1658,8 +1658,8 @@
    },
    "a": "A",
    "exEn": "Coupon=Y collapses to one column, member=N without coupon collapses to one, and member=Y without coupon keeps two columns: 4 in total.",
-   "qAr": "لنفس المتجر: الشحن مجاني إذا في كوبون، أو إذا الزبون member والطلب $100 أو أكثر، وغير هيك مدفوع. إذا عملنا minimise للـ decision table بدمج الأعمدة اللي نتيجتها ما بتعتمد على شرط معيّن، كم عمود بيضل؟",
-   "exAr": "الكوبون = Y بيصير عمود واحد، وmember = N بدون كوبون عمود واحد، وmember = Y بدون كوبون بيضلّوا عمودين: المجموع 4."
+   "qAr": "في المتجر نفسه: يكون الشحن مجانيًا إذا طُبّق كوبون، أو إذا كان الزبون member وقيمة الطلب $100 أو أكثر، وإلا فهو مدفوع. إذا أجرينا minimise للـ decision table بدمج الأعمدة التي لا تعتمد نتيجتها على شرط معيّن، فكم عمودًا يبقى؟",
+   "exAr": "يصبح الكوبون = Y عمودًا واحدًا، وmember = N بدون كوبون عمودًا واحدًا، ويبقى member = Y بدون كوبون عمودين: المجموع 4."
   },
   {
    "n": 111,
@@ -1674,8 +1674,8 @@
    },
    "a": "B",
    "exEn": "Coverage counts distinct columns exercised: columns 1, 2 and 5 are 3 of 6, which is 50%.",
-   "qAr": "‏decision table فيه 6 أعمدة ممكنة. الـ tests اللي تنفّذت غطّت الأعمدة 1 و2 و2 و5. قديش الـ decision table coverage؟",
-   "exAr": "الـ coverage بتعدّ الأعمدة المختلفة اللي انفحصت: 1 و2 و5 يعني 3 من 6، أي 50%."
+   "qAr": "‏decision table يحتوي على 6 أعمدة ممكنة. غطّت الـ tests المنفّذة الأعمدة 1 و2 و2 و5. ما مقدار الـ decision table coverage؟",
+   "exAr": "تُحتسب الـ coverage بعدد الأعمدة المختلفة التي فُحصت: 1 و2 و5، أي 3 من 6، أي 50%."
   },
   {
    "n": 112,
@@ -1690,8 +1690,8 @@
    },
    "a": "B",
    "exEn": "No age can be under 18 and 65 or over at the same time, so the TRUE/TRUE column is infeasible.",
-   "qAr": "‏decision table فيه شرطين: «Age < 18» و«Age ≥ 65». أي تركيبة قيم مستحيلة ولازم تنشال من الجدول؟",
-   "exAr": "ما في عمر بيكون أقل من 18 و65 أو أكثر بنفس الوقت، فعمود TRUE/TRUE مستحيل."
+   "qAr": "‏decision table يحتوي على شرطين: «Age < 18» و«Age ≥ 65». أي تركيبة قيم مستحيلة ويجب حذفها من الجدول؟",
+   "exAr": "لا يمكن أن يكون العمر أقل من 18 و65 أو أكثر في الوقت نفسه، لذا فإن عمود TRUE/TRUE مستحيل."
   },
   {
    "n": 113,
@@ -1706,8 +1706,8 @@
    },
    "a": "A",
    "exEn": "One sequence covers everything: Locked → Unlocked → Locked → Alarm → Locked exercises all four transitions.",
-   "qAr": "قفل ذكي إله ثلاث حالات: Locked وUnlocked وAlarm. الـ transitions: من Locked لـ Unlocked (PIN صحيح)، ومن Unlocked لـ Locked (زر القفل)، ومن Locked لـ Alarm (ثالث PIN غلط)، ومن Alarm لـ Locked (reset من الأدمن). ما أقل عدد test cases، كل واحد بيبلّش من Locked، لتغطية كل الـ valid transitions؟",
-   "exAr": "تسلسل واحد بيغطي الكل: Locked → Unlocked → Locked → Alarm → Locked بيمرّ على الـ transitions الأربعة."
+   "qAr": "لقفل ذكي ثلاث حالات: Locked وUnlocked وAlarm. والـ transitions هي: من Locked إلى Unlocked (PIN صحيح)، ومن Unlocked إلى Locked (زر القفل)، ومن Locked إلى Alarm (ثالث PIN خاطئ)، ومن Alarm إلى Locked (reset من المسؤول). ما أقل عدد من الـ test cases، يبدأ كلٌّ منها من Locked، لتغطية جميع الـ valid transitions؟",
+   "exAr": "يغطي تسلسل واحد الجميع: Locked → Unlocked → Locked → Alarm → Locked يمر بالـ transitions الأربعة."
   },
   {
    "n": 114,
@@ -1722,8 +1722,8 @@
    },
    "a": "A",
    "exEn": "The test exercises four of the five valid transitions; Paused→Stopped is never exercised, so coverage is 4/5 = 80%.",
-   "qAr": "مشغّل ميديا إله حالات Stopped وPlaying وPaused، وفي خمس valid transitions: Stopped→Playing (play)، وPlaying→Paused (pause)، وPaused→Playing (play)، وPlaying→Stopped (stop)، وPaused→Stopped (stop). test بيمشي هيك: Stopped –play→ Playing –pause→ Paused –play→ Playing –stop→ Stopped. قديش الـ valid transitions coverage؟",
-   "exAr": "الـ test بيغطي 4 من 5 transitions، وPaused→Stopped ما انفحص أبداً، فالـ coverage هي 4/5 = 80%."
+   "qAr": "لمشغّل وسائط الحالات Stopped وPlaying وPaused، وله خمس valid transitions: Stopped→Playing (play)، وPlaying→Paused (pause)، وPaused→Playing (play)، وPlaying→Stopped (stop)، وPaused→Stopped (stop). يسير test على النحو الآتي: Stopped –play→ Playing –pause→ Paused –play→ Playing –stop→ Stopped. ما مقدار الـ valid transitions coverage؟",
+   "exAr": "يغطي الـ test أربعة من خمسة transitions، ولم يُفحص Paused→Stopped إطلاقًا، فتكون الـ coverage 4/5 = 80%."
   },
   {
    "n": 115,
@@ -1738,8 +1738,8 @@
    },
    "a": "B",
    "exEn": "There is no 'pause' transition defined from Stopped, so this tests how the system handles an invalid event in that state.",
-   "qAr": "لنفس مشغّل الميديا، أي test case بيفحص invalid transition؟",
-   "exAr": "ما في transition اسمه pause من حالة Stopped، فهاد الـ test بيفحص كيف النظام بيتعامل مع حدث مش مسموح بهاي الحالة."
+   "qAr": "في مشغّل الوسائط نفسه، أي test case يفحص invalid transition؟",
+   "exAr": "لا يوجد transition باسم pause من الحالة Stopped، لذا يفحص هذا الـ test كيفية تعامل النظام مع حدث غير مسموح به في هذه الحالة."
   },
   {
    "n": 116,
@@ -1754,8 +1754,8 @@
    },
    "a": "C",
    "exEn": "Five transitions exist and a test stops at a final state, so three paths are needed: New→Paid→Shipped→Delivered, New→Cancelled, and New→Paid→Cancelled.",
-   "qAr": "الطلب بيمرّ بالحالات: New → Paid → Shipped → Delivered، وممكن كمان New → Cancelled أو Paid → Cancelled. الـ Delivered والـ Cancelled حالات نهائية. ما أقل عدد test cases، كل واحد بيبلّش من New وبيخلص بحالة نهائية، لتحقيق 100% valid transitions coverage؟",
-   "exAr": "في خمس transitions، والـ test بيوقف عند الحالة النهائية، فبنحتاج ثلاث مسارات: New→Paid→Shipped→Delivered، وNew→Cancelled، وNew→Paid→Cancelled."
+   "qAr": "يمر الطلب بالحالات: New → Paid → Shipped → Delivered، ويمكن أيضًا New → Cancelled أو Paid → Cancelled. والحالتان Delivered وCancelled نهائيتان. ما أقل عدد من الـ test cases، يبدأ كلٌّ منها من New وينتهي بحالة نهائية، لتحقيق 100% valid transitions coverage؟",
+   "exAr": "توجد خمسة transitions، ويتوقف الـ test عند الحالة النهائية، لذا نحتاج إلى ثلاثة مسارات: New→Paid→Shipped→Delivered، وNew→Cancelled، وNew→Paid→Cancelled."
   },
   {
    "n": 117,
@@ -1770,8 +1770,8 @@
    },
    "a": "B",
    "exEn": "With x = 5 the condition is false, so lines 1, 2 and 5 run but line 3 does not: 3 of 4 statements, 75%.",
-   "qAr": "بالكود اللي فوق، الأسطر 1 و2 و3 و5 هي الـ statements القابلة للتنفيذ. قديش الـ statement coverage لـ test واحد بقيمة x = 5؟",
-   "exAr": "لما x = 5 الشرط بيطلع false، فبيتنفّذ 1 و2 و5 وما بيتنفّذ 3: يعني 3 من 4، أي 75%."
+   "qAr": "في الكود أعلاه، الأسطر 1 و2 و3 و5 هي الـ statements القابلة للتنفيذ. ما مقدار الـ statement coverage لـ test واحد بالقيمة x = 5؟",
+   "exAr": "عندما x = 5 يكون الشرط false، فتُنفَّذ الأسطر 1 و2 و5 ولا يُنفَّذ السطر 3: أي 3 من 4، أي 75%."
   },
   {
    "n": 118,
@@ -1786,8 +1786,8 @@
    },
    "a": "A",
    "exEn": "Each decision needs a true and a false outcome; two tests (a>0, c>0) and (a≤0, c≤0) cover all four branches.",
-   "qAr": "بالكود اللي فوق (‏decisionين: a > 0 وc > 0)، ما أقل عدد test cases لتحقيق 100% branch coverage؟",
-   "exAr": "كل decision بدها نتيجة true ونتيجة false، وtestين (a>0، c>0) و(a≤0، c≤0) بيغطّوا الـ branches الأربعة."
+   "qAr": "في الكود أعلاه (يتضمن decisionين: a > 0 وc > 0)، ما أقل عدد من الـ test cases لتحقيق 100% branch coverage؟",
+   "exAr": "يحتاج كل decision إلى نتيجة true ونتيجة false، ويغطي testان (a>0، c>0) و(a≤0، c≤0) الـ branches الأربعة."
   },
   {
    "n": 119,
@@ -1802,8 +1802,8 @@
    },
    "a": "A",
    "exEn": "Only this test checks a stated criterion (the 30-minute expiry); the others test things the criteria do not mention.",
-   "qAr": "‏User story: «بصفتي زبون، بدي أعمل reset لكلمة السر عن طريق رابط بيوصلني على الإيميل». الـ acceptance criteria: الرابط بينتهي بعد 30 دقيقة من إرساله، وبينفع يُستخدم مرة وحدة بس. أي test case مشتق مباشرة من هاي الـ acceptance criteria؟",
-   "exAr": "بس هاد الـ test بيفحص criterion مكتوب (انتهاء الرابط بعد 30 دقيقة)، والباقي بيفحصوا أشياء مش مذكورة بالـ criteria."
+   "qAr": "‏User story: «بصفتي زبونًا، أريد إجراء reset لكلمة المرور عبر رابط يصلني على البريد الإلكتروني». الـ acceptance criteria: تنتهي صلاحية الرابط بعد 30 دقيقة من إرساله، ولا يمكن استخدامه إلا مرة واحدة. أي test case مشتق مباشرة من هذه الـ acceptance criteria؟",
+   "exAr": "هذا الـ test وحده يفحص criterion مكتوبًا (انتهاء صلاحية الرابط بعد 30 دقيقة)، أما البقية فتفحص أمورًا غير مذكورة في الـ criteria."
   },
   {
    "n": 120,
@@ -1818,8 +1818,1985 @@
    },
    "a": "C",
    "exEn": "The boundary is between 'not eligible' ($49 or less) and 'eligible' ($50 or more), so $49 and $50 are the boundary values.",
-   "qAr": "‏acceptance criterion بيقول: «Given مجموع السلة $50 أو أكثر، when الزبون يطبّق كوبون SAVE10، then بينخصم 10%». المبالغ بالدولار الصحيح. أي زوج tests بيطبّق boundary value analysis على هاد الـ criterion؟",
-   "exAr": "الحد بين «مش مؤهّل» ($49 أو أقل) و«مؤهّل» ($50 أو أكثر)، فـ $49 و$50 هم القيم الحدية."
+   "qAr": "ينص acceptance criterion على: «Given مجموع السلة $50 أو أكثر، when يطبّق الزبون كوبون SAVE10، then يُخصم 10%». والمبالغ بالدولار الصحيح. أي زوج من الـ tests يطبّق boundary value analysis على هذا الـ criterion؟",
+   "exAr": "الحد بين «غير مؤهّل» ($49 أو أقل) و«مؤهّل» ($50 أو أكثر)، لذا فإن $49 و$50 هما القيمتان الحديتان."
+  },
+  {
+   "n": 121,
+   "ch": 1,
+   "q": "Which of the following statements about testing is correct according to the CTFL syllabus?",
+   "o": {
+    "A": "Testing consists only of executing the software to find failures",
+    "B": "Testing includes both verification and validation, and can be both static and dynamic",
+    "C": "Testing is mainly a technical activity that does not require planning or management",
+    "D": "Testing is complete once all planned test cases have passed"
+   },
+   "a": "B",
+   "exEn": "Testing is a set of activities that includes verification and validation and involves both static and dynamic testing.",
+   "qAr": "أي العبارات التالية عن الاختبار صحيحة وفق منهج CTFL؟",
+   "exAr": "الاختبار مجموعة أنشطة تشمل verification وvalidation، ويتضمن static testing وdynamic testing معًا."
+  },
+  {
+   "n": 122,
+   "ch": 1,
+   "q": "During component testing of a system, the main objective is to find as many defects as possible. During acceptance testing of the same system, which objective is MOST likely to be emphasized?",
+   "o": {
+    "A": "Finding as many coding defects as possible in individual modules",
+    "B": "Verifying that internal interfaces between functions return correct values",
+    "C": "Measuring the code coverage achieved by the unit tests",
+    "D": "Building confidence that the system meets users' needs and is ready for use"
+   },
+   "a": "D",
+   "exEn": "Test objectives vary with context; acceptance testing typically focuses on building confidence and validating fitness for use.",
+   "qAr": "أثناء component testing لنظام ما، يكون الهدف الرئيسي إيجاد أكبر عدد ممكن من الـ defects. أثناء acceptance testing للنظام نفسه، أي هدف يُرجَّح التركيز عليه أكثر؟",
+   "exAr": "تختلف أهداف الاختبار حسب السياق؛ ويركّز acceptance testing عادةً على بناء الثقة والتحقق من صلاحية النظام للاستخدام."
+  },
+  {
+   "n": 123,
+   "ch": 1,
+   "q": "A tester reports a failure. The developer reproduces it, locates the defect in the code and fixes it. What should happen next to check that the fix works?",
+   "o": {
+    "A": "The tester performs confirmation testing to check that the original failure no longer occurs",
+    "B": "The developer repeats debugging to look for further defects in other modules",
+    "C": "The tester repeats test analysis to define new test conditions",
+    "D": "Nothing, because debugging has already confirmed that the fix works"
+   },
+   "a": "A",
+   "exEn": "Debugging covers reproduction, diagnosis and fixing; confirmation testing then checks whether the fix resolved the problem.",
+   "qAr": "يبلّغ مختبِر عن failure. يعيد المطوّر إنتاجه ويحدّد الـ defect في الكود ويصلحه. ما الذي يجب أن يحدث بعد ذلك للتحقق من نجاح الإصلاح؟",
+   "exAr": "يشمل debugging إعادة إنتاج المشكلة وتشخيصها وإصلاحها، ثم يتحقق confirmation testing من أن الإصلاح عالج المشكلة فعلًا."
+  },
+  {
+   "n": 124,
+   "ch": 1,
+   "q": "A review (static testing) identifies a defect in a requirements document. According to the syllabus, what does debugging involve in this case?",
+   "o": {
+    "A": "Reproducing the failure, diagnosing it and then fixing the defect",
+    "B": "Executing the requirements document in a test environment to observe failures",
+    "C": "Removing the defect; there is no need to reproduce a failure or diagnose it",
+    "D": "Running regression tests on the code before correcting the document"
+   },
+   "a": "C",
+   "exEn": "When static testing identifies a defect, debugging is concerned with removing it; reproduction and diagnosis are not needed.",
+   "qAr": "تكشف مراجعة (static testing) عن defect في وثيقة المتطلبات. وفق المنهج، ماذا يتضمن debugging في هذه الحالة؟",
+   "exAr": "عندما يكشف static testing عن defect، يقتصر debugging على إزالته، فلا حاجة لإعادة إنتاج failure أو تشخيصه."
+  },
+  {
+   "n": 125,
+   "ch": 1,
+   "q": "Which of the following is an example of how testing contributes to the success of a project?",
+   "o": {
+    "A": "Testers write production code to reduce the developers' workload",
+    "B": "Testers approve the project budget based on their test estimates",
+    "C": "Testers taking part in requirements reviews detect ambiguities early, reducing the risk of building incorrect functionality",
+    "D": "Testing removes the need for any user involvement during acceptance"
+   },
+   "a": "C",
+   "exEn": "Testing detects defects cost-effectively; early involvement such as requirements reviews reduces the risk of developing wrong functionality.",
+   "qAr": "أي مما يلي مثال على كيفية مساهمة الاختبار في نجاح المشروع؟",
+   "exAr": "يكشف الاختبار الـ defects بتكلفة مناسبة، ومشاركة المختبِرين المبكرة في مراجعة المتطلبات تقلّل خطر بناء وظائف غير صحيحة."
+  },
+  {
+   "n": 126,
+   "ch": 1,
+   "q": "Apart from detecting defects, which of the following is a reason why testing may be required?",
+   "o": {
+    "A": "To meet contractual, legal or regulatory requirements or standards",
+    "B": "To guarantee that the delivered software contains no defects",
+    "C": "To replace the need for code reviews",
+    "D": "To determine the individual performance ratings of developers"
+   },
+   "a": "A",
+   "exEn": "Testing may be required to meet contractual or legal requirements or to comply with regulatory standards.",
+   "qAr": "بعيدًا عن كشف الـ defects، أي مما يلي سبب قد يجعل الاختبار مطلوبًا؟",
+   "exAr": "قد يكون الاختبار مطلوبًا لتلبية متطلبات تعاقدية أو قانونية أو للامتثال لمعايير تنظيمية."
+  },
+  {
+   "n": 127,
+   "ch": 1,
+   "q": "How are test results used in Quality Assurance (QA)?",
+   "o": {
+    "A": "To fix the defects found in the product",
+    "B": "To replace process audits with product inspections",
+    "C": "To decide which individual testers need retraining",
+    "D": "As feedback on how well the development and test processes are performing"
+   },
+   "a": "D",
+   "exEn": "In QA, test results provide feedback on process performance; in testing (QC) they are used to fix defects.",
+   "qAr": "كيف تُستخدم نتائج الاختبار في Quality Assurance (QA)؟",
+   "exAr": "في الـ QA تُستخدم نتائج الاختبار كتغذية راجعة عن أداء عمليات التطوير والاختبار، أما في الاختبار (QC) فتُستخدم لإصلاح الـ defects."
+  },
+  {
+   "n": 128,
+   "ch": 1,
+   "q": "Working under heavy time pressure, a developer misread the discount rule in the specification and coded the wrong percentage. Customers were later charged incorrect prices. Which of these is the ROOT CAUSE?",
+   "o": {
+    "A": "The incorrect percentage in the code",
+    "B": "The heavy time pressure that led to the misreading",
+    "C": "Customers being charged incorrect prices",
+    "D": "The developer's misreading of the specification"
+   },
+   "a": "B",
+   "exEn": "The misreading is the error, the wrong percentage is the defect, the incorrect charge is the failure; the time pressure that led to the error is the root cause.",
+   "qAr": "تحت ضغط وقت شديد، أساء مطوّر قراءة قاعدة الخصم في المواصفات وبرمج نسبة خاطئة. لاحقًا دُفّع العملاء أسعارًا غير صحيحة. أي مما يلي هو الـ ROOT CAUSE؟",
+   "exAr": "سوء القراءة هو الـ error، والنسبة الخاطئة هي الـ defect، والسعر الخاطئ هو الـ failure؛ أما ضغط الوقت الذي أدى إلى الخطأ فهو الـ root cause."
+  },
+  {
+   "n": 129,
+   "ch": 1,
+   "q": "Besides defects in the software, what else can cause failures according to the syllabus?",
+   "o": {
+    "A": "Environmental conditions, such as radiation or electromagnetic fields affecting hardware or firmware",
+    "B": "Executing too many test cases in the same test cycle",
+    "C": "Designing test cases before the code is available",
+    "D": "Maintaining traceability between test cases and requirements"
+   },
+   "a": "A",
+   "exEn": "Failures can be caused by defects and also by environmental conditions such as radiation or electromagnetic fields.",
+   "qAr": "إلى جانب الـ defects في البرمجيات، ما الذي يمكن أن يسبّب failures أيضًا وفق المنهج؟",
+   "exAr": "قد تنتج الـ failures عن defects، وكذلك عن ظروف بيئية مثل الإشعاع أو المجالات الكهرومغناطيسية."
+  },
+  {
+   "n": 130,
+   "ch": 1,
+   "q": "What is the main purpose of performing root cause analysis?",
+   "o": {
+    "A": "To identify the person responsible for introducing each defect",
+    "B": "To reproduce the failure in the test environment",
+    "C": "To identify the underlying reasons for problems so that similar defects can be reduced or prevented in future",
+    "D": "To calculate the number of test cases needed for the next release"
+   },
+   "a": "C",
+   "exEn": "Root cause analysis identifies fundamental causes so that addressing them can prevent or reduce similar defects, leading to process improvement.",
+   "qAr": "ما الهدف الرئيسي من إجراء root cause analysis؟",
+   "exAr": "يحدّد root cause analysis الأسباب الجذرية للمشكلات، ومعالجتها تمنع أو تقلّل defects مشابهة في المستقبل وتحسّن العمليات."
+  },
+  {
+   "n": 131,
+   "ch": 1,
+   "q": "A test fails, but investigation shows that the expected result written in the test case was wrong and the software actually behaves correctly. What is this an example of?",
+   "o": {
+    "A": "A false negative",
+    "B": "A false positive",
+    "C": "A root cause",
+    "D": "A regression"
+   },
+   "a": "B",
+   "exEn": "Not all unexpected results are failures; a false positive is a reported failure where no defect exists in the test object, e.g. due to a defect in the testware.",
+   "qAr": "يفشل test، لكن التحقيق يُظهر أن النتيجة المتوقعة المكتوبة في الـ test case كانت خاطئة وأن البرنامج يعمل بشكل صحيح. ما الذي يمثّله هذا؟",
+   "exAr": "ليست كل نتيجة غير متوقعة failure؛ فالـ false positive هو الإبلاغ عن failure دون وجود defect في الـ test object، مثلًا بسبب defect في الـ testware."
+  },
+  {
+   "n": 132,
+   "ch": 1,
+   "q": "A team reviews user stories and acceptance criteria before any code is written, and testers design tests in parallel with development. Which testing principle is the team mainly applying?",
+   "o": {
+    "A": "Exhaustive testing is impossible",
+    "B": "Defects cluster together",
+    "C": "Tests wear out",
+    "D": "Early testing saves time and money"
+   },
+   "a": "D",
+   "exEn": "Removing defects early prevents them from causing derived defects and failures later, reducing cost.",
+   "qAr": "يراجع فريق الـ user stories والـ acceptance criteria قبل كتابة أي كود، ويصمّم المختبِرون الاختبارات بالتوازي مع التطوير. أي مبدأ اختبار يطبّقه الفريق أساسًا؟",
+   "exAr": "إزالة الـ defects مبكرًا تمنع ظهور defects وfailures مشتقة لاحقًا، فتقلّ التكلفة."
+  },
+  {
+   "n": 133,
+   "ch": 1,
+   "q": "In the last three releases, most reported failures came from the payment module, which is a small part of the system. How should the test manager use this observation for the next release?",
+   "o": {
+    "A": "Reduce testing of the payment module because its defects are already known",
+    "B": "Spread the test effort equally across all modules to avoid bias",
+    "C": "Stop regression testing of the other modules",
+    "D": "Use it as an input to risk-based testing and focus more test effort on the payment module"
+   },
+   "a": "D",
+   "exEn": "Defects cluster together; predicted and observed clusters are an important input to risk-based testing.",
+   "qAr": "في آخر ثلاثة releases، جاءت معظم الـ failures المبلَّغ عنها من وحدة الدفع، وهي جزء صغير من النظام. كيف يجب أن يستفيد مدير الاختبار من هذه الملاحظة في الـ release القادم؟",
+   "exAr": "الـ defects تتجمّع معًا، والتجمّعات المتوقعة والملاحَظة مُدخل مهم في risk-based testing."
+  },
+  {
+   "n": 134,
+   "ch": 1,
+   "q": "A regression test suite has been run unchanged in every sprint for a year and has found no new defects for months, while users keep reporting failures in production. What is the MOST appropriate action?",
+   "o": {
+    "A": "Run the same suite more frequently",
+    "B": "Review and modify the existing tests and write new tests",
+    "C": "Stop running the regression suite because it no longer finds defects",
+    "D": "Conclude that the areas covered by the suite are defect-free"
+   },
+   "a": "B",
+   "exEn": "Tests wear out: repeating the same tests becomes less effective at finding new defects, so tests and test data should be modified and new tests written.",
+   "qAr": "تُنفَّذ regression test suite دون تغيير في كل sprint منذ سنة، ولم تكشف أي defects جديدة منذ أشهر، بينما يستمر المستخدمون في الإبلاغ عن failures في الإنتاج. ما الإجراء الأنسب؟",
+   "exAr": "الاختبارات تفقد فعاليتها (tests wear out) عند تكرارها، لذا يجب تعديل الاختبارات الحالية وبياناتها وكتابة اختبارات جديدة."
+  },
+  {
+   "n": 135,
+   "ch": 1,
+   "q": "A company develops both a safety-critical infusion pump controller and a casual mobile game. The test manager plans formal, highly documented testing for the pump and a lighter, exploratory approach for the game. Which principle justifies this?",
+   "o": {
+    "A": "Absence-of-defects fallacy",
+    "B": "Testing shows the presence, not the absence of defects",
+    "C": "Testing is context dependent",
+    "D": "Defects cluster together"
+   },
+   "a": "C",
+   "exEn": "There is no single universal approach; testing is done differently in different contexts.",
+   "qAr": "تطوّر شركة نظام تحكّم لمضخة دواء حرجة للسلامة ولعبة جوال بسيطة. يخطط مدير الاختبار لاختبار رسمي وموثّق بدقة للمضخة، ونهج أخفّ واستكشافي للعبة. أي مبدأ يبرّر ذلك؟",
+   "exAr": "لا يوجد نهج اختبار واحد يناسب كل الحالات؛ فالاختبار يُنفَّذ بطرق مختلفة حسب السياق."
+  },
+  {
+   "n": 136,
+   "ch": 1,
+   "q": "After a long test cycle with no open defects, the project manager asks the tester to sign a statement that the system is 'defect-free'. What is the BEST response based on the testing principles?",
+   "o": {
+    "A": "Explain that testing reduces the probability of undiscovered defects but cannot prove that there are none",
+    "B": "Sign the statement, since all planned tests have passed",
+    "C": "Agree to sign only after every possible input combination has been tested",
+    "D": "Sign it only for the modules that had the highest number of defects"
+   },
+   "a": "A",
+   "exEn": "Testing shows the presence, not the absence of defects; it reduces the probability of remaining undiscovered defects but cannot prove correctness.",
+   "qAr": "بعد دورة اختبار طويلة دون defects مفتوحة، يطلب مدير المشروع من المختبِر توقيع إقرار بأن النظام «خالٍ من الـ defects». ما أفضل رد بناءً على مبادئ الاختبار؟",
+   "exAr": "الاختبار يُظهر وجود الـ defects لا غيابها؛ فهو يقلّل احتمال بقاء defects غير مكتشفة لكنه لا يثبت خلوّ النظام منها."
+  },
+  {
+   "n": 137,
+   "ch": 1,
+   "q": "A registration form has 12 fields, each accepting many values, and the possible combinations are far too numerous to test in the available time. What does the syllabus recommend?",
+   "o": {
+    "A": "Test every combination with automation, since automation removes this limitation",
+    "B": "Use test techniques, test case prioritization and risk-based testing to focus the test effort",
+    "C": "Test only the first field, since defects in the other fields are unlikely",
+    "D": "Delay the release until all combinations have been tested"
+   },
+   "a": "B",
+   "exEn": "Exhaustive testing is impossible except in trivial cases; test techniques, prioritization and risk-based testing should be used to focus effort.",
+   "qAr": "نموذج تسجيل يحتوي على 12 حقلًا، يقبل كل منها قيمًا كثيرة، وعدد التركيبات الممكنة أكبر بكثير مما يسمح به الوقت المتاح. بماذا يوصي المنهج؟",
+   "exAr": "الاختبار الشامل مستحيل إلا في الحالات البسيطة، لذا تُستخدم test techniques وتحديد أولويات الـ test cases وrisk-based testing لتركيز الجهد."
+  },
+  {
+   "n": 138,
+   "ch": 1,
+   "q": "During test execution, the test manager notices that progress is behind schedule and decides to re-prioritize the remaining tests and add another tester. Which test activity is this?",
+   "o": {
+    "A": "Test monitoring and test control",
+    "B": "Test planning",
+    "C": "Test analysis",
+    "D": "Test completion"
+   },
+   "a": "A",
+   "exEn": "Test monitoring compares actual progress against the plan; test control takes actions such as re-prioritizing or reallocating resources.",
+   "qAr": "أثناء تنفيذ الاختبارات، يلاحظ مدير الاختبار أن التقدّم متأخر عن الجدول، فيقرّر إعادة ترتيب أولويات الاختبارات المتبقية وإضافة مختبِر آخر. ما هو نشاط الاختبار هذا؟",
+   "exAr": "يقارن test monitoring التقدّم الفعلي بالخطة، ويتخذ test control إجراءات مثل إعادة ترتيب الأولويات أو إعادة توزيع الموارد."
+  },
+  {
+   "n": 139,
+   "ch": 1,
+   "q": "Which task is part of test implementation?",
+   "o": {
+    "A": "Defining the test objectives and test approach in the test plan",
+    "B": "Analyzing the test basis to identify testable features and test conditions",
+    "C": "Comparing actual results with expected results",
+    "D": "Organizing test cases into test procedures, assembling test suites and preparing test data and the test environment"
+   },
+   "a": "D",
+   "exEn": "Test implementation creates or acquires the testware needed for execution: test procedures, test suites, test data, test environment and the execution schedule.",
+   "qAr": "أي مهمة تُعدّ جزءًا من test implementation؟",
+   "exAr": "في test implementation يُجهَّز الـ testware اللازم للتنفيذ: test procedures وtest suites وtest data والـ test environment وجدول التنفيذ."
+  },
+  {
+   "n": 140,
+   "ch": 1,
+   "q": "At the end of a project, the team archives the testware for reuse, hands the test environment over to the operations team and holds a meeting to capture lessons learned. Which test activity are they performing?",
+   "o": {
+    "A": "Test execution",
+    "B": "Test monitoring and test control",
+    "C": "Test completion",
+    "D": "Test implementation"
+   },
+   "a": "C",
+   "exEn": "Test completion includes archiving testware, handing over the test environment, analysing lessons learned and producing a test completion report.",
+   "qAr": "في نهاية مشروع، يؤرشف الفريق الـ testware لإعادة استخدامه، ويسلّم الـ test environment لفريق التشغيل، ويعقد اجتماعًا لتوثيق الدروس المستفادة. أي نشاط اختبار ينفّذون؟",
+   "exAr": "يشمل test completion أرشفة الـ testware وتسليم الـ test environment وتحليل الدروس المستفادة وإعداد test completion report."
+  },
+  {
+   "n": 141,
+   "ch": 1,
+   "q": "Which of the following is performed during test execution?",
+   "o": {
+    "A": "Identifying and prioritizing test conditions",
+    "B": "Writing the test completion report",
+    "C": "Running tests, comparing actual results with expected results and reporting anomalies",
+    "D": "Designing test cases and identifying coverage items"
+   },
+   "a": "C",
+   "exEn": "Test execution includes running tests, comparing actual and expected results, analysing anomalies and reporting defects.",
+   "qAr": "أي مما يلي يُنفَّذ أثناء test execution؟",
+   "exAr": "يشمل test execution تشغيل الاختبارات، ومقارنة النتائج الفعلية بالمتوقعة، وتحليل الحالات الشاذة والإبلاغ عن الـ defects."
+  },
+  {
+   "n": 142,
+   "ch": 1,
+   "q": "Which testware is typically produced by test monitoring and test control?",
+   "o": {
+    "A": "Test conditions",
+    "B": "Test procedures and test suites",
+    "C": "Defect reports and test logs",
+    "D": "Test progress reports and documentation of control directives"
+   },
+   "a": "D",
+   "exEn": "Test monitoring and control produce test progress reports, documentation of control directives and risk information.",
+   "qAr": "أي testware يُنتَج عادةً من test monitoring وtest control؟",
+   "exAr": "ينتج عن test monitoring وtest control تقارير التقدّم (test progress reports) وتوثيق قرارات التحكم ومعلومات المخاطر."
+  },
+  {
+   "n": 143,
+   "ch": 1,
+   "q": "Which of the following is an example of a contextual factor that influences how the test process is carried out?",
+   "o": {
+    "A": "Team members' skills and project constraints such as scope, time and budget",
+    "B": "The glossary definition of a failure",
+    "C": "The seven testing principles",
+    "D": "The relationship between errors, defects and failures"
+   },
+   "a": "A",
+   "exEn": "Contextual factors include stakeholders, team skills, business domain, technical factors, project constraints, organizational factors, the SDLC and tools.",
+   "qAr": "أي مما يلي مثال على عامل سياقي يؤثّر في طريقة تنفيذ عملية الاختبار؟",
+   "exAr": "من العوامل السياقية: أصحاب المصلحة، ومهارات الفريق، ومجال العمل، والعوامل التقنية، وقيود المشروع، والعوامل التنظيمية، والـ SDLC، والأدوات."
+  },
+  {
+   "n": 144,
+   "ch": 1,
+   "q": "How can traceability of test results to risks be used?",
+   "o": {
+    "A": "To determine which developer introduced the most defects",
+    "B": "To evaluate the level of residual risk in a test object",
+    "C": "To generate test cases automatically from the risk register",
+    "D": "To replace the test completion report"
+   },
+   "a": "B",
+   "exEn": "Traceability of test results to risks can be used to evaluate the level of residual risk in a test object.",
+   "qAr": "كيف يمكن الاستفادة من traceability بين نتائج الاختبار والمخاطر؟",
+   "exAr": "تتيح traceability بين نتائج الاختبار والمخاطر تقييم مستوى المخاطر المتبقية (residual risk) في الـ test object."
+  },
+  {
+   "n": 145,
+   "ch": 1,
+   "q": "Which activities are mainly the focus of the testing role, as opposed to the test management role?",
+   "o": {
+    "A": "Test analysis, test design, test implementation and test execution",
+    "B": "Test planning, test monitoring and test control, and test completion",
+    "C": "Defining the organizational test policy and approving the budget",
+    "D": "Debugging and fixing the defects found during testing"
+   },
+   "a": "A",
+   "exEn": "The testing role focuses on the engineering side: analysis, design, implementation and execution; test management covers planning, monitoring and control, and completion.",
+   "qAr": "أي الأنشطة يركّز عليها أساسًا دور testing، مقارنةً بدور test management؟",
+   "exAr": "يركّز دور testing على الجانب الهندسي: التحليل والتصميم والتجهيز والتنفيذ، بينما يغطي test management التخطيط والمراقبة والتحكم والإكمال."
+  },
+  {
+   "n": 146,
+   "ch": 1,
+   "q": "In Agile software development, how is the test management role typically handled?",
+   "o": {
+    "A": "Only by an external test manager from another company",
+    "B": "Some test management tasks may be handled by the Agile team, while tasks spanning multiple teams may be done by test managers outside the team",
+    "C": "Only by the product owner",
+    "D": "It is not needed, because Agile teams do not plan or monitor testing"
+   },
+   "a": "B",
+   "exEn": "In Agile, some test management tasks may be handled by the team itself; tasks spanning several teams or the organization may be done by test managers outside the team.",
+   "qAr": "في Agile software development، كيف يُدار دور test management عادةً؟",
+   "exAr": "في Agile قد يتولى الفريق نفسه بعض مهام test management، أما المهام التي تمتد عبر عدة فرق أو على مستوى المؤسسة فقد يتولاها test managers من خارج الفريق."
+  },
+  {
+   "n": 147,
+   "ch": 1,
+   "q": "Shortly before a release, a tester finds several serious failures. The developers are under pressure and tend to react defensively to defect reports. What is the BEST way for the tester to communicate the findings?",
+   "o": {
+    "A": "Escalate directly to senior management without informing the developers",
+    "B": "Delay reporting until after the release to avoid conflict",
+    "C": "Point out which developer was responsible for each defect",
+    "D": "Report the information constructively and factually, focusing on the product and the shared goal of better quality"
+   },
+   "a": "D",
+   "exEn": "Testing can be perceived as destructive, so good communication skills are needed to report findings constructively and objectively.",
+   "qAr": "قبيل release بفترة قصيرة، يكتشف مختبِر عدة failures خطيرة. المطوّرون تحت ضغط ويميلون إلى ردّ فعل دفاعي تجاه الـ defect reports. ما أفضل طريقة لينقل المختبِر ما وجده؟",
+   "exAr": "قد يُنظر إلى الاختبار على أنه نشاط هدّام، لذا يحتاج المختبِر إلى مهارات تواصل جيدة لعرض النتائج بطريقة بنّاءة وموضوعية."
+  },
+  {
+   "n": 148,
+   "ch": 1,
+   "q": "Which of the following is an example of the whole-team approach?",
+   "o": {
+    "A": "Testers work in a separate team and receive the build only after development is finished",
+    "B": "Only testers are responsible for the quality of the product",
+    "C": "Testers collaborate with business representatives to create suitable acceptance tests, and with developers to agree on the test strategy and test automation approach",
+    "D": "Developers are not allowed to write tests, in order to preserve tester independence"
+   },
+   "a": "C",
+   "exEn": "In the whole-team approach everyone shares responsibility for quality; testers work closely with business representatives and developers.",
+   "qAr": "أي مما يلي مثال على الـ whole-team approach؟",
+   "exAr": "في الـ whole-team approach يتحمّل الجميع مسؤولية الجودة، ويعمل المختبِرون عن قرب مع ممثلي العمل والمطوّرين."
+  },
+  {
+   "n": 149,
+   "ch": 1,
+   "q": "Which is a potential DRAWBACK of independent testing?",
+   "o": {
+    "A": "Independent testers may recognize different kinds of failures than the author would",
+    "B": "Developers may lose a sense of responsibility for quality",
+    "C": "Independent testers can challenge assumptions made by stakeholders",
+    "D": "Independent testers bring a different perspective from the author"
+   },
+   "a": "B",
+   "exEn": "Drawbacks of independence include isolation from developers, testers seen as a bottleneck, and developers losing a sense of responsibility for quality.",
+   "qAr": "أي مما يلي سلبية محتمل في الاختبار المستقل (independent testing)؟",
+   "exAr": "من سلبيات الاستقلالية: عزلة المختبِرين عن المطوّرين، واعتبارهم bottleneck، وفقدان المطوّرين إحساسهم بالمسؤولية عن الجودة."
+  },
+  {
+   "n": 150,
+   "ch": 1,
+   "q": "Which of the following provides the HIGHEST level of test independence?",
+   "o": {
+    "A": "Testers from outside the organization",
+    "B": "Testers from a different team within the same organization",
+    "C": "Developers testing a colleague's code within the same team",
+    "D": "The author testing their own work product"
+   },
+   "a": "A",
+   "exEn": "Independence ranges from none (author) through peers and other teams within the organization up to testers from outside the organization.",
+   "qAr": "أي مما يلي يوفّر أعلى مستوى من استقلالية الاختبار؟",
+   "exAr": "تتدرّج الاستقلالية من انعدامها (الكاتب نفسه) إلى الزملاء ثم فرق أخرى داخل المؤسسة، وصولًا إلى أعلاها: مختبِرون من خارج المؤسسة."
+  },
+  {
+   "n": 151,
+   "ch": 2,
+   "q": "A project follows a sequential development model. How does this model typically affect testing?",
+   "o": {
+    "A": "Testers take part in reviews and test design early, but dynamic testing is usually only possible later, once executable code exists",
+    "B": "Dynamic testing starts in the first phase because code is produced in every iteration",
+    "C": "Testing is postponed entirely until all development work is complete, including reviews",
+    "D": "Static testing is not possible because no work products are produced before coding"
+   },
+   "a": "A",
+   "exEn": "In sequential models testers join requirements reviews, analysis and design early, but executable code usually arrives late, so dynamic testing comes later.",
+   "qAr": "يتبع مشروع ما نموذج تطوير تسلسليًا (sequential). كيف يؤثر هذا النموذج عادةً على الاختبار؟",
+   "exAr": "في النماذج التسلسلية يشارك المختبِرون مبكرًا في مراجعة المتطلبات والـ test analysis والـ test design، لكن الكود القابل للتنفيذ يأتي متأخرًا، لذلك يتأخر الـ dynamic testing."
+  },
+  {
+   "n": 152,
+   "ch": 2,
+   "q": "A team notices that its component tests and system tests repeatedly check the same things, wasting effort. Which good testing practice, applicable to any SDLC, addresses this problem?",
+   "o": {
+    "A": "Every development activity should have a corresponding test activity",
+    "B": "Each test level should have specific and distinct test objectives",
+    "C": "Testers should be involved in reviewing work products as soon as drafts are available",
+    "D": "Test analysis and design for a test level should begin during the corresponding development phase"
+   },
+   "a": "B",
+   "exEn": "Giving each test level specific, different objectives keeps testing appropriately comprehensive while avoiding redundancy.",
+   "qAr": "لاحظ فريق أن الـ component tests والـ system tests تفحص الأشياء نفسها بشكل متكرر، مما يهدر الجهد. أي ممارسة اختبار جيدة، تنطبق على أي SDLC، تعالج هذه المشكلة؟",
+   "exAr": "تحديد test objectives خاصة ومختلفة لكل test level يجعل الاختبار شاملًا بالقدر المناسب ويتجنب التكرار."
+  },
+  {
+   "n": 153,
+   "ch": 2,
+   "q": "According to good testing practices, when should testers start reviewing work products such as requirements or user stories?",
+   "o": {
+    "A": "Only after the work products have been formally approved and baselined",
+    "B": "After the related code has been delivered to the test environment",
+    "C": "As soon as drafts of these work products are available",
+    "D": "During the test completion activity at the end of the project"
+   },
+   "a": "C",
+   "exEn": "Good practice is for testers to review work products as soon as drafts are available, so earlier testing and defect detection support shift-left.",
+   "qAr": "وفقًا لممارسات الاختبار الجيدة، متى يجب أن يبدأ المختبِرون بمراجعة الـ work products مثل المتطلبات أو الـ user stories؟",
+   "exAr": "الممارسة الجيدة أن يراجع المختبِرون الـ work products بمجرد توفر مسوداتها، فيُكتشف الـ defect مبكرًا وهذا يدعم الـ shift-left."
+  },
+  {
+   "n": 154,
+   "ch": 2,
+   "q": "A developer first writes a small automated test that fails, then writes just enough code to make it pass, and then refactors the code. The cycle is repeated for every small piece of functionality. Which approach is the developer using?",
+   "o": {
+    "A": "Behavior-driven development (BDD)",
+    "B": "Acceptance test-driven development (ATDD)",
+    "C": "Exploratory testing",
+    "D": "Test-driven development (TDD)"
+   },
+   "a": "D",
+   "exEn": "TDD directs coding through test cases written first: write a failing test, code until it passes, then refactor, iteratively.",
+   "qAr": "يكتب مطوّر أولًا test آليًا صغيرًا يفشل، ثم يكتب الحد الأدنى من الكود ليجعله ينجح، ثم يعمل refactoring للكود، ويكرر الدورة لكل جزء صغير من الوظائف. أي approach يستخدم هذا المطوّر؟",
+   "exAr": "الـ TDD يوجّه كتابة الكود عن طريق test cases تُكتب أولًا: test يفشل، ثم كود حتى ينجح، ثم refactoring، بشكل تكراري."
+  },
+  {
+   "n": 155,
+   "ch": 2,
+   "q": "Which statement is TRUE for TDD, ATDD and BDD alike?",
+   "o": {
+    "A": "They replace the need for any testing at higher test levels",
+    "B": "Tests are defined before the code is written, and the tests may persist as automated tests for future regression",
+    "C": "They are only applicable in sequential development models",
+    "D": "Tests are written by testers only, after development is finished"
+   },
+   "a": "B",
+   "exEn": "All three test-first approaches apply early testing and shift-left by defining tests before code, and the tests can remain as automated regression tests.",
+   "qAr": "أي عبارة صحيحة بالنسبة لـ TDD وATDD وBDD معًا؟",
+   "exAr": "الثلاثة approaches من نوع test-first تطبّق الاختبار المبكر والـ shift-left لأن الـ tests تُعرَّف قبل الكود، ويمكن أن تبقى كـ automated tests للـ regression لاحقًا."
+  },
+  {
+   "n": 156,
+   "ch": 2,
+   "q": "Before development of a user story starts, the product owner, a developer and a tester write scenarios such as: \"Given the cart contains 3 items, When the user removes one item, Then the cart total is updated\". The scenarios are easy for business stakeholders to understand and are later automated. Which approach is being used?",
+   "o": {
+    "A": "Test-driven development (TDD)",
+    "B": "Static analysis",
+    "C": "Behavior-driven development (BDD)",
+    "D": "Checklist-based testing"
+   },
+   "a": "C",
+   "exEn": "BDD expresses desired behaviour as test cases in simple natural language, usually Given/When/Then, understandable by stakeholders and translatable into executable tests.",
+   "qAr": "قبل بدء تطوير user story، يكتب الـ product owner ومطوّر ومختبِر scenarios مثل: «Given السلة فيها 3 عناصر، When المستخدم يحذف عنصرًا، Then يتحدّث مجموع السلة». هذه الـ scenarios سهلة الفهم لأصحاب العمل وتُحوَّل لاحقًا إلى automated tests. أي approach مستخدَم هنا؟",
+   "exAr": "الـ BDD يعبّر عن السلوك المطلوب بـ test cases بلغة طبيعية بسيطة، غالبًا بصيغة Given/When/Then، يفهمها الـ stakeholders ويمكن تحويلها إلى tests قابلة للتنفيذ."
+  },
+  {
+   "n": 157,
+   "ch": 2,
+   "q": "An organization is moving to DevOps. From a testing perspective, which of the following is a RISK or challenge of this change?",
+   "o": {
+    "A": "Developers get faster feedback on the quality of their code",
+    "B": "Automated processes such as CI/CD support a stable test environment",
+    "C": "Testers gain more visibility of non-functional quality characteristics",
+    "D": "Test automation requires additional resources and may be difficult to establish and maintain"
+   },
+   "a": "D",
+   "exEn": "Syllabus DevOps risks include defining the delivery pipeline, introducing and maintaining CI/CD tools, and test automation needing extra resources and being hard to establish and maintain.",
+   "qAr": "تنتقل مؤسسة إلى DevOps. من منظور الاختبار، أي مما يلي يُعد risk أو تحديًا لهذا التغيير؟",
+   "exAr": "من مخاطر الـ DevOps: ضرورة تعريف الـ delivery pipeline، وإدخال أدوات CI/CD وصيانتها، وأن الـ test automation يحتاج موارد إضافية وقد يصعب بناؤه وصيانته."
+  },
+  {
+   "n": 158,
+   "ch": 2,
+   "q": "A team wants to apply a shift-left approach. Which of the following activities is an example of shift-left?",
+   "o": {
+    "A": "Starting non-functional testing, such as performance testing, at the component test level",
+    "B": "Postponing security testing until acceptance testing so that the system is complete",
+    "C": "Starting test design only after the code freeze",
+    "D": "Running static analysis only after system testing has finished"
+   },
+   "a": "A",
+   "exEn": "Shift-left practices include starting non-functional testing at component level where possible, rather than waiting for later levels.",
+   "qAr": "يريد فريق تطبيق الـ shift-left. أي من الأنشطة التالية مثال على الـ shift-left؟",
+   "exAr": "من ممارسات الـ shift-left أن يبدأ الـ non-functional testing (مثل الـ performance testing) على مستوى الـ component testing متى أمكن، بدل انتظار المستويات اللاحقة."
+  },
+  {
+   "n": 159,
+   "ch": 2,
+   "q": "A project manager objects to shift-left because testers would need training and extra effort early in the project. Which statement best responds to this concern?",
+   "o": {
+    "A": "Shift-left never adds cost at any point in the project",
+    "B": "Shift-left may add effort and cost early, but is expected to save effort and cost later in the process",
+    "C": "Shift-left only moves testing to the end of the lifecycle, so early costs are not affected",
+    "D": "Shift-left removes the need for dynamic testing, which compensates for the training cost"
+   },
+   "a": "B",
+   "exEn": "The syllabus notes shift-left may require extra training, effort or cost earlier, but is expected to save effort and cost later; stakeholder buy-in is important.",
+   "qAr": "يعترض project manager على الـ shift-left لأن المختبِرين سيحتاجون تدريبًا وجهدًا إضافيًا في بداية المشروع. أي عبارة تردّ على هذا القلق بشكل أفضل؟",
+   "exAr": "قد يضيف الـ shift-left جهدًا وتكلفة في البداية، لكن المتوقع أن يوفّر جهدًا وتكلفة لاحقًا في العملية، ومن المهم إقناع الـ stakeholders بذلك."
+  },
+  {
+   "n": 160,
+   "ch": 2,
+   "q": "During a sprint retrospective, testers point out that many defects came from ambiguous user stories. The team agrees to add a clarity checklist to backlog refinement so that future user stories are clearer. Which benefit of retrospectives does this outcome mainly illustrate?",
+   "o": {
+    "A": "Increased quality of testware through joint review of test processes",
+    "B": "Team bonding and learning through raising issues",
+    "C": "Improved quality of the test basis",
+    "D": "Reduced need for regression testing"
+   },
+   "a": "C",
+   "exEn": "Addressing deficiencies in the extent and quality of requirements improves the quality of the test basis, a listed benefit of retrospectives.",
+   "qAr": "خلال sprint retrospective، أشار المختبِرون إلى أن كثيرًا من الـ defects جاءت من user stories غامضة، فاتفق الفريق على إضافة checklist للوضوح أثناء الـ backlog refinement لتصبح الـ user stories القادمة أوضح. أي فائدة من فوائد الـ retrospectives توضّحها هذه النتيجة بشكل أساسي؟",
+   "exAr": "معالجة النقص في وضوح المتطلبات وجودتها تحسّن جودة الـ test basis، وهي من فوائد الـ retrospectives."
+  },
+  {
+   "n": 161,
+   "ch": 2,
+   "q": "An online shop has been fully tested on its own. The team now tests the exchange of data between the shop and an external payment gateway operated by a third party. Which test level is this?",
+   "o": {
+    "A": "Component testing",
+    "B": "Component integration testing",
+    "C": "Acceptance testing",
+    "D": "System integration testing"
+   },
+   "a": "D",
+   "exEn": "System integration testing focuses on interfaces between the system under test and other systems and external services.",
+   "qAr": "تم اختبار متجر إلكتروني بالكامل بشكل مستقل. يختبر الفريق الآن تبادل البيانات بين المتجر وبوابة دفع خارجية تديرها جهة ثالثة. ما هو هذا الـ test level؟",
+   "exAr": "الـ system integration testing يركّز على الـ interfaces بين النظام قيد الاختبار وأنظمة أخرى أو خدمات خارجية."
+  },
+  {
+   "n": 162,
+   "ch": 2,
+   "q": "Before go-live, the operations team checks backup and restore, disaster recovery and installation procedures of a new system. Which form of acceptance testing is this?",
+   "o": {
+    "A": "Operational acceptance testing",
+    "B": "User acceptance testing",
+    "C": "Contractual acceptance testing",
+    "D": "Beta testing"
+   },
+   "a": "A",
+   "exEn": "Operational acceptance testing verifies operational aspects such as backup/restore, disaster recovery, installation and maintenance tasks.",
+   "qAr": "قبل الإطلاق، يفحص فريق العمليات (operations) إجراءات الـ backup والـ restore والـ disaster recovery والتثبيت لنظام جديد. أي شكل من أشكال الـ acceptance testing هذا؟",
+   "exAr": "الـ operational acceptance testing يتحقق من الجوانب التشغيلية مثل الـ backup/restore والـ disaster recovery والتثبيت ومهام الصيانة."
+  },
+  {
+   "n": 163,
+   "ch": 2,
+   "q": "Which set of attributes is used in the syllabus to distinguish one test level from another?",
+   "o": {
+    "A": "Test technique, test tool, test priority and test schedule",
+    "B": "Test object, test objectives, test basis, defects and failures, and approach and responsibilities",
+    "C": "Functional, non-functional, black-box and white-box",
+    "D": "Test cases, test data, test scripts and test logs"
+   },
+   "a": "B",
+   "exEn": "Test levels are characterized by test object, test objectives, test basis, typical defects and failures, and approach and responsibilities.",
+   "qAr": "أي مجموعة من الخصائص تُستخدم في الـ syllabus للتمييز بين test level وآخر؟",
+   "exAr": "تتميز الـ test levels بالـ test object والـ test objectives والـ test basis والـ defects والـ failures المتوقعة، والـ approach والمسؤوليات."
+  },
+  {
+   "n": 164,
+   "ch": 2,
+   "p": 1,
+   "q": "Match each test to its test type:\n1. Checking that the page responds within 2 seconds with 500 concurrent users\n2. Checking that a 10% discount is calculated correctly\n3. Tests designed to cover all branches of the pricing code\n4. Tests derived from the specification without reference to internal structure",
+   "o": {
+    "A": "1-Functional, 2-Non-functional, 3-Black-box, 4-White-box",
+    "B": "1-Non-functional, 2-Functional, 3-Black-box, 4-White-box",
+    "C": "1-Non-functional, 2-Functional, 3-White-box, 4-Black-box",
+    "D": "1-White-box, 2-Black-box, 3-Functional, 4-Non-functional"
+   },
+   "a": "C",
+   "exEn": "Response time under load is non-functional, discount correctness is functional, code-structure coverage is white-box, and specification-based tests are black-box.",
+   "qAr": "طابق كل test مع الـ test type الخاص به:\n1. التحقق من أن الصفحة تستجيب خلال ثانيتين مع 500 مستخدم متزامن\n2. التحقق من حساب خصم 10% بشكل صحيح\n3. tests مصممة لتغطية كل الـ branches في كود التسعير\n4. tests مشتقة من الـ specification دون الرجوع إلى البنية الداخلية",
+   "exAr": "زمن الاستجابة تحت الحمل non-functional، وصحة الخصم functional، وتغطية بنية الكود white-box، والـ tests المشتقة من الـ specification هي black-box."
+  },
+  {
+   "n": 165,
+   "ch": 2,
+   "q": "A tester verifies that a new mobile app keeps working correctly while another app runs on the same device and shares its resources. Which quality characteristic is being tested?",
+   "o": {
+    "A": "Functional suitability",
+    "B": "Maintainability",
+    "C": "Portability",
+    "D": "Compatibility"
+   },
+   "a": "D",
+   "exEn": "Co-existence with other software in a shared environment is a sub-characteristic of compatibility, a non-functional characteristic.",
+   "qAr": "يتحقق مختبِر من أن تطبيق موبايل جديد يستمر في العمل بشكل صحيح أثناء تشغيل تطبيق آخر على الجهاز نفسه ويشاركه الموارد. أي quality characteristic يتم اختبارها؟",
+   "exAr": "التعايش (co-existence) مع برامج أخرى في بيئة مشتركة من الـ sub-characteristics لـ compatibility، وهي non-functional."
+  },
+  {
+   "n": 166,
+   "ch": 2,
+   "p": 1,
+   "q": "A defect in the login screen was fixed. The tester reruns the test case that originally failed, then runs existing tests on the profile and checkout features to make sure they were not affected. Which statement correctly describes these two activities?",
+   "o": {
+    "A": "The first is confirmation testing; the second is regression testing",
+    "B": "The first is regression testing; the second is confirmation testing",
+    "C": "Both are confirmation testing",
+    "D": "Both are regression testing"
+   },
+   "a": "A",
+   "exEn": "Re-running the failed test to check the fix is confirmation testing; checking that unchanged areas were not adversely affected is regression testing.",
+   "qAr": "تم إصلاح defect في شاشة الـ login. يعيد المختبِر تشغيل الـ test case الذي فشل سابقًا، ثم يشغّل tests موجودة على ميزتي الـ profile والـ checkout للتأكد من أنهما لم تتأثرا. أي عبارة تصف هذين النشاطين بشكل صحيح؟",
+   "exAr": "إعادة تشغيل الـ test الذي فشل للتحقق من الإصلاح هي confirmation testing، والتحقق من أن الأجزاء غير المعدّلة لم تتأثر سلبًا هو regression testing."
+  },
+  {
+   "n": 167,
+   "ch": 2,
+   "q": "A team's regression test suite grows every sprint and is run several times a day in the CI pipeline. What is the most appropriate approach for this suite?",
+   "o": {
+    "A": "Run it manually only before each major release",
+    "B": "Automate the regression tests, as they are strong candidates for automation",
+    "C": "Replace it with confirmation testing of fixed defects only",
+    "D": "Stop running it once the number of defects found drops"
+   },
+   "a": "B",
+   "exEn": "Regression suites are run many times and usually grow slowly, so they are strong candidates for automation, ideally early and within CI.",
+   "qAr": "تكبر الـ regression test suite لدى فريق مع كل sprint، وتُشغَّل عدة مرات يوميًا في الـ CI pipeline. ما الـ approach الأنسب لهذه الـ suite؟",
+   "exAr": "الـ regression test suites تُشغَّل مرات كثيرة وتكبر تدريجيًا، لذلك هي مرشحة قوية للـ automation، ويُفضَّل أن يبدأ ذلك مبكرًا ضمن الـ CI."
+  },
+  {
+   "n": 168,
+   "ch": 2,
+   "q": "A bank is retiring a legacy loan system, but regulations require its data to be kept for 10 years. Which maintenance testing is most relevant?",
+   "o": {
+    "A": "Performance testing of the legacy system under peak load",
+    "B": "Usability testing of the legacy system's screens",
+    "C": "Testing of data archiving, and of restore and retrieval procedures",
+    "D": "Component testing of the legacy system's source code"
+   },
+   "a": "C",
+   "exEn": "When a system is retired and data must be retained long-term, testing of data archiving and of restore and retrieval procedures may be required.",
+   "qAr": "يقوم بنك بإيقاف (retirement) نظام قروض قديم، لكن الأنظمة تتطلب الاحتفاظ ببياناته لمدة 10 سنوات. أي maintenance testing هو الأكثر صلة؟",
+   "exAr": "عند إيقاف نظام مع ضرورة الاحتفاظ ببياناته لفترة طويلة، قد يلزم اختبار أرشفة البيانات (data archiving) وإجراءات الـ restore والاسترجاع."
+  },
+  {
+   "n": 169,
+   "ch": 2,
+   "q": "A small change is planned for a large, business-critical payroll system in production. Which factors mainly determine the scope of the maintenance testing?",
+   "o": {
+    "A": "The number of testers available and the release date",
+    "B": "The SDLC model used when the system was first built",
+    "C": "The test tools that were used during the original development",
+    "D": "The degree of risk of the change, the size of the existing system and the size of the change"
+   },
+   "a": "D",
+   "exEn": "The scope of maintenance testing depends on the degree of risk of the change, the size of the existing system and the size of the change.",
+   "qAr": "يُخطَّط لتغيير صغير على نظام رواتب كبير وحرج للأعمال يعمل في الـ production. أي العوامل تحدد بشكل أساسي نطاق الـ maintenance testing؟",
+   "exAr": "نطاق الـ maintenance testing يعتمد على درجة الـ risk في التغيير، وحجم النظام الحالي، وحجم التغيير."
+  },
+  {
+   "n": 170,
+   "ch": 3,
+   "q": "A company wants to apply static testing to all work products of a new project. For which of the following is static testing generally NOT appropriate?",
+   "o": {
+    "A": "A third-party executable library that, for legal reasons, must not be analysed",
+    "B": "The user stories and their acceptance criteria",
+    "C": "The test plan and test cases",
+    "D": "The source code written by the internal team"
+   },
+   "a": "A",
+   "exEn": "Almost any readable work product can be statically tested, except those hard to interpret or that should not be analysed, e.g. third-party executable code for legal reasons.",
+   "qAr": "شركة تريد تطبيق static testing على كل الـ work products في مشروع جديد. على أيٍّ من التالية لا يكون static testing مناسبًا بشكل عام؟",
+   "exAr": "يمكن عمل static testing لأي work product قابل للقراءة تقريبًا، باستثناء ما يصعب تفسيره أو ما لا يجوز تحليله، مثل كود تنفيذي لطرف ثالث لأسباب قانونية."
+  },
+  {
+   "n": 171,
+   "ch": 3,
+   "q": "Which statement BEST describes a difference between static testing and dynamic testing?",
+   "o": {
+    "A": "Static testing can only be performed by tools, while dynamic testing is always manual",
+    "B": "Static testing finds defects directly in work products, while dynamic testing causes failures from which the defects are later found by analysis",
+    "C": "Static testing can only be applied to executable code, while dynamic testing applies to any work product",
+    "D": "Static testing is performed only after dynamic testing is completed"
+   },
+   "a": "B",
+   "exEn": "Static testing finds defects directly; dynamic testing causes failures and the associated defects are found through subsequent analysis.",
+   "qAr": "أي عبارة تصف بشكل أفضل فرقًا بين static testing وdynamic testing؟",
+   "exAr": "الـ static testing يجد الـ defects مباشرة، أما الـ dynamic testing فيُسبّب failures ثم نصل إلى الـ defects المرتبطة بها عبر التحليل لاحقًا."
+  },
+  {
+   "n": 172,
+   "ch": 3,
+   "q": "A team wants to evaluate two quality characteristics of a new module: (1) how easy the code will be to modify in the future, and (2) how fast it responds under peak load. Which statement is correct?",
+   "o": {
+    "A": "Both characteristics can only be measured by dynamic testing",
+    "B": "Both characteristics can be fully measured by static testing",
+    "C": "Characteristic (1) can be evaluated by static testing; characteristic (2) requires dynamic testing",
+    "D": "Characteristic (2) can be evaluated by static testing; characteristic (1) requires dynamic testing"
+   },
+   "a": "C",
+   "exEn": "Static testing can measure characteristics not dependent on executing code, such as maintainability; performance efficiency depends on execution, so it needs dynamic testing.",
+   "qAr": "فريق يريد تقييم خاصيتين من خصائص الجودة لـ module جديد: (1) مدى سهولة تعديل الكود مستقبلًا، و(2) سرعة الاستجابة تحت الحمل الأعلى. أي عبارة صحيحة؟",
+   "exAr": "الـ static testing يقيس خصائص لا تعتمد على تشغيل الكود مثل الـ maintainability، أما الـ performance efficiency فتعتمد على التشغيل وتحتاج dynamic testing."
+  },
+  {
+   "n": 173,
+   "ch": 3,
+   "q": "During reviews of a project's work products, the following issues were found:\ni. An interface specification uses kilometres while the consuming component expects miles\nii. One acceptance criterion of a user story has no test case covering it\niii. A variable is used before a value is assigned to it\niv. The system crashes intermittently when two users save at the same moment\nWhich of these are typically found more easily by static testing than by dynamic testing?",
+   "o": {
+    "A": "i and iv",
+    "B": "ii and iv",
+    "C": "iii and iv",
+    "D": "i, ii and iii"
+   },
+   "a": "D",
+   "exEn": "Incorrect interface specifications, gaps in test basis coverage and undefined variables are typical static-testing findings; an intermittent crash at run time is a failure observed in dynamic testing.",
+   "qAr": "أثناء مراجعة الـ work products في مشروع، تم إيجاد المشكلات المذكورة في السؤال (i: وحدات قياس غير متطابقة في interface specification، ii: acceptance criterion بدون test case، iii: متغير يُستخدم قبل إعطائه قيمة، iv: النظام ينهار أحيانًا عند الحفظ المتزامن). أيّها يُكتشف عادةً بسهولة أكبر بالـ static testing مقارنةً بالـ dynamic testing؟",
+   "exAr": "الـ interface specification الخاطئة والفجوات في تغطية الـ test basis والمتغيرات بلا قيمة هي نتائج نموذجية للـ static testing، أما الانهيار المتقطع أثناء التشغيل فهو failure يظهر في الـ dynamic testing."
+  },
+  {
+   "n": 174,
+   "ch": 3,
+   "q": "A team showed the product to business stakeholders for the first time just before release. The stakeholders rejected several features, causing costly rework and missed deadlines. What is the MAIN benefit that early and frequent stakeholder feedback would have provided?",
+   "o": {
+    "A": "It would have prevented misunderstandings about requirements and allowed changes to be understood and implemented earlier",
+    "B": "It would have removed the need for dynamic testing",
+    "C": "It would have guaranteed that the product contains no defects",
+    "D": "It would have allowed the team to skip writing acceptance criteria"
+   },
+   "a": "A",
+   "exEn": "Early and frequent stakeholder feedback allows early communication of quality problems, prevents requirement misunderstandings and helps implement changes earlier, avoiding costly rework.",
+   "qAr": "فريق عرض المنتج على الـ business stakeholders لأول مرة قبل الـ release مباشرةً، فرفضوا عدة features مما سبّب rework مكلفًا وتأخرًا عن المواعيد. ما الفائدة الرئيسية التي كان سيوفّرها الحصول على feedback مبكر ومتكرر من الـ stakeholders؟",
+   "exAr": "الـ feedback المبكر والمتكرر من الـ stakeholders يمنع سوء فهم الـ requirements ويسمح بفهم التغييرات وتنفيذها مبكرًا، فيتجنب الفريق الـ rework المكلف."
+  },
+  {
+   "n": 175,
+   "ch": 3,
+   "q": "Before a review starts, the team defines its scope, its purpose, the quality characteristics to be evaluated, the focus areas, the exit criteria and the effort and timeframes. In which review activity does this take place?",
+   "o": {
+    "A": "Review initiation",
+    "B": "Planning",
+    "C": "Individual review",
+    "D": "Communication and analysis"
+   },
+   "a": "B",
+   "exEn": "During planning, the scope of the review, including purpose, work product, quality characteristics, focus areas, exit criteria, effort and timeframes, is defined.",
+   "qAr": "قبل بدء الـ review، يحدّد الفريق نطاقه والغرض منه وخصائص الجودة المراد تقييمها ومجالات التركيز والـ exit criteria والجهد والإطار الزمني. في أي نشاط من أنشطة الـ review يحدث ذلك؟",
+   "exAr": "في نشاط الـ planning يتم تحديد نطاق الـ review بما فيه الغرض والـ work product وخصائص الجودة ومجالات التركيز والـ exit criteria والجهد والوقت."
+  },
+  {
+   "n": 176,
+   "ch": 3,
+   "q": "The review leader checks that every reviewer has access to the requirements document, understands their role and responsibilities, and has received the checklist they will use. Which review activity is this?",
+   "o": {
+    "A": "Planning",
+    "B": "Individual review",
+    "C": "Review initiation",
+    "D": "Fixing and reporting"
+   },
+   "a": "C",
+   "exEn": "Review initiation aims to make sure everyone involved is prepared: they have access to the work product, understand their role and have everything needed to perform the review.",
+   "qAr": "قائد الـ review يتأكد أن كل reviewer لديه صلاحية الوصول إلى وثيقة الـ requirements ويفهم دوره ومسؤولياته واستلم الـ checklist التي سيستخدمها. أي نشاط من أنشطة الـ review هذا؟",
+   "exAr": "الهدف من الـ review initiation هو التأكد من جاهزية كل المشاركين: الوصول إلى الـ work product وفهم أدوارهم وتوفّر كل ما يلزم لتنفيذ الـ review."
+  },
+  {
+   "n": 177,
+   "ch": 3,
+   "q": "In a review meeting, participants discuss the anomalies found, decide the status and ownership of each one and agree on whether the work product needs rework. Which review activity is being performed?",
+   "o": {
+    "A": "Planning",
+    "B": "Individual review",
+    "C": "Fixing and reporting",
+    "D": "Communication and analysis"
+   },
+   "a": "D",
+   "exEn": "In communication and analysis, anomalies are analysed and discussed, their status and ownership are decided, and a review decision is made.",
+   "qAr": "في اجتماع الـ review يناقش المشاركون الـ anomalies التي تم إيجادها، ويقرّرون حالة كل واحدة ومن المسؤول عنها، ويتفقون على ما إذا كان الـ work product يحتاج إلى rework. أي نشاط من أنشطة الـ review يتم تنفيذه؟",
+   "exAr": "في نشاط الـ communication and analysis يتم تحليل الـ anomalies ومناقشتها وتحديد حالتها ومالكها واتخاذ قرار الـ review."
+  },
+  {
+   "n": 178,
+   "ch": 3,
+   "q": "After the review meeting, a defect report is created for each confirmed defect, the author updates the work product until the exit criteria are met, and the review results are reported. Which review activity is this?",
+   "o": {
+    "A": "Fixing and reporting",
+    "B": "Communication and analysis",
+    "C": "Review initiation",
+    "D": "Individual review"
+   },
+   "a": "A",
+   "exEn": "In fixing and reporting, defect reports are created for defects requiring changes, fixes are made until exit criteria are reached, the work product is accepted and the results are reported.",
+   "qAr": "بعد اجتماع الـ review، يتم إنشاء defect report لكل defect مؤكد، ويحدّث الـ author الـ work product حتى تتحقق الـ exit criteria، ثم يتم الإبلاغ عن نتائج الـ review. أي نشاط من أنشطة الـ review هذا؟",
+   "exAr": "في نشاط الـ fixing and reporting يتم إنشاء الـ defect reports وإجراء الإصلاحات حتى تتحقق الـ exit criteria وقبول الـ work product والإبلاغ عن النتائج."
+  },
+  {
+   "n": 179,
+   "ch": 3,
+   "q": "A project needs to decide which of its design documents will be reviewed this sprint and to allocate staff and time for those reviews. Which review role is responsible for this?",
+   "o": {
+    "A": "Review leader",
+    "B": "Manager",
+    "C": "Moderator (facilitator)",
+    "D": "Author"
+   },
+   "a": "B",
+   "exEn": "The manager is responsible for deciding what is to be reviewed and for providing resources such as staff and time.",
+   "qAr": "مشروع يحتاج أن يقرّر أي وثائق الـ design ستتم مراجعتها في هذا الـ sprint، وأن يخصّص الأشخاص والوقت لهذه المراجعات. أي دور من أدوار الـ review مسؤول عن ذلك؟",
+   "exAr": "الـ manager هو المسؤول عن تحديد ما ستتم مراجعته وتوفير الموارد مثل الأشخاص والوقت."
+  },
+  {
+   "n": 180,
+   "ch": 3,
+   "q": "In a review, one person takes overall responsibility for the review, decides who will be involved, and organises when and where the review will take place. Which role is this?",
+   "o": {
+    "A": "Scribe (recorder)",
+    "B": "Reviewer",
+    "C": "Review leader",
+    "D": "Manager"
+   },
+   "a": "C",
+   "exEn": "The review leader takes overall responsibility for the review, such as deciding who will be involved and organising when and where it will take place.",
+   "qAr": "في الـ review، شخص واحد يتحمّل المسؤولية الكاملة عن الـ review، ويقرّر من سيشارك، وينظّم متى وأين ستُعقد. ما هذا الدور؟",
+   "exAr": "الـ review leader يتحمّل المسؤولية الكاملة عن الـ review، مثل تحديد المشاركين وتنظيم وقت ومكان انعقادها."
+  },
+  {
+   "n": 181,
+   "ch": 3,
+   "q": "Several architects disagree about how a new caching component should be designed. They want technically qualified peers to examine the proposal so the group can reach consensus and make a decision on the technical problem. Which review type BEST fits this situation?",
+   "o": {
+    "A": "Informal review",
+    "B": "Walkthrough",
+    "C": "Inspection",
+    "D": "Technical review"
+   },
+   "a": "D",
+   "exEn": "A technical review is performed by technically qualified reviewers and led by a moderator; its objectives are to gain consensus and make decisions regarding a technical problem.",
+   "qAr": "عدة architects يختلفون حول طريقة تصميم component جديد للـ caching، ويريدون أن يفحص زملاء مؤهلون تقنيًا هذا الاقتراح حتى تصل المجموعة إلى توافق وتتخذ قرارًا في المشكلة التقنية. أي نوع review يناسب هذا الموقف أكثر؟",
+   "exAr": "الـ technical review يقوم به reviewers مؤهلون تقنيًا ويقودها moderator، وهدفها الوصول إلى توافق واتخاذ قرارات بخصوص مشكلة تقنية."
+  },
+  {
+   "n": 182,
+   "ch": 3,
+   "q": "A team is organising an inspection of a requirements specification written by Sara. Who must NOT act as the scribe for this inspection?",
+   "o": {
+    "A": "Sara, the author of the specification",
+    "B": "A tester who is also a reviewer",
+    "C": "A business analyst from another team",
+    "D": "A trained moderator from the QA department"
+   },
+   "a": "A",
+   "exEn": "In an inspection, the author cannot act as the review leader or the scribe.",
+   "qAr": "فريق ينظّم inspection لوثيقة requirements specification كتبتها سارة. من الذي لا يجوز أن يكون الـ scribe في هذه الـ inspection؟",
+   "exAr": "في الـ inspection لا يجوز أن يكون الـ author هو الـ review leader أو الـ scribe."
+  },
+  {
+   "n": 183,
+   "ch": 3,
+   "q": "A manager plans to use the number of anomalies found in each developer's code during reviews to rate the developers' individual performance. How is this MOST likely to affect the reviews?",
+   "o": {
+    "A": "It will improve reviews, because evaluating participants is a key review objective",
+    "B": "It will undermine reviews, because evaluating participants should never be an objective of a review",
+    "C": "It will have no effect, because review results are confidential",
+    "D": "It will improve reviews, because authors will submit larger work products at once"
+   },
+   "a": "B",
+   "exEn": "A success factor for reviews is having clear objectives and measurable exit criteria; evaluation of participants should never be an objective.",
+   "qAr": "مدير يخطّط لاستخدام عدد الـ anomalies التي تُكتشف في كود كل developer أثناء الـ reviews لتقييم أدائه الفردي. ما الأثر الأكثر احتمالًا لذلك على الـ reviews؟",
+   "exAr": "من عوامل نجاح الـ reviews وجود أهداف واضحة وexit criteria قابلة للقياس، ولا يجوز أبدًا أن يكون تقييم المشاركين هدفًا من أهداف الـ review."
+  },
+  {
+   "n": 184,
+   "ch": 4,
+   "p": 1,
+   "q": "A cinema sets ticket prices by age in whole years: 0–2 free, 3–12 child, 13–64 adult, 65–120 senior. Ages below 0 or above 120 are rejected. What is the minimum number of test cases needed to cover all valid and invalid equivalence partitions?",
+   "o": {
+    "A": "4",
+    "B": "5",
+    "C": "6",
+    "D": "8"
+   },
+   "a": "C",
+   "exEn": "4 valid partitions (0–2, 3–12, 13–64, 65–120) + 2 invalid partitions (<0, >120) = 6 test cases.",
+   "qAr": "تحدد سينما سعر التذكرة وفق العمر بالسنوات الكاملة: 0–2 مجانًا، و3–12 طفل، و13–64 بالغ، و65–120 كبير سن. وتُرفض الأعمار الأقل من 0 أو الأكثر من 120. ما أقل عدد من الـ test cases اللازمة لتغطية جميع الـ equivalence partitions الصالحة وغير الصالحة؟",
+   "exAr": "لدينا 4 partitions صالحة (0–2، 3–12، 13–64، 65–120) و2 غير صالحين (أقل من 0، أكثر من 120)، أي 6 test cases."
+  },
+  {
+   "n": 185,
+   "ch": 4,
+   "p": 1,
+   "q": "A hotel booking form has two inputs: 'Room type' with valid partitions Single, Double and Suite, and 'Breakfast' with valid partitions Yes and No. Every test case sets both inputs. What is the minimum number of test cases needed so that every partition of each input is covered at least once?",
+   "o": {
+    "A": "3",
+    "B": "2",
+    "C": "5",
+    "D": "6"
+   },
+   "a": "A",
+   "exEn": "Each test covers one partition of each input at the same time, so the input with most partitions (Room type: 3) sets the minimum: 3 tests.",
+   "qAr": "يحتوي نموذج حجز فندق على مدخلين: «Room type» وله partitions صالحة هي Single وDouble وSuite، و«Breakfast» وله partitions صالحة هي Yes وNo. وكل test case تعبّئ المدخلين معًا. ما أقل عدد من الـ test cases لتغطية كل partition لكل مدخل مرة واحدة على الأقل؟",
+   "exAr": "تغطي كل test في الوقت نفسه partition من كل مدخل، لذا يحدد المدخل الأكثر partitions (Room type: 3) الحد الأدنى: 3 tests."
+  },
+  {
+   "n": 186,
+   "ch": 4,
+   "p": 1,
+   "q": "An electricity bill uses whole kWh values: 0–200 is tier 1, 201–500 is tier 2 and above 500 is tier 3. Negative values are rejected. Tests are executed with 50, 150 and 600 kWh. What equivalence partition coverage is achieved, counting the invalid partition?",
+   "o": {
+    "A": "25%",
+    "B": "75%",
+    "C": "100%",
+    "D": "50%"
+   },
+   "a": "D",
+   "exEn": "There are 4 partitions (<0, 0–200, 201–500, >500); 50 and 150 hit the same partition and 600 hits >500, so 2 of 4 = 50%.",
+   "qAr": "تستخدم فاتورة الكهرباء قيم kWh صحيحة: 0–200 الشريحة الأولى، و201–500 الشريحة الثانية، وما فوق 500 الشريحة الثالثة. وتُرفض القيم السالبة. نُفّذت tests بالقيم 50 و150 و600 kWh. ما نسبة الـ equivalence partition coverage المتحققة، مع احتساب الـ partition غير الصالح؟",
+   "exAr": "توجد 4 partitions (أقل من 0، 0–200، 201–500، أكثر من 500)؛ تقع 50 و150 في الـ partition نفسه و600 في الـ partition الأخير، أي 2 من 4 = 50%."
+  },
+  {
+   "n": 187,
+   "ch": 4,
+   "p": 1,
+   "q": "A car park charges by whole minutes: 0–30 free, 31–120 $2, 121–240 $5. Durations below 0 or above 240 are rejected. Using 2-value boundary value analysis, how many boundary values (coverage items) are there, including those in invalid partitions?",
+   "o": {
+    "A": "6",
+    "B": "8",
+    "C": "10",
+    "D": "12"
+   },
+   "a": "B",
+   "exEn": "Boundary values are the min and max of each partition: −1 | 0, 30 | 31, 120 | 121, 240 | 241 = 8 coverage items.",
+   "qAr": "يحسب موقف سيارات الأجرة بالدقائق الكاملة: 0–30 مجانًا، و31–120 بـ 2$، و121–240 بـ 5$. وتُرفض المدد الأقل من 0 أو الأكثر من 240. باستخدام 2-value boundary value analysis، كم boundary value (coverage item) لدينا، بما فيها تلك الواقعة في الـ partitions غير الصالحة؟",
+   "exAr": "الـ boundary values هي أصغر قيمة وأكبر قيمة في كل partition: ‎−1 | 0، 30 | 31، 120 | 121، 240 | 241 = 8 coverage items."
+  },
+  {
+   "n": 188,
+   "ch": 4,
+   "p": 1,
+   "q": "A restaurant app applies a happy-hour discount to orders placed from 17:00 to 18:59 inclusive (times in whole minutes). Using 2-value boundary value analysis, which set of order times covers all boundary values of the discount period?",
+   "o": {
+    "A": "17:00, 18:59",
+    "B": "16:59, 17:00, 17:01, 18:58, 18:59, 19:00",
+    "C": "16:59, 17:00, 18:59, 19:00",
+    "D": "16:59, 17:00, 19:00, 19:01"
+   },
+   "a": "C",
+   "exEn": "2-value BVA tests each boundary and its closest neighbour in the adjacent partition: 16:59/17:00 and 18:59/19:00.",
+   "qAr": "يطبّق تطبيق مطعم خصم happy hour على الطلبات من 17:00 حتى 18:59 ضمنًا (الوقت بالدقائق الكاملة). باستخدام 2-value boundary value analysis، أي مجموعة أوقات تغطي جميع الـ boundary values لفترة الخصم؟",
+   "exAr": "تفحص الـ 2-value BVA كل حد مع أقرب جار له في الـ partition المجاور: 16:59/17:00 و18:59/19:00."
+  },
+  {
+   "n": 189,
+   "ch": 4,
+   "p": 1,
+   "q": "A water tank sensor shows 'Low' for levels below 20, 'Normal' for 20–80 and 'High' above 80 (whole numbers). Using 3-value boundary value analysis as defined in CTFL v4.0, which value is NOT a coverage item for the boundary between Low and Normal?",
+   "o": {
+    "A": "18",
+    "B": "19",
+    "C": "21",
+    "D": "22"
+   },
+   "a": "D",
+   "exEn": "19 and 20 are both boundary values; each is tested with both neighbours, giving 18, 19, 20, 21 — so 22 is not needed.",
+   "qAr": "يعرض حسّاس خزان مياه «Low» للمستويات الأقل من 20، و«Normal» من 20–80، و«High» لما فوق 80 (أعداد صحيحة). باستخدام 3-value boundary value analysis وفق تعريف CTFL v4.0، أي قيمة ليست coverage item للحد بين Low وNormal؟",
+   "exAr": "كلٌّ من 19 و20 boundary value، وتُفحص كل منهما مع جارتيها، فتكون القيم 18 و19 و20 و21، أي أن 22 غير مطلوبة."
+  },
+  {
+   "n": 190,
+   "ch": 4,
+   "p": 1,
+   "q": "A discount code must be 6 to 10 characters long; shorter or longer codes are rejected. Consider only the two boundaries of the valid partition (between 'too short' and 'valid', and between 'valid' and 'too long'). Using 3-value boundary value analysis as defined in CTFL v4.0, how many DISTINCT code lengths must be tested?",
+   "o": {
+    "A": "8",
+    "B": "4",
+    "C": "6",
+    "D": "12"
+   },
+   "a": "A",
+   "exEn": "Boundary values are 5, 6, 10, 11; each with both neighbours gives 4, 5, 6, 7 and 9, 10, 11, 12 = 8 distinct lengths.",
+   "qAr": "يجب أن يكون طول كود الخصم من 6 إلى 10 أحرف، ويُرفض الأقصر أو الأطول. باعتبار الحدّين بين الـ partition الصالح والـ partitions غير الصالحة فقط (قصير جدًا / صالح، وصالح / طويل جدًا)، وباستخدام 3-value boundary value analysis حسب CTFL v4.0، كم طولًا مختلفًا يجب اختباره؟",
+   "exAr": "الـ boundary values هي 5 و6 و10 و11؛ كل وحدة مع جيرانها الاثنين بتعطي 4، 5، 6، 7 و9، 10، 11، 12 = 8 أطوال مختلفة."
+  },
+  {
+   "n": 191,
+   "ch": 4,
+   "p": 1,
+   "q": "A car insurance premium depends on three conditions: vehicle type (car, motorbike or truck), driver under 25 (Y/N) and previous claims (Y/N). How many columns does the FULL decision table contain if all combinations are feasible?",
+   "o": {
+    "A": "6",
+    "B": "7",
+    "C": "12",
+    "D": "8"
+   },
+   "a": "C",
+   "exEn": "The full table has one column per combination: 3 × 2 × 2 = 12.",
+   "qAr": "يعتمد قسط تأمين السيارة على ثلاثة conditions: نوع المركبة (car أو motorbike أو truck)، وكون السائق أقل من 25 سنة (Y/N)، ووجود مطالبات سابقة (Y/N). كم column يحتوي الـ decision table الكامل إذا كانت جميع التوليفات ممكنة؟",
+   "exAr": "يحتوي الجدول الكامل على column لكل توليفة: 3 × 2 × 2 = 12."
+  },
+  {
+   "n": 192,
+   "ch": 4,
+   "p": 1,
+   "q": "A minimised decision table for loan requests has four rules ('–' = does not matter):\nR1: Employed = Y, Good credit = Y, Guarantor = – → Approve\nR2: Employed = Y, Good credit = N, Guarantor = – → Refer\nR3: Employed = N, Good credit = –, Guarantor = Y → Refer\nR4: Employed = N, Good credit = –, Guarantor = N → Reject\nWhich test case has the correct expected result?",
+   "o": {
+    "A": "Employed = N, Good credit = Y, Guarantor = N → Approve",
+    "B": "Employed = Y, Good credit = N, Guarantor = Y → Refer",
+    "C": "Employed = N, Good credit = Y, Guarantor = Y → Approve",
+    "D": "Employed = Y, Good credit = Y, Guarantor = N → Refer"
+   },
+   "a": "B",
+   "exEn": "Employed = Y and Good credit = N matches R2 (Guarantor does not matter), so the expected result is Refer.",
+   "qAr": "عندنا decision table مختصر لطلبات القروض فيه أربع rules (الرمز «–» يعني ما بتفرق)، مكتوبة بالسؤال الإنجليزي فوق. أي test case نتيجتها المتوقعة صحيحة؟",
+   "exAr": "‏Employed = Y وGood credit = N بتطابق R2 (والـ Guarantor ما بتفرق)، فالنتيجة المتوقعة Refer."
+  },
+  {
+   "n": 193,
+   "ch": 4,
+   "p": 1,
+   "q": "A minimised decision table for a library loan has four rules (conditions: Member, Overdue items, Reserved by another reader; '–' = does not matter):\nR1: N, –, – → Refuse\nR2: Y, Y, – → Refuse\nR3: Y, N, Y → Waitlist\nR4: Y, N, N → Lend\nTests executed (Member, Overdue, Reserved): T1 (N, Y, N), T2 (Y, N, N), T3 (N, N, Y), T4 (Y, Y, Y). What decision table coverage is achieved?",
+   "o": {
+    "A": "75%",
+    "B": "50%",
+    "C": "100%",
+    "D": "25%"
+   },
+   "a": "A",
+   "exEn": "T1 and T3 → R1, T2 → R4, T4 → R2; R3 is never exercised, so 3 of 4 rules = 75%.",
+   "qAr": "لدينا decision table مختصر لاستعارة الكتب من مكتبة يتضمن أربع rules، والـ tests المنفّذة مذكورة في السؤال بالإنجليزية أعلاه. ما نسبة الـ decision table coverage المتحققة؟",
+   "exAr": "‏T1 وT3 ← R1، وT2 ← R4، وT4 ← R2؛ ولم تُفحص R3 إطلاقًا، أي 3 من 4 = 75%."
+  },
+  {
+   "n": 194,
+   "ch": 4,
+   "p": 1,
+   "q": "A lift door has four states: Closed, Opening, Open and Closing, with five valid transitions: Closed → Opening (open request), Opening → Open (fully opened), Open → Closing (timer expires), Closing → Closed (fully closed), Closing → Opening (obstacle detected). One test is executed: Closed → Opening → Open → Closing → Closed. What all states coverage and valid transitions coverage does it achieve?",
+   "o": {
+    "A": "75% all states, 80% valid transitions",
+    "B": "80% all states, 100% valid transitions",
+    "C": "100% all states, 100% valid transitions",
+    "D": "100% all states, 80% valid transitions"
+   },
+   "a": "D",
+   "exEn": "All 4 states are visited (100%); 4 of 5 transitions are exercised because Closing → Opening is missing (80%).",
+   "qAr": "لباب مصعد أربع states: Closed وOpening وOpen وClosing، وخمسة transitions صالحة: Closed → Opening (طلب فتح)، وOpening → Open (انفتح بالكامل)، وOpen → Closing (انتهاء المؤقت)، وClosing → Closed (أُغلق بالكامل)، وClosing → Opening (اكتشاف عائق). نُفّذ test واحد: Closed → Opening → Open → Closing → Closed. ما نسبة الـ all states coverage والـ valid transitions coverage المتحققة؟",
+   "exAr": "زِيرت جميع الـ states الأربع (100%)، وفُحص 4 من 5 transitions لأن Closing → Opening لم يُغطَّ (80%)."
+  },
+  {
+   "n": 195,
+   "ch": 4,
+   "p": 1,
+   "q": "A subscription has states Trial, Active, Suspended and Closed (final), with six valid transitions: Trial → Active (pay), Trial → Closed (trial expires), Active → Suspended (payment fails), Suspended → Active (payment updated), Suspended → Closed (unpaid for 30 days), Active → Closed (user cancels). Each test case must start in Trial and end in Closed. What is the minimum number of test cases needed for 100% valid transitions coverage?",
+   "o": {
+    "A": "2",
+    "B": "4",
+    "C": "3",
+    "D": "6"
+   },
+   "a": "C",
+   "exEn": "Each test ends with exactly one of the 3 transitions into Closed, so at least 3 are needed; e.g. Trial→Closed; Trial→Active→Suspended→Active→Closed; Trial→Active→Suspended→Closed.",
+   "qAr": "لاشتراك الـ states الآتية: Trial وActive وSuspended وClosed (نهائية)، وستة transitions صالحة: Trial → Active (دفع)، وTrial → Closed (انتهاء التجربة)، وActive → Suspended (فشل الدفع)، وSuspended → Active (تحديث الدفع)، وSuspended → Closed (عدم الدفع 30 يومًا)، وActive → Closed (إلغاء المستخدم). يجب أن تبدأ كل test case من Trial وتنتهي بـ Closed. ما أقل عدد من الـ test cases لتحقيق 100% valid transitions coverage؟",
+   "exAr": "تنتهي كل test بواحد فقط من الـ transitions الثلاثة التي تدخل Closed، لذا يلزم 3 على الأقل؛ مثلًا Trial→Closed وTrial→Active→Suspended→Active→Closed وTrial→Active→Suspended→Closed."
+  },
+  {
+   "n": 196,
+   "ch": 4,
+   "p": 1,
+   "q": "A smart heater has three states (Off, Standby, Heating) and three events (power, start, stop). The only valid transitions are: Off –power→ Standby, Standby –power→ Off, Standby –start→ Heating, Heating –stop→ Standby. In a complete state table, how many invalid transitions (state/event combinations with no defined transition) are there?",
+   "o": {
+    "A": "3",
+    "B": "5",
+    "C": "4",
+    "D": "9"
+   },
+   "a": "B",
+   "exEn": "The state table has 3 states × 3 events = 9 cells; 4 are valid, so 9 − 4 = 5 invalid transitions.",
+   "qAr": "لسخّان ذكي ثلاث states (Off وStandby وHeating) وثلاثة events (power وstart وstop). والـ transitions الصالحة الوحيدة هي: Off –power→ Standby، وStandby –power→ Off، وStandby –start→ Heating، وHeating –stop→ Standby. في الـ state table الكامل، كم invalid transition (توليفة state/event بلا transition معرّف) يوجد؟",
+   "exAr": "يحتوي الـ state table على 3 states × 3 events = 9 خانات، منها 4 صالحة، أي 9 − 4 = 5 invalid transitions."
+  },
+  {
+   "n": 197,
+   "ch": 4,
+   "p": 1,
+   "q": "A subscription has states Trial, Active, Suspended and Closed, with valid transitions: Trial → Active (pay), Trial → Closed (trial expires), Active → Suspended (payment fails), Suspended → Active (payment updated), Suspended → Closed (unpaid for 30 days), Active → Closed (user cancels). Which test case checks an INVALID transition?",
+   "o": {
+    "A": "In Trial, trigger 'payment fails' and check that it is rejected and the state stays Trial",
+    "B": "In Suspended, trigger 'payment updated' and check the state becomes Active",
+    "C": "In Active, trigger 'user cancels' and check the state becomes Closed",
+    "D": "In Trial, trigger 'trial expires' and check the state becomes Closed"
+   },
+   "a": "A",
+   "exEn": "No transition is defined for 'payment fails' in state Trial, so that test exercises an invalid transition; the others are valid transitions.",
+   "qAr": "لاشتراك الـ states الآتية: Trial وActive وSuspended وClosed، مع الـ transitions الصالحة المذكورة في السؤال بالإنجليزية أعلاه. أي test case تفحص INVALID transition؟",
+   "exAr": "لا يوجد transition معرّف للحدث «payment fails» في الـ state Trial، لذا تفحص هذه الـ test حالة invalid transition؛ أما البقية فهي valid transitions."
+  },
+  {
+   "n": 198,
+   "ch": 4,
+   "p": 1,
+   "q": "Consider this code (all lines except 'end if' are executable statements):\n1  read age\n2  read member\n3  fee = 10\n4  if age < 12 then\n5      fee = 5\n6  end if\n7  if member = \"Y\" then\n8      fee = fee - 2\n9  end if\n10 print fee\nWhich single test case achieves 100% statement coverage?",
+   "o": {
+    "A": "age = 10, member = \"N\"",
+    "B": "age = 15, member = \"Y\"",
+    "C": "age = 15, member = \"N\"",
+    "D": "age = 10, member = \"Y\""
+   },
+   "a": "D",
+   "exEn": "Lines 5 and 8 run only when age < 12 AND member = \"Y\", so age = 10 with member = \"Y\" executes every statement.",
+   "qAr": "في الكود أعلاه (جميع الأسطر ما عدا «end if» هي executable statements)، أي test case واحدة تحقق 100% statement coverage؟",
+   "exAr": "لا يُنفَّذ السطران 5 و8 إلا عندما يتحقق age < 12 وmember = \"Y\" معًا، لذا فإن age = 10 مع member = \"Y\" تنفّذ جميع الـ statements."
+  },
+  {
+   "n": 199,
+   "ch": 4,
+   "p": 1,
+   "q": "An acceptance criterion states: 'Given a user has entered a wrong password 3 consecutive times, when they try to log in again, then the account is locked for 15 minutes.' Which pair of test cases checks both sides of the lockout threshold?",
+   "o": {
+    "A": "3 wrong passwords then the correct one → locked; 5 wrong passwords → locked",
+    "B": "1 wrong password then the correct one → logged in; 2 wrong passwords then the correct one → logged in",
+    "C": "2 wrong passwords then the correct one → logged in; 3 wrong passwords then the correct one → account locked for 15 minutes",
+    "D": "3 wrong passwords → locked; correct password after 15 minutes → still locked"
+   },
+   "a": "C",
+   "exEn": "The threshold is 3 attempts: 2 failures must not lock and 3 failures must lock, so this pair tests just below and at the threshold.",
+   "qAr": "ينص معيار قبول على: «Given أدخل المستخدم كلمة مرور خاطئة 3 مرات متتالية، when يحاول تسجيل الدخول مرة أخرى، then يُقفل الحساب لمدة 15 دقيقة». أي زوج من الـ test cases يفحص جانبي حد القفل؟",
+   "exAr": "الحد هو 3 محاولات: يجب ألا تؤدي محاولتان خاطئتان إلى قفل الحساب وأن تؤدي 3 إلى قفله، لذا يفحص هذا الزوج ما دون الحد والحد نفسه تمامًا."
+  },
+  {
+   "n": 200,
+   "ch": 4,
+   "p": 1,
+   "q": "User story: 'As a shopper, I want to choose express delivery.' Acceptance criteria: express delivery is offered only for orders placed before 14:00; it costs $8; it is not offered if the cart contains an item marked 'bulky'. Which test case is NOT derived from these acceptance criteria?",
+   "o": {
+    "A": "Order at 13:59 with no bulky items → express offered at $8",
+    "B": "Order at 10:00 paid with a gift card → gift card balance reduced by the order total",
+    "C": "Order at 14:00 with no bulky items → express not offered",
+    "D": "Order at 10:00 containing a bulky item → express not offered"
+   },
+   "a": "B",
+   "exEn": "The gift card payment is not covered by any of the three criteria (cut-off time, price, bulky items); the other tests each check one criterion.",
+   "qAr": "User story: «As a shopper, I want to choose express delivery». معايير القبول: التوصيل السريع متاح فقط للطلبات قبل الساعة 14:00، وسعره 8$، وغير متاح إذا احتوت السلة على منتج معلَّم «bulky». أي test case غير مشتقة من معايير القبول هذه؟",
+   "exAr": "الدفع بالـ gift card غير مغطى بأي من المعايير الثلاثة (وقت الإغلاق، السعر، المنتجات الـ bulky)؛ أما بقية الـ tests فتفحص كلٌّ منها معيارًا."
+  },
+  {
+   "n": 201,
+   "ch": 4,
+   "q": "A tester derives test cases only from the requirements specification, without looking at the code. How is coverage measured for these tests?",
+   "o": {
+    "A": "As the proportion of items in the test basis (e.g. partitions, rules) exercised by the tests",
+    "B": "As the percentage of executable statements executed",
+    "C": "As the number of defects found per test case",
+    "D": "It cannot be measured, because the code is not examined"
+   },
+   "a": "A",
+   "exEn": "For black-box techniques, coverage is measured against the items identified in the test basis, not against the code.",
+   "qAr": "يشتق مختبِر الـ test cases من الـ requirements specification فقط، دون الاطلاع على الكود. كيف تُقاس الـ coverage لهذه الـ tests؟",
+   "exAr": "في الـ black-box techniques تُقاس الـ coverage بالنسبة إلى العناصر المحددة في الـ test basis، لا بالنسبة إلى الكود."
+  },
+  {
+   "n": 202,
+   "ch": 4,
+   "q": "Why are experience-based test techniques useful in addition to black-box and white-box techniques?",
+   "o": {
+    "A": "They guarantee full requirements coverage",
+    "B": "They can detect defects that may be missed by the more systematic techniques",
+    "C": "Their effectiveness does not depend on the tester's skills",
+    "D": "They provide a measurable level of code coverage"
+   },
+   "a": "B",
+   "exEn": "Experience-based techniques use tester knowledge and intuition, so they complement systematic techniques by finding defects those may miss.",
+   "qAr": "ليش الـ experience-based test techniques مفيدة بالإضافة للـ black-box والـ white-box techniques؟",
+   "exAr": "الـ experience-based techniques بتعتمد على خبرة وحدس المختبِر، فبتكمّل التقنيات المنهجية وبتلاقي defects ممكن تفوتها."
+  },
+  {
+   "n": 203,
+   "ch": 4,
+   "q": "A specification is vague and partly outdated. Why can white-box testing still be valuable in this situation?",
+   "o": {
+    "A": "It derives expected results directly from the specification",
+    "B": "It reliably detects requirements that were never implemented",
+    "C": "Because tests are based on the actual implementation, defects can be found even when the specification is vague, outdated or incomplete",
+    "D": "It removes the need for any black-box testing"
+   },
+   "a": "C",
+   "exEn": "White-box tests consider the whole implementation, so they can reveal defects even when specifications are poor.",
+   "qAr": "الـ specification غامضة وقديمة جزئياً. ليش الـ white-box testing ممكن تضل مفيدة بهاد الوضع؟",
+   "exAr": "الـ white-box tests بتعتمد على الـ implementation الفعلي، فبتقدر تكشف defects حتى لو الـ specifications ضعيفة."
+  },
+  {
+   "n": 204,
+   "ch": 4,
+   "q": "Which problem is a white-box test technique, used on its own, LEAST likely to detect?",
+   "o": {
+    "A": "A wrong calculation in a branch that the tests execute",
+    "B": "A statement that can never be reached",
+    "C": "A loop that never ends for a particular input value",
+    "D": "A requirement that was never implemented in the code"
+   },
+   "a": "D",
+   "exEn": "White-box tests are derived from the existing code, so they cannot reveal functionality that is missing from it (omissions).",
+   "qAr": "أي مشكلة الـ white-box test technique لحالها أقل احتمال تكشفها؟",
+   "exAr": "الـ white-box tests بتنشتق من الكود الموجود، فما بتقدر تكشف وظائف ناقصة منه أصلاً (omissions)."
+  },
+  {
+   "n": 205,
+   "ch": 4,
+   "q": "A tester compiles a list of possible developer errors, defects and failures (for example division by zero, empty mandatory fields, very long inputs) and then designs tests aimed specifically at exposing each one. Which approach is this?",
+   "o": {
+    "A": "Fault attack",
+    "B": "Checklist-based testing",
+    "C": "Session-based exploratory testing",
+    "D": "Equivalence partitioning"
+   },
+   "a": "A",
+   "exEn": "Fault attacks are a methodical way to implement error guessing: list possible errors, defects and failures, then design tests to expose them.",
+   "qAr": "يُعدّ مختبِر قائمة بالأخطاء والـ defects والـ failures المحتملة من المطورين (مثل القسمة على صفر، والحقول الإجبارية الفارغة، والمدخلات الطويلة جدًا)، ثم يصمم tests هدفها كشف كلٍّ منها. ما اسم هذا الأسلوب؟",
+   "exAr": "الـ fault attack طريقة منهجية لتطبيق الـ error guessing: نُعدّ قائمة بالأخطاء والـ defects والـ failures المحتملة ونصمم tests تكشفها."
+  },
+  {
+   "n": 206,
+   "ch": 4,
+   "q": "In session-based exploratory testing, what does a test charter contain?",
+   "o": {
+    "A": "A detailed step-by-step test procedure with expected results",
+    "B": "Test objectives that guide the tester during a time-boxed session",
+    "C": "The list of defects found during the session",
+    "D": "The code coverage targets for the session"
+   },
+   "a": "B",
+   "exEn": "A test charter states the test objectives that guide the exploratory session; results are discussed in a debriefing afterwards.",
+   "qAr": "في الـ session-based exploratory testing، ماذا يتضمن الـ test charter؟",
+   "exAr": "يحدد الـ test charter أهداف الاختبار التي توجّه الـ session الاستكشافية، وتُناقش النتائج بعدها في الـ debriefing."
+  },
+  {
+   "n": 207,
+   "ch": 4,
+   "q": "In which situation is exploratory testing MOST appropriate?",
+   "o": {
+    "A": "A regulator requires fully pre-documented test procedures with traceable steps",
+    "B": "A stable, fully specified system needs an automated regression suite",
+    "C": "Specifications are few or inadequate and there is significant time pressure",
+    "D": "The goal is to measure branch coverage of a module"
+   },
+   "a": "C",
+   "exEn": "Exploratory testing is most useful when specifications are few or inadequate or under time pressure, and to complement formal techniques.",
+   "qAr": "في أي موقف يكون الـ exploratory testing هو الأنسب؟",
+   "exAr": "يكون الـ exploratory testing أكثر فائدة عندما تكون الـ specifications قليلة أو ناقصة أو عند وجود ضغط في الوقت، وكمكمّل للتقنيات الرسمية."
+  },
+  {
+   "n": 208,
+   "ch": 4,
+   "q": "Which item is LEAST suitable to include in a checklist for checklist-based testing?",
+   "o": {
+    "A": "Does each error message tell the user how to correct the input?",
+    "B": "Are all date fields displayed in the agreed format?",
+    "C": "Can the user cancel every multi-step process before final confirmation?",
+    "D": "Is the application of good quality?"
+   },
+   "a": "D",
+   "exEn": "Checklist items should be specific and checkable; items that are too general, like 'good quality', should be avoided.",
+   "qAr": "أي عنصر هو الأقل ملاءمة لإدراجه في checklist خاصة بالـ checklist-based testing؟",
+   "exAr": "يجب أن تكون عناصر الـ checklist محددة وقابلة للفحص؛ وينبغي تجنب العناصر العامة جدًا مثل «جودة جيدة»."
+  },
+  {
+   "n": 209,
+   "ch": 4,
+   "q": "In the '3 C's' of user stories, what does 'Confirmation' refer to?",
+   "o": {
+    "A": "The acceptance criteria",
+    "B": "The written description of the story on a card",
+    "C": "The discussion about how the software will be used",
+    "D": "The product owner's signature on the release"
+   },
+   "a": "A",
+   "exEn": "Card = the story description, Conversation = the discussion, Confirmation = the acceptance criteria.",
+   "qAr": "في «3 C's» الخاصة بالـ user stories، ما المقصود بـ «Confirmation»؟",
+   "exAr": "‏Card = وصف الـ story، وConversation = النقاش، وConfirmation = الـ acceptance criteria."
+  },
+  {
+   "n": 210,
+   "ch": 4,
+   "q": "A user story says: 'As a user, I want the app to be fast.' Reviewers note that there is no way to check whether the story has been fulfilled. Which INVEST criterion is mainly violated?",
+   "o": {
+    "A": "Independent",
+    "B": "Testable",
+    "C": "Negotiable",
+    "D": "Valuable"
+   },
+   "a": "B",
+   "exEn": "Without measurable criteria nobody can verify the story is done, so it is not Testable.",
+   "qAr": "تنص User story على: «As a user, I want the app to be fast». لاحظ المراجعون أنه لا توجد طريقة للتحقق من تحقق الـ story. أي معيار من INVEST مخالَف بصورة رئيسية؟",
+   "exAr": "من دون معايير قابلة للقياس لا يستطيع أحد التحقق من اكتمال الـ story، لذا فهي ليست Testable."
+  },
+  {
+   "n": 211,
+   "ch": 4,
+   "q": "During collaborative user story writing, what is the tester's main contribution?",
+   "o": {
+    "A": "Estimating the development effort for each story",
+    "B": "Deciding the business priority of each story",
+    "C": "Exploring what-if scenarios, asking questions and identifying missing details so the story is testable",
+    "D": "Writing the unit tests for each story's code"
+   },
+   "a": "C",
+   "exEn": "Testers bring the testing perspective: they question the story, explore alternatives and missing details, and help make it testable.",
+   "qAr": "أثناء الكتابة التعاونية للـ user stories، ما المساهمة الرئيسية للمختبِر؟",
+   "exAr": "يقدّم المختبِر منظور الاختبار: يطرح الأسئلة، ويستكشف السيناريوهات البديلة والتفاصيل الناقصة، ويساعد على أن تكون الـ story قابلة للاختبار."
+  },
+  {
+   "n": 212,
+   "ch": 4,
+   "q": "A team writes acceptance criteria as a bulleted verification list and an input/output mapping table. Which acceptance criteria format is this?",
+   "o": {
+    "A": "Scenario-oriented (Given/When/Then)",
+    "B": "Use case format",
+    "C": "State transition format",
+    "D": "Rule-oriented"
+   },
+   "a": "D",
+   "exEn": "Rule-oriented acceptance criteria use formats such as bullet-point verification lists or input-output mapping tables.",
+   "qAr": "يكتب فريق الـ acceptance criteria على شكل قائمة تحقق بنقاط وجدول mapping للمدخلات والمخرجات. ما format الـ acceptance criteria هذا؟",
+   "exAr": "تستخدم الـ rule-oriented acceptance criteria أشكالًا مثل قوائم التحقق بنقاط أو جداول mapping للمدخلات والمخرجات."
+  },
+  {
+   "n": 213,
+   "ch": 4,
+   "q": "Which of the following is NOT a purpose of acceptance criteria?",
+   "o": {
+    "A": "To specify how the code should be structured internally",
+    "B": "To define the scope of the user story",
+    "C": "To reach consensus among the stakeholders",
+    "D": "To describe both positive and negative scenarios"
+   },
+   "a": "A",
+   "exEn": "Acceptance criteria define scope, build consensus, describe scenarios and support planning and acceptance testing; they do not prescribe internal code structure.",
+   "qAr": "أي مما يلي ليس من أغراض الـ acceptance criteria؟",
+   "exAr": "تحدد الـ acceptance criteria النطاق، وتساعد على الوصول إلى توافق، وتصف السيناريوهات، وتدعم التخطيط والـ acceptance testing؛ ولا تحدد البنية الداخلية للكود."
+  },
+  {
+   "n": 214,
+   "ch": 4,
+   "q": "In acceptance test-driven development (ATDD), in which order are test cases typically created?",
+   "o": {
+    "A": "Non-functional tests first, then negative tests, then positive tests",
+    "B": "Positive tests first, then negative tests, then non-functional tests",
+    "C": "Negative tests first, then positive tests, with non-functional tests left to the system test level",
+    "D": "All tests at once, after the implementation is finished"
+   },
+   "a": "B",
+   "exEn": "In ATDD, tests are written before implementation: typically positive tests first, then negative tests, then non-functional characteristics.",
+   "qAr": "بالـ acceptance test-driven development (ATDD)، بأي ترتيب عادةً بتنكتب الـ test cases؟",
+   "exAr": "بالـ ATDD الـ tests بتنكتب قبل الـ implementation: عادةً الـ positive tests أول، بعدها الـ negative tests، وآخر شي الخصائص الـ non-functional."
+  },
+  {
+   "n": 215,
+   "ch": 5,
+   "q": "A test manager is asked why the team should spend time writing a test plan for a new mobile banking release. Which is a benefit of test planning according to the syllabus?",
+   "o": {
+    "A": "It forces testers to consider future challenges related to risks, schedules, people, tools and costs",
+    "B": "It guarantees that no defects will remain in the release",
+    "C": "It replaces the need for test monitoring and test control during the project",
+    "D": "It removes the need to communicate with stakeholders once the plan is approved"
+   },
+   "a": "A",
+   "exEn": "Test planning guides testers' thinking and forces them to confront future challenges (risks, schedules, people, tools, costs); it does not remove monitoring, control or communication.",
+   "qAr": "يُسأل مدير الاختبار عن سبب تخصيص الفريق وقتًا لكتابة test plan لإصدار جديد من تطبيق بنكي على الجوال. أي مما يلي يُعدّ فائدة لتخطيط الاختبار وفق المنهج؟",
+   "exAr": "تخطيط الاختبار يوجّه تفكير المختبِرين ويجبرهم على مواجهة التحديات المستقبلية المتعلقة بالمخاطر والجداول والأشخاص والأدوات والتكاليف، ولا يلغي الـ monitoring أو الـ control أو التواصل."
+  },
+  {
+   "n": 216,
+   "ch": 5,
+   "q": "During iteration planning in a Scrum team, which activity is a typical contribution of the tester?",
+   "o": {
+    "A": "Approving the product vision and the release budget",
+    "B": "Participating in the detailed risk analysis of user stories and estimating test effort for testing tasks",
+    "C": "Writing the production code for the highest-priority user stories",
+    "D": "Deciding alone which user stories the team commits to"
+   },
+   "a": "B",
+   "exEn": "In iteration planning, testers take part in detailed risk analysis of user stories, determine testability, break stories into (testing) tasks and estimate test effort.",
+   "qAr": "أثناء الـ iteration planning في فريق Scrum، أي نشاط يُعدّ مساهمة نموذجية من المختبِر؟",
+   "exAr": "في الـ iteration planning يشارك المختبِر في تحليل المخاطر التفصيلي للـ user stories وتحديد قابليتها للاختبار وتقسيمها إلى مهام وتقدير جهد الاختبار."
+  },
+  {
+   "n": 217,
+   "ch": 5,
+   "q": "In an Agile team, a user story may only be pulled into the iteration when it has testable acceptance criteria and its dependencies are resolved. It is considered complete only when all its tests pass and the code has been reviewed. How are these two rules best described?",
+   "o": {
+    "A": "Both are exit criteria called the Definition of Done",
+    "B": "The first is the Definition of Done and the second is the Definition of Ready",
+    "C": "The first is the Definition of Ready (entry criteria) and the second is the Definition of Done (exit criteria)",
+    "D": "Both are entry criteria called the Definition of Ready"
+   },
+   "a": "C",
+   "exEn": "In Agile, entry criteria are often called the Definition of Ready and exit criteria the Definition of Done.",
+   "qAr": "في فريق Agile، لا يمكن سحب الـ user story إلى الـ iteration إلا إذا كانت لها acceptance criteria قابلة للاختبار وتم حل اعتمادياتها، ولا تُعدّ مكتملة إلا عندما تنجح كل اختباراتها ويُراجَع الكود. كيف توصف هاتان القاعدتان بشكل أفضل؟",
+   "exAr": "في Agile تُسمّى الـ entry criteria عادة Definition of Ready، وتُسمّى الـ exit criteria عادة Definition of Done."
+  },
+  {
+   "n": 218,
+   "ch": 5,
+   "q": "The planned exit criteria (90% requirements coverage) have not been met, but the testing budget is exhausted. The stakeholders review the remaining risks and accept releasing without further testing. Which statement is correct according to the syllabus?",
+   "o": {
+    "A": "Testing must continue regardless, because exit criteria can never be changed",
+    "B": "The release must be cancelled because the exit criteria were not achieved",
+    "C": "Exit criteria only apply to component testing, so they are irrelevant here",
+    "D": "Running out of budget can be a valid exit criterion if the stakeholders have reviewed and accepted the risk of going live"
+   },
+   "a": "D",
+   "exEn": "Running out of time or budget can be a valid exit criterion when stakeholders have reviewed and accepted the risk of releasing without further testing.",
+   "qAr": "لم تتحقق الـ exit criteria المخطط لها (تغطية 90% من المتطلبات)، لكن ميزانية الاختبار نفدت. راجع أصحاب المصلحة المخاطر المتبقية ووافقوا على الإصدار دون مزيد من الاختبار. أي العبارات التالية صحيحة وفق المنهج؟",
+   "exAr": "نفاد الوقت أو الميزانية يمكن أن يكون exit criterion مقبولًا إذا راجع أصحاب المصلحة خطر الإطلاق دون اختبار إضافي ووافقوا عليه."
+  },
+  {
+   "n": 219,
+   "ch": 5,
+   "p": 1,
+   "q": "In an organization, historical data shows that the test effort to development effort ratio on similar projects is 2:5. A new project has an estimated development effort of 350 person-days. Using estimation based on ratios, what is the estimated test effort?",
+   "o": {
+    "A": "140 person-days",
+    "B": "175 person-days",
+    "C": "875 person-days",
+    "D": "210 person-days"
+   },
+   "a": "A",
+   "exEn": "Test effort = 350 × 2/5 = 140 person-days.",
+   "qAr": "تُظهر البيانات التاريخية في مؤسسة ما أن نسبة جهد الاختبار إلى جهد التطوير في المشاريع المشابهة هي 2:5. مشروع جديد قُدّر جهد تطويره بـ 350 person-days. باستخدام estimation based on ratios، ما هو جهد الاختبار المقدّر؟",
+   "exAr": "جهد الاختبار = 350 × 2/5 = 140 person-days."
+  },
+  {
+   "n": 220,
+   "ch": 5,
+   "p": 1,
+   "q": "A tester uses three-point estimation for a testing task. The optimistic estimate is 4 hours, the most likely estimate is 7 hours and the pessimistic estimate is 16 hours. What is the final estimate E?",
+   "o": {
+    "A": "7 hours",
+    "B": "8 hours",
+    "C": "9 hours",
+    "D": "12 hours"
+   },
+   "a": "B",
+   "exEn": "E = (a + 4m + b) / 6 = (4 + 28 + 16) / 6 = 48 / 6 = 8 hours.",
+   "qAr": "يستخدم مختبِر three-point estimation لمهمة اختبار. التقدير المتفائل 4 ساعات، والأكثر احتمالًا 7 ساعات، والمتشائم 16 ساعة. ما هو التقدير النهائي E؟",
+   "exAr": "E = (a + 4m + b) / 6 = (4 + 28 + 16) / 6 = 48 / 6 = 8 ساعات."
+  },
+  {
+   "n": 221,
+   "ch": 5,
+   "p": 1,
+   "q": "For regression testing of a release, the team's three-point estimates are: optimistic a = 5 days, most likely m = 11 days, pessimistic b = 23 days. Using E = (a + 4m + b)/6 and SD = (b − a)/6, how should the estimate be reported?",
+   "o": {
+    "A": "11 ± 3 days",
+    "B": "13 ± 3 days",
+    "C": "12 ± 3 days",
+    "D": "12 ± 18 days"
+   },
+   "a": "C",
+   "exEn": "E = (5 + 44 + 23)/6 = 72/6 = 12; SD = (23 − 5)/6 = 3; estimate = 12 ± 3 days.",
+   "qAr": "لاختبار الـ regression testing لإصدار ما، كانت تقديرات الفريق بطريقة three-point estimation: المتفائل a = 5 أيام، والأكثر احتمالًا m = 11 يومًا، والمتشائم b = 23 يومًا. باستخدام E = (a + 4m + b)/6 وSD = (b − a)/6، كيف يجب عرض التقدير؟",
+   "exAr": "E = (5 + 44 + 23)/6 = 72/6 = 12، وSD = (23 − 5)/6 = 3، إذن التقدير 12 ± 3 أيام."
+  },
+  {
+   "n": 222,
+   "ch": 5,
+   "q": "An Agile team has completed the testing of 18, 22 and 20 story points in its last three iterations. The test lead uses the average of these values to estimate how much testing can be done in the next iteration. Which estimation technique is being used?",
+   "o": {
+    "A": "Wideband Delphi",
+    "B": "Three-point estimation",
+    "C": "Estimation based on ratios",
+    "D": "Extrapolation"
+   },
+   "a": "D",
+   "exEn": "Extrapolation uses measurements made as early as possible in the current project (e.g., average velocity of recent iterations) to estimate future work.",
+   "qAr": "أنجز فريق Agile اختبار 18 و22 و20 story points في آخر ثلاث iterations. يستخدم قائد الاختبار متوسط هذه القيم لتقدير حجم الاختبار الممكن في الـ iteration القادمة. أي تقنية تقدير تُستخدم هنا؟",
+   "exAr": "الـ Extrapolation تعتمد على قياسات مبكرة من المشروع الحالي (مثل متوسط الـ velocity لآخر iterations) لتقدير العمل القادم."
+  },
+  {
+   "n": 223,
+   "ch": 5,
+   "q": "In an Agile team, each member privately selects a card with an effort value for a user story; the cards are revealed together and large differences are discussed before re-estimating. This Planning Poker approach is a variant of which estimation technique?",
+   "o": {
+    "A": "Wideband Delphi",
+    "B": "Extrapolation",
+    "C": "Estimation based on ratios",
+    "D": "Three-point estimation"
+   },
+   "a": "A",
+   "exEn": "Planning Poker is a variant of Wideband Delphi, an expert-based technique that iterates until consensus.",
+   "qAr": "في فريق Agile، يختار كل عضو بشكل سري بطاقة تحمل قيمة جهد لـ user story، ثم تُكشف البطاقات معًا وتُناقش الفروقات الكبيرة قبل إعادة التقدير. طريقة Planning Poker هذه هي نسخة من أي تقنية تقدير؟",
+   "exAr": "الـ Planning Poker نسخة من Wideband Delphi، وهي تقنية تعتمد على الخبراء وتتكرر حتى الوصول إلى توافق."
+  },
+  {
+   "n": 224,
+   "ch": 5,
+   "p": 1,
+   "q": "Test cases have the following priorities (1 = highest) and dependencies:\nTC1: priority 2\nTC2: priority 1, can run only after TC3\nTC3: priority 4\nTC4: priority 3, can run only after TC5\nTC5: priority 5\nWhich execution order runs the highest-priority test cases as early as possible while respecting the dependencies?",
+   "o": {
+    "A": "TC2, TC3, TC1, TC4, TC5",
+    "B": "TC3, TC2, TC1, TC5, TC4",
+    "C": "TC3, TC2, TC1, TC4, TC5",
+    "D": "TC1, TC2, TC3, TC4, TC5"
+   },
+   "a": "B",
+   "exEn": "TC2 is highest but needs TC3 first (TC3, TC2); next TC1; then TC4, which needs TC5 first (TC5, TC4).",
+   "qAr": "لدينا test cases بالأولويات التالية (1 = الأعلى) والاعتماديات الموضحة في السؤال بالإنجليزية فوق. أي ترتيب تنفيذ يشغّل الـ test cases الأعلى أولوية في أبكر وقت ممكن مع احترام الاعتماديات؟",
+   "exAr": "TC2 هو الأعلى لكنه يحتاج TC3 قبله (TC3 ثم TC2)، بعدها TC1، ثم TC4 الذي يحتاج TC5 قبله (TC5 ثم TC4)."
+  },
+  {
+   "n": 225,
+   "ch": 5,
+   "p": 1,
+   "q": "Six requirements R1–R6 are covered by the following test cases:\nTC1: R1, R2\nTC2: R2, R3, R4, R5\nTC3: R1, R5, R6\nTC4: R3, R4\nUsing additional coverage prioritization, TC2 is executed first. Which test case should be executed second?",
+   "o": {
+    "A": "TC1",
+    "B": "TC4",
+    "C": "TC3",
+    "D": "TC1 or TC3 equally, because both cover R1"
+   },
+   "a": "C",
+   "exEn": "After TC2, R1 and R6 remain uncovered; TC3 adds two (R1, R6), TC1 adds one (R1), TC4 adds none.",
+   "qAr": "ست متطلبات R1–R6 تغطيها الـ test cases كما هو موضح في السؤال بالإنجليزية فوق. باستخدام additional coverage prioritization، يُنفَّذ TC2 أولًا. أي test case يجب أن يُنفَّذ ثانيًا؟",
+   "exAr": "بعد TC2 يبقى R1 وR6 غير مغطّيين؛ TC3 يضيف اثنين (R1 وR6)، وTC1 يضيف واحدًا (R1)، وTC4 لا يضيف شيئًا."
+  },
+  {
+   "n": 226,
+   "ch": 5,
+   "p": 1,
+   "q": "Using risk-based prioritization, test cases are ordered by risk level (higher = earlier), respecting dependencies:\nTC1: risk 20, can run only after TC4\nTC2: risk 12, can run only after TC5\nTC3: risk 15\nTC4: risk 6\nTC5: risk 9\nWhat is the correct execution order?",
+   "o": {
+    "A": "TC1, TC3, TC2, TC5, TC4",
+    "B": "TC4, TC1, TC3, TC2, TC5",
+    "C": "TC4, TC1, TC5, TC2, TC3",
+    "D": "TC4, TC1, TC3, TC5, TC2"
+   },
+   "a": "D",
+   "exEn": "TC1 (20) needs TC4 first; then TC3 (15); then TC2 (12), which needs TC5 first: TC4, TC1, TC3, TC5, TC2.",
+   "qAr": "باستخدام risk-based prioritization، تُرتَّب الـ test cases حسب مستوى المخاطرة (الأعلى أولًا) مع احترام الاعتماديات الموضحة في السؤال بالإنجليزية فوق. ما هو ترتيب التنفيذ الصحيح؟",
+   "exAr": "TC1 (20) يحتاج TC4 قبله، ثم TC3 (15)، ثم TC2 (12) الذي يحتاج TC5 قبله، فيكون الترتيب TC4، TC1، TC3، TC5، TC2."
+  },
+  {
+   "n": 227,
+   "ch": 5,
+   "q": "Which description matches additional coverage-based prioritization?",
+   "o": {
+    "A": "The test case achieving the highest coverage is run first; each subsequent test case is the one that achieves the highest coverage not yet achieved",
+    "B": "Test cases are ordered by the priority of the requirements they trace to, as defined by stakeholders",
+    "C": "Test cases are ordered by the results of risk analysis, with the most important risks first",
+    "D": "Test cases are executed in the order in which they were written"
+   },
+   "a": "A",
+   "exEn": "Additional coverage-based prioritization starts with the highest-coverage test, then repeatedly picks the test adding the most not-yet-achieved coverage.",
+   "qAr": "أي وصف يطابق additional coverage-based prioritization؟",
+   "exAr": "في هذه الطريقة يُنفَّذ أولًا الـ test case ذو التغطية الأعلى، ثم في كل مرة الـ test case الذي يضيف أكبر تغطية لم تتحقق بعد."
+  },
+  {
+   "n": 228,
+   "ch": 5,
+   "q": "A team is designing its automated test suite following the test pyramid model. Which statement is consistent with this model?",
+   "o": {
+    "A": "Tests in the top layer should be the most numerous because they are closest to the user",
+    "B": "Tests in the bottom layer are small, isolated and fast, so there should be more of them than in the higher layers",
+    "C": "All layers should contain the same number of tests to keep the pyramid balanced",
+    "D": "End-to-end tests are cheaper and faster to run than component tests"
+   },
+   "a": "B",
+   "exEn": "The test pyramid shows lower-layer tests are small, isolated and fast, so many are written; higher-layer tests are complex, slow and fewer.",
+   "qAr": "يصمّم فريق مجموعة الاختبارات المؤتمتة لديه وفق نموذج test pyramid. أي عبارة تتوافق مع هذا النموذج؟",
+   "exAr": "في الـ test pyramid تكون اختبارات الطبقة السفلى صغيرة ومعزولة وسريعة فيُكتب منها عدد كبير، بينما اختبارات الطبقات العليا معقدة وبطيئة وعددها أقل."
+  },
+  {
+   "n": 229,
+   "ch": 5,
+   "q": "According to the testing quadrants model, exploratory testing, usability testing and user acceptance testing belong to which quadrant?",
+   "o": {
+    "A": "Q1: technology facing, supporting the team",
+    "B": "Q2: business facing, supporting the team",
+    "C": "Q3: business facing, critiquing the product",
+    "D": "Q4: technology facing, critiquing the product"
+   },
+   "a": "C",
+   "exEn": "Q3 is business facing and critiques the product; it includes exploratory testing, usability testing and user acceptance testing.",
+   "qAr": "وفق نموذج testing quadrants، إلى أي quadrant ينتمي كلٌّ من exploratory testing وusability testing وuser acceptance testing؟",
+   "exAr": "الـ Q3 موجّه للأعمال (business facing) وينقد المنتج، ويشمل exploratory testing وusability testing وuser acceptance testing."
+  },
+  {
+   "n": 230,
+   "ch": 5,
+   "q": "A team plans performance testing and security testing for its web shop, mostly using tools. In which testing quadrant are these tests placed?",
+   "o": {
+    "A": "Q1",
+    "B": "Q2",
+    "C": "Q3",
+    "D": "Q4"
+   },
+   "a": "D",
+   "exEn": "Q4 is technology facing and critiques the product; it contains non-functional tests (except usability), such as performance and security tests, often automated.",
+   "qAr": "يخطط فريق لتنفيذ performance testing وsecurity testing لمتجره الإلكتروني باستخدام الأدوات في الغالب. في أي testing quadrant توضع هذه الاختبارات؟",
+   "exAr": "الـ Q4 موجّه للتقنية وينقد المنتج، ويضم الاختبارات غير الوظيفية (عدا usability) مثل الأداء والأمان، وغالبًا تكون مؤتمتة."
+  },
+  {
+   "n": 231,
+   "ch": 5,
+   "q": "Which pair correctly names the two main activities of risk management according to the syllabus?",
+   "o": {
+    "A": "Risk analysis (identification and assessment) and risk control (mitigation and monitoring)",
+    "B": "Risk estimation and risk reporting",
+    "C": "Defect management and configuration management",
+    "D": "Test monitoring and test completion"
+   },
+   "a": "A",
+   "exEn": "Risk management consists of risk analysis (risk identification and risk assessment) and risk control (risk mitigation and risk monitoring).",
+   "qAr": "أي زوج يسمّي بشكل صحيح النشاطين الرئيسيين لإدارة المخاطر (risk management) وفق المنهج؟",
+   "exAr": "إدارة المخاطر تتكون من risk analysis (التحديد والتقييم) وrisk control (التخفيف والمراقبة)."
+  },
+  {
+   "n": 232,
+   "ch": 5,
+   "q": "Two weeks before system testing starts, the team learns that the test environment will be delivered a month late because the infrastructure vendor is understaffed. How should this risk be classified?",
+   "o": {
+    "A": "A product risk, because it affects the quality of the product",
+    "B": "A project risk, because it relates to the management and control of the project",
+    "C": "A product risk, because it concerns a third party",
+    "D": "It is not a risk, because it has already been confirmed"
+   },
+   "a": "B",
+   "exEn": "Project risks relate to project management and control, e.g., delays in delivery of environments, supplier issues and staffing problems.",
+   "qAr": "قبل أسبوعين من بدء system testing، علم الفريق أن بيئة الاختبار ستُسلَّم متأخرة شهرًا لأن مزوّد البنية التحتية يعاني نقصًا في الموظفين. كيف يُصنَّف هذا الخطر؟",
+   "exAr": "الـ project risks تتعلق بإدارة المشروع والتحكم به، مثل تأخر تسليم البيئات ومشاكل المورّدين ونقص الكوادر."
+  },
+  {
+   "n": 233,
+   "ch": 5,
+   "q": "A test manager has completed a product risk analysis for an online insurance portal. How are the results most appropriately used?",
+   "o": {
+    "A": "To decide the salaries of the testers on the project",
+    "B": "To replace the need for test cases in high-risk areas",
+    "C": "To determine the test scope, test levels, test types, test techniques, test effort and test prioritization",
+    "D": "To prove that low-risk areas contain no defects and need no testing at all"
+   },
+   "a": "C",
+   "exEn": "Product risk analysis is used to focus test effort: it influences scope, levels, types, techniques, effort, prioritization and other mitigation activities.",
+   "qAr": "أكمل مدير اختبار product risk analysis لبوابة تأمين إلكترونية. ما الاستخدام الأنسب لنتائجه؟",
+   "exAr": "نتائج الـ product risk analysis تُستخدم لتركيز جهد الاختبار، فتحدد النطاق والمستويات والأنواع والتقنيات والجهد وترتيب أولويات الاختبار."
+  },
+  {
+   "n": 234,
+   "ch": 5,
+   "p": 1,
+   "q": "Risk level is calculated as likelihood × impact (each rated 1–5):\nR1: likelihood 4, impact 3\nR2: likelihood 2, impact 5\nR3: likelihood 5, impact 1\nR4: likelihood 3, impact 2\nWhat is the order of the risks from highest to lowest risk level?",
+   "o": {
+    "A": "R3, R1, R4, R2",
+    "B": "R2, R1, R4, R3",
+    "C": "R1, R2, R3, R4",
+    "D": "R1, R2, R4, R3"
+   },
+   "a": "D",
+   "exEn": "Risk levels: R1 = 12, R2 = 10, R4 = 6, R3 = 5, so the order is R1, R2, R4, R3.",
+   "qAr": "يُحسب مستوى المخاطرة (risk level) كحاصل ضرب likelihood × impact (كل منهما من 1 إلى 5) للمخاطر الموضحة في السؤال بالإنجليزية فوق. ما ترتيب المخاطر من الأعلى إلى الأدنى؟",
+   "exAr": "مستويات المخاطرة: R1 = 12، R2 = 10، R4 = 6، R3 = 5، فيكون الترتيب R1، R2، R4، R3."
+  },
+  {
+   "n": 235,
+   "ch": 5,
+   "p": 1,
+   "q": "A team calculates risk level as likelihood × impact (each rated 1–5). Any risk with a level of 15 or more requires extensive testing.\nR1: likelihood 3, impact 4\nR2: likelihood 4, impact 4\nR3: likelihood 5, impact 2\nR4: likelihood 2, impact 5\nWhich risks require extensive testing?",
+   "o": {
+    "A": "R2 only",
+    "B": "R2 and R4",
+    "C": "R3 and R4",
+    "D": "R1 and R2"
+   },
+   "a": "A",
+   "exEn": "Risk levels: R1 = 12, R2 = 16, R3 = 10, R4 = 10; only R2 reaches the threshold of 15.",
+   "qAr": "يحسب فريق مستوى المخاطرة كـ likelihood × impact (كل منهما من 1 إلى 5)، وأي خطر مستواه 15 أو أكثر يحتاج اختبارًا مكثفًا. بالنظر إلى المخاطر الموضحة في السؤال بالإنجليزية فوق، أي المخاطر تحتاج اختبارًا مكثفًا؟",
+   "exAr": "مستويات المخاطرة: R1 = 12، R2 = 16، R3 = 10، R4 = 10، وR2 وحده يصل إلى الحد 15."
+  },
+  {
+   "n": 236,
+   "ch": 5,
+   "q": "Which of the following is an example of mitigating a product risk through testing?",
+   "o": {
+    "A": "Buying insurance to cover losses from production failures",
+    "B": "Selecting testers with the right experience and applying appropriate test techniques and coverage levels for the risky area",
+    "C": "Ignoring the risk because its likelihood is low",
+    "D": "Moving the release date without changing any test activities"
+   },
+   "a": "B",
+   "exEn": "Testing-based mitigation actions include selecting experienced testers, applying the right level of independence, reviews, static analysis, suitable test techniques, coverage levels and test types.",
+   "qAr": "أي مما يلي يُعدّ مثالًا على تخفيف (mitigation) product risk من خلال الاختبار؟",
+   "exAr": "من إجراءات التخفيف بالاختبار: اختيار مختبِرين ذوي خبرة مناسبة، والاستقلالية المناسبة، والمراجعات، والـ static analysis، واختيار test techniques ومستويات تغطية وأنواع اختبار مناسبة."
+  },
+  {
+   "n": 237,
+   "ch": 5,
+   "q": "What is the purpose of risk monitoring?",
+   "o": {
+    "A": "To calculate the test effort using historical data",
+    "B": "To assign a severity to each defect report",
+    "C": "To ensure mitigation actions are effective, obtain information to improve risk management and identify emerging risks",
+    "D": "To identify all risks once at the start of the project so they never need to be revisited"
+   },
+   "a": "C",
+   "exEn": "Risk monitoring checks that mitigation actions are effective, gathers information to improve risk management and identifies emerging risks.",
+   "qAr": "ما الغرض من risk monitoring؟",
+   "exAr": "الـ risk monitoring يتأكد من فعالية إجراءات التخفيف، ويجمع معلومات لتحسين إدارة المخاطر، ويكتشف المخاطر الجديدة الناشئة."
+  },
+  {
+   "n": 238,
+   "ch": 5,
+   "q": "A company releasing a payment app cannot fully test integration with every regional bank. It signs a contract under which a third-party integration partner bears the financial consequences of failures in those integrations. Which risk response is this?",
+   "o": {
+    "A": "Risk mitigation by testing",
+    "B": "Risk acceptance",
+    "C": "Contingency plan",
+    "D": "Risk transfer"
+   },
+   "a": "D",
+   "exEn": "Shifting the consequences of a risk to another party is risk transfer, one of the risk control responses alongside mitigation, acceptance and contingency plans.",
+   "qAr": "شركة تُطلق تطبيق دفع ولا تستطيع اختبار التكامل مع كل بنك إقليمي بشكل كامل، فوقّعت عقدًا يتحمّل بموجبه شريك تكامل خارجي العواقب المالية لأي فشل في هذه التكاملات. ما نوع الاستجابة للخطر هنا؟",
+   "exAr": "نقل عواقب الخطر إلى طرف آخر هو risk transfer، وهو أحد خيارات التحكم بالمخاطر إلى جانب mitigation وacceptance وcontingency plans."
+  },
+  {
+   "n": 239,
+   "ch": 5,
+   "q": "A team rates each risk's likelihood and impact as 'low', 'medium' or 'high' and places the risk in a risk matrix. What kind of risk assessment is this?",
+   "o": {
+    "A": "Qualitative risk assessment",
+    "B": "Quantitative risk assessment",
+    "C": "Risk monitoring",
+    "D": "Risk mitigation"
+   },
+   "a": "A",
+   "exEn": "Using ordinal categories and a risk matrix is a qualitative approach; quantitative assessment uses numerical values for likelihood and impact.",
+   "qAr": "يصنّف فريق احتمال كل خطر وتأثيره إلى «low» أو «medium» أو «high» ويضع الخطر في risk matrix. ما نوع تقييم المخاطر هذا؟",
+   "exAr": "استخدام فئات وصفية وrisk matrix هو تقييم نوعي (qualitative)، أما التقييم الكمي فيستخدم قيمًا رقمية للاحتمال والتأثير."
+  },
+  {
+   "n": 240,
+   "ch": 5,
+   "q": "A test manager reports the defect detection percentage (DDP) and the number of open defects by priority. Into which category of test metrics do these fall?",
+   "o": {
+    "A": "Project progress metrics",
+    "B": "Defect metrics",
+    "C": "Cost metrics",
+    "D": "Coverage metrics"
+   },
+   "a": "B",
+   "exEn": "Number and priority of defects found/fixed, defect density and defect detection percentage are defect metrics.",
+   "qAr": "يعرض مدير الاختبار نسبة الـ defect detection percentage (DDP) وعدد الـ defects المفتوحة حسب الأولوية. إلى أي فئة من test metrics تنتمي هذه المقاييس؟",
+   "exAr": "عدد الـ defects المكتشفة والمصلَّحة وأولوياتها، والـ defect density، والـ defect detection percentage كلها defect metrics."
+  },
+  {
+   "n": 241,
+   "ch": 5,
+   "q": "A project has been cancelled before release. Which set of activities should still be performed as part of test completion?",
+   "o": {
+    "A": "Writing new test cases for the remaining requirements",
+    "B": "Executing the full regression test suite one last time",
+    "C": "Archiving useful testware, shutting down the test environment as agreed, and analysing lessons learned",
+    "D": "Starting the estimation for the next iteration"
+   },
+   "a": "C",
+   "exEn": "Test completion occurs at milestones such as project cancellation; it includes archiving or handing over testware, shutting down environments, lessons learned and the test completion report.",
+   "qAr": "أُلغي مشروع قبل إصداره. أي مجموعة من الأنشطة يجب أن تُنفَّذ رغم ذلك كجزء من test completion؟",
+   "exAr": "الـ test completion يحدث عند محطات مثل إلغاء المشروع، ويشمل أرشفة الـ testware أو تسليمه، وإيقاف بيئة الاختبار، وتحليل الدروس المستفادة، وكتابة test completion report."
+  },
+  {
+   "n": 242,
+   "ch": 5,
+   "q": "Which item is typically included in a test progress report but NOT in a test completion report?",
+   "o": {
+    "A": "A summary of the quality of the test object",
+    "B": "Deviations from the test plan",
+    "C": "Lessons learned for future projects",
+    "D": "Testing planned for the next reporting period"
+   },
+   "a": "D",
+   "exEn": "Test progress reports, produced regularly during testing, include the testing planned for the next period; completion reports summarise the finished testing and lessons learned.",
+   "qAr": "أي بند يُدرج عادة في test progress report ولكن ليس في test completion report؟",
+   "exAr": "الـ test progress report يصدر بشكل دوري أثناء الاختبار ويتضمن الاختبار المخطط للفترة القادمة، أما الـ test completion report فيلخّص الاختبار المنتهي والدروس المستفادة."
+  },
+  {
+   "n": 243,
+   "ch": 5,
+   "q": "A test lead must communicate test status to developers in a co-located team, to a remote product owner and to senior management. Which statement about communicating test status is correct?",
+   "o": {
+    "A": "The means of communication should be chosen and tailored to the needs and interests of each stakeholder group",
+    "B": "Only formal written reports are acceptable for communicating test status",
+    "C": "All stakeholders should receive exactly the same detailed report",
+    "D": "Test status should only be communicated at the end of the project"
+   },
+   "a": "A",
+   "exEn": "Status can be communicated verbally, via dashboards, electronic channels, online documentation or formal reports; the choice depends on stakeholders' needs, as different stakeholders want different information.",
+   "qAr": "يجب على قائد الاختبار إيصال حالة الاختبار إلى المطورين في فريق يعمل في نفس المكان، وإلى product owner يعمل عن بُعد، وإلى الإدارة العليا. أي عبارة صحيحة بخصوص إيصال حالة الاختبار؟",
+   "exAr": "يمكن إيصال الحالة شفهيًا أو عبر dashboards أو قنوات إلكترونية أو توثيق إلكتروني أو تقارير رسمية، ويُختار الأسلوب حسب احتياجات كل فئة من أصحاب المصلحة."
+  },
+  {
+   "n": 244,
+   "ch": 5,
+   "q": "A tester reports a failure, but the developer cannot reproduce it because nobody knows which build and which version of the test data were used. Which practice would most directly prevent this problem?",
+   "o": {
+    "A": "Using three-point estimation for test tasks",
+    "B": "Configuration management that uniquely identifies, version-controls and tracks test items and testware, and records baselines",
+    "C": "Applying the test pyramid to the automated tests",
+    "D": "Performing a product risk analysis before each iteration"
+   },
+   "a": "B",
+   "exEn": "Configuration management ensures all configuration items (test objects, testware) are uniquely identified, version controlled, tracked for changes and related to each other, enabling reproducibility.",
+   "qAr": "أبلغ مختبِر عن failure، لكن المطوّر لم يستطع إعادة إنتاجها لأن لا أحد يعرف أي build وأي نسخة من بيانات الاختبار استُخدمت. أي ممارسة تمنع هذه المشكلة بشكل مباشر؟",
+   "exAr": "الـ configuration management يضمن أن كل عناصر التهيئة (test objects والـ testware) معرّفة بشكل فريد وخاضعة لـ version control ومتتبَّعة ومرتبطة ببعضها، مما يتيح إعادة الإنتاج."
+  },
+  {
+   "n": 245,
+   "ch": 5,
+   "q": "A tester logs a defect report for a login failure. During analysis, the developer shows that the failure was caused by a misconfigured test environment and the software works correctly. According to the defect management process, how should this report be handled?",
+   "o": {
+    "A": "It must be kept open until the next release, because reports can never be closed without a code fix",
+    "B": "It must be deleted from the defect management tool so that metrics are not affected",
+    "C": "It is treated as a reported anomaly that is not a defect (a false positive) and is rejected or closed accordingly",
+    "D": "It must be reclassified as a product risk"
+   },
+   "a": "C",
+   "exEn": "Reported anomalies may turn out to be real defects or something else, such as a false positive or a change request; the workflow handles them through to closure, including rejection.",
+   "qAr": "سجّل مختبِر defect report لفشل في تسجيل الدخول. أثناء التحليل، أوضح المطوّر أن الفشل سببه بيئة اختبار مهيّأة بشكل خاطئ وأن البرنامج يعمل بشكل صحيح. وفق عملية defect management، كيف يجب التعامل مع هذا التقرير؟",
+   "exAr": "الـ anomalies المُبلَّغ عنها قد تكون defects حقيقية أو شيئًا آخر مثل false positive أو change request، والـ workflow يتعامل معها حتى الإغلاق بما في ذلك الرفض."
+  },
+  {
+   "n": 246,
+   "ch": 6,
+   "q": "Testers on a project keep reporting failures that developers cannot reproduce because each tester configures the test environment by hand. The team wants to spin up identical, disposable environments on demand. Which category of tool from the syllabus best addresses this need?",
+   "o": {
+    "A": "Tools supporting scalability and deployment standardization, such as virtual machines and containerization tools",
+    "B": "Static testing tools that review the environment configuration documents",
+    "C": "Test design and implementation tools that generate test cases and test data",
+    "D": "Collaboration tools that let testers and developers discuss the failures"
+   },
+   "a": "A",
+   "exEn": "Virtual machines and containerization tools support scalability and deployment standardization, giving identical reproducible environments.",
+   "qAr": "في مشروع ما، يُبلّغ المختبِرون باستمرار عن failures لا يستطيع المطوّرون إعادة إنتاجها، لأن كل مختبِر يُهيّئ الـ test environment يدويًا. يريد الفريق إنشاء بيئات متطابقة ومؤقتة عند الطلب. أي فئة من الأدوات في المنهج تلبّي هذه الحاجة بشكل أفضل؟",
+   "exAr": "أدوات الـ virtual machines والـ containerization تدعم الـ scalability وتوحيد الـ deployment، فتوفّر بيئات متطابقة وقابلة لإعادة الإنتاج."
+  },
+  {
+   "n": 247,
+   "ch": 6,
+   "q": "A test team works across three countries. They need a shared place to communicate, keep test-related information visible to everyone, and discuss defects with business representatives in real time. According to the CTFL v4.0 syllabus, which tool category primarily supports this?",
+   "o": {
+    "A": "Non-functional testing tools",
+    "B": "Collaboration tools",
+    "C": "Test execution and coverage tools",
+    "D": "Management tools"
+   },
+   "a": "B",
+   "exEn": "Collaboration tools facilitate communication and information sharing within the team and with stakeholders.",
+   "qAr": "يعمل فريق اختبار موزّع على ثلاث دول، ويحتاج إلى مكان مشترك للتواصل وإبقاء المعلومات المتعلقة بالاختبار متاحة للجميع، ومناقشة الـ defects مع ممثلي الـ business بشكل فوري. وفقًا لمنهج CTFL v4.0، أي فئة من الأدوات تدعم ذلك أساسًا؟",
+   "exAr": "الـ collaboration tools تسهّل التواصل وتبادل المعلومات داخل الفريق ومع الـ stakeholders."
+  },
+  {
+   "n": 248,
+   "ch": 6,
+   "q": "A team runs the same 300-step regression testing checklist manually before every release. Different testers sometimes skip steps or enter slightly different data, so results vary between runs. Which benefit of test automation most directly addresses this problem?",
+   "o": {
+    "A": "Automation removes the need to maintain test cases when requirements change",
+    "B": "Automation guarantees that the software contains no remaining defects",
+    "C": "Greater consistency and repeatability, reducing simple human errors",
+    "D": "Automation lets the team skip test analysis and test design"
+   },
+   "a": "C",
+   "exEn": "Automation executes tests consistently and repeatably, preventing simple human errors such as skipped steps or wrong data entry.",
+   "qAr": "يُنفّذ فريق قائمة regression testing من 300 خطوة يدويًا قبل كل release. أحيانًا يتخطّى بعض المختبِرين خطوات أو يُدخلون بيانات مختلفة قليلًا، فتختلف النتائج من تنفيذ لآخر. أي فائدة من فوائد test automation تعالج هذه المشكلة بشكل مباشر؟",
+   "exAr": "الـ automation تنفّذ الاختبارات بشكل ثابت وقابل للتكرار، فتمنع الأخطاء البشرية البسيطة مثل تخطّي خطوات أو إدخال بيانات خاطئة."
+  },
+  {
+   "n": 249,
+   "ch": 6,
+   "q": "A company built its entire UI automation suite on a free open-source framework. A year later, the community stops releasing updates and the framework no longer supports the latest browser versions. Which risk of test automation listed in the syllabus has materialized?",
+   "o": {
+    "A": "Unrealistic expectations about the functionality of the tool",
+    "B": "Over-reliance on the tool, ignoring the need for human critical thinking",
+    "C": "Inaccurate estimation of the time needed to write the scripts",
+    "D": "The open-source project supporting the tool may be abandoned"
+   },
+   "a": "D",
+   "exEn": "The syllabus lists the risk that a tool's vendor may go out of business or that an open-source project may be abandoned, leaving no updates or support.",
+   "qAr": "بنت شركة كامل الـ UI automation suite الخاصة بها على framework مجاني open-source. بعد سنة توقّف المجتمع عن إصدار التحديثات، ولم يعد الـ framework يدعم أحدث إصدارات المتصفحات. أي خطر من مخاطر test automation المذكورة في المنهج قد تحقّق؟",
+   "exAr": "يذكر المنهج خطر خروج مورّد الأداة من السوق أو التخلّي عن مشروع الـ open-source، فلا تبقى تحديثات أو دعم."
+  },
+  {
+   "n": 250,
+   "ch": 6,
+   "q": "During automated test execution, a team wants the tool to also report which statements and branches of the code were exercised by the tests. Which tool category described in CTFL v4.0 provides this?",
+   "o": {
+    "A": "Static testing tools",
+    "B": "Test execution and coverage tools",
+    "C": "Test design and implementation tools",
+    "D": "DevOps tools"
+   },
+   "a": "B",
+   "exEn": "Test execution and coverage tools facilitate automated test execution and coverage measurement.",
+   "qAr": "أثناء التنفيذ الآلي للاختبارات، يريد الفريق أن تُبيّن الأداة أيضًا أي statements وbranches في الكود تمّ تنفيذها بواسطة الاختبارات. أي فئة من الأدوات الموصوفة في CTFL v4.0 توفّر ذلك؟",
+   "exAr": "الـ test execution and coverage tools تسهّل التنفيذ الآلي للاختبارات وقياس الـ coverage."
   }
  ],
  "chapters": [
@@ -1863,7 +3840,8 @@
   "6": 2
  },
  "examPractical": {
-  "4": 5
+  "4": 5,
+  "5": 2
  },
  "examConfig": {
   "count": 40,
