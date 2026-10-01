@@ -94,7 +94,17 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
 
   /* ---------- التخزين على الجهاز ---------- */
   const load = (): Saved => { try { return { ans: {}, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch (_) { return { ans: {} }; } };
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (_) {} };
+  // الحفظ بيدمج مع المحفوظ (لو البنك مفتوح بأكثر من تاب ما بيمسح أجوبة التاب الثاني)
+  const save = (replace = false) => {
+    try {
+      if (replace) { localStorage.setItem(KEY, JSON.stringify(S)); return; }
+      const old = load();
+      S.ans = { ...old.ans, ...S.ans };
+      if (S.exam && old.exam && old.exam.endsAt === S.exam.endsAt) S.exam.ans = { ...old.exam.ans, ...S.exam.ans };
+      localStorage.setItem(KEY, JSON.stringify(S));
+    } catch (_) {}
+  };
+  let examSync: ((back: boolean) => void) | null = null;
   let S = load();
 
   let B: Bank;
@@ -175,7 +185,7 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
       h('div', { class: 'chips' }, chip(L.all, B.items), ...chapters().map((c) => chip(chLabel(c), B.items.filter((i) => i.ch === c)))),
       h('div', { class: 'row' },
         wrong.length > 0 && h('button', { type: 'button', class: 'btn btn-ghost btn-sm', onclick: () => practice(wrong) }, `${L.wrongOnly} (${wrong.length})`),
-        all.done > 0 && h('button', { type: 'button', class: 'linkbtn', onclick: async () => { if (await ask(L.resetConfirm)) { S.ans = {}; save(); home(); } } }, L.reset),
+        all.done > 0 && h('button', { type: 'button', class: 'linkbtn', onclick: async () => { if (await ask(L.resetConfirm)) { S.ans = {}; save(true); home(); } } }, L.reset),
       ),
     );
     const ec = h('section', { class: 'card exam-card' },
@@ -183,7 +193,7 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
         testoSvg('ec-testo'),
         h('div', {}, h('h2', {}, L.examTitle), h('p', { class: 'dim' }, fill(L.examText, { count: EX.count, minutes: EX.minutes, pass: EX.pass }))),
       ),
-      S.last && h('p', { class: 'last' }, fill(L.score, { score: S.last.score, total: S.last.total })),
+      S.last && h('p', { class: 'last' }, fill(L.lastScore, { score: S.last.score, total: S.last.total, date: new Date(S.last.at).toLocaleDateString('ar-JO-u-nu-latn', { day: 'numeric', month: 'long' }) })),
       h('button', { type: 'button', class: 'btn btn-primary', onclick: () => startExam() }, L.examButton),
     );
     show(h('div', { class: 'home' }, pc, ec));
@@ -277,7 +287,14 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
   }
 
   let timer = 0;
-  const stopExamUi = () => { clearInterval(timer); document.body.classList.remove('bk-exam-on'); };
+  const stopExamUi = () => { clearInterval(timer); examSync = null; document.body.classList.remove('bk-exam-on'); };
+  let hiddenAt = 0;
+  window.addEventListener('storage', (e) => { if (e.key === KEY && examSync) examSync(false); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { hiddenAt = Date.now(); return; }
+    // رجع بعد أكثر من 30 ثانية؟ Testo بيرحّب فيه وبيذكّره وين وصل
+    if (examSync) examSync(Date.now() - hiddenAt > 30_000);
+  });
 
   function startExam() {
     const total = EX.minutes * 60_000;
@@ -370,7 +387,7 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
             E.ans[it.n] = k; save();
             const now = answered();
             if (now === items.length && before < now) say(L.proctorAllDone, 'all');
-            else if (now > before && now % 10 === 0) say(fill(L.proctorQuarter, { n: now, total: items.length }), `q${now}`);
+            else if (now > before && now % 5 === 0) say(fill(L.proctorQuarter, { n: now, total: items.length }), `q${now}`);
             renderQ();
           }, flagBtn),
           h('div', { class: 'nav' },
@@ -406,6 +423,25 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
       );
       paintSide();
       top();
+    };
+
+    // تزامن: تاب ثاني جاوب/سلّم، أو رجع الطالب للتاب بعد غياب
+    examSync = (back: boolean) => {
+      const fresh = load();
+      if (!fresh.exam || fresh.exam.endsAt !== E.endsAt) {
+        if (!fresh.exam) { S = fresh; examSync = null; stopExamUi(); home(); }
+        return;
+      }
+      E.ans = { ...E.ans, ...fresh.exam.ans };
+      E.flags = fresh.exam.flags ?? E.flags;
+      E.said = [...new Set([...(E.said || []), ...(fresh.exam.said || [])])];
+      S.exam = E;
+      if (main.dataset.mode === 'review') reviewScreen(); else renderQ();
+      if (back) {
+        const left = Math.max(0, Math.ceil((E.endsAt - Date.now()) / 60000));
+        say(fill(L.proctorBack, { n: answered(), total: items.length, minutes: left }));
+      }
+      tick();
     };
 
     clearInterval(timer);

@@ -2171,7 +2171,7 @@ collections:
             default: "بالتوفيق! خذ نفس، عندك {minutes} دقيقة 🙂"
             hint: "{minutes}"
           - name: proctorQuarter
-            label: "المراقب — كل ربع أسئلة"
+            label: "المراقب — كل 5 أجوبة"
             widget: string
             required: false
             default: "ماشي تمام، جاوبت {n} من {total} 💪"
@@ -2196,6 +2196,12 @@ collections:
             widget: string
             required: false
             default: "آخر 5 دقائق! راجع الأسئلة المعلّمة 🚩"
+          - name: proctorBack
+            label: "المراقب — لما يرجع للتاب بعد غياب"
+            widget: string
+            required: false
+            default: "أهلاً، رجعت 👋 جاوبت {n} من {total}، وباقيلك {minutes} دقيقة."
+            hint: "{n} · {total} · {minutes} الدقائق الباقية"
           - name: proctorAllDone
             label: "المراقب — جاوب الكل"
             widget: string
@@ -2211,6 +2217,12 @@ collections:
             widget: string
             required: false
             default: "لا، رجوع"
+          - name: bankLastScore
+            label: "البنك — علامة آخر امتحان (ببطاقة الامتحان)"
+            widget: string
+            required: false
+            default: "آخر امتحان: {score} من {total} ({date})"
+            hint: "{score} · {total} · {date} تاريخ الامتحان"
           - name: bankTimeUp
             label: "البنك — خلص الوقت"
             widget: string
