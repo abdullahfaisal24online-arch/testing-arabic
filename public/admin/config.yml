@@ -2128,11 +2128,11 @@ collections:
             required: false
             default: "ارجع للأسئلة"
           - name: bankWeakest
-            label: "النتيجة — أضعف فصل"
+            label: "النتيجة — الفصل اللي خسّر أكثر علامات"
             widget: string
             required: false
-            default: "أضعف فصل عندك: {chapter}"
-            hint: "{chapter} اسم الفصل"
+            default: "أكثر فصل خسّرك علامات: {chapter} ({lost} من {total})"
+            hint: "{chapter} اسم الفصل · {lost} العلامات اللي راحت فيه · {total} أسئلته بالامتحان"
           - name: bankTrainWeak
             label: "النتيجة — زر التدريب على أضعف فصل"
             widget: string

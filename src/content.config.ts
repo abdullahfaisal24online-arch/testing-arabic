@@ -676,7 +676,7 @@ const storeSettings = defineCollection({
     bankReviewTitle: str("قبل ما تنهي"),
     bankReviewText: str("جاوبت {answered} من {total}. في {blank} بدون جواب و{flagged} معلّمة. اضغط على أي رقم لترجعله."),
     bankBackToQuestions: str("ارجع للأسئلة"),
-    bankWeakest: str("أضعف فصل عندك: {chapter}"),
+    bankWeakest: str("أكثر فصل خسّرك علامات: {chapter} ({lost} من {total})"),
     bankTrainWeak: str("تدرّب عليه"),
     bankCertTitle: str("جاهز للامتحان"),
     bankCertSave: str("احفظ الشهادة كصورة"),

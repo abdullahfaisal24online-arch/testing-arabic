@@ -438,7 +438,12 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
       const list = items.filter((x) => x.ch === c);
       return { c, list, right: list.filter((x) => ans[x.n] === x.a).length };
     });
-    const weakest = [...per].sort((a, b) => a.right / a.list.length - b.right / b.list.length)[0];
+    // أضعف فصل = اللي خسّرك أكثر علامات (فصل 11 سؤال أهم من فصل سؤالين)،
+    // ولو تساووا: الأقل نسبة صح، وبعدين الأكبر بالامتحان
+    const weakest = per
+      .map((p) => ({ ...p, lost: p.list.length - p.right }))
+      .filter((p) => p.lost > 0)
+      .sort((a, b) => b.lost - a.lost || a.right / a.list.length - b.right / b.list.length || b.list.length - a.list.length)[0];
     const wrong = items.filter((x) => ans[x.n] !== x.a);
 
     // حلقة العلامة بتعدّ لفوق
@@ -457,7 +462,7 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
         h('p', { class: 'big ' + (ok ? 'ok' : 'bad') }, ok ? L.passed : L.failed),
         h('p', { class: 'score2' }, fill(L.score, { score, total: items.length })),
         !ok && weakest && h('div', { class: 'weak' },
-          h('span', {}, fill(L.weakest, { chapter: chLabel(weakest.c) })),
+          h('span', {}, fill(L.weakest, { chapter: chLabel(weakest.c), lost: weakest.lost, total: weakest.list.length })),
           h('button', { type: 'button', class: 'btn btn-ghost btn-sm', onclick: () => practice(B.items.filter((x) => x.ch === weakest.c)) }, L.trainWeak),
         ),
       ),
