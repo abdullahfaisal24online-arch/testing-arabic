@@ -1,82 +1,419 @@
 ---
+/**
+ * بنك الأسئلة التفاعلي للمشتري: تدريب حسب الفصل + امتحان تجريبي بوقت.
+ * الصفحة نفسها ما فيها ولا سؤال — الأسئلة بتوصل من /api/pro/bank/<slug> بس لجهاز مفعّل.
+ */
 import { getCollection } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
+import { STORE_OPEN, getStoreSettings } from '../../../lib/store';
+import { getBank } from '../../../lib/banks';
 
 export async function getStaticPaths() {
+  if (!STORE_OPEN) return [];
   const products = (await getCollection('products')).filter((p) => !p.data.draft);
-  return products.map((product) => ({
-    params: { slug: product.id },
-    props: { product },
-  }));
+  return products.filter((p) => getBank(p.id).length > 0).map((product) => ({ params: { slug: product.id }, props: { product } }));
 }
 
 const { product } = Astro.props;
-const { data } = product;
+const t = await getStoreSettings();
+const L = {
+  practiceTitle: t.bankPracticeTitle, practiceText: t.bankPracticeText, all: t.bankAll, wrongOnly: t.bankWrongOnly,
+  examTitle: t.bankExamTitle, examText: t.bankExamText, examButton: t.bankExamButton,
+  next: t.bankNext, prev: t.bankPrev, correct: t.bankCorrect, wrong: t.bankWrong, english: t.bankEnglish, back: t.bankBack,
+  reset: t.bankReset, resetConfirm: t.bankResetConfirm, submit: t.bankSubmit, submitConfirm: t.bankSubmitConfirm,
+  timeUp: t.bankTimeUp, passed: t.bankPassed, failed: t.bankFailed, score: t.bankScore, byChapter: t.bankByChapter,
+  review: t.bankReview, retry: t.bankRetry, done: t.bankDone,
+};
+const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankExamPass };
 ---
 
-<Base title={data.title} description={data.pitch || data.title} noindex={true}>
-  <div class="wrap crumbs">
-    <a href="/pro/">موادي</a><span>›</span>
-    <span class="now">{data.title}</span>
-  </div>
+<Base title={product.data.title} description={product.data.title} noindex hideChat>
+  <div class="wrap bpage">
+    <a class="back" href="/pro/">{t.mineTitle}</a>
+    <h1>{product.data.title}</h1>
 
-  <section class="hero">
-    <div class="wrap">
-      <span class="eyebrow">{data.kind}</span>
-      <h1>{data.title}</h1>
-
-      <div class="panel">
-        <h2>المادة قيد التجهيز</h2>
-        <p>
-          وصولك مفتوح ومحفوظ على هاد الجهاز. المحتوى بينزل هون أول ما يجهز، ورح توصلك
-          رسالة على إيميلك لما ينزل — بدون ما تعمل أي إشي.
-        </p>
-        {
-          data.includes.length > 0 && (
-            <ul class="items">{data.includes.map((it) => <li>{it}</li>)}</ul>
-          )
-        }
+    <div id="bank" class="bank" data-slug={product.id} data-labels={JSON.stringify(L)} data-exam={JSON.stringify(exam)}>
+      <p class="dim" id="bload">…</p>
+      <div class="blocked" id="blocked" hidden>
+        <p>{t.bankLocked}</p>
+        <a class="btn btn-primary btn-sm" href="/pro/unlock/">{t.mineUnlock}</a>
       </div>
-
-      <p class="acts"><a class="btn" href="/pro/">رجوع لموادي</a></p>
+      <div id="bview"></div>
     </div>
-  </section>
+  </div>
 </Base>
 
+<script>
+  type Item = { n: number; ch: number; q: string; qAr?: string; o: Record<string, string>; a: string; exEn: string; exAr?: string };
+  type Chapter = { n: number; en: string; ar: string };
+  type Bank = { items: Item[]; chapters?: Chapter[]; exam?: Record<string, number> };
+
+  const root = document.getElementById('bank')!;
+  const slug = root.dataset.slug!;
+  const L = JSON.parse(root.dataset.labels!) as Record<string, string>;
+  const EX = JSON.parse(root.dataset.exam!) as { count: number; minutes: number; pass: number };
+  const view = document.getElementById('bview')!;
+  const KEY = `ta-bank:${slug}`;
+  const fill = (s: string, v: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (m, k) => (k in v ? String(v[k]) : m));
+
+  /* ---------- أدوات DOM ---------- */
+  type Kid = Node | string | null | undefined | false;
+  function h(tag: string, attrs: Record<string, any> = {}, ...kids: Kid[]) {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (v == null || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+      else if (k === 'hidden') el.hidden = !!v;
+      else el.setAttribute(k, v === true ? '' : String(v));
+    }
+    for (const c of kids) if (c != null && c !== false) el.append(c);
+    return el;
+  }
+  const show = (...nodes: Node[]) => { view.replaceChildren(...nodes); window.scrollTo({ top: root.offsetTop - 90, behavior: 'smooth' }); };
+
+  /* ---------- التخزين على الجهاز ---------- */
+  type Saved = { ans: Record<number, string>; exam?: { ids: number[]; ans: Record<number, string>; endsAt: number }; last?: { score: number; total: number; at: number } };
+  const load = (): Saved => { try { return { ans: {}, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch (_) { return { ans: {} }; } };
+  const save = (s: Saved) => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (_) {} };
+  let S = load();
+
+  let B: Bank;
+  let byN = new Map<number, Item>();
+  const chName = (n: number) => B.chapters?.find((c) => c.n === n);
+
+  /* ---------- سؤال واحد ---------- */
+  // mode: practice (جواب فوري) | exam (بدون تصحيح) | review (مصحّح وللقراءة)
+  function question(it: Item, mode: 'practice' | 'exam' | 'review', picked: string | undefined, onPick: (k: string) => void) {
+    const reveal = mode === 'review' || (mode === 'practice' && !!picked);
+    const ch = chName(it.ch);
+    const opts = h('div', { class: 'opts', dir: 'ltr' },
+      ...Object.entries(it.o).map(([k, v]) => {
+        let cls = 'opt';
+        if (reveal) { if (k === it.a) cls += ' ok'; else if (k === picked) cls += ' bad'; }
+        else if (k === picked) cls += ' sel';
+        return h('button', { type: 'button', class: cls, disabled: reveal, onclick: () => onPick(k) }, h('b', {}, k), h('span', {}, v));
+      }),
+    );
+    const ok = picked === it.a;
+    const ex = reveal
+      ? h('div', { class: 'ex' },
+          h('p', { class: 'verdict ' + (ok ? 'ok' : 'bad') }, ok ? L.correct : fill(L.wrong, { a: it.a })),
+          it.exAr ? h('p', { class: 'exar' }, it.exAr) : h('p', { class: 'exar', dir: 'ltr' }, it.exEn),
+          it.exAr && h('details', {}, h('summary', {}, L.english), h('p', { dir: 'ltr' }, it.exEn)),
+        )
+      : null;
+    return h('article', { class: 'q' },
+      h('span', { class: 'ch' }, `Chapter ${it.ch}${ch ? ` · ${ch.en}` : ''}`),
+      h('h2', { class: 'en', dir: 'ltr' }, mode === 'exam' ? it.q : `${it.n}. ${it.q}`),
+      it.qAr && h('p', { class: 'ar' }, it.qAr),
+      opts, ex,
+    );
+  }
+
+  /* ---------- الرئيسية ---------- */
+  function home() {
+    const chapters = [...new Set(B.items.map((i) => i.ch))].sort((a, b) => a - b);
+    const stat = (list: Item[]) => {
+      const done = list.filter((i) => S.ans[i.n]);
+      return { total: list.length, done: done.length, right: done.filter((i) => S.ans[i.n] === i.a).length };
+    };
+    const chip = (label: string, sub: string, list: Item[], pct: number) =>
+      h('button', { type: 'button', class: 'chip', onclick: () => practice(list) },
+        h('strong', {}, label), sub && h('small', {}, sub),
+        h('span', { class: 'meter' }, h('i', { style: `width:${pct}%` })),
+      );
+    const all = stat(B.items);
+    const wrong = B.items.filter((i) => S.ans[i.n] && S.ans[i.n] !== i.a);
+    const pc = h('section', { class: 'card' },
+      h('h2', {}, L.practiceTitle),
+      h('p', { class: 'dim' }, L.practiceText),
+      h('div', { class: 'chips' },
+        chip(L.all, `${all.right} ✓ · ${all.done} / ${all.total}`, B.items, (all.done / all.total) * 100),
+        ...chapters.map((c) => {
+          const list = B.items.filter((i) => i.ch === c);
+          const s = stat(list);
+          return chip(`Chapter ${c}${chName(c) ? ` — ${chName(c)!.ar}` : ''}`, `${s.right} ✓ · ${s.done} / ${s.total}`, list, (s.done / s.total) * 100);
+        }),
+      ),
+      h('div', { class: 'row' },
+        wrong.length > 0 && h('button', { type: 'button', class: 'btn btn-ghost btn-sm', onclick: () => practice(wrong) }, `${L.wrongOnly} (${wrong.length})`),
+        all.done > 0 && h('button', { type: 'button', class: 'linkbtn', onclick: () => { if (confirm(L.resetConfirm)) { S.ans = {}; save(S); home(); } } }, L.reset),
+      ),
+    );
+    const ec = h('section', { class: 'card exam' },
+      h('h2', {}, L.examTitle),
+      h('p', { class: 'dim' }, fill(L.examText, { count: EX.count, minutes: EX.minutes, pass: EX.pass })),
+      S.last && h('p', { class: 'last' }, fill(L.score, { score: S.last.score, total: S.last.total })),
+      h('button', { type: 'button', class: 'btn btn-primary', onclick: () => startExam() }, L.examButton),
+    );
+    show(h('div', { class: 'home' }, pc, ec));
+  }
+
+  /* ---------- التدريب ---------- */
+  function practice(list: Item[], start = 0) {
+    let i = Math.max(0, list.findIndex((it) => !S.ans[it.n]));
+    if (start) i = start;
+    if (i < 0) i = 0;
+    const box = h('div', { class: 'player' });
+    const render = () => {
+      const it = list[i];
+      const doneN = list.filter((x) => S.ans[x.n]).length;
+      const right = list.filter((x) => S.ans[x.n] === x.a).length;
+      const last = i === list.length - 1;
+      box.replaceChildren(
+        h('div', { class: 'top' },
+          h('button', { type: 'button', class: 'linkbtn', onclick: home }, L.back),
+          h('span', { class: 'num', dir: 'ltr' }, `${i + 1} / ${list.length}`),
+          h('div', { class: 'bar' }, h('i', { style: `width:${(doneN / list.length) * 100}%` })),
+          h('span', { class: 'score' }, `${right} ✓`),
+        ),
+        question(it, 'practice', S.ans[it.n], (k) => { S.ans[it.n] = k; save(S); render(); }),
+        h('div', { class: 'nav' },
+          h('button', { type: 'button', class: 'btn btn-ghost btn-sm', disabled: i === 0, onclick: () => { i--; render(); } }, L.prev),
+          last
+            ? h('button', { type: 'button', class: 'btn btn-primary btn-sm', disabled: !S.ans[it.n], onclick: () => finishPractice(list) }, L.next)
+            : h('button', { type: 'button', class: 'btn btn-primary btn-sm', onclick: () => { i++; render(); } }, L.next),
+        ),
+      );
+    };
+    render();
+    show(box);
+  }
+  function finishPractice(list: Item[]) {
+    const right = list.filter((x) => S.ans[x.n] === x.a).length;
+    show(h('section', { class: 'card result' },
+      h('p', { class: 'big' }, fill(L.done, { score: right, total: list.length })),
+      h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn btn-primary btn-sm', onclick: home }, L.back)),
+    ));
+  }
+
+  /* ---------- الامتحان ---------- */
+  function pickExam(): number[] {
+    const w = B.exam ?? {};
+    const chapters = [...new Set(B.items.map((i) => i.ch))].sort((a, b) => a - b);
+    const total = Math.min(EX.count, B.items.length);
+    const sumW = chapters.reduce((s, c) => s + (w[c] ?? 1), 0);
+    // توزيع حسب الأوزان (أكبر باقي) مع حد عدد أسئلة الفصل
+    const raw = chapters.map((c) => ({ c, x: ((w[c] ?? 1) / sumW) * total, size: B.items.filter((i) => i.ch === c).length }));
+    const take = raw.map((r) => ({ ...r, k: Math.min(r.size, Math.floor(r.x)) }));
+    let left = total - take.reduce((s, r) => s + r.k, 0);
+    for (const r of [...take].sort((a, b) => (b.x % 1) - (a.x % 1))) { if (left <= 0) break; if (r.k < r.size) { r.k++; left--; } }
+    for (const r of take) { while (left > 0 && r.k < r.size) { r.k++; left--; } }
+    const rnd = (n: number) => crypto.getRandomValues(new Uint32Array(1))[0] % n;
+    const ids: number[] = [];
+    for (const r of take) {
+      const pool = B.items.filter((i) => i.ch === r.c).map((i) => i.n);
+      for (let j = pool.length - 1; j > 0; j--) { const k = rnd(j + 1); [pool[j], pool[k]] = [pool[k], pool[j]]; }
+      ids.push(...pool.slice(0, r.k).sort((a, b) => a - b));
+    }
+    return ids;
+  }
+  let timer = 0;
+  function startExam() {
+    S.exam = { ids: pickExam(), ans: {}, endsAt: Date.now() + EX.minutes * 60_000 };
+    save(S);
+    window.taTrack?.('pro_exam_start', { slug });
+    runExam();
+  }
+  function runExam() {
+    const E = S.exam!;
+    const items = E.ids.map((n) => byN.get(n)!).filter(Boolean);
+    let i = 0;
+    const box = h('div', { class: 'player examp' });
+    const clock = h('span', { class: 'clock', dir: 'ltr' });
+    const tick = () => {
+      const ms = E.endsAt - Date.now();
+      if (ms <= 0) { clearInterval(timer); submitExam(true); return; }
+      const m = Math.floor(ms / 60000), s = Math.floor((ms % 60000) / 1000);
+      clock.textContent = `${m}:${String(s).padStart(2, '0')}`;
+      clock.classList.toggle('low', ms < 5 * 60_000);
+    };
+    const render = () => {
+      const it = items[i];
+      const answered = Object.keys(E.ans).length;
+      box.replaceChildren(
+        h('div', { class: 'top' },
+          clock,
+          h('span', { class: 'num', dir: 'ltr' }, `${i + 1} / ${items.length}`),
+          h('div', { class: 'bar' }, h('i', { style: `width:${(answered / items.length) * 100}%` })),
+          h('button', { type: 'button', class: 'btn btn-ghost btn-sm', onclick: () => submitExam(false) }, L.submit),
+        ),
+        question(it, 'exam', E.ans[it.n], (k) => { E.ans[it.n] = k; save(S); render(); }),
+        h('div', { class: 'nav' },
+          h('button', { type: 'button', class: 'btn btn-ghost btn-sm', disabled: i === 0, onclick: () => { i--; render(); } }, L.prev),
+          i < items.length - 1
+            ? h('button', { type: 'button', class: 'btn btn-primary btn-sm', onclick: () => { i++; render(); } }, L.next)
+            : h('button', { type: 'button', class: 'btn btn-primary btn-sm', onclick: () => submitExam(false) }, L.submit),
+        ),
+        h('div', { class: 'dots', dir: 'ltr' }, ...items.map((x, j) =>
+          h('button', { type: 'button', class: 'dot' + (E.ans[x.n] ? ' on' : '') + (j === i ? ' cur' : ''), onclick: () => { i = j; render(); } }, String(j + 1)),
+        )),
+      );
+    };
+    clearInterval(timer);
+    timer = window.setInterval(tick, 1000);
+    tick();
+    if (!S.exam) return; // خلص الوقت وهو مسكّر
+    render();
+    show(box);
+  }
+  function submitExam(timeUp: boolean) {
+    const E = S.exam;
+    if (!E) return;
+    const items = E.ids.map((n) => byN.get(n)!).filter(Boolean);
+    const blank = items.filter((x) => !E.ans[x.n]).length;
+    if (!timeUp && blank > 0 && !confirm(fill(L.submitConfirm, { n: blank }))) return;
+    clearInterval(timer);
+    const score = items.filter((x) => E.ans[x.n] === x.a).length;
+    S.last = { score, total: items.length, at: Date.now() };
+    delete S.exam;
+    save(S);
+    window.taTrack?.('pro_exam_done', { slug, score });
+    const pass = Math.round((EX.pass / EX.count) * items.length);
+    const ok = score >= pass;
+    const chapters = [...new Set(items.map((x) => x.ch))].sort((a, b) => a - b);
+    const wrong = items.filter((x) => E.ans[x.n] !== x.a);
+    show(h('section', { class: 'card result' },
+      timeUp && h('p', { class: 'dim' }, L.timeUp),
+      h('p', { class: 'big ' + (ok ? 'ok' : 'bad') }, ok ? L.passed : L.failed),
+      h('p', { class: 'score2' }, fill(L.score, { score, total: items.length })),
+      h('h3', {}, L.byChapter),
+      h('table', { class: 'tbl' }, h('tbody', {}, ...chapters.map((c) => {
+        const list = items.filter((x) => x.ch === c);
+        const r = list.filter((x) => E.ans[x.n] === x.a).length;
+        return h('tr', {},
+          h('td', {}, `Chapter ${c}${chName(c) ? ` — ${chName(c)!.ar}` : ''}`),
+          h('td', { dir: 'ltr' }, `${r} / ${list.length}`),
+          h('td', {}, h('span', { class: 'meter' }, h('i', { style: `width:${(r / list.length) * 100}%` }))),
+        );
+      }))),
+      h('div', { class: 'row' },
+        wrong.length > 0 && h('button', { type: 'button', class: 'btn btn-primary btn-sm', onclick: () => review(wrong, E.ans) }, `${L.review} (${wrong.length})`),
+        h('button', { type: 'button', class: 'btn btn-ghost btn-sm', onclick: () => startExam() }, L.retry),
+        h('button', { type: 'button', class: 'linkbtn', onclick: home }, L.back),
+      ),
+    ));
+  }
+  function review(list: Item[], ans: Record<number, string>) {
+    let i = 0;
+    const box = h('div', { class: 'player' });
+    const render = () => {
+      box.replaceChildren(
+        h('div', { class: 'top' },
+          h('button', { type: 'button', class: 'linkbtn', onclick: home }, L.back),
+          h('span', { class: 'num', dir: 'ltr' }, `${i + 1} / ${list.length}`),
+          h('div', { class: 'bar' }, h('i', { style: `width:${((i + 1) / list.length) * 100}%` })),
+        ),
+        question(list[i], 'review', ans[list[i].n], () => {}),
+        h('div', { class: 'nav' },
+          h('button', { type: 'button', class: 'btn btn-ghost btn-sm', disabled: i === 0, onclick: () => { i--; render(); } }, L.prev),
+          h('button', { type: 'button', class: 'btn btn-primary btn-sm', onclick: () => { if (i < list.length - 1) { i++; render(); } else home(); } }, i < list.length - 1 ? L.next : L.back),
+        ),
+      );
+    };
+    render();
+    show(box);
+  }
+
+  /* ---------- حماية بسيطة من النسخ ---------- */
+  for (const ev of ['copy', 'cut', 'contextmenu', 'dragstart', 'selectstart']) root.addEventListener(ev, (e) => e.preventDefault());
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && ['c', 'x', 'a', 's', 'p'].includes(e.key.toLowerCase())) e.preventDefault();
+  });
+
+  /* ---------- البداية ---------- */
+  (async () => {
+    try {
+      const r = await fetch(`/api/pro/bank/${slug}`, { cache: 'no-store' });
+      const d = await r.json();
+      document.getElementById('bload')!.hidden = true;
+      if (!d.ok) { document.getElementById('blocked')!.hidden = false; return; }
+      B = d.bank as Bank;
+      byN = new Map(B.items.map((i) => [i.n, i]));
+      if (S.exam && S.exam.endsAt > Date.now()) runExam();
+      else { if (S.exam) { submitExam(true); return; } home(); }
+    } catch (_) {
+      document.getElementById('bload')!.textContent = 'صار خطأ بالاتصال. حدّث الصفحة.';
+    }
+  })();
+</script>
+
 <style>
-  .crumbs { padding-top: 26px; font-size: 13px; color: var(--faint); display: flex; gap: 8px; flex-wrap: wrap; }
-  .crumbs a { color: var(--muted); text-decoration: none; }
-  .crumbs a:hover { color: var(--orange); }
-  .crumbs .now { color: var(--ink); }
-
-  .hero { padding-block: 26px 70px; }
-  .hero h1 { margin-top: 10px; }
-
-  .panel {
-    background: var(--surface);
-    border: 1px solid var(--orange-line);
-    border-radius: var(--r-xl);
-    padding: 24px 22px;
-    margin-top: 26px;
-    max-width: 720px;
-    display: grid;
-    gap: 12px;
+  .bpage { max-width: 860px; padding-block: 24px 80px; }
+  .back { display: inline-block; font-size: 14.5px; color: var(--muted); margin-bottom: 12px; }
+  .bpage h1 { font-size: clamp(24px, 3vw, 32px); margin: 0 0 18px; }
+  .bank { position: relative; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  .bank :global([hidden]) { display: none !important; }
+  .bank :global(.dim) { color: var(--muted); line-height: 1.9; }
+  .blocked { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
+  .blocked p { margin: 0 0 14px; line-height: 1.9; }
+  .bank :global(.home) { display: grid; gap: 18px; }
+  .bank :global(.card) { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 22px; }
+  .bank :global(.card h2) { font-size: 21px; margin: 0 0 4px; }
+  .bank :global(.card .dim) { margin: 0 0 16px; }
+  .bank :global(.chips) { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+  .bank :global(.chip) { font: inherit; text-align: start; display: grid; gap: 4px; padding: 12px 14px; border-radius: 14px; border: 1.5px solid var(--line-strong); background: transparent; color: var(--ink); cursor: pointer; transition: border-color .15s, background .15s; }
+  .bank :global(.chip:hover) { border-color: var(--cyan); background: var(--cyan-soft); }
+  .bank :global(.chip strong) { font-size: 14.5px; line-height: 1.5; }
+  .bank :global(.chip small) { color: var(--muted); font-size: 12.5px; direction: ltr; text-align: end; }
+  .bank :global(.meter) { display: block; height: 5px; border-radius: 3px; background: var(--line); overflow: hidden; min-width: 60px; }
+  .bank :global(.meter i) { display: block; height: 100%; background: var(--cyan); }
+  .bank :global(.row) { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+  .bank :global(.linkbtn) { font: inherit; font-size: 14px; background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; padding: 0; }
+  .bank :global(.exam .btn-primary) { width: 100%; justify-content: center; }
+  .bank :global(.last) { font-weight: 700; color: var(--cyan); margin: -6px 0 14px; }
+  .bank :global(.player) { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 20px; }
+  .bank :global(.top) { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .bank :global(.num), .bank :global(.score) { font-size: 14px; font-weight: 700; white-space: nowrap; }
+  .bank :global(.num) { color: var(--muted); }
+  .bank :global(.score) { color: #34d399; }
+  .bank :global(.bar) { flex: 1; min-width: 80px; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+  .bank :global(.bar i) { display: block; height: 100%; background: var(--cyan); transition: width .3s ease; }
+  .bank :global(.clock) { font: 700 16px ui-monospace, monospace; background: var(--navy); border: 1px solid var(--line-strong); padding: 4px 10px; border-radius: 10px; }
+  .bank :global(.clock.low) { color: #f87171; border-color: #f87171; }
+  .bank :global(.ch) { display: inline-block; font-size: 12.5px; font-weight: 700; color: var(--cyan); background: var(--cyan-soft); padding: 2px 12px; border-radius: 999px; direction: ltr; }
+  .bank :global(.en) { font-size: 19px; line-height: 1.55; margin: 12px 0 6px; text-align: left; }
+  .bank :global(.ar) { color: var(--muted); font-size: 15px; line-height: 1.8; margin: 0 0 14px; }
+  .bank :global(.opts) { display: grid; gap: 10px; margin-top: 12px; }
+  .bank :global(.opt) { font: inherit; display: flex; gap: 12px; align-items: flex-start; text-align: left; width: 100%; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--line-strong); background: transparent; color: var(--ink); cursor: pointer; font-size: 15px; line-height: 1.6; transition: border-color .15s, background .15s; }
+  .bank :global(.opt b) { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--faint); display: grid; place-items: center; font-size: 13px; }
+  .bank :global(.opt:not(:disabled):hover) { border-color: var(--cyan); background: var(--cyan-soft); }
+  .bank :global(.opt:disabled) { cursor: default; opacity: .6; }
+  .bank :global(.opt.sel) { border-color: var(--cyan); background: var(--cyan-soft); }
+  .bank :global(.opt.sel b) { background: var(--cyan); border-color: var(--cyan); color: var(--navy); }
+  .bank :global(.opt.ok) { opacity: 1; border-color: #34d399; background: rgba(52, 211, 153, .12); }
+  .bank :global(.opt.ok b) { background: #34d399; border-color: #34d399; color: #052e1f; }
+  .bank :global(.opt.bad) { opacity: 1; border-color: #f87171; background: rgba(248, 113, 113, .1); }
+  .bank :global(.opt.bad b) { background: #f87171; border-color: #f87171; color: #2a0909; }
+  .bank :global(.ex) { margin-top: 16px; padding: 14px 16px; border-radius: 14px; background: var(--navy); border: 1px solid var(--line); }
+  .bank :global(.verdict) { font-weight: 700; margin: 0 0 6px; }
+  .bank :global(.verdict.ok), .bank :global(.big.ok) { color: #34d399; }
+  .bank :global(.verdict.bad), .bank :global(.big.bad) { color: #f87171; }
+  .bank :global(.exar) { margin: 0; line-height: 1.9; }
+  .bank :global(.ex details) { margin-top: 8px; font-size: 14px; color: var(--muted); }
+  .bank :global(.ex summary) { cursor: pointer; color: var(--cyan); }
+  .bank :global(.ex details p) { margin: 6px 0 0; text-align: left; line-height: 1.7; }
+  .bank :global(.nav) { display: flex; justify-content: space-between; gap: 10px; margin-top: 16px; }
+  .bank :global(.nav .btn:disabled) { opacity: .4; cursor: not-allowed; transform: none; }
+  .bank :global(.dots) { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; border-top: 1px solid var(--line); padding-top: 14px; }
+  .bank :global(.dot) { font: inherit; font-size: 12px; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line-strong); background: transparent; color: var(--muted); cursor: pointer; }
+  .bank :global(.dot.on) { background: var(--cyan-soft); color: var(--ink); border-color: var(--cyan); }
+  .bank :global(.dot.cur) { outline: 2px solid var(--orange); outline-offset: 1px; }
+  .bank :global(.result) { text-align: center; }
+  .bank :global(.result .row) { justify-content: center; }
+  .bank :global(.big) { font-size: 22px; font-weight: 700; margin: 0 0 6px; }
+  .bank :global(.score2) { font-size: 18px; margin: 0 0 18px; }
+  .bank :global(.result h3) { font-size: 16px; margin: 0 0 8px; text-align: start; }
+  .bank :global(.tbl) { width: 100%; border-collapse: collapse; font-size: 14px; text-align: start; }
+  .bank :global(.tbl td) { padding: 8px 6px; border-top: 1px solid var(--line); }
+  .bank :global(.tbl td:nth-child(2)) { white-space: nowrap; font-weight: 700; }
+  .bank :global(.tbl td:last-child) { width: 30%; }
+  @media (max-width: 600px) {
+    .bank :global(.player), .bank :global(.card) { padding: 16px; }
+    .bank :global(.en) { font-size: 17px; }
+    .bank :global(.opt) { font-size: 14.5px; }
+    .bank :global(.tbl td:last-child) { display: none; }
   }
-  .panel h2 { font-size: 18px; margin: 0; }
-  .panel p { margin: 0; color: var(--muted); }
-
-  .items { display: grid; gap: 10px; padding-inline-start: 0; list-style: none; margin: 0; }
-  .items li { position: relative; padding-inline-start: 22px; color: var(--muted); }
-  .items li::before {
-    content: '';
-    position: absolute;
-    inset-inline-start: 0;
-    top: 9px;
-    width: 9px;
-    height: 9px;
-    background: var(--orange);
-    clip-path: polygon(0 0, 100% 0, 50% 100%);
-  }
-
-  .acts { margin-top: 30px; }
+  @media print { .bank { display: none !important; } }
 </style>

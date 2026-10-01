@@ -15,11 +15,13 @@
  *   GET  /admin/comments      صفحة المراجعة (محمية بكلمة سر)
  *   /api/store/*              مسار الشراء بالمتجر — شوف worker/store.ts
  *   /admin/store              إدارة طلبات المتجر وأكواد الخصم — worker/store-admin.ts
+ *   /api/pro/*                تفعيل الكود وفتح المحتوى المدفوع — worker/pro-access.ts
  */
 
 import { EmailMessage } from 'cloudflare:email';
 import { handleStore } from './store';
 import { handleStoreAdmin } from './store-admin';
+import { handleProAccess } from './pro-access';
 
 interface Env {
   DB: D1Database;
@@ -991,6 +993,7 @@ async function router(req: Request, env: Env): Promise<Response> {
 
   // ---------- المتجر (مسار الشراء) ----------
   if (path.startsWith('/api/store/')) return handleStore(req, env, url);
+  if (path.startsWith('/api/pro/')) return handleProAccess(req, env, url);
   if (path === '/admin/store' || path.startsWith('/admin/store/')) return handleStoreAdmin(req, env, url);
 
   // ---------- واجهة التعليقات ----------

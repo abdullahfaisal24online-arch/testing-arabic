@@ -162,7 +162,9 @@
     "D": "Critical thinking combined with domain knowledge"
    },
    "a": "D",
-   "exEn": "Testers need critical thinking, curiosity, attention to detail, communication and domain knowledge."
+   "exEn": "Testers need critical thinking, curiosity, attention to detail, communication and domain knowledge.",
+   "qAr": "أي مهارة تُعدّ أساسية لمختبِر البرمجيات؟",
+   "exAr": "يحتاج المختبِر إلى التفكير النقدي والفضول والانتباه للتفاصيل ومهارات التواصل ومعرفة المجال."
   },
   {
    "n": 12,
@@ -175,7 +177,9 @@
     "D": "Independent testers are unbiased and tend to notice different types of defects"
    },
    "a": "D",
-   "exEn": "Independence brings objectivity and challenges the assumptions made by the authors of the work product."
+   "exEn": "Independence brings objectivity and challenges the assumptions made by the authors of the work product.",
+   "qAr": "ما الميزة الرئيسية للاختبار المستقل (independent testing)؟",
+   "exAr": "يوفّر الاستقلال موضوعية ويتحدّى افتراضات من أنتج مخرَج العمل."
   },
   {
    "n": 13,
@@ -188,7 +192,9 @@
     "D": "Early testing prevents the occurrence of fatal system crashes"
    },
    "a": "A",
-   "exEn": "Test cases need to be reviewed and revised regularly, and new tests written, to keep finding defects."
+   "exEn": "Test cases need to be reviewed and revised regularly, and new tests written, to keep finding defects.",
+   "qAr": "أي عبارة تصف مفارقة المبيدات (pesticide paradox)؟",
+   "exAr": "يجب مراجعة حالات الاختبار وتحديثها وكتابة اختبارات جديدة باستمرار للحفاظ على قدرتها على كشف الـ defects."
   },
   {
    "n": 14,
@@ -201,7 +207,9 @@
     "D": "QA focuses on the process and on preventing defects, while testing is a form of quality control focused on detecting them"
    },
    "a": "D",
-   "exEn": "QA is process-oriented and preventive; testing is part of quality control and is product-oriented."
+   "exEn": "QA is process-oriented and preventive; testing is part of quality control and is product-oriented.",
+   "qAr": "ما الفرق بين ضمان الجودة (QA) والاختبار (testing)؟",
+   "exAr": "الـ QA موجّه للعمليات وذو طابع وقائي، بينما الاختبار جزء من ضبط الجودة وموجّه للمنتج."
   },
   {
    "n": 15,
@@ -214,7 +222,9 @@
     "D": "Shorten the project schedule automatically"
    },
    "a": "B",
-   "exEn": "Traceability supports coverage analysis, impact analysis, auditability and clearer status reporting."
+   "exEn": "Traceability supports coverage analysis, impact analysis, auditability and clearer status reporting.",
+   "qAr": "تساعد إمكانية التتبع (traceability) بين أساس الاختبار ومخرجات الاختبار على:",
+   "exAr": "يدعم التتبع تحليل التغطية وتحليل أثر التغيير وقابلية التدقيق ووضوح تقارير الحالة."
   },
   {
    "n": 16,
@@ -227,7 +237,9 @@
     "D": "Test design starts only after all coding is complete"
    },
    "a": "B",
-   "exEn": "Each development activity should be matched by a test activity so that defects are found as early as possible."
+   "exEn": "Each development activity should be matched by a test activity so that defects are found as early as possible.",
+   "qAr": "في أي نموذج لدورة حياة تطوير البرمجيات (SDLC)، تقتضي الممارسة الجيدة للاختبار أن:",
+   "exAr": "لكل نشاط تطوير نشاط اختبار مقابل، بحيث تُكتشف الـ defects في أبكر وقت ممكن."
   },
   {
    "n": 17,
@@ -240,7 +252,9 @@
     "D": "Starting test activities early in the SDLC so defects are found before the code is executed"
    },
    "a": "D",
-   "exEn": "Shift-left moves testing activities earlier, including reviews of requirements and designs, to catch defects sooner and cheaper."
+   "exEn": "Shift-left moves testing activities earlier, including reviews of requirements and designs, to catch defects sooner and cheaper.",
+   "qAr": "أي مما يلي يُعدّ مبدأً أساسياً في نهج الـ shift-left؟",
+   "exAr": "ينقل الـ shift-left أنشطة الاختبار إلى مرحلة أبكر، بما فيها مراجعة المتطلبات والتصاميم، لاكتشاف الـ defects أبكر وبكلفة أقل."
   },
   {
    "n": 18,
@@ -253,7 +267,9 @@
     "D": "Testing is skipped when user stories pass developer peer review"
    },
    "a": "B",
-   "exEn": "Agile relies on a whole-team approach in which testing runs continuously inside every iteration."
+   "exEn": "Agile relies on a whole-team approach in which testing runs continuously inside every iteration.",
+   "qAr": "كيف تُدمج أنشطة الاختبار عادةً في منهجيات Agile؟",
+   "exAr": "تعتمد Agile على نهج الفريق الكامل، حيث يجري الاختبار باستمرار داخل كل iteration."
   },
   {
    "n": 19,
@@ -266,7 +282,9 @@
     "D": "Verifying installation procedures on the target hardware"
    },
    "a": "A",
-   "exEn": "Component testing targets components that can be tested separately, such as functions, classes and modules."
+   "exEn": "Component testing targets components that can be tested separately, such as functions, classes and modules.",
+   "qAr": "ما التركيز الرئيسي لاختبار المكوّنات (component / unit testing)؟",
+   "exAr": "يستهدف اختبار المكوّنات الوحدات القابلة للاختبار منفردة، مثل الدوال والـ classes والـ modules."
   },
   {
    "n": 20,
@@ -279,7 +297,9 @@
     "D": "The interactions and interfaces between integrated components"
    },
    "a": "D",
-   "exEn": "It verifies the interfaces and interactions between components after they have been tested individually."
+   "exEn": "It verifies the interfaces and interactions between components after they have been tested individually.",
+   "qAr": "يركّز اختبار تكامل المكوّنات (component integration testing) على:",
+   "exAr": "يتحقق من الواجهات والتفاعلات بين المكوّنات بعد اختبار كل مكوّن على حدة."
   },
   {
    "n": 21,
@@ -292,7 +312,9 @@
     "D": "System testing"
    },
    "a": "D",
-   "exEn": "System testing evaluates the behavior and capabilities of the whole integrated system against system requirements."
+   "exEn": "System testing evaluates the behavior and capabilities of the whole integrated system against system requirements.",
+   "qAr": "أي مستوى اختبار يركّز على التحقق من أن النظام المتكامل يلبّي متطلبات النظام المحددة؟",
+   "exAr": "يقيّم اختبار النظام سلوك النظام المتكامل وقدراته مقارنةً بمتطلبات النظام."
   },
   {
    "n": 22,
@@ -305,7 +327,9 @@
     "D": "Ensuring code coverage reaches its target across all classes"
    },
    "a": "B",
-   "exEn": "Acceptance testing builds confidence in release readiness rather than aiming primarily to find defects."
+   "exEn": "Acceptance testing builds confidence in release readiness rather than aiming primarily to find defects.",
+   "qAr": "ما الهدف الرئيسي من اختبار القبول (acceptance testing)؟",
+   "exAr": "يهدف اختبار القبول إلى بناء الثقة بجاهزية الإصدار، لا إلى اكتشاف الـ defects بشكل أساسي."
   },
   {
    "n": 23,
@@ -318,7 +342,9 @@
     "D": "Contractual acceptance testing"
    },
    "a": "A",
-   "exEn": "Alpha testing happens at the developer's site; beta testing happens at the customer's own site."
+   "exEn": "Alpha testing happens at the developer's site; beta testing happens at the customer's own site.",
+   "qAr": "أي شكل من أشكال اختبار القبول يُنفَّذ من قبل عملاء محتملين في موقع الجهة المطوِّرة؟",
+   "exAr": "يجري الـ alpha testing في موقع الجهة المطوِّرة، بينما يجري الـ beta testing في موقع العميل."
   },
   {
    "n": 24,
@@ -331,7 +357,9 @@
     "D": "How easily the software can be moved to another environment"
    },
    "a": "B",
-   "exEn": "Functional testing evaluates the functions the system should perform — the 'what'."
+   "exEn": "Functional testing evaluates the functions the system should perform — the 'what'.",
+   "qAr": "بماذا يهتم الاختبار الوظيفي (functional testing) بشكل أساسي؟",
+   "exAr": "يقيّم الاختبار الوظيفي الوظائف التي يجب أن يؤديها النظام، أي «ماذا يفعل»."
   },
   {
    "n": 25,
@@ -344,7 +372,9 @@
     "D": "Database column definitions"
    },
    "a": "C",
-   "exEn": "Non-functional testing measures quality characteristics — how well the system behaves rather than what it does."
+   "exEn": "Non-functional testing measures quality characteristics — how well the system behaves rather than what it does.",
+   "qAr": "يشمل الاختبار غير الوظيفي (non-functional testing) تقييم أي من الخصائص التالية؟",
+   "exAr": "يقيس الاختبار غير الوظيفي خصائص الجودة، أي «كيف» يعمل النظام لا «ماذا» يفعل."
   },
   {
    "n": 26,
@@ -357,7 +387,9 @@
     "D": "Training new testers on the system"
    },
    "a": "B",
-   "exEn": "Regression testing looks for side effects in areas that were not changed; confirming a specific fix is confirmation testing. .confirmation testing"
+   "exEn": "Regression testing looks for side effects in areas that were not changed; confirming a specific fix is confirmation testing. .confirmation testing",
+   "qAr": "ما الهدف الرئيسي من اختبار الانحدار (regression testing)؟",
+   "exAr": "يبحث الـ regression testing عن آثار جانبية في الأجزاء التي لم تتغير، أما التأكد من إصلاح defect محدد فهو confirmation testing."
   },
   {
    "n": 27,
@@ -370,7 +402,9 @@
     "D": "Testing performed after a defect is fixed to confirm that the original defect is resolved"
    },
    "a": "D",
-   "exEn": "Confirmation testing re-executes the failing test to verify that the reported defect has actually been fixed."
+   "exEn": "Confirmation testing re-executes the failing test to verify that the reported defect has actually been fixed.",
+   "qAr": "ما المقصود باختبار التأكيد (confirmation testing / re-testing)؟",
+   "exAr": "يعيد اختبار التأكيد تنفيذ الاختبار الذي فشل للتحقق من أن الـ defect المبلَّغ عنه قد أُصلح فعلاً."
   },
   {
    "n": 28,
@@ -383,7 +417,9 @@
     "D": "Hiring new developers in the engineering department"
    },
    "a": "B",
-   "exEn": "Maintenance testing applies to a system already in operation when it is changed, migrated or retired."
+   "exEn": "Maintenance testing applies to a system already in operation when it is changed, migrated or retired.",
+   "qAr": "ما الذي يستدعي تنفيذ اختبار الصيانة (maintenance testing)؟",
+   "exAr": "ينطبق اختبار الصيانة على نظام قيد التشغيل عند تعديله أو ترحيله أو إيقافه."
   },
   {
    "n": 29,
@@ -396,7 +432,9 @@
     "D": "Generate user manuals automatically"
    },
    "a": "B",
-   "exEn": "Impact analysis identifies the areas affected by a change so the right amount of regression testing can be planned."
+   "exEn": "Impact analysis identifies the areas affected by a change so the right amount of regression testing can be planned.",
+   "qAr": "يُستخدم تحليل الأثر (impact analysis) في اختبار الصيانة من أجل:",
+   "exAr": "يحدد تحليل الأثر المناطق المتأثرة بالتغيير لتحديد حجم اختبار الانحدار المطلوب."
   },
   {
    "n": 30,
@@ -409,7 +447,9 @@
     "D": "Non-functional testing can be performed at every test level"
    },
    "a": "D",
-   "exEn": "Any test type — functional, non-functional, black-box or white-box — can be applied at any test level."
+   "exEn": "Any test type — functional, non-functional, black-box or white-box — can be applied at any test level.",
+   "qAr": "أي عبارة حول مستويات الاختبار وأنواعه صحيحة؟",
+   "exAr": "يمكن تطبيق أي نوع اختبار — وظيفي أو غير وظيفي أو black-box أو white-box — في أي مستوى اختبار."
   },
   {
    "n": 31,
@@ -422,7 +462,9 @@
     "D": "It promotes automated, continuous testing integrated into the CI/CD pipeline"
    },
    "a": "D",
-   "exEn": "DevOps relies on continuous integration and delivery, so tests run automatically on every change to give fast feedback."
+   "exEn": "DevOps relies on continuous integration and delivery, so tests run automatically on every change to give fast feedback.",
+   "qAr": "ما تأثير الـ DevOps على الاختبار؟",
+   "exAr": "يعتمد الـ DevOps على التكامل والتسليم المستمر، فتُنفَّذ الاختبارات آلياً مع كل تغيير لتوفير تغذية راجعة سريعة."
   },
   {
    "n": 32,
@@ -435,7 +477,9 @@
     "D": "CPU performance under stress conditions"
    },
    "a": "C",
-   "exEn": "Static testing can evaluate almost any readable work product, without executing the software."
+   "exEn": "Static testing can evaluate almost any readable work product, without executing the software.",
+   "qAr": "أي مخرجات عمل يمكن تقييمها باستخدام تقنيات الاختبار الساكن (static testing)؟",
+   "exAr": "يمكن للاختبار الساكن تقييم أي مخرَج عمل قابل للقراءة تقريباً، دون تنفيذ البرنامج."
   },
   {
    "n": 33,
@@ -448,7 +492,9 @@
     "D": "It removes the need for acceptance testing"
    },
    "a": "B",
-   "exEn": "Defects found by reviews and static analysis are removed before execution, which is significantly cheaper."
+   "exEn": "Defects found by reviews and static analysis are removed before execution, which is significantly cheaper.",
+   "qAr": "ما الميزة الكبرى للاختبار الساكن مقارنةً بالاختبار الديناميكي؟",
+   "exAr": "الـ defects التي تكتشفها المراجعات والتحليل الساكن تُزال قبل التنفيذ، وهو أقل كلفة بكثير."
   },
   {
    "n": 34,
@@ -461,7 +507,9 @@
     "D": "Hardware driver compatibility crashes"
    },
    "a": "C",
-   "exEn": "Requirement defects, ambiguities and standard violations are naturally exposed by reviews, not by execution."
+   "exEn": "Requirement defects, ambiguities and standard violations are naturally exposed by reviews, not by execution.",
+   "qAr": "أي نوع من الـ defects يسهل اكتشافه بالاختبار الساكن أكثر من الديناميكي؟",
+   "exAr": "الـ defects في المتطلبات والغموض ومخالفات المعايير تظهر طبيعياً في المراجعات لا في التنفيذ."
   },
   {
    "n": 35,
@@ -474,7 +522,9 @@
     "D": "Informal review"
    },
    "a": "D",
-   "exEn": "An informal review follows no defined process and produces no mandatory documented output."
+   "exEn": "An informal review follows no defined process and produces no mandatory documented output.",
+   "qAr": "أي نوع مراجعة يتميز بأنه غير رسمي وبلا عملية موثّقة، ويُستخدم بين الزملاء للحصول على ملاحظات سريعة؟",
+   "exAr": "لا تتبع المراجعة غير الرسمية عملية محددة ولا تُنتج مخرجات موثّقة إلزامية."
   },
   {
    "n": 36,
@@ -487,7 +537,9 @@
     "D": "The management representative"
    },
    "a": "A",
-   "exEn": "The facilitator runs the meeting, manages the time and mediates between the participants."
+   "exEn": "The facilitator runs the meeting, manages the time and mediates between the participants.",
+   "qAr": "أي دور في المراجعة الرسمية يقود الاجتماع ويكون مسؤولاً عن نجاح عملية المراجعة؟",
+   "exAr": "يدير الـ facilitator الاجتماع وينظّم الوقت ويتوسّط بين المشاركين."
   },
   {
    "n": 37,
@@ -500,7 +552,9 @@
     "D": "Running the static analysis tools"
    },
    "a": "A",
-   "exEn": "The scribe collects the anomalies, decisions and recommendations raised in the meeting."
+   "exEn": "The scribe collects the anomalies, decisions and recommendations raised in the meeting.",
+   "qAr": "ما الدور الرئيسي للـ scribe أثناء اجتماع المراجعة؟",
+   "exAr": "يوثّق الـ scribe الملاحظات والقرارات والتوصيات التي تُطرح في الاجتماع."
   },
   {
    "n": 38,
@@ -513,7 +567,9 @@
     "D": "Technical review"
    },
    "a": "C",
-   "exEn": "Inspection is the most formal review type, based on rules, checklists, defined roles, metrics and entry/exit criteria."
+   "exEn": "Inspection is the most formal review type, based on rules, checklists, defined roles, metrics and entry/exit criteria.",
+   "qAr": "أي نوع مراجعة هو الأكثر رسميةً، ويقوده moderator مدرَّب، ويستخدم معايير دخول وخروج ومقاييس؟",
+   "exAr": "الـ inspection هو أكثر أنواع المراجعة رسميةً، ويعتمد على قواعد وقوائم تحقق وأدوار محددة ومقاييس ومعايير دخول وخروج."
   },
   {
    "n": 39,
@@ -526,7 +582,9 @@
     "D": "The scribe logs the defects into the tracking tool"
    },
    "a": "C",
-   "exEn": "Each reviewer studies the work product alone and notes anomalies before the review meeting takes place."
+   "exEn": "Each reviewer studies the work product alone and notes anomalies before the review meeting takes place.",
+   "qAr": "ماذا يحدث خلال مرحلة المراجعة الفردية (التحضير) في عملية المراجعة؟",
+   "exAr": "يدرس كل مراجع مخرَج العمل منفرداً ويسجّل الملاحظات قبل انعقاد اجتماع المراجعة."
   },
   {
    "n": 40,
@@ -539,7 +597,9 @@
     "D": "Clear objectives, active management support and a culture that makes participants feel safe"
    },
    "a": "D",
-   "exEn": "Reviews succeed when the goals are clear, management supports them, and people are not punished for what is found."
+   "exEn": "Reviews succeed when the goals are clear, management supports them, and people are not punished for what is found.",
+   "qAr": "أي عامل يُعدّ حاسماً لنجاح المراجعات داخل المؤسسة؟",
+   "exAr": "تنجح المراجعات عندما تكون الأهداف واضحة والإدارة داعمة ولا يُعاقَب الأشخاص على ما يُكتشف."
   },
   {
    "n": 41,
@@ -552,7 +612,9 @@
     "D": "It is carried out exclusively by static analysis tools"
    },
    "a": "A",
-   "exEn": "In a walkthrough the author presents the work product and the participants raise questions and comments."
+   "exEn": "In a walkthrough the author presents the work product and the participants raise questions and comments.",
+   "qAr": "ما الخاصية الرئيسية للـ walkthrough؟",
+   "exAr": "في الـ walkthrough يعرض المؤلف مخرَج العمل ويطرح المشاركون أسئلتهم وملاحظاتهم."
   },
   {
    "n": 42,
@@ -565,7 +627,9 @@
     "D": "Decision table review"
    },
    "a": "C",
-   "exEn": "Perspective-based reading asks each reviewer to evaluate the document as one specific stakeholder would."
+   "exEn": "Perspective-based reading asks each reviewer to evaluate the document as one specific stakeholder would.",
+   "qAr": "أي تقنية ساكنة تراجع مخرَج العمل من منظور فئة محددة، مثل المستخدم النهائي أو فني الصيانة أو المختبِر؟",
+   "exAr": "تطلب القراءة القائمة على المنظور من كل مراجع تقييم الوثيقة كما لو كان أحد أصحاب المصلحة المحددين."
   },
   {
    "n": 43,
@@ -578,7 +642,9 @@
     "D": "Analysis of the specified requirements, interfaces and functional specifications, without looking at the code"
    },
    "a": "D",
-   "exEn": "Black-box techniques derive test cases from the specification, independently of the internal implementation."
+   "exEn": "Black-box techniques derive test cases from the specification, independently of the internal implementation.",
+   "qAr": "تعتمد تقنيات الـ black-box بشكل أساسي على:",
+   "exAr": "تشتق تقنيات الـ black-box حالات الاختبار من المواصفات، بمعزل عن البنية الداخلية للنظام."
   },
   {
    "n": 44,
@@ -591,7 +657,9 @@
     "D": "Feedback collected from users during beta testing"
    },
    "a": "C",
-   "exEn": "White-box techniques derive tests from the internal structure and measure structural coverage."
+   "exEn": "White-box techniques derive tests from the internal structure and measure structural coverage.",
+   "qAr": "تركّز تقنيات الـ white-box على:",
+   "exAr": "تشتق تقنيات الـ white-box الاختبارات من البنية الداخلية وتقيس التغطية الهيكلية."
   },
   {
    "n": 45,
@@ -604,7 +672,9 @@
     "D": "The knowledge, background and intuition of the tester"
    },
    "a": "D",
-   "exEn": "They use the tester's skill, domain knowledge and awareness of likely defects to design tests."
+   "exEn": "They use the tester's skill, domain knowledge and awareness of likely defects to design tests.",
+   "qAr": "تعتمد التقنيات القائمة على الخبرة بشكل كبير على:",
+   "exAr": "تستفيد هذه التقنيات من مهارة المختبِر ومعرفته بالمجال وإدراكه للـ defects المحتملة في تصميم الاختبارات."
   },
   {
    "n": 46,
@@ -617,7 +687,9 @@
     "D": "Dynamic and static partitions"
    },
    "a": "A",
-   "exEn": "Equivalence partitioning covers accepted (valid) values and rejected (invalid) values alike."
+   "exEn": "Equivalence partitioning covers accepted (valid) values and rejected (invalid) values alike.",
+   "qAr": "في تقسيم التكافؤ (equivalence partitioning)، تُقسم الأقسام إلى:",
+   "exAr": "يغطي تقسيم التكافؤ القيم المقبولة (valid) والقيم المرفوضة (invalid) على حد سواء."
   },
   {
    "n": 47,
@@ -630,7 +702,9 @@
     "D": "1, 5, 10"
    },
    "a": "B",
-   "exEn": "2-value BVA tests each boundary and its closest neighbour outside the partition: 1 and 10 with 0 and 11."
+   "exEn": "2-value BVA tests each boundary and its closest neighbour outside the partition: 1 and 10 with 0 and 11.",
+   "qAr": "حقل إدخال يقبل أعداداً صحيحة من 1 إلى 10 شاملةً الطرفين. ما القيم التي تُختبر في تحليل القيم الحدية ثنائي القيمة؟",
+   "exAr": "يختبر الـ BVA ثنائي القيمة كل حد والقيمة المجاورة له خارج القسم: 1 و10 مع 0 و11."
   },
   {
    "n": 48,
@@ -643,7 +717,9 @@
     "D": "It identifies missing database indexes"
    },
    "a": "B",
-   "exEn": "Decision tables make combinations of conditions explicit, so no important combination is silently missed."
+   "exEn": "Decision tables make combinations of conditions explicit, so no important combination is silently missed.",
+   "qAr": "ما القوة الرئيسية لاختبار جداول القرار (decision table testing)؟",
+   "exAr": "تُظهر جداول القرار تركيبات الشروط بشكل صريح، فلا تُهمَل تركيبة مهمة دون قصد."
   },
   {
    "n": 49,
@@ -656,7 +732,9 @@
     "D": "Process bulk batch files sequentially"
    },
    "a": "A",
-   "exEn": "The technique models states, events, transitions and actions, so it fits systems whose behavior depends on history."
+   "exEn": "The technique models states, events, transitions and actions, so it fits systems whose behavior depends on history.",
+   "qAr": "يناسب اختبار انتقال الحالة (state transition testing) الأنظمة التي:",
+   "exAr": "تنمذج هذه التقنية الحالات والأحداث والانتقالات والإجراءات، لذا تناسب الأنظمة التي يعتمد سلوكها على حالتها السابقة."
   },
   {
    "n": 50,
@@ -669,7 +747,9 @@
     "D": "Executing a test for every user story in the backlog"
    },
    "a": "B",
-   "exEn": "Statement coverage counts executable statements exercised at least once, and is weaker than branch coverage."
+   "exEn": "Statement coverage counts executable statements exercised at least once, and is weaker than branch coverage.",
+   "qAr": "في اختبار العبارات (statement testing)، ما الذي يمثّل تغطية عبارات بنسبة 100%؟",
+   "exAr": "تحسب تغطية العبارات العبارات القابلة للتنفيذ التي نُفّذت مرة واحدة على الأقل، وهي أضعف من تغطية الفروع."
   },
   {
    "n": 51,
@@ -682,7 +762,9 @@
     "D": "Statement coverage is 0%"
    },
    "a": "C",
-   "exEn": "Branch coverage subsumes statement coverage: covering all branches necessarily executes all statements."
+   "exEn": "Branch coverage subsumes statement coverage: covering all branches necessarily executes all statements.",
+   "qAr": "إذا حقق module تغطية فروع 100%، فما الذي يمكن ضمانه بشأن تغطية العبارات؟",
+   "exAr": "تغطية الفروع تتضمّن تغطية العبارات: تغطية كل الفروع تعني بالضرورة تنفيذ كل العبارات."
   },
   {
    "n": 52,
@@ -695,7 +777,9 @@
     "D": "Testers anticipate likely mistakes based on experience and knowledge of common failures"
    },
    "a": "D",
-   "exEn": "Error guessing uses past experience with defects to target the places where they are most likely to occur."
+   "exEn": "Error guessing uses past experience with defects to target the places where they are most likely to occur.",
+   "qAr": "أي عبارة تصف تخمين الأخطاء (error guessing) بشكل أفضل؟",
+   "exAr": "يستخدم تخمين الأخطاء الخبرة السابقة بالـ defects لاستهداف الأماكن الأكثر احتمالاً لوجودها."
   },
   {
    "n": 53,
@@ -708,7 +792,9 @@
     "D": "Complete reliance on formal requirement specifications"
    },
    "a": "C",
-   "exEn": "In exploratory testing the tester learns about the product, designs and runs tests at the same time."
+   "exEn": "In exploratory testing the tester learns about the product, designs and runs tests at the same time.",
+   "qAr": "يتميز الاختبار الاستكشافي (exploratory testing) بأنه:",
+   "exAr": "في الاختبار الاستكشافي يتعلم المختبِر عن المنتج ويصمم الاختبارات وينفذها في الوقت نفسه."
   },
   {
    "n": 54,
@@ -721,7 +807,9 @@
     "D": "Compiling the code automatically using build tools"
    },
    "a": "C",
-   "exEn": "The checklist captures lessons learned and common risks, giving consistent coverage without detailed scripts."
+   "exEn": "The checklist captures lessons learned and common risks, giving consistent coverage without detailed scripts.",
+   "qAr": "يتضمن الاختبار القائم على قوائم التحقق (checklist-based testing):",
+   "exAr": "تلخّص قائمة التحقق الدروس المستفادة والمخاطر الشائعة، وتمنح تغطية متسقة دون حاجة إلى نصوص تفصيلية."
   },
   {
    "n": 55,
@@ -734,7 +822,9 @@
     "D": "They apply only to non-functional testing"
    },
    "a": "A",
-   "exEn": "Acceptance criteria describe the expected behavior, so test cases can be derived directly from them."
+   "exEn": "Acceptance criteria describe the expected behavior, so test cases can be derived directly from them.",
+   "qAr": "ما علاقة معايير قبول قصة المستخدم (acceptance criteria) بتصميم الاختبارات؟",
+   "exAr": "تصف معايير القبول السلوك المتوقع، لذا يمكن اشتقاق حالات الاختبار منها مباشرةً."
   },
   {
    "n": 56,
@@ -747,7 +837,9 @@
     "D": "9, 10, 11 and 49, 50, 51"
    },
    "a": "D",
-   "exEn": "3-value BVA tests each boundary together with the value before it and the value after it."
+   "exEn": "3-value BVA tests each boundary together with the value before it and the value after it.",
+   "qAr": "في تحليل القيم الحدية ثلاثي القيمة، ما القيم التي تُختبر للنطاق [10، 50]؟",
+   "exAr": "يختبر الـ BVA ثلاثي القيمة كل حد مع القيمة التي تسبقه والقيمة التي تليه."
   },
   {
    "n": 57,
@@ -760,7 +852,9 @@
     "D": "Boundary value analysis"
    },
    "a": "A",
-   "exEn": "Decision tables are built specifically to handle combinations of conditions and their resulting actions."
+   "exEn": "Decision tables are built specifically to handle combinations of conditions and their resulting actions.",
+   "qAr": "أي تقنية black-box تختبر بكفاءة التركيبات الصحيحة وغير الصحيحة من الشروط؟",
+   "exAr": "صُمّمت جداول القرار تحديداً للتعامل مع تركيبات الشروط والإجراءات الناتجة عنها."
   },
   {
    "n": 58,
@@ -773,7 +867,9 @@
     "D": "Evaluating system behavior against user persona expectations"
    },
    "a": "B",
-   "exEn": "White-box techniques aim at structural coverage criteria derived from the internal implementation."
+   "exEn": "White-box techniques aim at structural coverage criteria derived from the internal implementation.",
+   "qAr": "ما الهدف الرئيسي لتقنيات الـ white-box؟",
+   "exAr": "تهدف تقنيات الـ white-box إلى تحقيق معايير تغطية هيكلية مشتقة من البنية الداخلية."
   },
   {
    "n": 59,
@@ -786,7 +882,9 @@
     "D": "65"
    },
    "a": "B",
-   "exEn": "Values below 18 or above 65 fall outside the accepted range and therefore lie in an invalid partition."
+   "exEn": "Values below 18 or above 65 fall outside the accepted range and therefore lie in an invalid partition.",
+   "qAr": "أي مما يلي يمثّل قسم تكافؤ غير صالح (invalid partition) لحقل يقبل الأعمار من 18 إلى 65؟",
+   "exAr": "القيم الأقل من 18 أو الأكبر من 65 تقع خارج النطاق المقبول، وبالتالي ضمن قسم غير صالح."
   },
   {
    "n": 60,
@@ -799,7 +897,9 @@
     "D": "They guarantee a defect-free release"
    },
    "a": "A",
-   "exEn": "ATDD brings the three perspectives together to agree on acceptance criteria and examples before development."
+   "exEn": "ATDD brings the three perspectives together to agree on acceptance criteria and examples before development.",
+   "qAr": "ما الميزة الرئيسية للمقاربات القائمة على التعاون مثل الـ ATDD؟",
+   "exAr": "يجمع الـ ATDD المنظورات الثلاثة للاتفاق على معايير القبول والأمثلة قبل بدء التطوير."
   },
   {
    "n": 61,
@@ -812,7 +912,9 @@
     "D": "It removes the need for boundary value analysis"
    },
    "a": "C",
-   "exEn": "Because members of a partition are treated alike, testing one representative value normally suffices."
+   "exEn": "Because members of a partition are treated alike, testing one representative value normally suffices.",
+   "qAr": "أي عبارة عن تقسيم التكافؤ صحيحة؟",
+   "exAr": "لأن عناصر القسم الواحد تُعالَج بالطريقة نفسها، يكفي عادةً اختبار قيمة واحدة تمثّل القسم."
   },
   {
    "n": 62,
@@ -825,7 +927,9 @@
     "D": "(Executed statements / total executable statements) × 100"
    },
    "a": "D",
-   "exEn": "Coverage is the proportion of executable statements exercised by the tests, expressed as a percentage."
+   "exEn": "Coverage is the proportion of executable statements exercised by the tests, expressed as a percentage.",
+   "qAr": "كيف تُحسب تغطية العبارات (statement coverage)؟",
+   "exAr": "التغطية هي نسبة العبارات القابلة للتنفيذ التي نفّذتها الاختبارات، معبَّراً عنها بالنسبة المئوية."
   },
   {
    "n": 63,
@@ -838,7 +942,9 @@
     "D": "The project Gantt chart"
    },
    "a": "A",
-   "exEn": "A charter defines the mission, scope and focus of a time-boxed exploratory session."
+   "exEn": "A charter defines the mission, scope and focus of a time-boxed exploratory session.",
+   "qAr": "عند استخدام الاختبار الاستكشافي، يُوجَّه تنفيذ الاختبار من خلال:",
+   "exAr": "يحدد الـ charter مهمة الجلسة الاستكشافية ونطاقها ومحور تركيزها ضمن وقت محدد."
   },
   {
    "n": 64,
@@ -851,7 +957,9 @@
     "D": "The type of system, applicable standards, risk level, contractual requirements and tester skills"
    },
    "a": "D",
-   "exEn": "Technique selection depends on the context: system type, risk, regulations, documentation available and team experience."
+   "exEn": "Technique selection depends on the context: system type, risk, regulations, documentation available and team experience.",
+   "qAr": "أي عامل يؤثر أكثر من غيره في اختيار تقنيات الاختبار؟",
+   "exAr": "يعتمد اختيار التقنية على السياق: نوع النظام والمخاطر والمعايير والتوثيق المتاح وخبرة الفريق."
   },
   {
    "n": 65,
@@ -864,7 +972,9 @@
     "D": "An unhandled exception in the code"
    },
    "a": "C",
-   "exEn": "A transition links a source state to a target state and is caused by an event, possibly with a resulting action."
+   "exEn": "A transition links a source state to a target state and is caused by an event, possibly with a resulting action.",
+   "qAr": "في مخطط انتقال الحالة، ماذا يمثّل الـ transition؟",
+   "exAr": "يربط الـ transition بين حالة المصدر وحالة الهدف، ويقع نتيجة حدث، وقد يصاحبه إجراء ناتج."
   },
   {
    "n": 66,
@@ -877,7 +987,9 @@
     "D": "Removing the need for requirement documentation"
    },
    "a": "C",
-   "exEn": "The checklist keeps important aspects from being overlooked and keeps coverage repeatable between testers."
+   "exEn": "The checklist keeps important aspects from being overlooked and keeps coverage repeatable between testers.",
+   "qAr": "ما الفائدة الرئيسية من استخدام الاختبار القائم على قوائم التحقق؟",
+   "exAr": "تمنع قائمة التحقق إغفال الجوانب المهمة وتحافظ على تغطية قابلة للتكرار بين المختبِرين."
   },
   {
    "n": 67,
@@ -890,7 +1002,9 @@
     "D": "Describing the general, high-level approach to testing across an organization or programme"
    },
    "a": "D",
-   "exEn": "A test strategy is generic and long-lived; a test plan applies that strategy to one specific project or release."
+   "exEn": "A test strategy is generic and long-lived; a test plan applies that strategy to one specific project or release.",
+   "qAr": "ما الهدف الرئيسي من استراتيجية الاختبار (test strategy)؟",
+   "exAr": "الاستراتيجية عامة وطويلة الأمد، بينما تطبّق خطة الاختبار تلك الاستراتيجية على مشروع أو إصدار محدد."
   },
   {
    "n": 68,
@@ -903,7 +1017,9 @@
     "D": "Hardware vendor purchase agreements"
    },
    "a": "B",
-   "exEn": "The test plan documents what will be tested, how, by whom, when, and under which conditions testing starts and stops."
+   "exEn": "The test plan documents what will be tested, how, by whom, when, and under which conditions testing starts and stops.",
+   "qAr": "ما الذي تتضمنه خطة الاختبار (test plan)؟",
+   "exAr": "توثّق خطة الاختبار ما سيُختبر وكيف ومن سينفذه ومتى، وشروط بدء الاختبار وإيقافه."
   },
   {
    "n": 69,
@@ -916,7 +1032,9 @@
     "D": "The test completion report has been signed off"
    },
    "a": "A",
-   "exEn": "Entry criteria are the conditions that must be met before test execution can meaningfully start."
+   "exEn": "Entry criteria are the conditions that must be met before test execution can meaningfully start.",
+   "qAr": "أي مما يلي مثال على معيار دخول (entry criterion) للاختبار؟",
+   "exAr": "معايير الدخول هي الشروط التي يجب توفرها قبل أن يبدأ تنفيذ الاختبار بشكل مُجدٍ."
   },
   {
    "n": 70,
@@ -929,7 +1047,9 @@
     "D": "The development backlog for the sprint has been planned"
    },
    "a": "C",
-   "exEn": "Exit criteria define when a test activity or level can be considered complete."
+   "exEn": "Exit criteria define when a test activity or level can be considered complete.",
+   "qAr": "أي مما يلي مثال على معيار خروج (exit criterion) للاختبار؟",
+   "exAr": "تحدد معايير الخروج متى يمكن اعتبار نشاط أو مستوى الاختبار مكتملاً."
   },
   {
    "n": 71,
@@ -942,7 +1062,9 @@
     "D": "Transferring all project risks to external vendors"
    },
    "a": "B",
-   "exEn": "Risk analysis decides what to test first, how deeply, and what may be left untested."
+   "exEn": "Risk analysis decides what to test first, how deeply, and what may be left untested.",
+   "qAr": "ما الهدف من الاختبار القائم على المخاطر (risk-based testing)؟",
+   "exAr": "يحدد تحليل المخاطر ما يُختبر أولاً وبأي عمق، وما يمكن الاستغناء عن اختباره."
   },
   {
    "n": 72,
@@ -955,7 +1077,9 @@
     "D": "A shortage of training among team members"
    },
    "a": "C",
-   "exEn": "Product risk concerns the quality of the deliverable itself, such as wrong calculations or poor performance."
+   "exEn": "Product risk concerns the quality of the deliverable itself, such as wrong calculations or poor performance.",
+   "qAr": "يُعرَّف خطر المنتج (product risk) بأنه:",
+   "exAr": "يتعلق خطر المنتج بجودة المُخرَج نفسه، مثل حسابات خاطئة أو أداء ضعيف."
   },
   {
    "n": 73,
@@ -968,7 +1092,9 @@
     "D": "A risk related to project management, schedule, budget, resources or organizational issues"
    },
    "a": "D",
-   "exEn": "Project risks threaten the ability to deliver; product risks threaten the quality of what is delivered."
+   "exEn": "Project risks threaten the ability to deliver; product risks threaten the quality of what is delivered.",
+   "qAr": "يُعرَّف خطر المشروع (project risk) بأنه:",
+   "exAr": "مخاطر المشروع تهدد القدرة على التسليم، بينما مخاطر المنتج تهدد جودة ما يُسلَّم."
   },
   {
    "n": 74,
@@ -981,7 +1107,9 @@
     "D": "The sprint duration and the size of the team"
    },
    "a": "A",
-   "exEn": "Risk level = likelihood × impact, and it drives prioritization of the test effort."
+   "exEn": "Risk level = likelihood × impact, and it drives prioritization of the test effort.",
+   "qAr": "يُقيَّم مستوى الخطر (risk level) في اختبار البرمجيات بناءً على الجمع بين:",
+   "exAr": "مستوى الخطر = الاحتمالية × الأثر، وهو ما يوجّه ترتيب أولويات جهد الاختبار."
   },
   {
    "n": 75,
@@ -994,7 +1122,9 @@
     "D": "The number of documents stored on the shared drive"
    },
    "a": "C",
-   "exEn": "Pass, fail and blocked rates against the plan show whether execution is on track."
+   "exEn": "Pass, fail and blocked rates against the plan show whether execution is on track.",
+   "qAr": "أي مقياس يوفّر معلومات مفيدة عن تقدم تنفيذ الاختبار؟",
+   "exAr": "تُظهر نسب النجاح والفشل والحظر مقارنةً بالخطة ما إذا كان التنفيذ يسير وفق المسار المطلوب."
   },
   {
    "n": 76,
@@ -1007,7 +1137,9 @@
     "D": "Purchasing cloud server instances"
    },
    "a": "C",
-   "exEn": "Configuration management makes results reproducible: every test knows which version of which item it ran against."
+   "exEn": "Configuration management makes results reproducible: every test knows which version of which item it ran against.",
+   "qAr": "ما المسؤولية الرئيسية لإدارة التكوين (configuration management) في الاختبار؟",
+   "exAr": "تجعل إدارة التكوين النتائج قابلة لإعادة الإنتاج: كل اختبار يُعرف على أي إصدار من أي عنصر نُفِّذ."
   },
   {
    "n": 77,
@@ -1020,7 +1152,9 @@
     "D": "Documenting the visual guidelines of the interface"
    },
    "a": "B",
-   "exEn": "A defect report is a communication tool; its value is measured by how easily the issue can be reproduced and fixed."
+   "exEn": "A defect report is a communication tool; its value is measured by how easily the issue can be reproduced and fixed.",
+   "qAr": "ما الهدف الرئيسي من تقرير الـ defect (defect report)؟",
+   "exAr": "تقرير الـ defect أداة تواصل، وقيمته تُقاس بسهولة إعادة إنتاج المشكلة وإصلاحها."
   },
   {
    "n": 78,
@@ -1033,7 +1167,9 @@
     "D": "The roadmap of future features"
    },
    "a": "A",
-   "exEn": "Without reproduction steps and the expected/actual comparison, the report cannot be acted on reliably."
+   "exEn": "Without reproduction steps and the expected/actual comparison, the report cannot be acted on reliably.",
+   "qAr": "أي من المعلومات التالية يجب أن يتضمنها تقرير الـ defect المكتوب بشكل جيد؟",
+   "exAr": "بدون خطوات إعادة الإنتاج ومقارنة النتيجة المتوقعة بالفعلية، لا يمكن التعامل مع التقرير بشكل موثوق."
   },
   {
    "n": 79,
@@ -1046,7 +1182,9 @@
     "D": "The two terms describe exactly the same thing"
    },
    "a": "C",
-   "exEn": "A defect can be highly severe but low priority, or cosmetic yet urgent — for example a misspelled company name on the home page."
+   "exEn": "A defect can be highly severe but low priority, or cosmetic yet urgent — for example a misspelled company name on the home page.",
+   "qAr": "ما الفرق بين خطورة الـ defect (severity) وأولوية الـ defect (priority)؟",
+   "exAr": "قد يكون الـ defect عالي الخطورة ومنخفض الأولوية، أو شكلياً وعاجلاً في الوقت نفسه — مثل خطأ إملائي في اسم الشركة على الصفحة الرئيسية."
   },
   {
    "n": 80,
@@ -1059,7 +1197,9 @@
     "D": "Authoring the original user requirements"
    },
    "a": "B",
-   "exEn": "Monitoring gathers and reports information; acting on that information is test control."
+   "exEn": "Monitoring gathers and reports information; acting on that information is test control.",
+   "qAr": "ما النشاط الذي تتضمنه مراقبة الاختبار (test monitoring)؟",
+   "exAr": "تجمع المراقبة المعلومات وتقدّمها في تقارير، أما التصرف بناءً عليها فهو test control."
   },
   {
    "n": 81,
@@ -1072,7 +1212,9 @@
     "D": "Selecting the development tools for the team"
    },
    "a": "B",
-   "exEn": "Control is the reaction: re-prioritizing, re-allocating effort or adjusting the schedule when monitoring shows deviations."
+   "exEn": "Control is the reaction: re-prioritizing, re-allocating effort or adjusting the schedule when monitoring shows deviations.",
+   "qAr": "يشير التحكم في الاختبار (test control) إلى:",
+   "exAr": "التحكم هو رد الفعل: إعادة ترتيب الأولويات أو توزيع الجهد أو تعديل الجدول عندما تُظهر المراقبة انحرافاً."
   },
   {
    "n": 82,
@@ -1085,7 +1227,9 @@
     "D": "Wideband Delphi (and Planning Poker in Agile)"
    },
    "a": "D",
-   "exEn": "Wideband Delphi reaches a group estimate iteratively while limiting the influence of dominant participants."
+   "exEn": "Wideband Delphi reaches a group estimate iteratively while limiting the influence of dominant participants.",
+   "qAr": "أي تقنية تقدير تطلب من الخبراء تقديراتهم بشكل مجهول عبر عدة جولات حتى الوصول إلى توافق؟",
+   "exAr": "يصل الـ Wideband Delphi إلى تقدير جماعي عبر جولات متكررة مع الحد من تأثير المشاركين الأكثر هيمنة."
   },
   {
    "n": 83,
@@ -1098,7 +1242,9 @@
     "D": "A price list of hardware components"
    },
    "a": "C",
-   "exEn": "The report supports a release decision: what was tested, what was found, and what risk remains."
+   "exEn": "The report supports a release decision: what was tested, what was found, and what risk remains.",
+   "qAr": "في تقرير إنهاء الاختبار (test completion report)، ما المعلومات الأساسية التي يجب تقديمها لأصحاب المصلحة؟",
+   "exAr": "يدعم التقرير قرار الإصدار: ما الذي اختُبر، وما الذي اكتُشف، وما المخاطر المتبقية."
   },
   {
    "n": 84,
@@ -1111,7 +1257,9 @@
     "D": "The software calculates incorrect interest rates for loan applications"
    },
    "a": "D",
-   "exEn": "An incorrect calculation is a defect in the delivered product, so it belongs to product risk."
+   "exEn": "An incorrect calculation is a defect in the delivered product, so it belongs to product risk.",
+   "qAr": "أي مما يلي يُعدّ خطر منتج (product risk) لا خطر مشروع (project risk)؟",
+   "exAr": "الحساب الخاطئ defect في المنتج المُسلَّم، وبالتالي يندرج ضمن مخاطر المنتج."
   },
   {
    "n": 85,
@@ -1124,7 +1272,9 @@
     "D": "The technical support specialist"
    },
    "a": "A",
-   "exEn": "The test manager owns planning, monitoring, control and reporting of the test effort."
+   "exEn": "The test manager owns planning, monitoring, control and reporting of the test effort.",
+   "qAr": "أي دور مسؤول عن إعداد خطط الاختبار واستراتيجياته؟",
+   "exAr": "يتولى مدير الاختبار مسؤولية التخطيط والمراقبة والتحكم وإعداد التقارير لجهد الاختبار."
   },
   {
    "n": 86,
@@ -1137,7 +1287,9 @@
     "D": "Making requirement specifications unnecessary"
    },
    "a": "A",
-   "exEn": "Tools support the process; they free tester time from repetitive execution rather than replacing testing itself."
+   "exEn": "Tools support the process; they free tester time from repetitive execution rather than replacing testing itself.",
+   "qAr": "أي مما يلي يُعدّ هدفاً رئيسياً لأدوات أتمتة الاختبار؟",
+   "exAr": "تدعم الأدوات العملية وتوفّر وقت المختبِر من التنفيذ المتكرر، لكنها لا تحل محل الاختبار نفسه."
   },
   {
    "n": 87,
@@ -1150,7 +1302,9 @@
     "D": "Developers refusing to write production code"
    },
    "a": "B",
-   "exEn": "Automation has ongoing costs: scripts must be maintained as the product changes, and benefits take time to appear."
+   "exEn": "Automation has ongoing costs: scripts must be maintained as the product changes, and benefits take time to appear.",
+   "qAr": "ما الخطر الرئيسي المرتبط بإدخال أدوات أتمتة الاختبار؟",
+   "exAr": "للأتمتة كلفة مستمرة: يجب صيانة النصوص كلما تغيّر المنتج، ولا تظهر فوائدها إلا بعد وقت."
   },
   {
    "n": 88,
@@ -1163,7 +1317,9 @@
     "D": "Network monitoring tools"
    },
    "a": "A",
-   "exEn": "Static analysis tools examine code and documents without executing them, often against coding standards."
+   "exEn": "Static analysis tools examine code and documents without executing them, often against coding standards.",
+   "qAr": "أي فئة أدوات تدعم أنشطة الاختبار الساكن؟",
+   "exAr": "تفحص أدوات التحليل الساكن الكود والوثائق دون تنفيذها، غالباً مقارنةً بمعايير كتابة الكود."
   },
   {
    "n": 89,
@@ -1176,7 +1332,9 @@
     "D": "Screen recording software"
    },
    "a": "C",
-   "exEn": "Model-based testing tools derive test cases automatically from a model of the expected system behavior."
+   "exEn": "Model-based testing tools derive test cases automatically from a model of the expected system behavior.",
+   "qAr": "أي فئة أدوات تساعد مباشرةً في تصميم الاختبارات وتوليد حالات الاختبار؟",
+   "exAr": "تشتق أدوات الـ model-based testing حالات الاختبار آلياً من نموذج يمثّل السلوك المتوقع للنظام."
   },
   {
    "n": 90,
@@ -1189,7 +1347,9 @@
     "D": "Compiling the application source code"
    },
    "a": "A",
-   "exEn": "They keep the status, history and assignment of every defect visible, and produce the metrics used in reporting."
+   "exEn": "They keep the status, history and assignment of every defect visible, and produce the metrics used in reporting.",
+   "qAr": "ما الفائدة الأساسية من استخدام أدوات إدارة الـ defects؟",
+   "exAr": "تُبقي حالة كل defect وتاريخه والمسؤول عنه واضحة، وتوفّر المقاييس المستخدمة في التقارير."
   },
   {
    "n": 91,
@@ -1202,7 +1362,9 @@
     "D": "Defect tracking systems"
    },
    "a": "A",
-   "exEn": "Load and performance tools generate concurrent virtual users and measure response times and resource usage."
+   "exEn": "Load and performance tools generate concurrent virtual users and measure response times and resource usage.",
+   "qAr": "أي نوع من الأدوات يحاكي حملاً عالياً من المستخدمين لقياس أزمنة استجابة التطبيق؟",
+   "exAr": "تولّد أدوات الأداء والحمل مستخدمين افتراضيين متزامنين وتقيس أزمنة الاستجابة واستهلاك الموارد."
   },
   {
    "n": 92,
@@ -1215,7 +1377,9 @@
     "D": "Monitors the physical temperature of the servers"
    },
    "a": "B",
-   "exEn": "A harness drives the component under test and compares actual results with expected ones."
+   "exEn": "A harness drives the component under test and compares actual results with expected ones.",
+   "qAr": "ماذا يفعل الـ test execution harness (أو الـ test driver)؟",
+   "exAr": "يُشغّل الـ harness المكوّن قيد الاختبار ويقارن النتائج الفعلية بالمتوقعة."
   },
   {
    "n": 93,
@@ -1228,7 +1392,9 @@
     "D": "Customizing the tool's source code before defining the requirements"
    },
    "a": "C",
-   "exEn": "A pilot verifies fit with the existing process, reveals the real effort needed and builds internal expertise."
+   "exEn": "A pilot verifies fit with the existing process, reveals the real effort needed and builds internal expertise.",
+   "qAr": "ما الممارسة الموصى بها عند إدخال أداة جديدة إلى المؤسسة؟",
+   "exAr": "يتحقق المشروع التجريبي من ملاءمة الأداة للعملية القائمة ويكشف الجهد الحقيقي المطلوب ويبني الخبرة الداخلية."
   },
   {
    "n": 94,
@@ -1241,7 +1407,9 @@
     "D": "Static analysis linters"
    },
    "a": "C",
-   "exEn": "Test management tools hold the testware, link it to requirements, and record execution results and progress."
+   "exEn": "Test management tools hold the testware, link it to requirements, and record execution results and progress.",
+   "qAr": "أي نوع أدوات يدعم إدارة الاختبار وربط المتطلبات وإعداد تقارير التنفيذ؟",
+   "exAr": "تحتفظ أدوات إدارة الاختبار بمخرجات الاختبار وتربطها بالمتطلبات وتسجّل نتائج التنفيذ والتقدم."
   },
   {
    "n": 95,
@@ -1254,7 +1422,9 @@
     "D": "Conduct interviews with users"
    },
    "a": "A",
-   "exEn": "Dynamic analysis observes the software during execution to find defects that only appear at runtime."
+   "exEn": "Dynamic analysis observes the software during execution to find defects that only appear at runtime.",
+   "qAr": "تُستخدم أدوات التحليل الديناميكي من أجل:",
+   "exAr": "يراقب التحليل الديناميكي البرنامج أثناء التنفيذ لاكتشاف الـ defects التي لا تظهر إلا في وقت التشغيل."
   },
   {
    "n": 96,
@@ -1267,7 +1437,9 @@
     "D": "Managing employee payroll records"
    },
    "a": "C",
-   "exEn": "Execution tools repeat defined tests reliably, which is most valuable for regression cycles."
+   "exEn": "Execution tools repeat defined tests reliably, which is most valuable for regression cycles.",
+   "qAr": "ما الهدف الرئيسي لأدوات تنفيذ الاختبار الديناميكي؟",
+   "exAr": "تكرر أدوات التنفيذ الاختبارات المحددة بثبات، وهو ما يكون أكثر فائدة في دورات الانحدار."
   },
   {
    "n": 97,
@@ -1280,7 +1452,9 @@
     "D": "Developers stop fixing defects"
    },
    "a": "A",
-   "exEn": "Automated scripts are software too: every change to the product may require updating them."
+   "exEn": "Automated scripts are software too: every change to the product may require updating them.",
+   "qAr": "ما الخطر المحتمل للإفراط في الاعتماد على نصوص الاختبار المؤتمتة؟",
+   "exAr": "نصوص الأتمتة برمجيات أيضاً: كل تغيير في المنتج قد يستوجب تحديثها."
   },
   {
    "n": 98,
@@ -1293,7 +1467,9 @@
     "D": "Build and deployment automation tools such as Jenkins or GitHub Actions"
    },
    "a": "D",
-   "exEn": "CI tools trigger the test suites automatically whenever code is committed, giving fast feedback on every change."
+   "exEn": "CI tools trigger the test suites automatically whenever code is committed, giving fast feedback on every change.",
+   "qAr": "أي فئة أدوات هي الأكثر فائدة للاختبار المؤتمت ضمن الـ CI/CD pipeline؟",
+   "exAr": "تُشغّل أدوات الـ CI مجموعات الاختبار آلياً مع كل commit، ما يوفّر تغذية راجعة سريعة لكل تغيير."
   },
   {
    "n": 99,
@@ -1306,7 +1482,9 @@
     "D": "They configure the server hardware"
    },
    "a": "B",
-   "exEn": "Generating representative data at volume is often the slowest part of preparing an execution environment."
+   "exEn": "Generating representative data at volume is often the slowest part of preparing an execution environment.",
+   "qAr": "ما الدور الذي تلعبه أدوات توليد البيانات في الاختبار؟",
+   "exAr": "توليد بيانات ممثّلة وبكميات كبيرة غالباً ما يكون أبطأ جزء في تجهيز بيئة التنفيذ."
   },
   {
    "n": 100,
@@ -1319,7 +1497,49 @@
     "D": "Choosing a tool based on its visual appearance"
    },
    "a": "B",
-   "exEn": "Tool selection is a fit question: process, technology, budget, skills and support all weigh in."
+   "exEn": "Tool selection is a fit question: process, technology, budget, skills and support all weigh in.",
+   "qAr": "ما المعيار الأساسي لاختيار أداة اختبار للمؤسسة؟",
+   "exAr": "اختيار الأداة مسألة ملاءمة: العملية والتقنية والميزانية والمهارات والدعم كلها عوامل مؤثرة."
   }
- ]
+ ],
+ "chapters": [
+  {
+   "n": 1,
+   "en": "Fundamentals of Testing",
+   "ar": "أساسيات الاختبار"
+  },
+  {
+   "n": 2,
+   "en": "Testing Throughout the SDLC",
+   "ar": "الاختبار خلال دورة حياة التطوير"
+  },
+  {
+   "n": 3,
+   "en": "Static Testing",
+   "ar": "الاختبار الساكن"
+  },
+  {
+   "n": 4,
+   "en": "Test Analysis and Design",
+   "ar": "تحليل الاختبار وتصميمه"
+  },
+  {
+   "n": 5,
+   "en": "Managing the Test Activities",
+   "ar": "إدارة أنشطة الاختبار"
+  },
+  {
+   "n": 6,
+   "en": "Test Tools",
+   "ar": "أدوات الاختبار"
+  }
+ ],
+ "exam": {
+  "1": 8,
+  "2": 6,
+  "3": 4,
+  "4": 11,
+  "5": 9,
+  "6": 2
+ }
 }

@@ -1,121 +1,96 @@
 ---
+// «موادي»: المواد المفتوحة على هاد الجهاز (من /api/pro/me).
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import { STORE_OPEN, getStoreSettings } from '../../lib/store';
 
-const products = (await getCollection('products'))
-  .filter((p) => !p.data.draft)
-  .sort((a, b) => a.data.order - b.data.order);
+if (!STORE_OPEN) return Astro.redirect('/store/');
+const t = await getStoreSettings();
+const covers = Object.fromEntries(
+  (await getCollection('products')).filter((p) => !p.data.draft).map((p) => [p.id, { cover: p.data.cover ?? '', kind: p.data.kind }]),
+);
 ---
-<Base
-  title="موادي"
-  description="المواد المدفوعة المفتوحة على هاد الجهاز."
-  noindex={true}
->
-  <section class="hero dots">
-    <div class="wrap">
-      <span class="eyebrow">القسم المدفوع</span>
-      <h1>موادي</h1>
-      <p class="intro">
-        هون بتلاقي كل مادة مدفوعة مفتوحة على هاد الجهاز. الفتح مربوط بالجهاز نفسه —
-        لو فتحت الموقع من جهاز تاني، دخّل الكود مرة وحدة هناك كذلك.
-      </p>
 
-      <div class="list" id="pro-list" aria-live="polite">
-        <p class="dim" id="pro-loading">لحظة…</p>
+<Base title={t.mineTitle} description={t.mineText} noindex hideChat>
+  <div class="wrap mpage" id="mine" data-covers={JSON.stringify(covers)} data-open={t.mineOpen} data-confirm={t.mineLogoutConfirm}>
+    <h1>{t.mineTitle}</h1>
+    <p class="lead">{t.mineText}</p>
 
-        <p class="dim" id="pro-empty" hidden>
-          ما في مواد مفتوحة على هاد الجهاز. إذا عندك كود <a href="/pro/unlock/">دخّلو من هون</a>،
-          وإذا لأ شوف <a href="/store/">المتجر</a>.
-        </p>
+    <p class="dim" id="mload">…</p>
+    <div class="mgrid" id="mgrid" hidden></div>
 
-        <div class="grid" id="pro-grid" hidden>
-          {
-            products.map((p) => (
-              <a class="item" href={`/pro/${p.id}/`} data-slug={p.id} hidden>
-                <span class="kind">{p.data.kind}</span>
-                <h2>{p.data.title}</h2>
-                <span class="go">افتح المادة ›</span>
-              </a>
-            ))
-          }
-        </div>
+    <div class="mempty" id="mempty" hidden>
+      <p>{t.mineEmpty}</p>
+      <div class="mbtns">
+        <a class="btn btn-primary btn-sm" href="/pro/unlock/">{t.mineUnlock}</a>
+        <a class="btn btn-ghost btn-sm" href="/store/">{t.mineStore}</a>
       </div>
-
-      <p class="acts">
-        <a class="btn" href="/pro/unlock/">دخّل كود جديد</a>
-        <a class="btn" href="/store/">المتجر</a>
-        <button class="btn" type="button" id="pro-logout">إغلاق الوصول على هاد الجهاز</button>
-      </p>
     </div>
-  </section>
+
+    <div class="mfoot" id="mfoot" hidden>
+      <a href="/pro/unlock/">{t.mineUnlock}</a>
+      <button type="button" class="linkbtn" id="logout">{t.mineLogout}</button>
+    </div>
+  </div>
 </Base>
 
-<script is:inline>
-  (() => {
-    const loading = document.getElementById('pro-loading');
-    const empty = document.getElementById('pro-empty');
-    const grid = document.getElementById('pro-grid');
-    const btn = document.getElementById('pro-logout');
+<script>
+  const root = document.getElementById('mine')!;
+  const covers = JSON.parse(root.dataset.covers!) as Record<string, { cover: string; kind: string }>;
+  const $ = (id: string) => document.getElementById(id)!;
 
-    const show = (open) => {
-      if (loading) loading.hidden = true;
-      let shown = 0;
-      if (grid) {
-        for (const card of grid.querySelectorAll('[data-slug]')) {
-          const on = open.indexOf(card.getAttribute('data-slug')) !== -1;
-          card.hidden = !on;
-          if (on) shown++;
-        }
-        grid.hidden = shown === 0;
-      }
-      if (empty) empty.hidden = shown > 0;
-    };
+  async function load() {
+    let products: { slug: string; title: string }[] = [];
+    try {
+      const d = await (await fetch('/api/pro/me', { cache: 'no-store' })).json();
+      products = d.ok ? d.products : [];
+    } catch (_) {}
+    $('mload').hidden = true;
+    if (!products.length) { $('mempty').hidden = false; return; }
+    const grid = $('mgrid');
+    grid.replaceChildren(...products.map((p) => {
+      const a = document.createElement('a');
+      a.className = 'mcard';
+      a.href = `/pro/${p.slug}/`;
+      const c = covers[p.slug];
+      if (c?.cover) { const img = document.createElement('img'); img.src = c.cover; img.alt = ''; img.loading = 'lazy'; a.append(img); }
+      const box = document.createElement('div');
+      if (c?.kind) { const k = document.createElement('span'); k.className = 'kind'; k.textContent = c.kind; box.append(k); }
+      const s = document.createElement('strong'); s.textContent = p.title;
+      const go = document.createElement('span'); go.className = 'go'; go.textContent = root.dataset.open + ' ←';
+      box.append(s, go);
+      a.append(box);
+      return a;
+    }));
+    grid.hidden = false;
+    $('mfoot').hidden = false;
+  }
 
-    fetch('/api/pro/status')
-      .then((r) => r.json())
-      .then((s) => show(Array.isArray(s.products) ? s.products : []))
-      .catch(() => {
-        if (loading) loading.textContent = 'ما قدرنا نجيب موادك. حدّث الصفحة وجرّب كمان مرة.';
-      });
-
-    if (btn) {
-      btn.addEventListener('click', async () => {
-        btn.disabled = true;
-        try {
-          await fetch('/api/pro/logout', { method: 'POST' });
-        } catch (err) {
-          /* ما بيهم — رح نرجّعه لصفحة الكود بأي حال */
-        }
-        location.href = '/pro/unlock/';
-      });
-    }
-  })();
+  $('logout').addEventListener('click', async () => {
+    if (!confirm(root.dataset.confirm!)) return;
+    try { await fetch('/api/pro/logout', { method: 'POST' }); } catch (_) {}
+    location.reload();
+  });
+  load();
 </script>
 
 <style>
-  .hero { padding-block: 56px 64px; }
-  .hero h1 { margin-top: 12px; }
-  .intro { max-width: 62ch; color: var(--muted); margin-top: 12px; }
-
-  .list { margin-top: 28px; max-width: 720px; }
+  .mpage { max-width: 900px; padding-block: 32px 80px; }
+  .mpage h1 { font-size: clamp(26px, 3vw, 34px); margin: 0 0 6px; }
+  .lead { color: var(--muted); line-height: 1.9; margin: 0 0 22px; }
   .dim { color: var(--muted); }
-
-  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
-  .item {
-    display: grid;
-    gap: 7px;
-    align-content: start;
-    background: var(--surface);
-    border: 1px solid var(--orange-line);
-    border-radius: var(--r-xl);
-    padding: 20px;
-    text-decoration: none;
-    color: inherit;
-  }
-  .item:hover { border-color: var(--orange); }
-  .kind { font-size: 12px; color: var(--faint); }
-  .item h2 { font-size: 18px; margin: 0; }
-  .go { font-size: 13px; color: var(--orange); }
-
-  .acts { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 32px; }
+  [hidden] { display: none !important; }
+  .mgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .mcard { display: grid; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; color: var(--ink); text-decoration: none; transition: border-color .15s, transform .15s; }
+  .mcard:hover { border-color: var(--cyan); transform: translateY(-2px); }
+  .mcard img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
+  .mcard div { display: grid; gap: 6px; padding: 14px 16px 16px; }
+  .mcard .kind { font-size: 12.5px; color: var(--cyan); font-weight: 700; }
+  .mcard strong { font-size: 17px; line-height: 1.5; }
+  .mcard .go { color: var(--orange); font-weight: 700; font-size: 14.5px; }
+  .mempty { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
+  .mempty p { margin: 0 0 14px; line-height: 1.9; }
+  .mbtns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .mfoot { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 26px; font-size: 14px; }
+  .linkbtn { font: inherit; background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; padding: 0; }
 </style>

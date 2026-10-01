@@ -1834,6 +1834,285 @@ collections:
             label: "الدفع — ملاحظة إضافية للمشتري"
             widget: text
             required: false
+          - name: unlockTitle
+            label: "التفعيل — العنوان"
+            widget: string
+            required: false
+            default: "فعّل الكود"
+          - name: unlockText
+            label: "التفعيل — النص تحت العنوان"
+            widget: text
+            required: false
+            default: "دخّل كود التفعيل اللي وصلك على الإيميل. الجهاز بيضل متذكّرك سنة، والكود بيشتغل على {devices} أجهزة."
+            hint: "{devices} عدد الأجهزة"
+          - name: unlockField
+            label: "التفعيل — اسم خانة الكود"
+            widget: string
+            required: false
+            default: "كود التفعيل"
+          - name: unlockButton
+            label: "التفعيل — زر التفعيل"
+            widget: string
+            required: false
+            default: "فعّل"
+          - name: unlockOk
+            label: "التفعيل — رسالة النجاح"
+            widget: string
+            required: false
+            default: "تمام! انفتحت المواد على هاد الجهاز."
+          - name: unlockOkButton
+            label: "التفعيل — زر بعد النجاح"
+            widget: string
+            required: false
+            default: "روح على موادي"
+          - name: unlockErrInvalid
+            label: "التفعيل — كود غلط"
+            widget: string
+            required: false
+            default: "الكود مش صحيح. تأكد منه وجرّب كمان مرة."
+          - name: unlockErrBlocked
+            label: "التفعيل — كود موقوف"
+            widget: string
+            required: false
+            default: "هاد الكود موقوف. راسلنا إذا في مشكلة."
+          - name: unlockErrDevices
+            label: "التفعيل — وصل حد الأجهزة"
+            widget: text
+            required: false
+            default: "الكود مفعّل على {devices} أجهزة، وهاد الحد الأقصى. اطلع من جهاز قديم من صفحة «موادي» أو راسلنا ومنصفّرلك الأجهزة."
+            hint: "{devices} عدد الأجهزة"
+          - name: unlockErrTooMany
+            label: "التفعيل — محاولات كثيرة"
+            widget: string
+            required: false
+            default: "محاولات كثيرة. استنى شوي وجرّب."
+          - name: forgotLink
+            label: "نسيت الكود — الرابط"
+            widget: string
+            required: false
+            default: "نسيت الكود؟"
+          - name: forgotText
+            label: "نسيت الكود — النص"
+            widget: text
+            required: false
+            default: "اكتب الإيميل اللي اشتريت فيه، ومنبعتلك الكود عليه."
+          - name: forgotButton
+            label: "نسيت الكود — الزر"
+            widget: string
+            required: false
+            default: "ابعتلي الكود"
+          - name: forgotDone
+            label: "نسيت الكود — بعد الإرسال"
+            widget: text
+            required: false
+            default: "إذا الإيميل مسجّل عنا، رح يوصلك الكود خلال دقائق. شيّك على الـ Spam كمان."
+          - name: forgotSubject
+            label: "إيميل نسيت الكود — العنوان"
+            widget: string
+            required: false
+            default: "كود التفعيل تبعك — Testing بالعربي"
+          - name: forgotBody
+            label: "إيميل نسيت الكود — النص"
+            widget: text
+            required: false
+            default: "أهلاً {name}،\n\nطلبت تذكير بكود التفعيل لـ «{product}». هاد هو:"
+            hint: "{name} الاسم · {product} المنتج · الكود والزر بيضافوا لحالهم"
+          - name: mineTitle
+            label: "موادي — العنوان"
+            widget: string
+            required: false
+            default: "موادي"
+          - name: mineText
+            label: "موادي — النص"
+            widget: text
+            required: false
+            default: "كل المواد المفتوحة على هاد الجهاز."
+          - name: mineEmpty
+            label: "موادي — ما في مواد"
+            widget: text
+            required: false
+            default: "ما في مواد مفتوحة على هاد الجهاز لسا. إذا عندك كود فعّله، وإذا لأ شوف المتجر."
+          - name: mineUnlock
+            label: "موادي — زر «عندي كود»"
+            widget: string
+            required: false
+            default: "عندي كود"
+          - name: mineStore
+            label: "موادي — زر المتجر"
+            widget: string
+            required: false
+            default: "روح على المتجر"
+          - name: mineOpen
+            label: "موادي — زر فتح المادة"
+            widget: string
+            required: false
+            default: "افتح"
+          - name: mineLogout
+            label: "موادي — زر الخروج من الجهاز"
+            widget: string
+            required: false
+            default: "اطلع من هاد الجهاز"
+          - name: mineLogoutConfirm
+            label: "موادي — تأكيد الخروج"
+            widget: text
+            required: false
+            default: "متأكد؟ رح تحتاج تدخّل الكود من جديد على هاد الجهاز، وبيفضى مكانه لجهاز تاني."
+          - name: bankLocked
+            label: "البنك — مقفول"
+            widget: text
+            required: false
+            default: "هاد المحتوى للي اشترى. فعّل الكود أول."
+          - name: bankPracticeTitle
+            label: "البنك — عنوان التدريب"
+            widget: string
+            required: false
+            default: "تدرّب"
+          - name: bankPracticeText
+            label: "البنك — نص التدريب"
+            widget: text
+            required: false
+            default: "اختار فصل أو كل الأسئلة. بتشوف الجواب والشرح فوراً، وتقدّمك بينحفظ على هاد الجهاز."
+          - name: bankAll
+            label: "البنك — كل الأسئلة"
+            widget: string
+            required: false
+            default: "كل الأسئلة"
+          - name: bankWrongOnly
+            label: "البنك — أخطائي بس"
+            widget: string
+            required: false
+            default: "أخطائي بس"
+          - name: bankExamTitle
+            label: "البنك — عنوان الامتحان"
+            widget: string
+            required: false
+            default: "امتحان تجريبي"
+          - name: bankExamText
+            label: "البنك — نص الامتحان"
+            widget: text
+            required: false
+            default: "{count} سؤال عشوائي موزّعين على الفصول مثل الامتحان الحقيقي، {minutes} دقيقة، والنجاح من {pass}."
+            hint: "{count} عدد الأسئلة · {minutes} الدقائق · {pass} علامة النجاح"
+          - name: bankExamButton
+            label: "البنك — زر بدء الامتحان"
+            widget: string
+            required: false
+            default: "ابدأ الامتحان"
+          - name: bankExamCount
+            label: "البنك — عدد أسئلة الامتحان"
+            widget: number
+            required: false
+            value_type: int
+            min: 1
+            default: 40
+          - name: bankExamMinutes
+            label: "البنك — مدة الامتحان (دقائق)"
+            widget: number
+            required: false
+            value_type: int
+            min: 1
+            default: 65
+          - name: bankExamPass
+            label: "البنك — علامة النجاح"
+            widget: number
+            required: false
+            value_type: int
+            min: 1
+            default: 26
+          - name: bankNext
+            label: "البنك — زر التالي"
+            widget: string
+            required: false
+            default: "التالي"
+          - name: bankPrev
+            label: "البنك — زر السابق"
+            widget: string
+            required: false
+            default: "السابق"
+          - name: bankCorrect
+            label: "البنك — جواب صح"
+            widget: string
+            required: false
+            default: "صح ✓"
+          - name: bankWrong
+            label: "البنك — جواب غلط"
+            widget: string
+            required: false
+            default: "غلط — الجواب الصحيح {a}"
+            hint: "{a} الجواب الصحيح"
+          - name: bankEnglish
+            label: "البنك — زر الشرح بالإنجليزي"
+            widget: string
+            required: false
+            default: "الشرح بالإنجليزي"
+          - name: bankBack
+            label: "البنك — رجوع للقائمة"
+            widget: string
+            required: false
+            default: "→ رجوع"
+          - name: bankReset
+            label: "البنك — زر تصفير التقدّم"
+            widget: string
+            required: false
+            default: "صفّر التقدّم"
+          - name: bankResetConfirm
+            label: "البنك — تأكيد التصفير"
+            widget: string
+            required: false
+            default: "أكيد بدك تصفّر التقدّم؟"
+          - name: bankSubmit
+            label: "البنك — زر تسليم الامتحان"
+            widget: string
+            required: false
+            default: "سلّم الامتحان"
+          - name: bankSubmitConfirm
+            label: "البنك — تأكيد التسليم"
+            widget: string
+            required: false
+            default: "في {n} سؤال بدون جواب. أكيد بدك تسلّم؟"
+            hint: "{n} عدد الأسئلة بدون جواب"
+          - name: bankTimeUp
+            label: "البنك — خلص الوقت"
+            widget: string
+            required: false
+            default: "خلص الوقت! هاي نتيجتك."
+          - name: bankPassed
+            label: "البنك — نجح"
+            widget: string
+            required: false
+            default: "مبروك، نجحت! 🎉"
+          - name: bankFailed
+            label: "البنك — ما نجح"
+            widget: string
+            required: false
+            default: "ما وصلت لعلامة النجاح هالمرة. راجع أخطاءك وجرّب كمان."
+          - name: bankScore
+            label: "البنك — العلامة"
+            widget: string
+            required: false
+            default: "علامتك {score} من {total}"
+            hint: "{score} العلامة · {total} العدد"
+          - name: bankByChapter
+            label: "البنك — عنوان التوزيع على الفصول"
+            widget: string
+            required: false
+            default: "حسب الفصل"
+          - name: bankReview
+            label: "البنك — زر مراجعة الأخطاء"
+            widget: string
+            required: false
+            default: "راجع أخطاءك"
+          - name: bankRetry
+            label: "البنك — زر امتحان جديد"
+            widget: string
+            required: false
+            default: "امتحان جديد"
+          - name: bankDone
+            label: "البنك — خلصت الأسئلة"
+            widget: string
+            required: false
+            default: "خلصت! جاوبت صح على {score} من {total}."
+            hint: "{score} · {total}"
 
       - name: announcements
         label: "شريط الأخبار"

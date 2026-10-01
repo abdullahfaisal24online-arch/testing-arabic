@@ -1,189 +1,136 @@
 ---
+// تفعيل كود الشراء على هاد الجهاز (+ «نسيت الكود؟»). الرابط بالإيميل بيعبّي الكود لحاله: /pro/unlock/?code=TA-XXXX-XXXX
 import Base from '../../layouts/Base.astro';
+import { STORE_OPEN, getStoreSettings, tpl } from '../../lib/store';
+
+if (!STORE_OPEN) return Astro.redirect('/store/');
+const t = await getStoreSettings();
+const L = {
+  invalid: t.unlockErrInvalid, blocked: t.unlockErrBlocked, devices: t.unlockErrDevices, too_many: t.unlockErrTooMany,
+  ok: t.unlockOk, forgotDone: t.forgotDone, bad_email: 'الإيميل مش مكتوب صح.', network: 'صار خطأ بالاتصال. جرّب كمان مرة.',
+};
 ---
-<Base
-  title="ادخل كود الوصول"
-  description="صفحة إدخال كود الوصول للمواد المدفوعة على منصة Testing بالعربي."
-  noindex={true}
->
-  <section class="hero dots">
-    <div class="wrap">
-      <span class="eyebrow">القسم المدفوع</span>
-      <h1>ادخل كود الوصول</h1>
-      <p class="intro">
-        الكود وصلك بعد ما أكّدنا الحوالة. بتدخّلو مرة وحدة على هاد الجهاز، وبعدها بتفتح
-        مادتك مباشرة بدون حساب ولا كلمة سر.
-      </p>
 
-      <p class="want" id="unlock-want" hidden></p>
+<Base title={t.unlockTitle} description={t.unlockText} noindex hideChat>
+  <div class="wrap upage">
+    <div class="ucard">
+      <h1>{t.unlockTitle}</h1>
+      <p class="lead">{tpl(t.unlockText, { devices: t.maxDevices })}</p>
 
-      <form class="form" id="unlock-form" novalidate>
-        <label class="sr-only" for="pro-code">كود الوصول</label>
-        <input
-          id="pro-code"
-          name="code"
-          type="text"
-          inputmode="latin"
-          autocomplete="off"
-          spellcheck="false"
-          placeholder="TA-XXXX-XXXX"
-          maxlength="12"
-          required
-        />
-        <button class="btn btn-primary" type="submit" id="unlock-btn">افتح المادة</button>
-        <p class="msg" id="unlock-msg" role="status" aria-live="polite"></p>
+      <form id="uform" novalidate data-labels={JSON.stringify(L)}>
+        <label>
+          <span>{t.unlockField}</span>
+          <input name="code" id="code" required maxlength="20" dir="ltr" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="TA-XXXX-XXXX" />
+        </label>
+        <p class="msg" id="umsg" role="alert" hidden></p>
+        <button class="btn btn-primary" type="submit" id="ubtn">{t.unlockButton}</button>
       </form>
 
-      <p class="muted">
-        ما عندك كود؟ شوف <a href="/store/">المتجر</a> — أو
-        <a href="/newsletter/">اشترك بالنشرة</a> عشان تعرف أول ما ينزل جديد.
-      </p>
+      <div class="done" id="udone" hidden>
+        <p class="ok">✓ {t.unlockOk}</p>
+        <ul id="ulist"></ul>
+        <a class="btn btn-primary" href="/pro/">{t.unlockOkButton}</a>
+      </div>
+
+      <details class="forgot" id="forgot">
+        <summary>{t.forgotLink}</summary>
+        <form id="fform" novalidate>
+          <p>{t.forgotText}</p>
+          <div class="frow">
+            <input name="email" type="email" required maxlength="254" dir="ltr" autocomplete="email" />
+            <button class="btn btn-ghost btn-sm" type="submit" id="fbtn">{t.forgotButton}</button>
+          </div>
+          <p class="msg" id="fmsg" role="status" hidden></p>
+        </form>
+      </details>
     </div>
-  </section>
+  </div>
 </Base>
 
-<script is:inline>
-  (() => {
-    const form = document.getElementById('unlock-form');
-    const input = document.getElementById('pro-code');
-    const btn = document.getElementById('unlock-btn');
-    const msg = document.getElementById('unlock-msg');
-    const want = document.getElementById('unlock-want');
-    if (!form || !input || !btn || !msg) return;
+<script>
+  const $ = (id: string) => document.getElementById(id)!;
+  const form = $('uform') as HTMLFormElement;
+  const L = JSON.parse(form.dataset.labels!);
+  const input = $('code') as HTMLInputElement;
+  const q = new URLSearchParams(location.search).get('code');
+  if (q) input.value = q.toUpperCase();
 
-    const params = new URLSearchParams(location.search);
-    const wantSlug = (params.get('p') || '').trim();
+  const say = (el: HTMLElement, text: string, ok = false) => { el.textContent = text; el.className = 'msg ' + (ok ? 'ok' : 'bad'); el.hidden = false; };
 
-    const errors = {
-      format: 'شكل الكود غلط. لازم يكون على شكل TA-XXXX-XXXX.',
-      unknown: 'ما لقينا هاد الكود. تأكد إنك نسخته صح.',
-      blocked: 'هاد الكود موقوف. تواصل معنا إذا بتعتقد إنو في غلط.',
-      expired: 'انتهت صلاحية هاد الكود.',
-      devices: 'الكود مستعمل على أقصى عدد أجهزة مسموح. تواصل معنا إذا بدك تنقلو لجهاز تاني.',
-      origin: 'صار خطأ بالطلب. حدّث الصفحة وجرّب من جديد.',
-    };
-
-    // أسماء المنتجات — عشان نحكي للزائر شو المادة اللي بدها كود
-    let titles = {};
-    if (wantSlug && want) {
-      fetch('/store/products.json')
-        .then((r) => r.json())
-        .then((cat) => {
-          for (const p of cat.products || []) titles[p.slug] = p.title;
-          if (titles[wantSlug]) {
-            want.textContent = 'المادة المطلوبة: ' + titles[wantSlug];
-            want.hidden = false;
-          }
-        })
-        .catch(() => {
-          /* اسم المادة تحسين بس — الفتح بيشتغل بدونه */
-        });
-    }
-
-    // الحروف كلها كبيرة والشرطات تلقائية عشان ما يغلط بالكتابة
-    input.addEventListener('input', () => {
-      const raw = input.value
-        .toUpperCase()
-        .replace(/[^A-Z0-9]/g, '')
-        .replace(/^(?:TA)+/, '');
-      let out = 'TA';
-      if (raw.length) out += '-' + raw.slice(0, 4);
-      if (raw.length > 4) out += '-' + raw.slice(4, 8);
-      input.value = out;
-    });
-
-    const goto = (opened) => {
-      const to = params.get('to') || '';
-      // لو الكود ما بيفتح المادة المطلوبة، ما بنرجّعه لنفس المسار — بيصير دوران
-      if (to && /^\/(pro|lessons)\//.test(to) && (!wantSlug || opened.indexOf(wantSlug) !== -1)) {
-        location.href = to;
-        return;
-      }
-      location.href = '/pro/';
-    };
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      msg.textContent = '';
-      msg.className = 'msg';
-      btn.disabled = true;
-      try {
-        const res = await fetch('/api/pro/unlock', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ code: input.value.trim() }),
-        });
-        const data = await res.json().catch(() => ({}));
-        if (data && data.ok) {
-          const opened = Array.isArray(data.products) ? data.products : [];
-          if (wantSlug && opened.indexOf(wantSlug) === -1) {
-            const names = opened.map((s) => titles[s] || s).join('، ');
-            msg.textContent =
-              'الكود اشتغل، بس هو بيفتح' +
-              (names ? ' ' + names : ' مادة تانية') +
-              ' — مش المادة المطلوبة. رح نوديك لموادك.';
-            msg.className = 'msg ok';
-            setTimeout(() => (location.href = '/pro/'), 2200);
-            return;
-          }
-          msg.textContent = 'تم! جاري فتح المادة…';
-          msg.className = 'msg ok';
-          goto(opened);
-          return;
-        }
-        msg.textContent = errors[data && data.error] || 'ما زبطت. جرّب من جديد.';
-        msg.className = 'msg bad';
-      } catch (err) {
-        msg.textContent = 'ما قدرنا نوصل للسيرفر. شيك على النت وجرّب كمان مرة.';
-        msg.className = 'msg bad';
-      }
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = $('umsg');
+    msg.hidden = true;
+    if (!input.value.trim()) { input.focus(); return; }
+    const btn = $('ubtn') as HTMLButtonElement;
+    btn.disabled = true;
+    try {
+      const r = await fetch('/api/pro/unlock', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ code: input.value }) });
+      const d = await r.json();
+      if (!d.ok) throw Object.assign(new Error(d.error || 'network'), { devices: d.devices });
+      const ul = $('ulist');
+      ul.replaceChildren(...d.products.map((p: { slug: string; title: string }) => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = `/pro/${p.slug}/`;
+        a.textContent = p.title;
+        li.append(a);
+        return li;
+      }));
+      form.hidden = true;
+      ($('forgot') as HTMLElement).hidden = true;
+      $('udone').hidden = false;
+      history.replaceState(null, '', location.pathname);
+      window.taTrack?.('pro_unlock', {});
+    } catch (x) {
+      const err = x as Error & { devices?: number };
+      say(msg, (L[err.message] || L.network).replace('{devices}', String(err.devices ?? '')));
       btn.disabled = false;
-    });
-  })();
+    }
+  });
+
+  ($('fform') as HTMLFormElement).addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.currentTarget as HTMLFormElement;
+    const email = (f.elements.namedItem('email') as HTMLInputElement).value.trim();
+    const msg = $('fmsg');
+    const btn = $('fbtn') as HTMLButtonElement;
+    btn.disabled = true;
+    try {
+      const r = await fetch('/api/pro/forgot', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email }) });
+      const d = await r.json();
+      if (!d.ok) throw new Error(d.error || 'network');
+      say(msg, L.forgotDone, true);
+    } catch (x) {
+      say(msg, L[(x as Error).message] || L.network);
+      btn.disabled = false;
+    }
+  });
 </script>
 
 <style>
-  .hero { padding-block: 56px 64px; }
-  .hero h1 { margin-top: 12px; }
-  .intro { max-width: 58ch; color: var(--muted); margin-top: 12px; }
-
-  .want {
-    margin-top: 20px;
-    font-size: 14px;
-    color: var(--orange);
-    border-inline-start: 2px solid var(--orange);
-    padding-inline-start: 12px;
-  }
-
-  .form {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 10px;
-    max-width: 460px;
-    margin-top: 28px;
-  }
-  .form input {
-    background: var(--bg);
-    border: 1px solid var(--line-strong);
-    border-radius: var(--r-md);
-    padding: 14px 18px;
-    color: var(--ink);
-    font-family: 'IBM Plex Mono', ui-monospace, monospace;
-    font-size: 17px;
-    letter-spacing: 2px;
-    text-align: center;
-    min-height: 48px;
-    direction: ltr;
-  }
-  .form input::placeholder { color: var(--faint); letter-spacing: 1px; }
-
-  .msg { grid-column: 1 / -1; font-size: 14px; margin: 0; min-height: 20px; }
-  .msg.bad { color: #ff8f6b; }
-  .msg.ok { color: #5ad19a; }
-
-  .muted { margin-top: 26px; font-size: 14px; color: var(--faint); }
-
-  @media (max-width: 620px) {
-    .form { grid-template-columns: 1fr; }
-  }
+  .upage { max-width: 560px; padding-block: 40px 80px; }
+  .ucard { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 26px 22px; }
+  .ucard h1 { font-size: clamp(24px, 3vw, 30px); margin: 0 0 6px; }
+  .lead { color: var(--muted); line-height: 1.9; margin: 0 0 20px; }
+  #uform { display: grid; gap: 14px; }
+  #uform label { display: grid; gap: 6px; }
+  #uform label span { font-weight: 700; font-size: 14.5px; }
+  .ucard input { font: inherit; font-size: 17px; background: var(--navy); border: 1.5px solid var(--line-strong); border-radius: 12px; padding: 12px 14px; color: var(--ink); width: 100%; min-width: 0; }
+  #code { font-family: ui-monospace, monospace; letter-spacing: 2px; text-align: center; font-size: 20px; }
+  .ucard input:focus { outline: none; border-color: var(--cyan); }
+  #uform .btn, .done .btn { width: 100%; justify-content: center; }
+  .msg { margin: 0; line-height: 1.8; } .msg.ok { color: #34d399; } .msg.bad { color: #f87171; }
+  .msg[hidden], .done[hidden], #uform[hidden], .forgot[hidden] { display: none; }
+  .done { display: grid; gap: 12px; }
+  .done .ok { color: #34d399; font-weight: 700; font-size: 17px; margin: 0; }
+  .done ul { margin: 0; padding-inline-start: 20px; line-height: 2; }
+  .forgot { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 14px; }
+  .forgot summary { cursor: pointer; color: var(--cyan); font-size: 14.5px; }
+  .forgot form { display: grid; gap: 10px; margin-top: 10px; }
+  .forgot p { margin: 0; color: var(--muted); line-height: 1.8; font-size: 14.5px; }
+  .frow { display: flex; gap: 8px; }
+  .frow input { flex: 1; font-size: 16px; padding: 10px 12px; }
+  .frow .btn { flex: none; }
+  @media (max-width: 480px) { .frow { flex-direction: column; } }
 </style>

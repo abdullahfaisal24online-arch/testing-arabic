@@ -33,7 +33,7 @@ function htmlBody(text: string, cta?: { href: string; label: string }, code?: st
 export async function sendBuyerMail(
   env: MailEnv,
   to: string,
-  kind: 'order' | 'approved' | 'rejected',
+  kind: 'order' | 'approved' | 'rejected' | 'forgot',
   texts: MailTexts,
   vars: Record<string, string>,
   cta?: { href: string; label: string },
@@ -53,8 +53,8 @@ export async function sendBuyerMail(
         from: env.STORE_MAIL_FROM || 'Testing بالعربي <store@testing-arabic.com>',
         to: [to],
         subject,
-        text: body + (cta ? `\n\n${cta.label}: ${cta.href}` : '') + (kind === 'approved' && vars.code ? `\n\n${vars.code}` : ''),
-        html: htmlBody(body, cta, kind === 'approved' ? vars.code : undefined),
+        text: body + (cta ? `\n\n${cta.label}: ${cta.href}` : '') + (kind !== 'order' && kind !== 'rejected' && vars.code ? `\n\n${vars.code}` : ''),
+        html: htmlBody(body, cta, kind === 'approved' || kind === 'forgot' ? vars.code : undefined),
       }),
     });
     if (!res.ok) {

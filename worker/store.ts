@@ -70,6 +70,12 @@ export async function ensureTables(env: StoreEnv) {
       code TEXT PRIMARY KEY, name TEXT, email TEXT, payment_ref TEXT, price_jod REAL, products TEXT,
       max_devices INTEGER NOT NULL DEFAULT 3, status TEXT NOT NULL DEFAULT 'active', created_at INTEGER NOT NULL, expires_at INTEGER)`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS pro_activations (id TEXT PRIMARY KEY, code TEXT NOT NULL, device_hash TEXT NOT NULL, created_at INTEGER NOT NULL, last_seen_at INTEGER)`),
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_pro_act_code ON pro_activations (code)`),
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_pro_act_dev ON pro_activations (device_hash)`),
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_pro_codes_email ON pro_codes (email)`),
+    // محاولات التفعيل الغلط وطلبات «نسيت الكود» (حماية من التخمين)
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS pro_attempts (ip_hash TEXT NOT NULL, kind TEXT NOT NULL, at INTEGER NOT NULL)`),
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_pro_attempts ON pro_attempts (ip_hash, kind, at)`),
   ]);
   READY = true;
 }
