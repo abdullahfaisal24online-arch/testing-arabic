@@ -1500,6 +1500,326 @@
    "exEn": "Tool selection is a fit question: process, technology, budget, skills and support all weigh in.",
    "qAr": "ما المعيار الأساسي لاختيار أداة اختبار للمؤسسة؟",
    "exAr": "اختيار الأداة مسألة ملاءمة: العملية والتقنية والميزانية والمهارات والدعم كلها عوامل مؤثرة."
+  },
+  {
+   "n": 101,
+   "ch": 4,
+   "p": 1,
+   "q": "A loyalty app calculates discounts from an integer number of points: 0–99 points: no discount; 100–499 points: 5%; 500 points or more: 10%. Negative values are rejected. What is the minimum number of test cases needed to cover all valid and invalid equivalence partitions?",
+   "o": {
+    "A": "3",
+    "B": "4",
+    "C": "5",
+    "D": "6"
+   },
+   "a": "B",
+   "exEn": "There are three valid partitions (0–99, 100–499, ≥500) and one invalid partition (<0), so four values are enough.",
+   "qAr": "تطبيق ولاء بيحسب الخصم من عدد نقاط صحيح: 0–99 بدون خصم، 100–499 خصم 5%، و500 فأكثر خصم 10%. القيم السالبة مرفوضة. ما أقل عدد test cases لتغطية كل الـ equivalence partitions الصالحة وغير الصالحة؟",
+   "exAr": "في ثلاث partitions صالحة (0–99، 100–499، 500 فأكثر) وواحد غير صالح (أقل من 0)، فأربع قيم بتكفي."
+  },
+  {
+   "n": 102,
+   "ch": 4,
+   "p": 1,
+   "q": "A courier charges by parcel weight in whole kilograms: 1–5 kg: $5; 6–20 kg: $12; 21–30 kg: $20. Weights below 1 kg or above 30 kg are rejected. Which set of inputs achieves 100% equivalence partition coverage with the fewest values?",
+   "o": {
+    "A": "1, 5, 6, 20, 21, 30",
+    "B": "0, 3, 10, 31",
+    "C": "-1, 0, 4, 15, 28",
+    "D": "0, 3, 10, 25, 31"
+   },
+   "a": "D",
+   "exEn": "Five partitions exist (<1, 1–5, 6–20, 21–30, >30); only this set hits each one exactly once.",
+   "qAr": "شركة توصيل بتحسب السعر حسب وزن الطرد بالكيلو (أعداد صحيحة): 1–5 كغ بـ $5، و6–20 كغ بـ $12، و21–30 كغ بـ $20. الوزن أقل من 1 أو أكثر من 30 مرفوض. أي مجموعة قيم بتحقق 100% equivalence partition coverage بأقل عدد قيم؟",
+   "exAr": "في خمس partitions (أقل من 1، 1–5، 6–20، 21–30، أكثر من 30)، وهاي المجموعة الوحيدة اللي بتغطي كل واحد مرة وحدة."
+  },
+  {
+   "n": 103,
+   "ch": 4,
+   "p": 1,
+   "q": "A password must be 8 to 16 characters long and contain at least one digit. Which input belongs to an INVALID equivalence partition?",
+   "o": {
+    "A": "abc12345",
+    "B": "a1b2c3d4e5f6g7h8",
+    "C": "Password2026",
+    "D": "abcdefghij"
+   },
+   "a": "D",
+   "exEn": "'abcdefghij' has a valid length but no digit, so it falls in the invalid 'no digit' partition.",
+   "qAr": "كلمة السر لازم يكون طولها من 8 لـ 16 حرف وفيها رقم واحد على الأقل. أي قيمة بتنتمي لـ equivalence partition غير صالح؟",
+   "exAr": "‏'abcdefghij' طولها صالح بس ما فيها ولا رقم، فهي من الـ partition غير الصالح «بدون رقم»."
+  },
+  {
+   "n": 104,
+   "ch": 4,
+   "p": 1,
+   "q": "A thermostat display shows 'Cold' below 15°C, 'Comfortable' from 15°C to 24°C, and 'Hot' at 25°C or above (whole degrees). Tests already exist for 10°C and 20°C. Which additional value is needed to reach 100% equivalence partition coverage of the displayed output?",
+   "o": {
+    "A": "14",
+    "B": "15",
+    "C": "30",
+    "D": "24"
+   },
+   "a": "C",
+   "exEn": "The existing tests cover 'Cold' and 'Comfortable'; only a value of 25 or more covers the missing 'Hot' partition.",
+   "qAr": "ترموستات بيعرض «Cold» تحت 15°، و«Comfortable» من 15° لـ 24°، و«Hot» من 25° وطالع (درجات صحيحة). في tests جاهزة لـ 10° و20°. أي قيمة إضافية لازم عشان نوصل 100% equivalence partition coverage للمخرجات؟",
+   "exAr": "الـ tests الموجودة بتغطي «Cold» و«Comfortable»، وبس قيمة 25 أو أكثر بتغطي الـ partition الناقص «Hot»."
+  },
+  {
+   "n": 105,
+   "ch": 4,
+   "p": 1,
+   "q": "A username must be at least 8 and at most 20 characters long. Using 2-value boundary value analysis, how many test cases are needed to cover all boundary coverage items for the length?",
+   "o": {
+    "A": "2",
+    "B": "3",
+    "C": "6",
+    "D": "4"
+   },
+   "a": "D",
+   "exEn": "2-value BVA tests each boundary and its closest neighbour in the adjacent partition: 7, 8, 20 and 21.",
+   "qAr": "اسم المستخدم لازم يكون طوله 8 أحرف على الأقل و20 على الأكثر. باستخدام 2-value boundary value analysis، كم test case بنحتاج لتغطية كل الـ boundary coverage items للطول؟",
+   "exAr": "الـ 2-value BVA بتفحص كل حد مع أقرب قيمة إله بالـ partition المجاور: 7 و8 و20 و21."
+  },
+  {
+   "n": 106,
+   "ch": 4,
+   "p": 1,
+   "q": "An exam result is 'Fail' for scores 0–64 and 'Pass' for 65–100 (whole numbers). Using 3-value boundary value analysis, which values must be tested for the boundary between Fail and Pass?",
+   "o": {
+    "A": "64, 65",
+    "B": "64, 65, 66",
+    "C": "63, 64, 65, 66",
+    "D": "63, 64, 66, 67"
+   },
+   "a": "C",
+   "exEn": "Both 64 and 65 are boundary values; 3-value BVA tests each with its two neighbours, giving 63, 64, 65 and 66.",
+   "qAr": "نتيجة الامتحان «Fail» للعلامات 0–64 و«Pass» للعلامات 65–100 (أعداد صحيحة). باستخدام 3-value boundary value analysis، أي قيم لازم نفحصها للحد بين Fail وPass؟",
+   "exAr": "‏64 و65 الاثنين قيم حدية، والـ 3-value BVA بتفحص كل وحدة مع جيرانها الاثنين، فبيطلع 63 و64 و65 و66."
+  },
+  {
+   "n": 107,
+   "ch": 4,
+   "p": 1,
+   "q": "An interest-rate field accepts values from 0.5% to 5.0% in steps of 0.1. Using 2-value boundary value analysis, which values test the UPPER boundary?",
+   "o": {
+    "A": "4.9 and 5.0",
+    "B": "5.0 and 6.0",
+    "C": "4.9, 5.0 and 5.1",
+    "D": "5.0 and 5.1"
+   },
+   "a": "D",
+   "exEn": "With a step of 0.1, the closest invalid neighbour of 5.0 is 5.1, so 2-value BVA uses 5.0 and 5.1.",
+   "qAr": "حقل نسبة فائدة بيقبل قيم من 0.5% لـ 5.0% بخطوات 0.1. باستخدام 2-value boundary value analysis، أي قيم بتفحص الحد الأعلى؟",
+   "exAr": "لما الخطوة 0.1، أقرب جار غير صالح لـ 5.0 هو 5.1، فالـ 2-value BVA بتستعمل 5.0 و5.1."
+  },
+  {
+   "n": 108,
+   "ch": 4,
+   "p": 1,
+   "q": "A field accepts integers from 10 to 30. A tester applying 2-value boundary value analysis executes tests with the values 10, 20 and 31. What boundary value coverage has been achieved?",
+   "o": {
+    "A": "25%",
+    "B": "75%",
+    "C": "100%",
+    "D": "50%"
+   },
+   "a": "D",
+   "exEn": "The coverage items are 9, 10, 30 and 31; the tests hit only 10 and 31, so 2 of 4 items are covered.",
+   "qAr": "حقل بيقبل أعداد صحيحة من 10 لـ 30. مختبِر طبّق 2-value boundary value analysis ونفّذ tests بالقيم 10 و20 و31. قديش الـ boundary value coverage اللي تحققت؟",
+   "exAr": "الـ coverage items هي 9 و10 و30 و31، والـ tests غطّت بس 10 و31، يعني 2 من 4."
+  },
+  {
+   "n": 109,
+   "ch": 4,
+   "p": 1,
+   "q": "An online shop's shipping rule has three conditions: customer is a member (Y/N), order total is $100 or more (Y/N), and a free-shipping coupon is applied (Y/N). How many columns does the FULL decision table contain?",
+   "o": {
+    "A": "3",
+    "B": "6",
+    "C": "8",
+    "D": "9"
+   },
+   "a": "C",
+   "exEn": "A full decision table lists every combination of the conditions: 2 × 2 × 2 = 8 columns.",
+   "qAr": "قاعدة الشحن بمتجر أونلاين إلها ثلاث شروط: الزبون member (Y/N)، والطلب $100 أو أكثر (Y/N)، ومطبّق كوبون شحن مجاني (Y/N). كم عمود بيكون بالـ decision table الكامل؟",
+   "exAr": "الـ decision table الكامل بيعرض كل احتمالات الشروط: 2 × 2 × 2 = 8 أعمدة."
+  },
+  {
+   "n": 110,
+   "ch": 4,
+   "p": 1,
+   "q": "For the shop above: shipping is free if a coupon is applied, or if the customer is a member AND the order is $100 or more; otherwise it is paid. If the decision table is minimised by merging columns whose outcome does not depend on a condition, how many columns remain?",
+   "o": {
+    "A": "4",
+    "B": "3",
+    "C": "5",
+    "D": "8"
+   },
+   "a": "A",
+   "exEn": "Coupon=Y collapses to one column, member=N without coupon collapses to one, and member=Y without coupon keeps two columns: 4 in total.",
+   "qAr": "لنفس المتجر: الشحن مجاني إذا في كوبون، أو إذا الزبون member والطلب $100 أو أكثر، وغير هيك مدفوع. إذا عملنا minimise للـ decision table بدمج الأعمدة اللي نتيجتها ما بتعتمد على شرط معيّن، كم عمود بيضل؟",
+   "exAr": "الكوبون = Y بيصير عمود واحد، وmember = N بدون كوبون عمود واحد، وmember = Y بدون كوبون بيضلّوا عمودين: المجموع 4."
+  },
+  {
+   "n": 111,
+   "ch": 4,
+   "p": 1,
+   "q": "A decision table has 6 feasible columns. The executed tests exercise columns 1, 2, 2 and 5. What decision table coverage has been achieved?",
+   "o": {
+    "A": "33%",
+    "B": "50%",
+    "C": "67%",
+    "D": "100%"
+   },
+   "a": "B",
+   "exEn": "Coverage counts distinct columns exercised: columns 1, 2 and 5 are 3 of 6, which is 50%.",
+   "qAr": "‏decision table فيه 6 أعمدة ممكنة. الـ tests اللي تنفّذت غطّت الأعمدة 1 و2 و2 و5. قديش الـ decision table coverage؟",
+   "exAr": "الـ coverage بتعدّ الأعمدة المختلفة اللي انفحصت: 1 و2 و5 يعني 3 من 6، أي 50%."
+  },
+  {
+   "n": 112,
+   "ch": 4,
+   "p": 1,
+   "q": "A decision table uses two conditions: 'Age < 18' and 'Age ≥ 65'. Which combination of condition values is infeasible and should be removed from the table?",
+   "o": {
+    "A": "Both conditions FALSE",
+    "B": "Both conditions TRUE",
+    "C": "'Age < 18' TRUE and 'Age ≥ 65' FALSE",
+    "D": "'Age < 18' FALSE and 'Age ≥ 65' TRUE"
+   },
+   "a": "B",
+   "exEn": "No age can be under 18 and 65 or over at the same time, so the TRUE/TRUE column is infeasible.",
+   "qAr": "‏decision table فيه شرطين: «Age < 18» و«Age ≥ 65». أي تركيبة قيم مستحيلة ولازم تنشال من الجدول؟",
+   "exAr": "ما في عمر بيكون أقل من 18 و65 أو أكثر بنفس الوقت، فعمود TRUE/TRUE مستحيل."
+  },
+  {
+   "n": 113,
+   "ch": 4,
+   "p": 1,
+   "q": "A smart lock has three states: Locked, Unlocked and Alarm. Transitions: Locked → Unlocked (correct PIN), Unlocked → Locked (lock button), Locked → Alarm (third wrong PIN), Alarm → Locked (admin reset). What is the minimum number of test cases, each starting in Locked, needed to cover all valid transitions?",
+   "o": {
+    "A": "1",
+    "B": "2",
+    "C": "3",
+    "D": "4"
+   },
+   "a": "A",
+   "exEn": "One sequence covers everything: Locked → Unlocked → Locked → Alarm → Locked exercises all four transitions.",
+   "qAr": "قفل ذكي إله ثلاث حالات: Locked وUnlocked وAlarm. الـ transitions: من Locked لـ Unlocked (PIN صحيح)، ومن Unlocked لـ Locked (زر القفل)، ومن Locked لـ Alarm (ثالث PIN غلط)، ومن Alarm لـ Locked (reset من الأدمن). ما أقل عدد test cases، كل واحد بيبلّش من Locked، لتغطية كل الـ valid transitions؟",
+   "exAr": "تسلسل واحد بيغطي الكل: Locked → Unlocked → Locked → Alarm → Locked بيمرّ على الـ transitions الأربعة."
+  },
+  {
+   "n": 114,
+   "ch": 4,
+   "p": 1,
+   "q": "A media player has states Stopped, Playing and Paused, with five valid transitions: Stopped→Playing (play), Playing→Paused (pause), Paused→Playing (play), Playing→Stopped (stop), Paused→Stopped (stop). A test runs: Stopped –play→ Playing –pause→ Paused –play→ Playing –stop→ Stopped. What valid transitions coverage is achieved?",
+   "o": {
+    "A": "80%",
+    "B": "60%",
+    "C": "100%",
+    "D": "67%"
+   },
+   "a": "A",
+   "exEn": "The test exercises four of the five valid transitions; Paused→Stopped is never exercised, so coverage is 4/5 = 80%.",
+   "qAr": "مشغّل ميديا إله حالات Stopped وPlaying وPaused، وفي خمس valid transitions: Stopped→Playing (play)، وPlaying→Paused (pause)، وPaused→Playing (play)، وPlaying→Stopped (stop)، وPaused→Stopped (stop). test بيمشي هيك: Stopped –play→ Playing –pause→ Paused –play→ Playing –stop→ Stopped. قديش الـ valid transitions coverage؟",
+   "exAr": "الـ test بيغطي 4 من 5 transitions، وPaused→Stopped ما انفحص أبداً، فالـ coverage هي 4/5 = 80%."
+  },
+  {
+   "n": 115,
+   "ch": 4,
+   "p": 1,
+   "q": "For the media player above, which test case checks an INVALID transition?",
+   "o": {
+    "A": "Pressing play while the player is Paused",
+    "B": "Pressing pause while the player is Stopped",
+    "C": "Pressing stop while the player is Playing",
+    "D": "Pressing play while the player is Stopped"
+   },
+   "a": "B",
+   "exEn": "There is no 'pause' transition defined from Stopped, so this tests how the system handles an invalid event in that state.",
+   "qAr": "لنفس مشغّل الميديا، أي test case بيفحص invalid transition؟",
+   "exAr": "ما في transition اسمه pause من حالة Stopped، فهاد الـ test بيفحص كيف النظام بيتعامل مع حدث مش مسموح بهاي الحالة."
+  },
+  {
+   "n": 116,
+   "ch": 4,
+   "p": 1,
+   "q": "An order moves through states: New → Paid → Shipped → Delivered, and can also go New → Cancelled or Paid → Cancelled. Delivered and Cancelled are final states. What is the minimum number of test cases, each starting at New and ending in a final state, needed for 100% valid transitions coverage?",
+   "o": {
+    "A": "2",
+    "B": "4",
+    "C": "3",
+    "D": "5"
+   },
+   "a": "C",
+   "exEn": "Five transitions exist and a test stops at a final state, so three paths are needed: New→Paid→Shipped→Delivered, New→Cancelled, and New→Paid→Cancelled.",
+   "qAr": "الطلب بيمرّ بالحالات: New → Paid → Shipped → Delivered، وممكن كمان New → Cancelled أو Paid → Cancelled. الـ Delivered والـ Cancelled حالات نهائية. ما أقل عدد test cases، كل واحد بيبلّش من New وبيخلص بحالة نهائية، لتحقيق 100% valid transitions coverage؟",
+   "exAr": "في خمس transitions، والـ test بيوقف عند الحالة النهائية، فبنحتاج ثلاث مسارات: New→Paid→Shipped→Delivered، وNew→Cancelled، وNew→Paid→Cancelled."
+  },
+  {
+   "n": 117,
+   "ch": 4,
+   "p": 1,
+   "q": "Consider this code:\n1  read x\n2  if x > 10 then\n3      print \"big\"\n4  end if\n5  print \"done\"\nLines 1, 2, 3 and 5 are executable statements. What statement coverage does a single test with x = 5 achieve?",
+   "o": {
+    "A": "50%",
+    "B": "75%",
+    "C": "67%",
+    "D": "100%"
+   },
+   "a": "B",
+   "exEn": "With x = 5 the condition is false, so lines 1, 2 and 5 run but line 3 does not: 3 of 4 statements, 75%.",
+   "qAr": "بالكود اللي فوق، الأسطر 1 و2 و3 و5 هي الـ statements القابلة للتنفيذ. قديش الـ statement coverage لـ test واحد بقيمة x = 5؟",
+   "exAr": "لما x = 5 الشرط بيطلع false، فبيتنفّذ 1 و2 و5 وما بيتنفّذ 3: يعني 3 من 4، أي 75%."
+  },
+  {
+   "n": 118,
+   "ch": 4,
+   "p": 1,
+   "q": "Consider this code:\nif a > 0 then b = 1 else b = 2 end if\nif c > 0 then d = 1 end if\nWhat is the minimum number of test cases needed to achieve 100% branch coverage?",
+   "o": {
+    "A": "2",
+    "B": "1",
+    "C": "3",
+    "D": "4"
+   },
+   "a": "A",
+   "exEn": "Each decision needs a true and a false outcome; two tests (a>0, c>0) and (a≤0, c≤0) cover all four branches.",
+   "qAr": "بالكود اللي فوق (‏decisionين: a > 0 وc > 0)، ما أقل عدد test cases لتحقيق 100% branch coverage؟",
+   "exAr": "كل decision بدها نتيجة true ونتيجة false، وtestين (a>0، c>0) و(a≤0، c≤0) بيغطّوا الـ branches الأربعة."
+  },
+  {
+   "n": 119,
+   "ch": 4,
+   "p": 1,
+   "q": "User story: 'As a customer, I want to reset my password through an emailed link.' Acceptance criteria: the link expires 30 minutes after it is sent, and it can be used only once. Which test case is derived directly from these acceptance criteria?",
+   "o": {
+    "A": "Open the link 31 minutes after it was sent and verify it is rejected",
+    "B": "Verify the login page loads in under 2 seconds",
+    "C": "Verify the password field masks the characters",
+    "D": "Verify the email uses the company logo"
+   },
+   "a": "A",
+   "exEn": "Only this test checks a stated criterion (the 30-minute expiry); the others test things the criteria do not mention.",
+   "qAr": "‏User story: «بصفتي زبون، بدي أعمل reset لكلمة السر عن طريق رابط بيوصلني على الإيميل». الـ acceptance criteria: الرابط بينتهي بعد 30 دقيقة من إرساله، وبينفع يُستخدم مرة وحدة بس. أي test case مشتق مباشرة من هاي الـ acceptance criteria؟",
+   "exAr": "بس هاد الـ test بيفحص criterion مكتوب (انتهاء الرابط بعد 30 دقيقة)، والباقي بيفحصوا أشياء مش مذكورة بالـ criteria."
+  },
+  {
+   "n": 120,
+   "ch": 4,
+   "p": 1,
+   "q": "An acceptance criterion states: 'Given a cart total of $50 or more, when the customer applies coupon SAVE10, then 10% is deducted.' Totals are in whole dollars. Which pair of tests applies boundary value analysis to this criterion?",
+   "o": {
+    "A": "Cart totals of $50 and $80",
+    "B": "Cart totals of $10 and $100",
+    "C": "Cart totals of $49 and $50",
+    "D": "Cart totals of $72 and $80"
+   },
+   "a": "C",
+   "exEn": "The boundary is between 'not eligible' ($49 or less) and 'eligible' ($50 or more), so $49 and $50 are the boundary values.",
+   "qAr": "‏acceptance criterion بيقول: «Given مجموع السلة $50 أو أكثر، when الزبون يطبّق كوبون SAVE10، then بينخصم 10%». المبالغ بالدولار الصحيح. أي زوج tests بيطبّق boundary value analysis على هاد الـ criterion؟",
+   "exAr": "الحد بين «مش مؤهّل» ($49 أو أقل) و«مؤهّل» ($50 أو أكثر)، فـ $49 و$50 هم القيم الحدية."
   }
  ],
  "chapters": [
@@ -1541,5 +1861,8 @@
   "4": 11,
   "5": 9,
   "6": 2
+ },
+ "examPractical": {
+  "4": 5
  }
 }
