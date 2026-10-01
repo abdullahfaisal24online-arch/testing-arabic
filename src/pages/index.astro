@@ -53,7 +53,7 @@ const featured = lessons.find((l) => l.data.featured) ?? lessons[0];
 const featuredThumb = featured
   ? bunnyThumb(featured.data.videoId, featured.data.thumbnail, site.bunnyCdnHostname)
   : null;
-const latest = lessons.filter((l) => l.id !== featured?.id).slice(0, 4);
+const latest = lessons.filter((l) => l.id !== featured?.id).slice(0, 3);
 
 // بطاقة البطل: فيديو ترحيبي ثابت، أو آخر درس
 const welcomeEmbed = home.welcomeVideoId ? bunnyEmbed(home.welcomeVideoId, site.bunnyLibraryId) : '';
@@ -239,7 +239,7 @@ const jsonLd: Record<string, unknown>[] = [
           <span class="grow"></span>
           <a href="/lessons/" class="more">كل الدروس ←</a>
         </div>
-        <div class="grid grid-4">
+        <div class="grid grid-3">
           {latest.map((l) => <LessonCard lesson={l} courseTitle={courseTitleOf(l)} />)}
         </div>
       </div>
@@ -291,8 +291,8 @@ const jsonLd: Record<string, unknown>[] = [
           <span class="grow"></span>
           <a href="/news/" class="more">كل الأخبار ←</a>
         </div>
-        <div class="grid grid-2">
-          {news.slice(0, 2).map((n) => <NewsCard item={n} />)}
+        <div class="grid grid-3">
+          {news.slice(0, 3).map((n) => <NewsCard item={n} />)}
         </div>
       </div>
     </section>
