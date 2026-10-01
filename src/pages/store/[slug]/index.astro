@@ -5,7 +5,7 @@ import { getCollection, render } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
 import Prose from '../../../components/Prose.astro';
 import { getSite } from '../../../lib/site';
-import { STORE_OPEN, jod, getStoreSettings, tpl } from '../../../lib/store';
+import { STORE_OPEN, usd, getStoreSettings, tpl } from '../../../lib/store';
 import { getBank } from '../../../lib/banks';
 
 export async function getStaticPaths() {
@@ -71,8 +71,8 @@ const jsonLd = [
 
       <div class="pricebox">
         <div class="prow">
-          <b class="now">{jod(finalPrice)}</b>
-          {data.offerPrice != null && <s>{jod(data.price)}</s>}
+          <b class="now">{usd(finalPrice)}</b>
+          {data.offerPrice != null && <s>{usd(data.price)}</s>}
           {saving > 0 && t.saveLabel && <span class="save">{tpl(t.saveLabel, { p: saving })}</span>}
         </div>
         {data.offerNote && <p class="note">{data.offerNote}</p>}
@@ -107,7 +107,7 @@ const jsonLd = [
     <section class="cta-end">
       <div>
         <h2>{data.endTitle || t.endTitle}</h2>
-        <p>{data.title} · <b>{jod(finalPrice)}</b>{data.offerPrice != null && <s> {jod(data.price)}</s>}</p>
+        <p>{data.title} · <b>{usd(finalPrice)}</b>{data.offerPrice != null && <s> {usd(data.price)}</s>}</p>
       </div>
       <div class="cta-acts">
         {hasSample && <a class="btn btn-ghost" href={`/store/${product.id}/sample/`}>{tpl(data.sampleButton || t.sampleButton, { n: sampleN })}</a>}

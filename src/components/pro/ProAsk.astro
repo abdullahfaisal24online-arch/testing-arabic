@@ -1,0 +1,38 @@
+---
+/**
+ * نافذة تأكيد داخل الصفحة (بدل confirm تبع المتصفح).
+ * الاستعمال بالسكربت: if (await window.taAsk('نص السؤال')) { … }
+ */
+interface Props { yes: string; no: string }
+const { yes, no } = Astro.props;
+---
+
+<dialog class="ta-ask" id="ta-ask">
+  <form method="dialog">
+    <p id="ta-ask-text"></p>
+    <div class="ta-ask-btns">
+      <button class="btn btn-primary btn-sm" value="yes">{yes}</button>
+      <button class="btn btn-ghost btn-sm" value="no">{no}</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+  const dlg = document.getElementById('ta-ask') as HTMLDialogElement;
+  (window as any).taAsk = (text: string) =>
+    new Promise<boolean>((done) => {
+      document.getElementById('ta-ask-text')!.textContent = text;
+      dlg.returnValue = '';
+      dlg.addEventListener('close', () => done(dlg.returnValue === 'yes'), { once: true });
+      dlg.showModal();
+    });
+  dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close('no'); });
+</script>
+
+<style>
+  .ta-ask { border: 1px solid var(--line-strong); border-radius: 18px; background: var(--surface); color: var(--ink); padding: 22px; width: min(420px, calc(100vw - 32px)); }
+  .ta-ask::backdrop { background: rgba(5, 10, 25, .65); }
+  .ta-ask p { margin: 0 0 18px; line-height: 1.9; font-size: 16px; }
+  .ta-ask-btns { display: flex; gap: 10px; }
+  .ta-ask-btns .btn { flex: 1; justify-content: center; }
+</style>

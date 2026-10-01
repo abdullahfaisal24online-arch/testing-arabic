@@ -12,7 +12,7 @@ const covers = Object.fromEntries(
 ---
 
 <Base title={t.mineTitle} description={t.mineText} noindex hideChat>
-  <div class="wrap mpage" id="mine" data-covers={JSON.stringify(covers)} data-open={t.mineOpen} data-confirm={t.mineLogoutConfirm}>
+  <div class="wrap mpage" id="mine" data-covers={JSON.stringify(covers)} data-open={t.mineOpen}>
     <h1>{t.mineTitle}</h1>
     <p class="lead">{t.mineText}</p>
 
@@ -27,10 +27,6 @@ const covers = Object.fromEntries(
       </div>
     </div>
 
-    <div class="mfoot" id="mfoot" hidden>
-      <a href="/pro/unlock/">{t.mineUnlock}</a>
-      <button type="button" class="linkbtn" id="logout">{t.mineLogout}</button>
-    </div>
   </div>
 </Base>
 
@@ -55,7 +51,6 @@ const covers = Object.fromEntries(
       const c = covers[p.slug];
       if (c?.cover) { const img = document.createElement('img'); img.src = c.cover; img.alt = ''; img.loading = 'lazy'; a.append(img); }
       const box = document.createElement('div');
-      if (c?.kind) { const k = document.createElement('span'); k.className = 'kind'; k.textContent = c.kind; box.append(k); }
       const s = document.createElement('strong'); s.textContent = p.title;
       const go = document.createElement('span'); go.className = 'go'; go.textContent = root.dataset.open + ' ←';
       box.append(s, go);
@@ -63,18 +58,12 @@ const covers = Object.fromEntries(
       return a;
     }));
     grid.hidden = false;
-    $('mfoot').hidden = false;
   }
 
-  $('logout').addEventListener('click', async () => {
-    if (!confirm(root.dataset.confirm!)) return;
-    try { await fetch('/api/pro/logout', { method: 'POST' }); } catch (_) {}
-    location.reload();
-  });
   load();
 </script>
 
-<style>
+<style is:global>
   .mpage { max-width: 900px; padding-block: 32px 80px; }
   .mpage h1 { font-size: clamp(26px, 3vw, 34px); margin: 0 0 6px; }
   .lead { color: var(--muted); line-height: 1.9; margin: 0 0 22px; }

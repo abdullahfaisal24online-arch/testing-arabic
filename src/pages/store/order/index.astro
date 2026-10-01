@@ -48,6 +48,10 @@ const labels = t
         <section class="box" data-when="awaiting_payment" hidden>
           <h2>{t.payTitle}</h2>
           <p class="muted" data-fill="payText"></p>
+          <div class="jodbox" id="jodbox" hidden>
+            <span>{t.payJodLabel}</span>
+            <div class="cp"><b id="o-jod" dir="ltr"></b><button type="button" id="copy-jod" data-copy="">{t.copyLabel}</button></div>
+          </div>
           {!hasPay && <p class="note">{t.payFallback}</p>}
           <div class="pays">
             {t.cliqAlias && (
@@ -119,7 +123,8 @@ const labels = t
     const L = JSON.parse(root.dataset.labels || '{}');
     const $ = (id: string) => document.getElementById(id)!;
     const token = new URLSearchParams(location.search).get('t') || '';
-    const jod = (n: number) => `${Number.isInteger(n) ? n : n.toFixed(2)} د.أ`;
+    const usd = (n: number) => `$${Number.isInteger(n) ? n : n.toFixed(2)}`;
+    const jod = (n: number) => `${n} د.أ`;
     const fmt = (ms: number) => new Date(ms).toLocaleString('ar-JO-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'long', hour: 'numeric', minute: '2-digit' });
     const fill = (s: string, v: Record<string, string>) => s.replace(/\{(\w+)\}/g, (m, k) => (k in v ? v[k] : m));
     let proof: Blob | null = null;
@@ -129,9 +134,15 @@ const labels = t
       $('order').hidden = false;
       $('o-product').textContent = o.productTitle || o.product;
       $('o-id').textContent = o.id;
-      $('o-amount').textContent = jod(o.amount);
-      const dEl = $('o-disc'); dEl.hidden = !o.discount; dEl.textContent = o.discount ? `خصم ${o.discountCode}: − ${jod(o.discount)}` : '';
-      const vars = { id: o.id, amount: jod(o.amount), date: fmt(o.expiresAt) };
+      $('o-amount').textContent = usd(o.amount);
+      const dEl = $('o-disc'); dEl.hidden = !o.discount; dEl.textContent = o.discount ? `خصم ${o.discountCode}: − ${usd(o.discount)}` : '';
+      // المبلغ اللي بيتحوّل فعلياً (CliQ/بنك) بالدينار
+      if (o.amountJod != null) {
+        $('o-jod').textContent = jod(o.amountJod);
+        $('copy-jod').dataset.copy = String(o.amountJod);
+        $('jodbox').hidden = false;
+      }
+      const vars = { id: o.id, amount: o.amountJod != null ? `${jod(o.amountJod)} (${usd(o.amount)})` : usd(o.amount), date: fmt(o.expiresAt) };
       document.querySelectorAll<HTMLElement>('[data-fill]').forEach((el) => (el.textContent = fill(L[el.dataset.fill!] || '', vars)));
       document.querySelectorAll<HTMLElement>('[data-when]').forEach((el) => (el.hidden = el.dataset.when !== o.status));
       const stage = { awaiting_payment: 1, review: 3, approved: 4 }[o.status as string] ?? 1;
@@ -246,6 +257,10 @@ const labels = t
   .muted { color: var(--muted); line-height: 1.9; margin: 0; } .small { font-size: 13.5px; }
   .pays, .pay, .up { grid-template-columns: minmax(0, 1fr); }
   .pays { display: grid; gap: 12px; }
+  .jodbox { display: grid; gap: 6px; background: var(--orange-soft, rgba(246,130,59,.12)); border: 1.5px solid var(--orange); border-radius: 14px; padding: 12px 14px; margin: 0 0 14px; }
+  .jodbox[hidden] { display: none; }
+  .jodbox > span { font-size: 13.5px; color: var(--muted); }
+  .jodbox b { font-size: 22px; color: var(--orange); }
   .pay { background: var(--navy); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 8px; }
   .cp { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 14.5px; }
   .cp > * { min-width: 0; }

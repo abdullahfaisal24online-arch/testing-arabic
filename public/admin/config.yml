@@ -41,13 +41,13 @@ collections:
         widget: string
         required: false
       - name: price
-        label: "السعر بالدينار"
+        label: "السعر بالدولار ($)"
         widget: number
-        default: 29
+        default: 40
         value_type: float
         min: 0
       - name: offerPrice
-        label: "سعر العرض بالدينار"
+        label: "سعر العرض بالدولار ($)"
         widget: number
         required: false
         value_type: float
@@ -1830,6 +1830,29 @@ collections:
             value_type: int
             min: 1
             default: 48
+          - name: jodRate
+            label: "الدفع — سعر صرف الدولار بالدينار"
+            widget: number
+            required: false
+            value_type: float
+            min: 0.1
+            default: 0.709
+            hint: "الأسعار بالمتجر بالدولار. وقت الدفع بيطلع للمشتري المبلغ بالدينار = السعر × هاد الرقم"
+          - name: payJodLabel
+            label: "الدفع — عنوان المبلغ بالدينار"
+            widget: string
+            required: false
+            default: "المبلغ اللي بتحوّله بالدينار"
+          - name: myBarText
+            label: "صفحة المتجر — شريط «موادي» (للي عنده مواد)"
+            widget: string
+            required: false
+            default: "عندك مواد مفتوحة على هاد الجهاز."
+          - name: myBarButton
+            label: "صفحة المتجر — زر شريط «موادي»"
+            widget: string
+            required: false
+            default: "افتح موادي"
           - name: payNote
             label: "الدفع — ملاحظة إضافية للمشتري"
             widget: text
@@ -1947,16 +1970,6 @@ collections:
             widget: string
             required: false
             default: "افتح"
-          - name: mineLogout
-            label: "موادي — زر الخروج من الجهاز"
-            widget: string
-            required: false
-            default: "اطلع من هاد الجهاز"
-          - name: mineLogoutConfirm
-            label: "موادي — تأكيد الخروج"
-            widget: text
-            required: false
-            default: "متأكد؟ رح تحتاج تدخّل الكود من جديد على هاد الجهاز، وبيفضى مكانه لجهاز تاني."
           - name: bankLocked
             label: "البنك — مقفول"
             widget: text
@@ -2049,7 +2062,7 @@ collections:
             label: "البنك — رجوع للقائمة"
             widget: string
             required: false
-            default: "→ رجوع"
+            default: "رجوع للقائمة"
           - name: bankReset
             label: "البنك — زر تصفير التقدّم"
             widget: string
@@ -2064,13 +2077,134 @@ collections:
             label: "البنك — زر تسليم الامتحان"
             widget: string
             required: false
-            default: "سلّم الامتحان"
+            default: "إنهاء"
           - name: bankSubmitConfirm
             label: "البنك — تأكيد التسليم"
             widget: string
             required: false
             default: "في {n} سؤال بدون جواب. أكيد بدك تسلّم؟"
             hint: "{n} عدد الأسئلة بدون جواب"
+          - name: bankFlag
+            label: "الامتحان — زر تعليم السؤال"
+            widget: string
+            required: false
+            default: "علّمه لأرجعله"
+          - name: bankFlagged
+            label: "الامتحان — سؤال معلّم"
+            widget: string
+            required: false
+            default: "معلّم"
+          - name: bankTimeLeft
+            label: "الامتحان — عنوان الساعة"
+            widget: string
+            required: false
+            default: "الوقت المتبقي"
+          - name: bankAnswered
+            label: "الامتحان — عدّاد الأجوبة"
+            widget: string
+            required: false
+            default: "جاوبت {n} من {total}"
+            hint: "{n} · {total}"
+          - name: bankFlaggedCount
+            label: "الامتحان — عدّاد المعلّمة"
+            widget: string
+            required: false
+            default: "معلّمة: {n}"
+            hint: "{n}"
+          - name: bankReviewTitle
+            label: "الامتحان — عنوان شاشة المراجعة"
+            widget: string
+            required: false
+            default: "قبل ما تنهي"
+          - name: bankReviewText
+            label: "الامتحان — نص شاشة المراجعة"
+            widget: text
+            required: false
+            default: "جاوبت {answered} من {total}. في {blank} بدون جواب و{flagged} معلّمة. اضغط على أي رقم لترجعله."
+            hint: "{answered} · {total} · {blank} · {flagged}"
+          - name: bankBackToQuestions
+            label: "الامتحان — زر الرجوع للأسئلة"
+            widget: string
+            required: false
+            default: "ارجع للأسئلة"
+          - name: bankWeakest
+            label: "النتيجة — أضعف فصل"
+            widget: string
+            required: false
+            default: "أضعف فصل عندك: {chapter}"
+            hint: "{chapter} اسم الفصل"
+          - name: bankTrainWeak
+            label: "النتيجة — زر التدريب على أضعف فصل"
+            widget: string
+            required: false
+            default: "تدرّب عليه"
+          - name: bankCertTitle
+            label: "النتيجة — عنوان الشهادة"
+            widget: string
+            required: false
+            default: "جاهز للامتحان"
+          - name: bankCertSave
+            label: "النتيجة — زر حفظ الشهادة"
+            widget: string
+            required: false
+            default: "احفظ الشهادة كصورة"
+          - name: bankCertNote
+            label: "النتيجة — ملاحظة الشهادة"
+            widget: string
+            required: false
+            default: "امتحان تجريبي على منصة Testing بالعربي، مش شهادة ISTQB رسمية"
+          - name: proctorName
+            label: "المراقب — الاسم"
+            widget: string
+            required: false
+            default: "Testo"
+          - name: proctorStart
+            label: "المراقب — أول الامتحان"
+            widget: string
+            required: false
+            default: "بالتوفيق! خذ نفس، عندك {minutes} دقيقة 🙂"
+            hint: "{minutes}"
+          - name: proctorQuarter
+            label: "المراقب — كل ربع أسئلة"
+            widget: string
+            required: false
+            default: "ماشي تمام، جاوبت {n} من {total} 💪"
+            hint: "{n} · {total}"
+          - name: proctorFlag
+            label: "المراقب — لما يعلّم سؤال"
+            widget: string
+            required: false
+            default: "تمام، منرجعله قبل ما تنهي 🚩"
+          - name: proctorHalf
+            label: "المراقب — نص الوقت"
+            widget: string
+            required: false
+            default: "نص الوقت راح. كمّل بنفس الهدوء 👌"
+          - name: proctor10
+            label: "المراقب — آخر 10 دقائق"
+            widget: string
+            required: false
+            default: "باقي 10 دقائق ⏳"
+          - name: proctor5
+            label: "المراقب — آخر 5 دقائق"
+            widget: string
+            required: false
+            default: "آخر 5 دقائق! راجع الأسئلة المعلّمة 🚩"
+          - name: proctorAllDone
+            label: "المراقب — جاوب الكل"
+            widget: string
+            required: false
+            default: "جاوبت على كل الأسئلة 👏 راجع المعلّمة أو اضغط إنهاء."
+          - name: confirmYes
+            label: "نافذة التأكيد — زر الموافقة"
+            widget: string
+            required: false
+            default: "أكيد"
+          - name: confirmNo
+            label: "نافذة التأكيد — زر الرجوع"
+            widget: string
+            required: false
+            default: "لا، رجوع"
           - name: bankTimeUp
             label: "البنك — خلص الوقت"
             widget: string

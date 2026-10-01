@@ -2,11 +2,17 @@
 /**
  * بنك الأسئلة التفاعلي للمشتري: تدريب حسب الفصل + امتحان تجريبي بوقت.
  * الصفحة نفسها ما فيها ولا سؤال — الأسئلة بتوصل من /api/pro/bank/<slug> بس لجهاز مفعّل.
+ *
+ * التدريب: جواب وشرح فوري، التقدّم بينحفظ على الجهاز، ودعسوقات بتوقع لما الجواب غلط.
+ * الامتحان: ساعة دائرية على الجنب، تعليم الأسئلة 🚩، شاشة مراجعة قبل «إنهاء»،
+ *           Testo كمراقب بيحكي جمل قصيرة، ونتيجة احتفالية مع شهادة جاهزية بتنحفظ كصورة.
+ * كل النصوص من «إعدادات المتجر» بلوحة التحكم (الخانات اللي بتبلّش بـ bank و proctor).
  */
 import { getCollection } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
 import { STORE_OPEN, getStoreSettings } from '../../../lib/store';
 import { getBank } from '../../../lib/banks';
+import ProAsk from '../../../components/pro/ProAsk.astro';
 
 export async function getStaticPaths() {
   if (!STORE_OPEN) return [];
@@ -16,23 +22,21 @@ export async function getStaticPaths() {
 
 const { product } = Astro.props;
 const t = await getStoreSettings();
-const L = {
-  practiceTitle: t.bankPracticeTitle, practiceText: t.bankPracticeText, all: t.bankAll, wrongOnly: t.bankWrongOnly,
-  examTitle: t.bankExamTitle, examText: t.bankExamText, examButton: t.bankExamButton,
-  next: t.bankNext, prev: t.bankPrev, correct: t.bankCorrect, wrong: t.bankWrong, english: t.bankEnglish, back: t.bankBack,
-  reset: t.bankReset, resetConfirm: t.bankResetConfirm, submit: t.bankSubmit, submitConfirm: t.bankSubmitConfirm,
-  timeUp: t.bankTimeUp, passed: t.bankPassed, failed: t.bankFailed, score: t.bankScore, byChapter: t.bankByChapter,
-  review: t.bankReview, retry: t.bankRetry, done: t.bankDone,
-};
+// bankPracticeTitle ← practiceTitle ، proctorStart بيضل proctorStart
+const L = Object.fromEntries(
+  Object.entries(t)
+    .filter(([k, v]) => /^(bank|proctor)/.test(k) && typeof v === 'string')
+    .map(([k, v]) => [k.startsWith('bank') ? k[4].toLowerCase() + k.slice(5) : k, v]),
+);
 const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankExamPass };
 ---
 
 <Base title={product.data.title} description={product.data.title} noindex hideChat>
   <div class="wrap bpage">
-    <a class="back" href="/pro/">{t.mineTitle}</a>
+    <a class="backbtn" href="/pro/"><span aria-hidden="true">→</span> {t.mineTitle}</a>
     <h1>{product.data.title}</h1>
 
-    <div id="bank" class="bank" data-slug={product.id} data-labels={JSON.stringify(L)} data-exam={JSON.stringify(exam)}>
+    <div id="bank" class="bank" data-slug={product.id} data-title={product.data.title} data-labels={JSON.stringify(L)} data-exam={JSON.stringify(exam)}>
       <p class="dim" id="bload">…</p>
       <div class="blocked" id="blocked" hidden>
         <p>{t.bankLocked}</p>
@@ -41,20 +45,27 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
       <div id="bview"></div>
     </div>
   </div>
+  <div class="bk-swarm" id="bk-swarm" aria-hidden="true"></div>
+  <ProAsk yes={t.confirmYes} no={t.confirmNo} />
 </Base>
 
 <script>
   type Item = { n: number; ch: number; q: string; qAr?: string; o: Record<string, string>; a: string; exEn: string; exAr?: string };
   type Chapter = { n: number; en: string; ar: string };
   type Bank = { items: Item[]; chapters?: Chapter[]; exam?: Record<string, number> };
+  type Exam = { ids: number[]; ans: Record<number, string>; flags: number[]; endsAt: number; total: number; said: string[] };
+  type Saved = { ans: Record<number, string>; exam?: Exam; last?: { score: number; total: number; at: number } };
 
   const root = document.getElementById('bank')!;
   const slug = root.dataset.slug!;
+  const productTitle = root.dataset.title!;
   const L = JSON.parse(root.dataset.labels!) as Record<string, string>;
   const EX = JSON.parse(root.dataset.exam!) as { count: number; minutes: number; pass: number };
   const view = document.getElementById('bview')!;
   const KEY = `ta-bank:${slug}`;
-  const fill = (s: string, v: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (m, k) => (k in v ? String(v[k]) : m));
+  const fill = (s: string, v: Record<string, string | number>) => (s || '').replace(/\{(\w+)\}/g, (m, k) => (k in v ? String(v[k]) : m));
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ask = (text: string): Promise<boolean> => (window as any).taAsk(text);
 
   /* ---------- أدوات DOM ---------- */
   type Kid = Node | string | null | undefined | false;
@@ -70,21 +81,51 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
     for (const c of kids) if (c != null && c !== false) el.append(c);
     return el;
   }
-  const show = (...nodes: Node[]) => { view.replaceChildren(...nodes); window.scrollTo({ top: root.offsetTop - 90, behavior: 'smooth' }); };
+  const SVG = 'http://www.w3.org/2000/svg';
+  const s = (tag: string, attrs: Record<string, string | number>) => {
+    const el = document.createElementNS(SVG, tag);
+    for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+    return el;
+  };
+  const top = () => window.scrollTo({ top: root.offsetTop - 90, behavior: calm ? 'auto' : 'smooth' });
+  const show = (...nodes: Node[]) => { view.replaceChildren(...nodes); top(); };
+  const backBtn = (label: string, on: () => void) => h('button', { type: 'button', class: 'backbtn', onclick: on }, h('span', { 'aria-hidden': 'true' }, '→'), ` ${label}`);
 
   /* ---------- التخزين على الجهاز ---------- */
-  type Saved = { ans: Record<number, string>; exam?: { ids: number[]; ans: Record<number, string>; endsAt: number }; last?: { score: number; total: number; at: number } };
   const load = (): Saved => { try { return { ans: {}, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch (_) { return { ans: {} }; } };
-  const save = (s: Saved) => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (_) {} };
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (_) {} };
   let S = load();
 
   let B: Bank;
   let byN = new Map<number, Item>();
+  let buyer = '';
   const chName = (n: number) => B.chapters?.find((c) => c.n === n);
+  const chLabel = (n: number) => `Chapter ${n}${chName(n) ? ` — ${chName(n)!.ar}` : ''}`;
+  const chapters = () => [...new Set(B.items.map((i) => i.ch))].sort((a, b) => a - b);
+
+  /* ---------- دعسوقات لما الجواب غلط (زي Bug Hunter) ---------- */
+  const swarm = document.getElementById('bk-swarm')!;
+  function bugsFall() {
+    if (calm) return;
+    swarm.replaceChildren(...Array.from({ length: 30 }, () => {
+      const b = h('span', {}, '🐞');
+      b.style.left = `${Math.random() * 96}%`;
+      b.style.top = `${-20 - Math.random() * 80}px`;
+      b.style.animationDelay = `${Math.random() * 0.4}s`;
+      b.style.animationDuration = `${1.1 + Math.random() * 0.7}s`;
+      b.style.fontSize = `${18 + Math.random() * 24}px`;
+      b.style.setProperty('--drift', `${Math.random() * 120 - 60}px`);
+      return b;
+    }));
+    swarm.classList.remove('show');
+    void swarm.offsetWidth;
+    swarm.classList.add('show');
+    setTimeout(() => swarm.classList.remove('show'), 1900);
+  }
 
   /* ---------- سؤال واحد ---------- */
   // mode: practice (جواب فوري) | exam (بدون تصحيح) | review (مصحّح وللقراءة)
-  function question(it: Item, mode: 'practice' | 'exam' | 'review', picked: string | undefined, onPick: (k: string) => void) {
+  function question(it: Item, mode: 'practice' | 'exam' | 'review', picked: string | undefined, onPick: (k: string) => void, extra?: Node | null) {
     const reveal = mode === 'review' || (mode === 'practice' && !!picked);
     const ch = chName(it.ch);
     const opts = h('div', { class: 'opts', dir: 'ltr' },
@@ -104,7 +145,7 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
         )
       : null;
     return h('article', { class: 'q' },
-      h('span', { class: 'ch' }, `Chapter ${it.ch}${ch ? ` · ${ch.en}` : ''}`),
+      h('div', { class: 'qhead' }, h('span', { class: 'ch' }, `Chapter ${it.ch}${ch ? ` · ${ch.en}` : ''}`), extra),
       h('h2', { class: 'en', dir: 'ltr' }, mode === 'exam' ? it.q : `${it.n}. ${it.q}`),
       it.qAr && h('p', { class: 'ar' }, it.qAr),
       opts, ex,
@@ -113,37 +154,34 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
 
   /* ---------- الرئيسية ---------- */
   function home() {
-    const chapters = [...new Set(B.items.map((i) => i.ch))].sort((a, b) => a - b);
+    stopExamUi();
     const stat = (list: Item[]) => {
       const done = list.filter((i) => S.ans[i.n]);
       return { total: list.length, done: done.length, right: done.filter((i) => S.ans[i.n] === i.a).length };
     };
-    const chip = (label: string, sub: string, list: Item[], pct: number) =>
-      h('button', { type: 'button', class: 'chip', onclick: () => practice(list) },
-        h('strong', {}, label), sub && h('small', {}, sub),
-        h('span', { class: 'meter' }, h('i', { style: `width:${pct}%` })),
+    const chip = (label: string, list: Item[]) => {
+      const st = stat(list);
+      return h('button', { type: 'button', class: 'chip', onclick: () => practice(list) },
+        h('strong', {}, label), h('small', {}, `${st.right} ✓ · ${st.done} / ${st.total}`),
+        h('span', { class: 'meter' }, h('i', { style: `width:${(st.done / st.total) * 100}%` })),
       );
+    };
     const all = stat(B.items);
     const wrong = B.items.filter((i) => S.ans[i.n] && S.ans[i.n] !== i.a);
     const pc = h('section', { class: 'card' },
       h('h2', {}, L.practiceTitle),
       h('p', { class: 'dim' }, L.practiceText),
-      h('div', { class: 'chips' },
-        chip(L.all, `${all.right} ✓ · ${all.done} / ${all.total}`, B.items, (all.done / all.total) * 100),
-        ...chapters.map((c) => {
-          const list = B.items.filter((i) => i.ch === c);
-          const s = stat(list);
-          return chip(`Chapter ${c}${chName(c) ? ` — ${chName(c)!.ar}` : ''}`, `${s.right} ✓ · ${s.done} / ${s.total}`, list, (s.done / s.total) * 100);
-        }),
-      ),
+      h('div', { class: 'chips' }, chip(L.all, B.items), ...chapters().map((c) => chip(chLabel(c), B.items.filter((i) => i.ch === c)))),
       h('div', { class: 'row' },
         wrong.length > 0 && h('button', { type: 'button', class: 'btn btn-ghost btn-sm', onclick: () => practice(wrong) }, `${L.wrongOnly} (${wrong.length})`),
-        all.done > 0 && h('button', { type: 'button', class: 'linkbtn', onclick: () => { if (confirm(L.resetConfirm)) { S.ans = {}; save(S); home(); } } }, L.reset),
+        all.done > 0 && h('button', { type: 'button', class: 'linkbtn', onclick: async () => { if (await ask(L.resetConfirm)) { S.ans = {}; save(); home(); } } }, L.reset),
       ),
     );
-    const ec = h('section', { class: 'card exam' },
-      h('h2', {}, L.examTitle),
-      h('p', { class: 'dim' }, fill(L.examText, { count: EX.count, minutes: EX.minutes, pass: EX.pass })),
+    const ec = h('section', { class: 'card exam-card' },
+      h('div', { class: 'ec-top' },
+        testoSvg('ec-testo'),
+        h('div', {}, h('h2', {}, L.examTitle), h('p', { class: 'dim' }, fill(L.examText, { count: EX.count, minutes: EX.minutes, pass: EX.pass }))),
+      ),
       S.last && h('p', { class: 'last' }, fill(L.score, { score: S.last.score, total: S.last.total })),
       h('button', { type: 'button', class: 'btn btn-primary', onclick: () => startExam() }, L.examButton),
     );
@@ -151,10 +189,9 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
   }
 
   /* ---------- التدريب ---------- */
-  function practice(list: Item[], start = 0) {
+  function practice(list: Item[]) {
+    stopExamUi();
     let i = Math.max(0, list.findIndex((it) => !S.ans[it.n]));
-    if (start) i = start;
-    if (i < 0) i = 0;
     const box = h('div', { class: 'player' });
     const render = () => {
       const it = list[i];
@@ -163,12 +200,15 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
       const last = i === list.length - 1;
       box.replaceChildren(
         h('div', { class: 'top' },
-          h('button', { type: 'button', class: 'linkbtn', onclick: home }, L.back),
+          backBtn(L.back, home),
           h('span', { class: 'num', dir: 'ltr' }, `${i + 1} / ${list.length}`),
           h('div', { class: 'bar' }, h('i', { style: `width:${(doneN / list.length) * 100}%` })),
           h('span', { class: 'score' }, `${right} ✓`),
         ),
-        question(it, 'practice', S.ans[it.n], (k) => { S.ans[it.n] = k; save(S); render(); }),
+        question(it, 'practice', S.ans[it.n], (k) => {
+          S.ans[it.n] = k; save(); render();
+          if (k !== it.a) bugsFall();
+        }),
         h('div', { class: 'nav' },
           h('button', { type: 'button', class: 'btn btn-ghost btn-sm', disabled: i === 0, onclick: () => { i--; render(); } }, L.prev),
           last
@@ -188,16 +228,36 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
     ));
   }
 
+  /* ---------- Testo (المراقب) ---------- */
+  function testoSvg(cls: string) {
+    const svg = s('svg', { viewBox: '0 0 48 48', class: cls, 'aria-hidden': 'true' });
+    svg.append(
+      s('path', { d: 'M24 6v5', stroke: '#f6823b', 'stroke-width': 2.6, 'stroke-linecap': 'round', fill: 'none' }),
+      s('circle', { cx: 24, cy: 4.5, r: 2.4, fill: '#ff9a57' }),
+      s('rect', { x: 4.5, y: 20, width: 4, height: 10, rx: 2, fill: '#e56b1f' }),
+      s('rect', { x: 39.5, y: 20, width: 4, height: 10, rx: 2, fill: '#e56b1f' }),
+      s('rect', { x: 9, y: 12, width: 30, height: 26, rx: 9, fill: '#f6823b' }),
+      s('rect', { x: 13.5, y: 17.5, width: 21, height: 15, rx: 6.5, fill: '#0a1428' }),
+      s('circle', { class: 'eye', cx: 19.5, cy: 24, r: 2.7 }),
+      s('circle', { class: 'eye', cx: 28.5, cy: 24, r: 2.7 }),
+      s('path', { class: 'mouth', d: 'M19.5 28.6c2.7 2 6.3 2 9 0', 'stroke-width': 1.8, 'stroke-linecap': 'round', fill: 'none' }),
+    );
+    return svg;
+  }
+
   /* ---------- الامتحان ---------- */
   function pickExam(): number[] {
     const w = B.exam ?? {};
-    const chapters = [...new Set(B.items.map((i) => i.ch))].sort((a, b) => a - b);
+    const chs = chapters();
     const total = Math.min(EX.count, B.items.length);
-    const sumW = chapters.reduce((s, c) => s + (w[c] ?? 1), 0);
+    const sumW = chs.reduce((acc, c) => acc + (w[c] ?? 1), 0);
     // توزيع حسب الأوزان (أكبر باقي) مع حد عدد أسئلة الفصل
-    const raw = chapters.map((c) => ({ c, x: ((w[c] ?? 1) / sumW) * total, size: B.items.filter((i) => i.ch === c).length }));
-    const take = raw.map((r) => ({ ...r, k: Math.min(r.size, Math.floor(r.x)) }));
-    let left = total - take.reduce((s, r) => s + r.k, 0);
+    const take = chs.map((c) => {
+      const x = ((w[c] ?? 1) / sumW) * total;
+      const size = B.items.filter((i) => i.ch === c).length;
+      return { c, x, size, k: Math.min(size, Math.floor(x)) };
+    });
+    let left = total - take.reduce((acc, r) => acc + r.k, 0);
     for (const r of [...take].sort((a, b) => (b.x % 1) - (a.x % 1))) { if (left <= 0) break; if (r.k < r.size) { r.k++; left--; } }
     for (const r of take) { while (left > 0 && r.k < r.size) { r.k++; left--; } }
     const rnd = (n: number) => crypto.getRandomValues(new Uint32Array(1))[0] % n;
@@ -205,103 +265,306 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
     for (const r of take) {
       const pool = B.items.filter((i) => i.ch === r.c).map((i) => i.n);
       for (let j = pool.length - 1; j > 0; j--) { const k = rnd(j + 1); [pool[j], pool[k]] = [pool[k], pool[j]]; }
-      ids.push(...pool.slice(0, r.k).sort((a, b) => a - b));
+      ids.push(...pool.slice(0, r.k));
     }
     return ids;
   }
+
   let timer = 0;
+  const stopExamUi = () => { clearInterval(timer); document.body.classList.remove('bk-exam-on'); };
+
   function startExam() {
-    S.exam = { ids: pickExam(), ans: {}, endsAt: Date.now() + EX.minutes * 60_000 };
-    save(S);
+    const total = EX.minutes * 60_000;
+    S.exam = { ids: pickExam(), ans: {}, flags: [], endsAt: Date.now() + total, total, said: [] };
+    save();
     window.taTrack?.('pro_exam_start', { slug });
-    runExam();
+    runExam(true);
   }
-  function runExam() {
+
+  function runExam(fresh = false) {
     const E = S.exam!;
+    E.flags ??= []; E.said ??= []; E.total ??= EX.minutes * 60_000;
     const items = E.ids.map((n) => byN.get(n)!).filter(Boolean);
     let i = 0;
-    const box = h('div', { class: 'player examp' });
-    const clock = h('span', { class: 'clock', dir: 'ltr' });
+
+    // --- الساعة والمراقب (على الجنب) ---
+    const R = 52, C = 2 * Math.PI * R;
+    const ringFill = s('circle', { class: 'rfill', cx: 60, cy: 60, r: R, 'stroke-dasharray': C.toFixed(1), 'stroke-dashoffset': 0 });
+    const ringSvg = s('svg', { viewBox: '0 0 120 120', class: 'ring-svg' });
+    ringSvg.append(s('circle', { class: 'rtrack', cx: 60, cy: 60, r: R }), ringFill);
+    for (let m = 0; m < 12; m++) {
+      const a = (m / 12) * 2 * Math.PI;
+      ringSvg.append(s('line', { class: 'tick', x1: 60 + 44 * Math.sin(a), y1: 60 - 44 * Math.cos(a), x2: 60 + 47 * Math.sin(a), y2: 60 - 47 * Math.cos(a) }));
+    }
+    const time = h('b', { class: 'rtime', dir: 'ltr' }, '');
+    const ring = h('div', { class: 'ring' }, ringSvg, h('div', { class: 'rcenter' }, time, h('small', {}, L.timeLeft)));
+    const answeredEl = h('span', { class: 'stat' });
+    const flaggedEl = h('span', { class: 'stat flagc' });
+    const bubble = h('p', { class: 'bubble', 'aria-live': 'polite' });
+    const testo = h('div', { class: 'proctor' }, testoSvg('pr-face'), h('div', { class: 'pr-say' }, h('b', {}, L.proctorName), bubble));
+    const dots = h('div', { class: 'dots', dir: 'ltr' });
+    const finishBtn = h('button', { type: 'button', class: 'btn btn-primary finish', onclick: () => reviewScreen() }, L.submit);
+    const aside = h('aside', { class: 'side' },
+      h('div', { class: 'side-top' }, ring, h('div', { class: 'stats' }, answeredEl, flaggedEl), finishBtn),
+      testo, dots,
+    );
+    const main = h('div', { class: 'ex-main' });
+    const wrap = h('div', { class: 'exam-wrap' }, main, aside);
+
+    const say = (text: string, key?: string) => {
+      if (key) { if (E.said.includes(key)) return; E.said.push(key); save(); }
+      bubble.textContent = text;
+      testo.classList.remove('talk'); void testo.offsetWidth; testo.classList.add('talk');
+    };
+    const answered = () => items.filter((x) => E.ans[x.n]).length;
+    const paintSide = () => {
+      answeredEl.textContent = fill(L.answered, { n: answered(), total: items.length });
+      flaggedEl.textContent = `🚩 ${fill(L.flaggedCount, { n: E.flags.length })}`;
+      flaggedEl.hidden = E.flags.length === 0;
+      dots.replaceChildren(...items.map((x, j) =>
+        h('button', {
+          type: 'button',
+          class: 'dot' + (E.ans[x.n] ? ' on' : '') + (E.flags.includes(x.n) ? ' fl' : '') + (j === i && main.dataset.mode === 'q' ? ' cur' : ''),
+          'aria-label': String(j + 1),
+          onclick: () => { i = j; renderQ(); },
+        }, String(j + 1)),
+      ));
+    };
     const tick = () => {
       const ms = E.endsAt - Date.now();
-      if (ms <= 0) { clearInterval(timer); submitExam(true); return; }
-      const m = Math.floor(ms / 60000), s = Math.floor((ms % 60000) / 1000);
-      clock.textContent = `${m}:${String(s).padStart(2, '0')}`;
-      clock.classList.toggle('low', ms < 5 * 60_000);
+      if (ms <= 0) { time.textContent = '0:00'; submitExam(true); return; }
+      const m = Math.floor(ms / 60000), sec = Math.floor((ms % 60000) / 1000);
+      time.textContent = `${m}:${String(sec).padStart(2, '0')}`;
+      ringFill.setAttribute('stroke-dashoffset', (C * (1 - ms / E.total)).toFixed(1));
+      ring.classList.toggle('warn', ms < 10 * 60_000);
+      ring.classList.toggle('danger', ms < 5 * 60_000);
+      testo.classList.toggle('worried', ms < 5 * 60_000);
+      if (ms < 5 * 60_000) say(L.proctor5, 't5');
+      else if (ms < 10 * 60_000) say(L.proctor10, 't10');
+      else if (ms < E.total / 2) say(L.proctorHalf, 'half');
     };
-    const render = () => {
+
+    const renderQ = () => {
+      main.dataset.mode = 'q';
       const it = items[i];
-      const answered = Object.keys(E.ans).length;
-      box.replaceChildren(
-        h('div', { class: 'top' },
-          clock,
-          h('span', { class: 'num', dir: 'ltr' }, `${i + 1} / ${items.length}`),
-          h('div', { class: 'bar' }, h('i', { style: `width:${(answered / items.length) * 100}%` })),
-          h('button', { type: 'button', class: 'btn btn-ghost btn-sm', onclick: () => submitExam(false) }, L.submit),
+      const flagged = E.flags.includes(it.n);
+      const flagBtn = h('button', {
+        type: 'button', class: 'flag' + (flagged ? ' on' : ''), 'aria-pressed': flagged ? 'true' : 'false',
+        onclick: () => {
+          if (E.flags.includes(it.n)) E.flags = E.flags.filter((n) => n !== it.n);
+          else { E.flags.push(it.n); say(L.proctorFlag); }
+          save(); renderQ();
+        },
+      }, '🚩 ', flagged ? L.flagged : L.flag);
+      main.replaceChildren(
+        h('div', { class: 'player' },
+          h('div', { class: 'top' }, h('span', { class: 'num' }, `${i + 1} / ${items.length}`), h('div', { class: 'bar' }, h('i', { style: `width:${(answered() / items.length) * 100}%` }))),
+          question(it, 'exam', E.ans[it.n], (k) => {
+            const before = answered();
+            E.ans[it.n] = k; save();
+            const now = answered();
+            if (now === items.length && before < now) say(L.proctorAllDone, 'all');
+            else if (now > before && now % 10 === 0) say(fill(L.proctorQuarter, { n: now, total: items.length }), `q${now}`);
+            renderQ();
+          }, flagBtn),
+          h('div', { class: 'nav' },
+            h('button', { type: 'button', class: 'btn btn-ghost btn-sm', disabled: i === 0, onclick: () => { i--; renderQ(); } }, L.prev),
+            i < items.length - 1
+              ? h('button', { type: 'button', class: 'btn btn-primary btn-sm', onclick: () => { i++; renderQ(); } }, L.next)
+              : h('button', { type: 'button', class: 'btn btn-primary btn-sm', onclick: () => reviewScreen() }, L.next),
+          ),
         ),
-        question(it, 'exam', E.ans[it.n], (k) => { E.ans[it.n] = k; save(S); render(); }),
-        h('div', { class: 'nav' },
-          h('button', { type: 'button', class: 'btn btn-ghost btn-sm', disabled: i === 0, onclick: () => { i--; render(); } }, L.prev),
-          i < items.length - 1
-            ? h('button', { type: 'button', class: 'btn btn-primary btn-sm', onclick: () => { i++; render(); } }, L.next)
-            : h('button', { type: 'button', class: 'btn btn-primary btn-sm', onclick: () => submitExam(false) }, L.submit),
-        ),
-        h('div', { class: 'dots', dir: 'ltr' }, ...items.map((x, j) =>
-          h('button', { type: 'button', class: 'dot' + (E.ans[x.n] ? ' on' : '') + (j === i ? ' cur' : ''), onclick: () => { i = j; render(); } }, String(j + 1)),
-        )),
       );
+      paintSide();
     };
+
+    // شاشة المراجعة قبل الإنهاء
+    const reviewScreen = () => {
+      main.dataset.mode = 'review';
+      const blank = items.length - answered();
+      main.replaceChildren(
+        h('section', { class: 'card rv' },
+          h('h2', {}, L.reviewTitle),
+          h('p', { class: 'dim' }, fill(L.reviewText, { answered: answered(), total: items.length, blank, flagged: E.flags.length })),
+          h('div', { class: 'rv-grid', dir: 'ltr' }, ...items.map((x, j) =>
+            h('button', {
+              type: 'button', class: 'dot big' + (E.ans[x.n] ? ' on' : ' blank') + (E.flags.includes(x.n) ? ' fl' : ''),
+              onclick: () => { i = j; renderQ(); top(); },
+            }, String(j + 1)),
+          )),
+          h('div', { class: 'row' },
+            h('button', { type: 'button', class: 'btn btn-primary', onclick: () => submitExam(false) }, L.submit),
+            h('button', { type: 'button', class: 'btn btn-ghost', onclick: () => renderQ() }, L.backToQuestions),
+          ),
+        ),
+      );
+      paintSide();
+      top();
+    };
+
     clearInterval(timer);
-    timer = window.setInterval(tick, 1000);
+    document.body.classList.add('bk-exam-on');
+    view.replaceChildren(wrap);
+    renderQ();
+    if (fresh) say(fill(L.proctorStart, { minutes: EX.minutes }), 'start');
+    else say(fill(L.answered, { n: answered(), total: items.length }));
     tick();
-    if (!S.exam) return; // خلص الوقت وهو مسكّر
-    render();
-    show(box);
+    timer = window.setInterval(tick, 1000);
+    top();
   }
-  function submitExam(timeUp: boolean) {
+
+  async function submitExam(timeUp: boolean) {
     const E = S.exam;
     if (!E) return;
     const items = E.ids.map((n) => byN.get(n)!).filter(Boolean);
     const blank = items.filter((x) => !E.ans[x.n]).length;
-    if (!timeUp && blank > 0 && !confirm(fill(L.submitConfirm, { n: blank }))) return;
-    clearInterval(timer);
+    if (!timeUp && blank > 0 && !(await ask(fill(L.submitConfirm, { n: blank })))) return;
+    if (S.exam !== E) return;
+    stopExamUi();
     const score = items.filter((x) => E.ans[x.n] === x.a).length;
     S.last = { score, total: items.length, at: Date.now() };
     delete S.exam;
-    save(S);
+    save();
     window.taTrack?.('pro_exam_done', { slug, score });
+    result(items, E.ans, score, timeUp);
+  }
+
+  /* ---------- النتيجة ---------- */
+  function result(items: Item[], ans: Record<number, string>, score: number, timeUp: boolean) {
     const pass = Math.round((EX.pass / EX.count) * items.length);
     const ok = score >= pass;
-    const chapters = [...new Set(items.map((x) => x.ch))].sort((a, b) => a - b);
-    const wrong = items.filter((x) => E.ans[x.n] !== x.a);
+    const chs = [...new Set(items.map((x) => x.ch))].sort((a, b) => a - b);
+    const per = chs.map((c) => {
+      const list = items.filter((x) => x.ch === c);
+      return { c, list, right: list.filter((x) => ans[x.n] === x.a).length };
+    });
+    const weakest = [...per].sort((a, b) => a.right / a.list.length - b.right / b.list.length)[0];
+    const wrong = items.filter((x) => ans[x.n] !== x.a);
+
+    // حلقة العلامة بتعدّ لفوق
+    const R = 52, C = 2 * Math.PI * R;
+    const arc = s('circle', { class: 'rfill', cx: 60, cy: 60, r: R, 'stroke-dasharray': C.toFixed(1), 'stroke-dashoffset': C.toFixed(1) });
+    const passMark = s('line', { class: 'passmark', x1: 60, y1: 2, x2: 60, y2: 16, transform: `rotate(${(pass / items.length) * 360} 60 60)` });
+    const svg = s('svg', { viewBox: '0 0 120 120', class: 'ring-svg' });
+    svg.append(s('circle', { class: 'rtrack', cx: 60, cy: 60, r: R }), arc, passMark);
+    const num = h('b', { class: 'rtime', dir: 'ltr' }, '0');
+    const ring = h('div', { class: 'ring big ' + (ok ? 'pass' : 'fail') }, svg, h('div', { class: 'rcenter' }, num, h('small', { dir: 'ltr' }, `/ ${items.length}`)));
+
+    const head = h('div', { class: 'res-head' },
+      ring,
+      h('div', {},
+        timeUp && h('p', { class: 'dim' }, L.timeUp),
+        h('p', { class: 'big ' + (ok ? 'ok' : 'bad') }, ok ? L.passed : L.failed),
+        h('p', { class: 'score2' }, fill(L.score, { score, total: items.length })),
+        !ok && weakest && h('div', { class: 'weak' },
+          h('span', {}, fill(L.weakest, { chapter: chLabel(weakest.c) })),
+          h('button', { type: 'button', class: 'btn btn-ghost btn-sm', onclick: () => practice(B.items.filter((x) => x.ch === weakest.c)) }, L.trainWeak),
+        ),
+      ),
+    );
+
+    const table = h('table', { class: 'tbl' }, h('tbody', {}, ...per.map((p) =>
+      h('tr', {},
+        h('td', {}, chLabel(p.c)),
+        h('td', { dir: 'ltr' }, `${p.right} / ${p.list.length}`),
+        h('td', {}, h('span', { class: 'meter' }, h('i', { style: `width:${(p.right / p.list.length) * 100}%` }))),
+      ),
+    )));
+
+    const cert = ok ? certificate(score, items.length) : null;
+
     show(h('section', { class: 'card result' },
-      timeUp && h('p', { class: 'dim' }, L.timeUp),
-      h('p', { class: 'big ' + (ok ? 'ok' : 'bad') }, ok ? L.passed : L.failed),
-      h('p', { class: 'score2' }, fill(L.score, { score, total: items.length })),
+      head,
+      cert,
       h('h3', {}, L.byChapter),
-      h('table', { class: 'tbl' }, h('tbody', {}, ...chapters.map((c) => {
-        const list = items.filter((x) => x.ch === c);
-        const r = list.filter((x) => E.ans[x.n] === x.a).length;
-        return h('tr', {},
-          h('td', {}, `Chapter ${c}${chName(c) ? ` — ${chName(c)!.ar}` : ''}`),
-          h('td', { dir: 'ltr' }, `${r} / ${list.length}`),
-          h('td', {}, h('span', { class: 'meter' }, h('i', { style: `width:${(r / list.length) * 100}%` }))),
-        );
-      }))),
+      table,
       h('div', { class: 'row' },
-        wrong.length > 0 && h('button', { type: 'button', class: 'btn btn-primary btn-sm', onclick: () => review(wrong, E.ans) }, `${L.review} (${wrong.length})`),
+        wrong.length > 0 && h('button', { type: 'button', class: 'btn btn-primary btn-sm', onclick: () => review(wrong, ans) }, `${L.review} (${wrong.length})`),
         h('button', { type: 'button', class: 'btn btn-ghost btn-sm', onclick: () => startExam() }, L.retry),
-        h('button', { type: 'button', class: 'linkbtn', onclick: home }, L.back),
+        backBtn(L.back, home),
       ),
     ));
+
+    // حركة العدّ
+    const t0 = performance.now(), dur = calm ? 1 : 1400;
+    const step = (now: number) => {
+      const k = Math.min(1, (now - t0) / dur);
+      const e = 1 - Math.pow(1 - k, 3);
+      const v = Math.round(score * e);
+      num.textContent = String(v);
+      arc.setAttribute('stroke-dashoffset', (C * (1 - (score / items.length) * e)).toFixed(1));
+      if (k < 1) requestAnimationFrame(step);
+      else if (ok) confetti();
+    };
+    requestAnimationFrame(step);
   }
+
+  function confetti() {
+    if (calm) return;
+    const colors = ['#f6823b', '#38bdf8', '#34d399', '#fbbf24', '#f472b6'];
+    swarm.replaceChildren(...Array.from({ length: 70 }, () => {
+      const p = h('i', { class: 'cf' });
+      p.style.left = `${Math.random() * 100}%`;
+      p.style.top = `${-10 - Math.random() * 60}px`;
+      p.style.background = colors[Math.floor(Math.random() * colors.length)];
+      p.style.animationDelay = `${Math.random() * 0.6}s`;
+      p.style.animationDuration = `${1.8 + Math.random() * 1.2}s`;
+      p.style.setProperty('--drift', `${Math.random() * 200 - 100}px`);
+      return p;
+    }));
+    swarm.classList.remove('show'); void swarm.offsetWidth; swarm.classList.add('show', 'party');
+    setTimeout(() => swarm.classList.remove('show', 'party'), 3400);
+  }
+
+  /* ---------- شهادة الجاهزية (صورة) ---------- */
+  function certificate(score: number, total: number) {
+    const W = 1200, H = 675;
+    const cv = h('canvas', { width: W, height: H, class: 'cert-cv' }) as HTMLCanvasElement;
+    const draw = async () => {
+      try { await document.fonts.ready; } catch (_) {}
+      const x = cv.getContext('2d')!;
+      const font = getComputedStyle(document.body).fontFamily;
+      const g = x.createLinearGradient(0, 0, W, H);
+      g.addColorStop(0, '#0d1b33'); g.addColorStop(1, '#0a1428');
+      x.fillStyle = g; x.fillRect(0, 0, W, H);
+      x.strokeStyle = '#f6823b'; x.lineWidth = 6; x.strokeRect(28, 28, W - 56, H - 56);
+      x.strokeStyle = 'rgba(56,189,248,.35)'; x.lineWidth = 2; x.strokeRect(44, 44, W - 88, H - 88);
+      x.direction = 'rtl'; x.textAlign = 'center';
+      x.fillStyle = '#f6823b'; x.font = `700 30px ${font}`; x.fillText('Testing بالعربي 🔻', W / 2, 118);
+      x.fillStyle = '#e8eef9'; x.font = `800 74px ${font}`; x.fillText(L.certTitle, W / 2, 230);
+      x.fillStyle = '#93a4c0'; x.font = `500 30px ${font}`; x.fillText(productTitle, W / 2, 290);
+      if (buyer) { x.fillStyle = '#e8eef9'; x.font = `700 46px ${font}`; x.fillText(buyer, W / 2, 380); }
+      x.fillStyle = '#34d399'; x.font = `800 64px ${font}`; x.direction = 'ltr'; x.fillText(`${score} / ${total}`, W / 2, buyer ? 470 : 420);
+      x.direction = 'rtl';
+      x.fillStyle = '#93a4c0'; x.font = `400 24px ${font}`;
+      x.fillText(new Date().toLocaleDateString('ar-JO-u-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' }), W / 2, buyer ? 525 : 485);
+      x.font = `400 21px ${font}`; x.fillStyle = '#7b8aa5';
+      x.fillText(L.certNote, W / 2, H - 92);
+      x.fillStyle = '#38bdf8'; x.font = `600 22px ${font}`; x.direction = 'ltr'; x.fillText('testing-arabic.com', W / 2, H - 60);
+    };
+    draw();
+    const saveBtn = h('button', {
+      type: 'button', class: 'btn btn-primary btn-sm',
+      onclick: () => {
+        cv.toBlob((b) => {
+          if (!b) return;
+          const a = h('a', { href: URL.createObjectURL(b), download: `testing-arabic-${slug}-${score}.png` }) as HTMLAnchorElement;
+          document.body.append(a); a.click(); a.remove();
+          setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+          window.taTrack?.('pro_cert_save', { slug, score });
+        }, 'image/png');
+      },
+    }, L.certSave);
+    return h('div', { class: 'cert' }, cv, saveBtn);
+  }
+
   function review(list: Item[], ans: Record<number, string>) {
     let i = 0;
     const box = h('div', { class: 'player' });
     const render = () => {
       box.replaceChildren(
         h('div', { class: 'top' },
-          h('button', { type: 'button', class: 'linkbtn', onclick: home }, L.back),
+          backBtn(L.back, home),
           h('span', { class: 'num', dir: 'ltr' }, `${i + 1} / ${list.length}`),
           h('div', { class: 'bar' }, h('i', { style: `width:${((i + 1) / list.length) * 100}%` })),
         ),
@@ -325,95 +588,190 @@ const exam = { count: t.bankExamCount, minutes: t.bankExamMinutes, pass: t.bankE
   /* ---------- البداية ---------- */
   (async () => {
     try {
-      const r = await fetch(`/api/pro/bank/${slug}`, { cache: 'no-store' });
+      const [r, me] = await Promise.all([
+        fetch(`/api/pro/bank/${slug}`, { cache: 'no-store' }),
+        fetch('/api/pro/me', { cache: 'no-store' }).then((x) => x.json()).catch(() => ({})),
+      ]);
       const d = await r.json();
       document.getElementById('bload')!.hidden = true;
       if (!d.ok) { document.getElementById('blocked')!.hidden = false; return; }
       B = d.bank as Bank;
       byN = new Map(B.items.map((i) => [i.n, i]));
+      buyer = (me && me.name) || '';
       if (S.exam && S.exam.endsAt > Date.now()) runExam();
-      else { if (S.exam) { submitExam(true); return; } home(); }
+      else if (S.exam) submitExam(true);
+      else home();
     } catch (_) {
       document.getElementById('bload')!.textContent = 'صار خطأ بالاتصال. حدّث الصفحة.';
     }
   })();
 </script>
 
-<style>
+<style is:global>
   .bpage { max-width: 860px; padding-block: 24px 80px; }
-  .back { display: inline-block; font-size: 14.5px; color: var(--muted); margin-bottom: 12px; }
+  body.bk-exam-on .bpage { max-width: 1180px; }
+  .backbtn { font: inherit; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--ink);
+    background: var(--surface); border: 1.5px solid var(--line-strong); border-radius: 999px; padding: 6px 14px 6px 16px; cursor: pointer; text-decoration: none; transition: border-color .15s, color .15s; }
+  .backbtn:hover { border-color: var(--cyan); color: var(--cyan); }
+  .backbtn span { font-size: 16px; line-height: 1; }
+  .bpage > .backbtn { margin-bottom: 14px; }
   .bpage h1 { font-size: clamp(24px, 3vw, 32px); margin: 0 0 18px; }
   .bank { position: relative; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-  .bank :global([hidden]) { display: none !important; }
-  .bank :global(.dim) { color: var(--muted); line-height: 1.9; }
-  .blocked { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
-  .blocked p { margin: 0 0 14px; line-height: 1.9; }
-  .bank :global(.home) { display: grid; gap: 18px; }
-  .bank :global(.card) { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 22px; }
-  .bank :global(.card h2) { font-size: 21px; margin: 0 0 4px; }
-  .bank :global(.card .dim) { margin: 0 0 16px; }
-  .bank :global(.chips) { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
-  .bank :global(.chip) { font: inherit; text-align: start; display: grid; gap: 4px; padding: 12px 14px; border-radius: 14px; border: 1.5px solid var(--line-strong); background: transparent; color: var(--ink); cursor: pointer; transition: border-color .15s, background .15s; }
-  .bank :global(.chip:hover) { border-color: var(--cyan); background: var(--cyan-soft); }
-  .bank :global(.chip strong) { font-size: 14.5px; line-height: 1.5; }
-  .bank :global(.chip small) { color: var(--muted); font-size: 12.5px; direction: ltr; text-align: end; }
-  .bank :global(.meter) { display: block; height: 5px; border-radius: 3px; background: var(--line); overflow: hidden; min-width: 60px; }
-  .bank :global(.meter i) { display: block; height: 100%; background: var(--cyan); }
-  .bank :global(.row) { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
-  .bank :global(.linkbtn) { font: inherit; font-size: 14px; background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; padding: 0; }
-  .bank :global(.exam .btn-primary) { width: 100%; justify-content: center; }
-  .bank :global(.last) { font-weight: 700; color: var(--cyan); margin: -6px 0 14px; }
-  .bank :global(.player) { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 20px; }
-  .bank :global(.top) { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-  .bank :global(.num), .bank :global(.score) { font-size: 14px; font-weight: 700; white-space: nowrap; }
-  .bank :global(.num) { color: var(--muted); }
-  .bank :global(.score) { color: #34d399; }
-  .bank :global(.bar) { flex: 1; min-width: 80px; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
-  .bank :global(.bar i) { display: block; height: 100%; background: var(--cyan); transition: width .3s ease; }
-  .bank :global(.clock) { font: 700 16px ui-monospace, monospace; background: var(--navy); border: 1px solid var(--line-strong); padding: 4px 10px; border-radius: 10px; }
-  .bank :global(.clock.low) { color: #f87171; border-color: #f87171; }
-  .bank :global(.ch) { display: inline-block; font-size: 12.5px; font-weight: 700; color: var(--cyan); background: var(--cyan-soft); padding: 2px 12px; border-radius: 999px; direction: ltr; }
-  .bank :global(.en) { font-size: 19px; line-height: 1.55; margin: 12px 0 6px; text-align: left; }
-  .bank :global(.ar) { color: var(--muted); font-size: 15px; line-height: 1.8; margin: 0 0 14px; }
-  .bank :global(.opts) { display: grid; gap: 10px; margin-top: 12px; }
-  .bank :global(.opt) { font: inherit; display: flex; gap: 12px; align-items: flex-start; text-align: left; width: 100%; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--line-strong); background: transparent; color: var(--ink); cursor: pointer; font-size: 15px; line-height: 1.6; transition: border-color .15s, background .15s; }
-  .bank :global(.opt b) { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--faint); display: grid; place-items: center; font-size: 13px; }
-  .bank :global(.opt:not(:disabled):hover) { border-color: var(--cyan); background: var(--cyan-soft); }
-  .bank :global(.opt:disabled) { cursor: default; opacity: .6; }
-  .bank :global(.opt.sel) { border-color: var(--cyan); background: var(--cyan-soft); }
-  .bank :global(.opt.sel b) { background: var(--cyan); border-color: var(--cyan); color: var(--navy); }
-  .bank :global(.opt.ok) { opacity: 1; border-color: #34d399; background: rgba(52, 211, 153, .12); }
-  .bank :global(.opt.ok b) { background: #34d399; border-color: #34d399; color: #052e1f; }
-  .bank :global(.opt.bad) { opacity: 1; border-color: #f87171; background: rgba(248, 113, 113, .1); }
-  .bank :global(.opt.bad b) { background: #f87171; border-color: #f87171; color: #2a0909; }
-  .bank :global(.ex) { margin-top: 16px; padding: 14px 16px; border-radius: 14px; background: var(--navy); border: 1px solid var(--line); }
-  .bank :global(.verdict) { font-weight: 700; margin: 0 0 6px; }
-  .bank :global(.verdict.ok), .bank :global(.big.ok) { color: #34d399; }
-  .bank :global(.verdict.bad), .bank :global(.big.bad) { color: #f87171; }
-  .bank :global(.exar) { margin: 0; line-height: 1.9; }
-  .bank :global(.ex details) { margin-top: 8px; font-size: 14px; color: var(--muted); }
-  .bank :global(.ex summary) { cursor: pointer; color: var(--cyan); }
-  .bank :global(.ex details p) { margin: 6px 0 0; text-align: left; line-height: 1.7; }
-  .bank :global(.nav) { display: flex; justify-content: space-between; gap: 10px; margin-top: 16px; }
-  .bank :global(.nav .btn:disabled) { opacity: .4; cursor: not-allowed; transform: none; }
-  .bank :global(.dots) { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; border-top: 1px solid var(--line); padding-top: 14px; }
-  .bank :global(.dot) { font: inherit; font-size: 12px; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line-strong); background: transparent; color: var(--muted); cursor: pointer; }
-  .bank :global(.dot.on) { background: var(--cyan-soft); color: var(--ink); border-color: var(--cyan); }
-  .bank :global(.dot.cur) { outline: 2px solid var(--orange); outline-offset: 1px; }
-  .bank :global(.result) { text-align: center; }
-  .bank :global(.result .row) { justify-content: center; }
-  .bank :global(.big) { font-size: 22px; font-weight: 700; margin: 0 0 6px; }
-  .bank :global(.score2) { font-size: 18px; margin: 0 0 18px; }
-  .bank :global(.result h3) { font-size: 16px; margin: 0 0 8px; text-align: start; }
-  .bank :global(.tbl) { width: 100%; border-collapse: collapse; font-size: 14px; text-align: start; }
-  .bank :global(.tbl td) { padding: 8px 6px; border-top: 1px solid var(--line); }
-  .bank :global(.tbl td:nth-child(2)) { white-space: nowrap; font-weight: 700; }
-  .bank :global(.tbl td:last-child) { width: 30%; }
+  .bank [hidden] { display: none !important; }
+  .bank .dim { color: var(--muted); line-height: 1.9; }
+  .bank .blocked { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px; }
+  .bank .blocked p { margin: 0 0 14px; line-height: 1.9; }
+  .bank .home { display: grid; gap: 18px; }
+  .bank .card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 22px; }
+  .bank .card h2 { font-size: 21px; margin: 0 0 4px; }
+  .bank .card .dim { margin: 0 0 16px; }
+  .bank .chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+  .bank .chip { font: inherit; text-align: start; display: grid; gap: 4px; padding: 12px 14px; border-radius: 14px; border: 1.5px solid var(--line-strong); background: transparent; color: var(--ink); cursor: pointer; transition: border-color .15s, background .15s; }
+  .bank .chip:hover { border-color: var(--cyan); background: var(--cyan-soft); }
+  .bank .chip strong { font-size: 14.5px; line-height: 1.5; }
+  .bank .chip small { color: var(--muted); font-size: 12.5px; direction: ltr; text-align: end; }
+  .bank .meter { display: block; height: 5px; border-radius: 3px; background: var(--line); overflow: hidden; min-width: 60px; }
+  .bank .meter i { display: block; height: 100%; background: var(--cyan); }
+  .bank .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+  .bank .linkbtn { font: inherit; font-size: 14px; background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; padding: 0; }
+  .bank .exam-card .btn-primary { width: 100%; justify-content: center; }
+  .bank .ec-top { display: flex; gap: 14px; align-items: flex-start; }
+  .bank .ec-testo { width: 54px; height: 54px; flex: none; }
+  .bank .ec-testo .eye, .bank .pr-face .eye { fill: #38bdf8; }
+  .bank .ec-testo .mouth, .bank .pr-face .mouth { stroke: #38bdf8; }
+  .bank .last { font-weight: 700; color: var(--cyan); margin: -6px 0 14px; }
+
+  /* اللاعب */
+  .bank .player { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 20px; }
+  .bank .top { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .bank .num, .bank .score { font-size: 14px; font-weight: 700; white-space: nowrap; }
+  .bank .num { color: var(--muted); direction: ltr; }
+  .bank .score { color: #34d399; }
+  .bank .bar { flex: 1; min-width: 80px; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+  .bank .bar i { display: block; height: 100%; background: var(--cyan); transition: width .3s ease; }
+  .bank .qhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .bank .ch { display: inline-block; font-size: 12.5px; font-weight: 700; color: var(--cyan); background: var(--cyan-soft); padding: 2px 12px; border-radius: 999px; direction: ltr; }
+  .bank .flag { font: inherit; font-size: 13px; font-weight: 700; color: var(--muted); background: transparent; border: 1.5px dashed var(--line-strong); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+  .bank .flag:hover { color: var(--ink); border-color: var(--orange); }
+  .bank .flag.on { color: var(--orange); border-style: solid; border-color: var(--orange); background: var(--orange-soft, rgba(246,130,59,.12)); }
+  .bank .en { font-size: 19px; line-height: 1.55; margin: 12px 0 6px; text-align: left; }
+  .bank .ar { color: var(--muted); font-size: 15px; line-height: 1.8; margin: 0 0 14px; }
+  .bank .opts { display: grid; gap: 10px; margin-top: 12px; }
+  .bank .opt { font: inherit; display: flex; gap: 12px; align-items: flex-start; text-align: left; width: 100%; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--line-strong); background: transparent; color: var(--ink); cursor: pointer; font-size: 15px; line-height: 1.6; transition: border-color .15s, background .15s; }
+  .bank .opt b { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--faint); display: grid; place-items: center; font-size: 13px; }
+  .bank .opt:not(:disabled):hover { border-color: var(--cyan); background: var(--cyan-soft); }
+  .bank .opt:disabled { cursor: default; opacity: .6; }
+  .bank .opt.sel { border-color: var(--cyan); background: var(--cyan-soft); }
+  .bank .opt.sel b { background: var(--cyan); border-color: var(--cyan); color: var(--navy); }
+  .bank .opt.ok { opacity: 1; border-color: #34d399; background: rgba(52, 211, 153, .12); }
+  .bank .opt.ok b { background: #34d399; border-color: #34d399; color: #052e1f; }
+  .bank .opt.bad { opacity: 1; border-color: #f87171; background: rgba(248, 113, 113, .1); animation: bk-shake .4s; }
+  .bank .opt.bad b { background: #f87171; border-color: #f87171; color: #2a0909; }
+  .bank .ex { margin-top: 16px; padding: 14px 16px; border-radius: 14px; background: var(--navy); border: 1px solid var(--line); }
+  .bank .verdict { font-weight: 700; margin: 0 0 6px; }
+  .bank .verdict.ok, .bank .big.ok { color: #34d399; }
+  .bank .verdict.bad, .bank .big.bad { color: #f87171; }
+  .bank .exar { margin: 0; line-height: 1.9; }
+  .bank .ex details { margin-top: 8px; font-size: 14px; color: var(--muted); }
+  .bank .ex summary { cursor: pointer; color: var(--cyan); }
+  .bank .ex details p { margin: 6px 0 0; text-align: left; line-height: 1.7; }
+  .bank .nav { display: flex; justify-content: space-between; gap: 10px; margin-top: 16px; }
+  .bank .nav .btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+  /* الامتحان: سؤال + عمود جانبي */
+  .bank .exam-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 18px; align-items: start; }
+  .bank .side { position: sticky; top: 86px; display: grid; gap: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 18px; }
+  .bank .side-top { display: grid; justify-items: center; gap: 10px; }
+  .bank .ring { position: relative; width: 170px; height: 170px; }
+  .bank .ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .bank .rtrack { fill: none; stroke: var(--line); stroke-width: 9; }
+  .bank .rfill { fill: none; stroke: var(--cyan); stroke-width: 9; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke .4s; }
+  .bank .tick { stroke: var(--faint); stroke-width: 1.5; }
+  .bank .ring.warn .rfill { stroke: var(--orange); }
+  .bank .ring.danger .rfill { stroke: #f87171; }
+  .bank .ring.danger { animation: bk-pulse 1s ease-in-out infinite; }
+  .bank .rcenter { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: 2px; }
+  .bank .rtime { font: 800 32px ui-monospace, 'IBM Plex Mono', monospace; color: var(--ink); line-height: 1; }
+  .bank .rcenter small { font-size: 12px; color: var(--muted); }
+  .bank .stats { display: grid; gap: 2px; text-align: center; font-size: 14px; font-weight: 700; }
+  .bank .stat.flagc { color: var(--orange); }
+  .bank .finish { width: 100%; justify-content: center; }
+  .bank .proctor { display: flex; gap: 10px; align-items: flex-start; background: var(--navy); border: 1px solid var(--line); border-radius: 16px; padding: 10px 12px; }
+  .bank .pr-face { width: 44px; height: 44px; flex: none; }
+  .bank .proctor.worried .pr-face .eye { fill: #f87171; }
+  .bank .proctor.worried .pr-face .mouth { stroke: #f87171; }
+  .bank .pr-say { display: grid; gap: 2px; min-width: 0; }
+  .bank .pr-say b { font-size: 13px; color: var(--orange); }
+  .bank .bubble { margin: 0; font-size: 14px; line-height: 1.7; }
+  .bank .proctor.talk .pr-face { animation: bk-hop .5s ease; }
+  .bank .proctor.talk .bubble { animation: bk-pop .35s ease; }
+  .bank .dots { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; }
+  .bank .dot { font: inherit; font-size: 11.5px; aspect-ratio: 1; border-radius: 8px; border: 1px solid var(--line-strong); background: transparent; color: var(--muted); cursor: pointer; padding: 0; position: relative; }
+  .bank .dot.on { background: var(--cyan-soft); color: var(--ink); border-color: var(--cyan); }
+  .bank .dot.fl::after { content: ''; position: absolute; top: -3px; inset-inline-end: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--orange); }
+  .bank .dot.cur { outline: 2px solid var(--orange); outline-offset: 1px; }
+  .bank .rv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 8px; margin: 6px 0 4px; }
+  .bank .dot.big { font-size: 14px; border-radius: 10px; }
+  .bank .dot.blank { border-style: dashed; color: #f87171; border-color: rgba(248,113,113,.5); }
+
+  /* النتيجة */
+  .bank .result h3 { font-size: 16px; margin: 22px 0 8px; }
+  .bank .res-head { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
+  .bank .ring.big { width: 150px; height: 150px; flex: none; }
+  .bank .ring.pass .rfill { stroke: #34d399; }
+  .bank .ring.fail .rfill { stroke: #f87171; }
+  .bank .passmark { stroke: var(--ink); stroke-width: 2.5; }
+  .bank .big { font-size: 22px; font-weight: 700; margin: 0 0 4px; }
+  .bank .score2 { font-size: 17px; margin: 0; color: var(--muted); }
+  .bank .weak { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; font-size: 14.5px; }
+  .bank .cert { display: grid; gap: 10px; justify-items: start; margin-top: 20px; }
+  .bank .cert-cv { width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); }
+  .bank .tbl { width: 100%; border-collapse: collapse; font-size: 14px; text-align: start; }
+  .bank .tbl td { padding: 8px 6px; border-top: 1px solid var(--line); }
+  .bank .tbl td:nth-child(2) { white-space: nowrap; font-weight: 700; }
+  .bank .tbl td:last-child { width: 30%; }
+
+  /* دعسوقات وقصاصات */
+  .bk-swarm { position: fixed; inset: 0; z-index: 1300; pointer-events: none; overflow: hidden; visibility: hidden; background: rgba(190, 18, 60, 0); transition: background .2s; }
+  .bk-swarm.show { visibility: visible; background: rgba(190, 18, 60, .12); }
+  .bk-swarm.party { background: transparent; }
+  .bk-swarm span { position: absolute; animation: bk-fall 1.5s cubic-bezier(.18, .7, .3, 1) forwards; filter: saturate(1.8) hue-rotate(-15deg) drop-shadow(0 5px 3px rgba(80, 0, 0, .25)); }
+  .bk-swarm .cf { position: absolute; width: 9px; height: 14px; border-radius: 2px; animation: bk-fall 2.4s cubic-bezier(.2, .6, .4, 1) forwards; }
+
+  @keyframes bk-fall { to { transform: translate3d(var(--drift, 0px), 115vh, 0) rotate(720deg); } }
+  @keyframes bk-shake { 0%, 100% { transform: none; } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+  @keyframes bk-pulse { 50% { transform: scale(1.03); } }
+  @keyframes bk-hop { 40% { transform: translateY(-5px) rotate(-6deg); } }
+  @keyframes bk-pop { from { opacity: 0; transform: translateY(4px); } }
+
+  @media (max-width: 900px) {
+    .bank .exam-wrap { grid-template-columns: 1fr; }
+    .bank .side { order: -1; top: 64px; z-index: 5; padding: 10px 12px; gap: 8px; border-radius: 16px; }
+    .bank .side-top { grid-template-columns: auto 1fr auto; justify-items: start; align-items: center; gap: 12px; }
+    .bank .side .ring { width: 66px; height: 66px; }
+    .bank .side .rtrack, .bank .side .rfill { stroke-width: 11; }
+    .bank .side .tick, .bank .side .rcenter small { display: none; }
+    .bank .side .rtime { font-size: 15px; }
+    .bank .side .stats { text-align: start; font-size: 13px; }
+    .bank .side .finish { width: auto; padding-inline: 18px; }
+    .bank .proctor { padding: 6px 10px; }
+    .bank .pr-face { width: 30px; height: 30px; }
+    .bank .bubble { font-size: 13px; }
+    /* بالجوال: الشريط الثابت فيه الساعة + العدّاد + إنهاء + جملة Testo بس (الأرقام بشاشة المراجعة) */
+    .bank .side .dots, .bank .pr-say b { display: none; }
+    .bank .proctor { align-items: center; border-radius: 12px; }
+  }
   @media (max-width: 600px) {
-    .bank :global(.player), .bank :global(.card) { padding: 16px; }
-    .bank :global(.en) { font-size: 17px; }
-    .bank :global(.opt) { font-size: 14.5px; }
-    .bank :global(.tbl td:last-child) { display: none; }
+    .bank .player, .bank .card { padding: 16px; }
+    .bank .en { font-size: 17px; }
+    .bank .opt { font-size: 14.5px; }
+    .bank .tbl td:last-child { display: none; }
+    .bank .res-head { justify-content: center; text-align: center; }
+    .bank .weak { justify-content: center; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bank .rfill, .bank .bar i { transition: none; }
+    .bank .ring.danger, .bank .proctor.talk .pr-face, .bank .proctor.talk .bubble, .bank .opt.bad { animation: none; }
   }
   @media print { .bank { display: none !important; } }
 </style>

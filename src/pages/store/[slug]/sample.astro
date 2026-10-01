@@ -3,7 +3,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
 import SampleQuiz from '../../../components/store/SampleQuiz.astro';
-import { STORE_OPEN, jod, getStoreSettings, tpl } from '../../../lib/store';
+import { STORE_OPEN, usd, getStoreSettings, tpl } from '../../../lib/store';
 import { getBank } from '../../../lib/banks';
 
 export async function getStaticPaths() {
@@ -45,7 +45,7 @@ const orderHref = `/store/${product.id}/order/`;
     <div class="wrap buyin">
       <div class="bb-info">
         <strong>{data.cardTitle || data.title}</strong>
-        <span><b>{jod(finalPrice)}</b>{data.offerPrice != null && <s>{jod(data.price)}</s>}</span>
+        <span><b>{usd(finalPrice)}</b>{data.offerPrice != null && <s>{usd(data.price)}</s>}</span>
       </div>
       <a class="btn btn-primary btn-sm" href={orderHref} data-track="store_sample_buy">{data.buyButton || t.buyButton}</a>
     </div>

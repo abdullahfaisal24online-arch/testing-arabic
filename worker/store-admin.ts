@@ -9,7 +9,7 @@
  *   GET  /admin/store/discounts                                            أكواد الخصم
  *   POST /admin/store/action                                               قبول / رفض / خصم…
  */
-import { ensureTables, catalog, type StoreEnv, type Order } from './store';
+import { ensureTables, catalog, money, type StoreEnv, type Order } from './store';
 import { sendBuyerMail } from './store-mail';
 
 const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // بدون 0 O 1 I L
@@ -18,7 +18,8 @@ const newCode = () => {
   return `TA-${pick(4)}-${pick(4)}`;
 };
 const esc = (s: unknown) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-const jod = (n: number) => `${Number.isInteger(n) ? n : n.toFixed(2)} JOD`;
+const jod = (n: number) => `$${Number.isInteger(n) ? n : n.toFixed(2)}`;
+const jd = (n: number | null | undefined) => (n != null ? `${n} د.أ` : '');
 const when = (ms: number | null) =>
   ms ? new Date(ms).toLocaleString('ar-JO-u-nu-latn', { timeZone: 'Asia/Amman', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) : '—';
 const html = (body: string, status = 200) =>
@@ -69,8 +70,19 @@ input,select,textarea{font:inherit;font-size:15px;background:#0b1729;border:1px 
 form.inline{display:flex;gap:8px;flex-wrap:wrap;align-items:end}form.inline label{display:grid;gap:4px;font-size:13px;color:var(--mut);flex:1;min-width:120px}
 .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.codebox{font-size:22px;letter-spacing:2px;color:#a7f3d0;border:2px solid var(--gr);border-radius:12px;padding:10px 14px;display:inline-block}
 .muted{color:var(--mut)}
+dialog.ask{border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);padding:20px;width:min(400px,calc(100vw - 32px))}
+dialog.ask::backdrop{background:rgba(5,10,25,.65)}dialog.ask p{margin:0 0 16px;font-size:16px;line-height:1.8}
+dialog.ask div{display:flex;gap:8px}dialog.ask .btn{flex:1}
 </style></head><body><div class="wrap"><header><h1>🔻 إدارة المتجر</h1><nav><a href="/admin/store">الطلبات</a><a href="/admin/store/discounts">أكواد الخصم</a><a href="/store/" target="_blank">المتجر ↗</a></nav></header>
-${flash ? `<div class="flash">${esc(flash)}</div>` : ''}${inner}</div></body></html>`;
+${flash ? `<div class="flash">${esc(flash)}</div>` : ''}${inner}</div>
+<dialog class="ask" id="ask"><form method="dialog"><p id="ask-t"></p><div><button class="btn o2" value="yes">أكيد</button><button class="btn g" value="no">لا، رجوع</button></div></form></dialog>
+<script>
+// نافذة تأكيد من الموقع (بدل confirm تبع المتصفح) لأي فورم عليه data-ask
+(function(){var d=document.getElementById('ask'),f=null;
+document.addEventListener('submit',function(e){var t=e.target;if(!t.dataset||!t.dataset.ask||t.dataset.ok)return;e.preventDefault();f=t;document.getElementById('ask-t').textContent=t.dataset.ask;d.returnValue='';d.showModal();});
+d.addEventListener('close',function(){if(f&&d.returnValue==='yes'){f.dataset.ok='1';f.requestSubmit?f.requestSubmit():f.submit();}f=null;});
+d.addEventListener('click',function(e){if(e.target===d)d.close('no');});})();
+</script></body></html>`;
 }
 
 async function listPage(env: StoreEnv, url: URL) {
@@ -88,7 +100,7 @@ async function listPage(env: StoreEnv, url: URL) {
     const st = o.status === 'awaiting_payment' && now > o.expires_at ? 'expired' : o.status;
     const [label, cls] = STATUS[st] ?? [st, 'p'];
     return `<tr><td><a class="mono" href="/admin/store/order/${esc(o.id)}">${esc(o.id)}</a></td><td>${esc(o.name)}<br><small class="mono muted">${esc(o.email)}</small></td>
-<td>${esc(o.product_title ?? o.product)}</td><td>${jod(o.amount)}${o.discount_code ? `<br><small class="muted">${esc(o.discount_code)}</small>` : ''}</td>
+<td>${esc(o.product_title ?? o.product)}</td><td>${jod(o.amount)}${o.amount_jod != null ? `<br><small class="muted">${jd(o.amount_jod)}</small>` : ''}${o.discount_code ? `<br><small class="muted">${esc(o.discount_code)}</small>` : ''}</td>
 <td>${when(o.created_at)}</td><td><span class="st ${cls}">${label}</span></td><td><a class="btn g" href="/admin/store/order/${esc(o.id)}">فتح</a></td></tr>`;
   }).join('');
   return `<div class="kpis"><div><b>${c.review ?? 0}</b>قيد المراجعة</div><div><b>${c.awaiting_payment ?? 0}</b>بانتظار الدفع</div>
@@ -117,7 +129,7 @@ async function orderPage(env: StoreEnv, id: string, origin: string) {
 
   const actions =
     o.status === 'review' || o.status === 'awaiting_payment' || o.status === 'expired'
-      ? `<div class="warn">قبل ما توافق: افتح تطبيق البنك وتأكد إنه وصل تحويل بمبلغ <b>${jod(o.amount)}</b> ومعه <b class="mono">${esc(o.id)}</b>.</div>
+      ? `<div class="warn">قبل ما توافق: افتح تطبيق البنك وتأكد إنه وصل تحويل بمبلغ <b>${o.amount_jod != null ? jd(o.amount_jod) : jod(o.amount)}</b> ومعه <b class="mono">${esc(o.id)}</b>.</div>
 <form method="post" action="/admin/store/action" class="acts"><input type="hidden" name="id" value="${esc(o.id)}"><input type="hidden" name="do" value="approve">
 <button class="btn y">✓ قبول وتوليد الكود</button></form>
 <form method="post" action="/admin/store/action" class="inline" style="margin-top:12px"><input type="hidden" name="id" value="${esc(o.id)}"><input type="hidden" name="do" value="reject">
@@ -126,7 +138,7 @@ async function orderPage(env: StoreEnv, id: string, origin: string) {
         ? `<p>كود التفعيل:</p><p><span class="codebox mono">${esc(o.code)}</span></p><p class="muted">الأجهزة المفعّلة: ${devices?.n ?? 0}</p>
 <div class="acts"><form method="post" action="/admin/store/action"><input type="hidden" name="id" value="${esc(o.id)}"><input type="hidden" name="do" value="resend"><button class="btn g">إعادة إرسال الإيميل</button></form>
 <form method="post" action="/admin/store/action"><input type="hidden" name="id" value="${esc(o.id)}"><input type="hidden" name="do" value="reset_devices"><button class="btn g">تصفير الأجهزة</button></form>
-<form method="post" action="/admin/store/action" onsubmit="return confirm('إيقاف الكود؟ المشتري ما بيقدر يفتح المحتوى بعدها.')"><input type="hidden" name="id" value="${esc(o.id)}"><input type="hidden" name="do" value="revoke"><button class="btn n">إيقاف الكود</button></form></div>`
+<form method="post" action="/admin/store/action" data-ask="إيقاف الكود؟ المشتري ما بيقدر يفتح المحتوى بعدها."><input type="hidden" name="id" value="${esc(o.id)}"><input type="hidden" name="do" value="revoke"><button class="btn n">إيقاف الكود</button></form></div>`
         : o.status === 'rejected'
           ? `<p class="muted">مرفوض${o.reject_reason ? `: ${esc(o.reject_reason)}` : ''}</p><form method="post" action="/admin/store/action"><input type="hidden" name="id" value="${esc(o.id)}"><input type="hidden" name="do" value="reopen"><button class="btn g">رجّعه لقيد المراجعة</button></form>`
           : '';
@@ -136,7 +148,7 @@ async function orderPage(env: StoreEnv, id: string, origin: string) {
 <div class="kv"><span>المنتج</span><b>${esc(o.product_title ?? o.product)}</b><span>المشتري</span><b>${esc(o.name)}</b>
 <span>الإيميل</span><b class="mono">${esc(o.email)}</b><span>واتساب</span><b class="mono">${esc(o.phone ?? '—')}</b>
 <span>السعر</span><b>${jod(o.price)}</b><span>كود الخصم</span><b>${o.discount_code ? `${esc(o.discount_code)} (− ${jod(o.discount)})` : '—'}</b>
-<span>المطلوب</span><b style="color:var(--or)">${jod(o.amount)}</b><span>مرجع التحويل</span><b class="mono">${esc(o.ref ?? '—')}</b>
+<span>المطلوب</span><b style="color:var(--or)">${jod(o.amount)}${o.amount_jod != null ? ` · ${jd(o.amount_jod)}` : ''}</b><span>مرجع التحويل</span><b class="mono">${esc(o.ref ?? '—')}</b>
 <span>تاريخ الطلب</span><b>${when(o.created_at)}</b><span>وصل الإثبات</span><b>${when(o.proof_at)}</b><span>آخر حجز</span><b>${when(o.expires_at)}</b></div>
 <div style="margin-top:14px">${actions}</div>
 <div class="acts">${phone ? `<a class="btn g" target="_blank" href="https://wa.me/${phone}?text=${encodeURIComponent(waText)}">واتساب للمشتري ↗</a>` : ''}
@@ -150,11 +162,11 @@ async function discountsPage(env: StoreEnv, products: { slug: string; title: str
 <td>${d.products ? esc(d.products) : 'كل المنتجات'}</td><td>${d.used}${d.max_uses ? ` / ${d.max_uses}` : ''}</td><td>${d.expires_at ? when(d.expires_at) : '—'}</td>
 <td>${d.active ? '<span class="st o">فعّال</span>' : '<span class="st x">موقوف</span>'}</td><td>${esc(d.note ?? '')}</td>
 <td><form method="post" action="/admin/store/action" style="display:inline"><input type="hidden" name="do" value="disc_toggle"><input type="hidden" name="code" value="${esc(d.code)}"><button class="btn g">${d.active ? 'إيقاف' : 'تفعيل'}</button></form>
-<form method="post" action="/admin/store/action" style="display:inline" onsubmit="return confirm('حذف الكود؟')"><input type="hidden" name="do" value="disc_delete"><input type="hidden" name="code" value="${esc(d.code)}"><button class="btn n">حذف</button></form></td></tr>`).join('');
+<form method="post" action="/admin/store/action" style="display:inline" data-ask="حذف كود الخصم؟"><input type="hidden" name="do" value="disc_delete"><input type="hidden" name="code" value="${esc(d.code)}"><button class="btn n">حذف</button></form></td></tr>`).join('');
   return `<div class="card"><h2 style="margin-top:0">كود خصم جديد</h2>
 <form method="post" action="/admin/store/action" class="inline"><input type="hidden" name="do" value="disc_add">
 <label>الكود<input name="code" required maxlength="40" dir="ltr" placeholder="LAUNCH20"></label>
-<label>النوع<select name="kind"><option value="pct">نسبة %</option><option value="fixed">مبلغ ثابت JOD</option></select></label>
+<label>النوع<select name="kind"><option value="pct">نسبة %</option><option value="fixed">مبلغ ثابت $</option></select></label>
 <label>القيمة<input name="value" type="number" step="0.01" min="0.01" required></label>
 <label>لمنتج معيّن (اختياري)<select name="products"><option value="">كل المنتجات</option>${products.map((p) => `<option value="${esc(p.slug)}">${esc(p.title)}</option>`).join('')}</select></label>
 <label>حد الاستخدام (0 = بلا حد)<input name="max_uses" type="number" min="0" value="0"></label>
@@ -191,7 +203,7 @@ async function action(req: Request, env: StoreEnv, url: URL) {
   const o = await env.DB.prepare(`SELECT * FROM store_orders WHERE id = ?1`).bind(id).first<Order & { ref: string | null }>();
   if (!o) return back(req, '/admin/store');
   const link = `${url.origin}/store/order/?t=${o.token}`;
-  const vars = { name: o.name, id: o.id, amount: `${o.amount} JOD`, product: o.product_title ?? o.product, link };
+  const vars = { name: o.name, id: o.id, amount: money(o.amount, o.amount_jod), product: o.product_title ?? o.product, link };
 
   if (act === 'approve' && o.status !== 'approved') {
     let code = '';

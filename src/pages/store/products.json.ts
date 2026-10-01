@@ -30,6 +30,7 @@ export const GET: APIRoute = async () => {
     open: STORE_OPEN,
     store: {
       holdHours: st?.holdHours ?? 48,
+      jodRate: st?.jodRate ?? 0.709,
       maxDevices: st?.maxDevices ?? 3,
       mail: st
         ? { orderSubject: st.orderSubject, orderBody: st.orderBody, orderButton: st.orderButton, approvedSubject: st.approvedSubject,

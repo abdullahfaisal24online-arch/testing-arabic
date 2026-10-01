@@ -2,7 +2,7 @@
 // طلب الشراء: معلومات المشتري + كود خصم ← بيعمل الطلب وبيحوّل على صفحة متابعة الطلب.
 import { getCollection } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
-import { STORE_OPEN, jod, getStoreSettings } from '../../../lib/store';
+import { STORE_OPEN, usd, getStoreSettings } from '../../../lib/store';
 
 export async function getStaticPaths() {
   if (!STORE_OPEN) return [];
@@ -59,9 +59,9 @@ const L = { codeOk: t.codeOk, codeBad: t.codeBad };
       <aside class="osum">
         {data.cover && <img src={data.cover} alt="" width="1280" height="720" loading="lazy" />}
         <strong>{data.title}</strong>
-        <div class="srow"><span>{data.kind}</span><span>{jod(price)}{data.offerPrice != null && <s> {jod(data.price)}</s>}</span></div>
+        <div class="srow"><span>{data.kind}</span><span>{usd(price)}{data.offerPrice != null && <s> {usd(data.price)}</s>}</span></div>
         <div class="srow disc" id="disc-row" hidden><span id="disc-name"></span><span id="disc-val"></span></div>
-        <div class="srow total"><b>{t.summaryTotal}</b><b id="total">{jod(price)}</b></div>
+        <div class="srow total"><b>{t.summaryTotal}</b><b id="total">{usd(price)}</b></div>
       </aside>
     </div>
   </div>
@@ -73,7 +73,7 @@ const L = { codeOk: t.codeOk, codeBad: t.codeBad };
   const price = Number(form.dataset.price);
   const L = JSON.parse(form.dataset.labels!);
   const $ = (id: string) => document.getElementById(id)!;
-  const jod = (n: number) => `${Number.isInteger(n) ? n : n.toFixed(2)} د.أ`;
+  const usd = (n: number) => `$${Number.isInteger(n) ? n : n.toFixed(2)}`;
   const ERR: Record<string, string> = {
     bad_name: 'اكتب اسمك.', bad_email: 'الإيميل مش مكتوب صح.', too_many: 'طلبات كثيرة بوقت قصير. استنى شوي وجرّب.',
     code_invalid: L.codeBad, code_expired: L.codeBad, code_product: L.codeBad, code_used_up: L.codeBad,
@@ -92,8 +92,8 @@ const L = { codeOk: t.codeOk, codeBad: t.codeBad };
     applied = code;
     $('disc-row').hidden = !code;
     $('disc-name').textContent = code;
-    $('disc-val').textContent = `− ${jod(discount)}`;
-    $('total').textContent = jod(Math.round((price - discount) * 100) / 100);
+    $('disc-val').textContent = `− ${usd(discount)}`;
+    $('total').textContent = usd(Math.round((price - discount) * 100) / 100);
   };
 
   $('apply').addEventListener('click', async () => {
@@ -104,7 +104,7 @@ const L = { codeOk: t.codeOk, codeBad: t.codeBad };
     try {
       const r = await fetch('/api/store/discount', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ product, code }) });
       const d = await r.json();
-      if (d.ok) { setDiscount(d.code, d.discount); msg.textContent = L.codeOk.replace('{discount}', jod(d.discount)); msg.className = 'ok'; }
+      if (d.ok) { setDiscount(d.code, d.discount); msg.textContent = L.codeOk.replace('{discount}', usd(d.discount)); msg.className = 'ok'; }
       else { setDiscount('', 0); msg.textContent = ERR[d.error] || L.codeBad; msg.className = 'bad'; }
     } catch (_) { msg.textContent = ERR.network; msg.className = 'bad'; }
   });

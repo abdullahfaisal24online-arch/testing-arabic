@@ -19,7 +19,9 @@ export const STORE_GROUPS = [
   { key: 'more', title: 'groupMore', kinds: ['قوالب', 'حزمة'] },
 ] as const;
 
-export const jod = (n: number) => `${Number.isInteger(n) ? n : n.toFixed(2)} د.أ`;
+/** الأسعار بالدولار (المقابل بالدينار بيطلع بس وقت الدفع — سعر الصرف من إعدادات المتجر) */
+export const usd = (n: number) => `$${Number.isInteger(n) ? n : n.toFixed(2)}`;
+export const toJod = (n: number, rate: number) => Math.round(n * rate * 100) / 100;
 
 
 /** إعدادات المتجر من لوحة التحكم (إعدادات الموقع ← المتجر) */

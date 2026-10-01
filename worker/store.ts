@@ -77,21 +77,29 @@ export async function ensureTables(env: StoreEnv) {
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS pro_attempts (ip_hash TEXT NOT NULL, kind TEXT NOT NULL, at INTEGER NOT NULL)`),
     env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_pro_attempts ON pro_attempts (ip_hash, kind, at)`),
   ]);
+  // المبلغ بالدينار وقت الطلب (الأسعار بالدولار) — عمود جديد، بينضاف مرة وحدة
+  try { await env.DB.prepare(`ALTER TABLE store_orders ADD COLUMN amount_jod REAL`).run(); } catch (_) { /* موجود */ }
   READY = true;
 }
 
+/** «$28 (19.85 د.أ)» */
+export const money = (usd: number, jod?: number | null) =>
+  `$${Number.isInteger(usd) ? usd : usd.toFixed(2)}${jod != null ? ` (${jod} د.أ)` : ''}`;
+export const toJod = (usd: number, rate: number) => Math.round(usd * rate * 100) / 100;
+
 /* ---------- الكاتالوج ---------- */
 interface Product { slug: string; title: string; price: number; offerPrice: number | null }
-export interface Catalog { open: boolean; holdHours: number; maxDevices: number; mail: MailTexts; products: Product[] }
+export interface Catalog { open: boolean; holdHours: number; maxDevices: number; jodRate: number; mail: MailTexts; products: Product[] }
 
 export async function catalog(req: Request, env: StoreEnv): Promise<Catalog> {
   const res = await env.ASSETS.fetch(new Request(new URL('/store/products.json', req.url)));
-  if (!res.ok) return { open: false, holdHours: 48, maxDevices: 3, mail: {}, products: [] };
-  const data = (await res.json()) as { open?: boolean; store?: { holdHours?: number; maxDevices?: number; mail?: MailTexts }; products?: Product[] };
+  if (!res.ok) return { open: false, holdHours: 48, maxDevices: 3, jodRate: 0.709, mail: {}, products: [] };
+  const data = (await res.json()) as { open?: boolean; store?: { holdHours?: number; maxDevices?: number; jodRate?: number; mail?: MailTexts }; products?: Product[] };
   return {
     open: !!data.open,
     holdHours: Math.max(1, Number(data.store?.holdHours) || 48),
     maxDevices: Math.max(1, Number(data.store?.maxDevices) || 3),
+    jodRate: Number(data.store?.jodRate) > 0 ? Number(data.store?.jodRate) : 0.709,
     mail: data.store?.mail ?? {},
     products: data.products ?? [],
   };
@@ -122,7 +130,7 @@ async function applyDiscount(env: StoreEnv, rawCode: string, product: string, pr
 export type Order = {
   id: string; token: string; product: string; product_title: string | null; name: string; email: string;
   price: number; discount_code: string | null; discount: number; amount: number; status: string;
-  created_at: number; expires_at: number; proof_at: number | null; code: string | null; reject_reason: string | null;
+  created_at: number; expires_at: number; proof_at: number | null; code: string | null; reject_reason: string | null; amount_jod: number | null;
 };
 
 const publicOrder = (o: Order) => ({
@@ -135,6 +143,7 @@ const publicOrder = (o: Order) => ({
   discountCode: o.discount_code,
   discount: o.discount,
   amount: o.amount,
+  amountJod: o.amount_jod,
   status: o.status,
   createdAt: o.created_at,
   expiresAt: o.expires_at,
@@ -155,7 +164,7 @@ async function loadOrder(env: StoreEnv, token: string): Promise<Order | null> {
 }
 
 async function notifyOwner(env: StoreEnv, o: Order, ref: string, origin: string) {
-  const subject = `طلب جديد بانتظار المراجعة — ${o.id} (${o.amount} JOD)`;
+  const subject = `طلب جديد بانتظار المراجعة — ${o.id} (${o.amount_jod ?? o.amount} JOD)`;
   const raw = [
     `From: Testing بالعربي <${MAIL_FROM}>`,
     `To: ${OWNER_TO}`,
@@ -166,7 +175,7 @@ async function notifyOwner(env: StoreEnv, o: Order, ref: string, origin: string)
     `الطلب: ${o.id}`,
     `المنتج: ${o.product_title ?? o.product}`,
     `المشتري: ${o.name} — ${o.email}`,
-    `المبلغ: ${o.amount} JOD${o.discount_code ? ` (كود ${o.discount_code}، خصم ${o.discount})` : ''}`,
+    `المبلغ: ${o.amount_jod != null ? `${o.amount_jod} JOD` : ''} ($${o.amount})${o.discount_code ? ` (كود ${o.discount_code}، خصم ${o.discount})` : ''}`,
     ref ? `مرجع التحويل: ${ref}` : '',
     '',
     'وصل إثبات الدفع. قبل ما توافق، تأكد من تطبيق البنك إنه التحويل وصل بنفس المبلغ ومعه رقم الطلب.',
@@ -191,7 +200,7 @@ export async function handleStore(req: Request, env: StoreEnv, url: URL): Promis
     const price = p.offerPrice ?? p.price;
     const r = await applyDiscount(env, clean(body.code, 40), p.slug, price);
     if (!r.ok) return json({ ok: false, error: r.error });
-    return json({ ok: true, code: r.code, price, discount: r.discount, amount: round2(price - r.discount) });
+    return json({ ok: true, code: r.code, price, discount: r.discount, amount: round2(price - r.discount), amountJod: toJod(round2(price - r.discount), cat.jodRate) });
   }
 
   // ---- إنشاء طلب ----
@@ -215,6 +224,7 @@ export async function handleStore(req: Request, env: StoreEnv, url: URL): Promis
     const d = await applyDiscount(env, clean(body.code, 40), p.slug, price);
     if (!d.ok) return json({ ok: false, error: d.error });
     const amount = round2(price - d.discount);
+    const amountJod = toJod(amount, cat.jodRate);
 
     const now = Date.now();
     const token = randHex(20);
@@ -222,11 +232,11 @@ export async function handleStore(req: Request, env: StoreEnv, url: URL): Promis
       const id = `TA-${Math.floor(1000 + Math.random() * 9000)}${randHex(1).toUpperCase().slice(0, 1)}`;
       try {
         await env.DB.prepare(
-          `INSERT INTO store_orders (id, token, product, product_title, name, email, phone, price, discount_code, discount, amount, status, created_at, expires_at, ip_hash)
-           VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, 'awaiting_payment', ?12, ?13, ?14)`,
-        ).bind(id, token, p.slug, p.title, name, email, phone || null, price, d.code || null, d.discount, amount, now, now + cat.holdHours * 3600_000, ipHash).run();
+          `INSERT INTO store_orders (id, token, product, product_title, name, email, phone, price, discount_code, discount, amount, status, created_at, expires_at, ip_hash, amount_jod)
+           VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, 'awaiting_payment', ?12, ?13, ?14, ?15)`,
+        ).bind(id, token, p.slug, p.title, name, email, phone || null, price, d.code || null, d.discount, amount, now, now + cat.holdHours * 3600_000, ipHash, amountJod).run();
         const link = `${url.origin}/store/order/?t=${token}`;
-        const mailing = sendBuyerMail(env, email, 'order', cat.mail, { name, id, amount: `${amount} JOD`, product: p.title, link, hours: String(cat.holdHours) }, { href: link, label: cat.mail.orderButton || 'تفاصيل الطلب' });
+        const mailing = sendBuyerMail(env, email, 'order', cat.mail, { name, id, amount: money(amount, amountJod), product: p.title, link, hours: String(cat.holdHours) }, { href: link, label: cat.mail.orderButton || 'تفاصيل الطلب' });
         await mailing;
         return json({ ok: true, id, token, amount });
       } catch (e) {

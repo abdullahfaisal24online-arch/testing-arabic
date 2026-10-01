@@ -3,7 +3,7 @@
 // بالموقع الحقيقي بيضل يعرض «قريباً» لحد يوم الإطلاق — شوف src/lib/store.ts
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import { STORE_OPEN, STORE_GROUPS, jod, getStoreSettings } from '../../lib/store';
+import { STORE_OPEN, STORE_GROUPS, usd, getStoreSettings } from '../../lib/store';
 
 const products = STORE_OPEN
   ? (await getCollection('products')).filter((p) => !p.data.draft).sort((a, b) => a.data.order - b.data.order)
@@ -31,6 +31,17 @@ const groups = STORE_GROUPS.map((g) => ({ ...g, title: t ? t[g.title] : '', item
   </Base>
 ) : (
   <Base title={t!.heroEyebrow} description={t!.heroText}>
+    <!-- شريط «موادي»: بيتغيّر حسب إذا الجهاز مفعّل عليه مواد -->
+    <div class="mybar" id="mybar">
+      <div class="wrap mybar-in">
+        <span class="mb-ic" aria-hidden="true">📚</span>
+        <span class="mb-text" data-none>{t!.haveCodeText}</span>
+        <span class="mb-text" data-has hidden>{t!.myBarText}</span>
+        <a class="mb-btn" href="/pro/unlock/" data-none>{t!.haveCodeLink}</a>
+        <a class="mb-btn on" href="/pro/" data-has hidden>{t!.myBarButton} ←</a>
+      </div>
+    </div>
+
     <section class="store-head dots">
       <div class="wrap">
         <span class="eyebrow">{t!.heroEyebrow}</span>
@@ -55,7 +66,7 @@ const groups = STORE_GROUPS.map((g) => ({ ...g, title: t ? t[g.title] : '', item
               <a class="pcard" href={`/store/${p.id}/`}>
                 <div class="thumb">
                   {p.data.cover ? <img src={p.data.cover} alt="" width="1280" height="720" loading="lazy" decoding="async" /> : <span class="ph">🔻</span>}
-                  {(p.data.cardBadge || (p.data.offerPrice != null && t!.offerBadge)) && <span class="flag">{p.data.cardBadge || t!.offerBadge}</span>}
+                  {p.data.cardBadge && <span class="flag">{p.data.cardBadge}</span>}
                 </div>
                 <div class="body">
                   <span class="kind">{p.data.kind}</span>
@@ -63,8 +74,8 @@ const groups = STORE_GROUPS.map((g) => ({ ...g, title: t ? t[g.title] : '', item
                   {(p.data.cardText || p.data.pitch) && <p>{p.data.cardText || p.data.pitch}</p>}
                   <div class="foot">
                     <span class="price">
-                      <b>{jod(p.data.offerPrice ?? p.data.price)}</b>
-                      {p.data.offerPrice != null && <s>{jod(p.data.price)}</s>}
+                      <b>{usd(p.data.offerPrice ?? p.data.price)}</b>
+                      {p.data.offerPrice != null && <s>{usd(p.data.price)}</s>}
                     </span>
                     <span class="go">{p.data.cardButton || t!.cardButton}</span>
                   </div>
@@ -75,12 +86,22 @@ const groups = STORE_GROUPS.map((g) => ({ ...g, title: t ? t[g.title] : '', item
         </section>
       ))}
 
-      <p class="have">{t!.haveCodeText} <a href="/pro/unlock/">{t!.haveCodeLink}</a> · <a href="/pro/">{t!.myItemsLink}</a></p>
     </div>
   </Base>
 )}
 
 <script>
+  // موادي: إذا الجهاز عليه مواد بنبدّل الشريط لـ «افتح موادي»
+  fetch('/api/pro/me', { cache: 'no-store' })
+    .then((r) => r.json())
+    .then((d) => {
+      if (!d.ok || !d.products?.length) return;
+      document.querySelectorAll<HTMLElement>('#mybar [data-none]').forEach((e) => (e.hidden = true));
+      document.querySelectorAll<HTMLElement>('#mybar [data-has]').forEach((e) => (e.hidden = false));
+      document.getElementById('mybar')!.classList.add('has');
+    })
+    .catch(() => {});
+
   const chips = [...document.querySelectorAll<HTMLButtonElement>('.store-head .chip')];
   chips.forEach((c) =>
     c.addEventListener('click', () => {
@@ -100,6 +121,14 @@ const groups = STORE_GROUPS.map((g) => ({ ...g, title: t ? t[g.title] : '', item
   .store-soon h1 { margin: 0 0 18px; }
   .store-soon p { color: var(--muted); line-height: 1.9; margin-bottom: 26px; }
 
+  .mybar { background: var(--surface); border-bottom: 1px solid var(--line); }
+  .mybar.has { background: var(--cyan-soft); border-color: var(--cyan); }
+  .mybar-in { display: flex; align-items: center; gap: 10px; padding-block: 10px; font-size: 14.5px; }
+  .mb-text { flex: 1; color: var(--ink); min-width: 0; }
+  .mb-text[hidden], .mb-btn[hidden] { display: none; }
+  .mb-btn { flex: none; font-weight: 700; color: var(--cyan); border: 1.5px solid var(--cyan); border-radius: 999px; padding: 5px 16px; text-decoration: none; white-space: nowrap; }
+  .mb-btn.on { background: var(--cyan); color: var(--navy); }
+  .mb-btn:hover { filter: brightness(1.1); }
   .store-head { background: var(--navy); border-bottom: 1px solid var(--line); padding-block: 60px 40px; text-align: center; }
   .store-head .lead { max-width: 60ch; margin: 12px auto 0; color: var(--muted); line-height: 1.9; }
   .chips { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 26px; }
