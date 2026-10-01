@@ -53,7 +53,7 @@ const L = { codeOk: t.codeOk, codeBad: t.codeBad };
 
         <p class="err" id="err" role="alert" hidden></p>
         <button class="btn btn-primary" type="submit" id="submit">{t.orderSubmit}</button>
-        {t.orderAgree && <p class="agree">{t.orderAgree}</p>}
+        {(t.orderAgree || t.termsLink) && <p class="agree">{t.orderAgree} <a href="/store-terms/" target="_blank">{t.termsLink}</a></p>}
       </form>
 
       <aside class="osum">

@@ -569,6 +569,7 @@ const storeSettings = defineCollection({
     summaryTotal: str("المجموع"),
     orderSubmit: str("متابعة للدفع ←"),
     orderAgree: str("بالضغط على «متابعة» إنت موافق على شروط الشراء وسياسة الاسترجاع."),
+    termsLink: str("اقرأ الشروط"),
     orderOpen: str("عندك طلب مفتوح لهاد المنتج —"),
     orderOpenLink: str("كمّله من هون"),
     payTitle: str("حوّل المبلغ"),

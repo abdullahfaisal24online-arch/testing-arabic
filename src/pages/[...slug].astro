@@ -2,11 +2,13 @@
 import { getCollection, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { getSite } from '../lib/site';
+import { STORE_OPEN } from '../lib/store';
 import ContactForm from '../components/ContactForm.astro';
 import OptimizedImage from '../components/OptimizedImage.astro';
 
 export async function getStaticPaths() {
-  const pages = (await getCollection('pages')).filter((p) => !p.data.draft);
+  // صفحة شروط المتجر بتنبني بس لما المتجر مفتوح
+  const pages = (await getCollection('pages')).filter((p) => !p.data.draft && (STORE_OPEN || p.id !== 'store-terms'));
   return pages.map((page) => ({ params: { slug: page.id }, props: { page } }));
 }
 

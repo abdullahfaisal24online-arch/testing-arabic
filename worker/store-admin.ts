@@ -259,8 +259,16 @@ export async function handleStoreAdmin(req: Request, env: StoreEnv, url: URL): P
   if (!req.headers.get('cf-access-authenticated-user-email') && !req.headers.get('cf-access-jwt-assertion')) {
     return new Response('Forbidden', { status: 403 });
   }
-  await ensureTables(env);
   const path = url.pathname.replace(/\/+$/, '');
+  // عدد الطلبات اللي بانتظار المراجعة — لزر «طلبات المتجر» بلوحة الـ CMS (بيختفي إذا المتجر مسكّر)
+  if (path === '/admin/store/count') {
+    const cat = await catalog(req, env);
+    if (!cat.open) return Response.json({ ok: false, error: 'store_closed' }, { headers: { 'cache-control': 'no-store' } });
+    await ensureTables(env);
+    const r = await env.DB.prepare(`SELECT COUNT(*) AS n FROM store_orders WHERE status = 'review'`).first<{ n: number }>();
+    return Response.json({ ok: true, pending: r?.n ?? 0 }, { headers: { 'cache-control': 'no-store' } });
+  }
+  await ensureTables(env);
   const flash = FLASH[url.searchParams.get('m') ?? ''] ?? '';
 
   if (req.method === 'POST') {

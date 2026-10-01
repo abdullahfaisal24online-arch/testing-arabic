@@ -83,6 +83,7 @@ const jsonLd = [
           </a>
         )}
         {trust.length > 0 && <ul class="trust">{trust.map((x: string) => <li>{x}</li>)}</ul>}
+        {t.termsLink && <a class="terms" href="/store-terms/">{t.termsLink}: شروط الشراء وسياسة الاسترجاع</a>}
       </div>
     </div>
   </section>
@@ -142,6 +143,7 @@ const jsonLd = [
   .pricebox .btn { width: 100%; justify-content: center; margin-top: 14px; }
   .pricebox .btn + .btn { margin-top: 10px; }
   .trust { list-style: none; margin: 16px 0 0; padding: 14px 0 0; border-top: 1px solid var(--line); display: grid; gap: 6px; font-size: 14px; color: var(--muted); }
+  .terms { display: inline-block; margin-top: 10px; font-size: 13.5px; color: var(--muted); text-decoration: underline; }
   .trust li::before { content: '✓  '; color: #34d399; font-weight: 700; }
   .pbody { padding-bottom: 70px; display: grid; gap: 30px; }
   .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px 24px; }

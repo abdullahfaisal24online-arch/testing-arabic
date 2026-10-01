@@ -13,18 +13,20 @@
     <script src="https://unpkg.com/@sveltia/cms@0.205.0/dist/sveltia-cms.js"></script>
 
     <!--
-      زر «مراجعة التعليقات» بالقائمة الجانبية.
+      أزرار إضافية بالقائمة الجانبية: «مراجعة التعليقات» و«طلبات المتجر».
 
-      Sveltia CMS ما بتدعم إضافة روابط للقائمة رسمياً، فمنضيفه بنسخ عنصر موجود
-      ومنحطّه بآخر القائمة. الكود دفاعي بالكامل: إذا تغيّر شكل اللوحة بأي تحديث،
-      الزر بس ما بيظهر — ما بينكسر إشي باللوحة نفسها.
+      Sveltia CMS ما بتدعم إضافة روابط للقائمة رسمياً، فمنضيفهم بنسخ عنصر موجود
+      ومنحطّهم بآخر القائمة. الكود دفاعي بالكامل: إذا تغيّر شكل اللوحة بأي تحديث،
+      الأزرار بس ما بتظهر — ما بينكسر إشي باللوحة نفسها.
+      زر المتجر بيظهر بس لما المتجر مفتوح بهاد البناء (/admin/store/count بيرجّع ok).
     -->
     <script>
       (function () {
-        var TARGET = '/admin/comments';
-        var LABEL = 'مراجعة التعليقات';
-        var ICON = 'forum';
-        var MARK = 'ta-comments-link';
+        var LINKS = [
+          { target: '/admin/comments', label: 'مراجعة التعليقات', icon: 'forum', mark: 'ta-comments-link', title: 'مراجعة تعليقات الزوار', count: '/admin/comments/count', always: true },
+          { target: '/admin/store', label: 'طلبات المتجر', icon: 'shopping_cart', mark: 'ta-store-link', title: 'طلبات المتجر بانتظار المراجعة', count: '/admin/store/count', always: false },
+        ];
+        var storeOpen = null; // null = لسا ما عرفنا
 
         function group() {
           var sidebar = document.querySelector('.primary-sidebar');
@@ -33,9 +35,9 @@
           return g && g.querySelector('button[role="option"]') ? g : null;
         }
 
-        function build(sample) {
+        function build(sample, L) {
           var opt = sample.cloneNode(true);
-          opt.setAttribute('data-' + MARK, '1');
+          opt.setAttribute('data-' + L.mark, '1');
 
           var btn = opt.querySelector('button[role="option"]');
           if (!btn) return null;
@@ -43,17 +45,17 @@
           btn.removeAttribute('id');
           btn.removeAttribute('tabindex');
           btn.setAttribute('aria-selected', 'false');
-          btn.setAttribute('value', LABEL);
-          btn.setAttribute('data-search-value', LABEL);
-          btn.setAttribute('data-label', LABEL);
-          btn.setAttribute('data-value', LABEL);
-          btn.setAttribute('title', 'مراجعة تعليقات الزوار');
+          btn.setAttribute('value', L.label);
+          btn.setAttribute('data-search-value', L.label);
+          btn.setAttribute('data-label', L.label);
+          btn.setAttribute('data-value', L.label);
+          btn.setAttribute('title', L.title);
 
           var label = btn.querySelector('.label');
-          if (label) label.textContent = LABEL;
+          if (label) label.textContent = L.label;
 
           var icons = btn.querySelectorAll('.sui.icon');
-          if (icons.length) icons[0].textContent = ICON;
+          if (icons.length) icons[0].textContent = L.icon;
 
           var count = btn.querySelector('.count');
           if (count) {
@@ -66,7 +68,7 @@
             function (e) {
               e.preventDefault();
               e.stopPropagation();
-              window.location.href = TARGET;
+              window.location.href = L.target;
             },
             true,
           );
@@ -74,16 +76,16 @@
           return opt;
         }
 
-        // عدد التعليقات المنتظرة — الطلب بيمرّ من نفس بوابة Access
-        function refreshCount(opt) {
-          fetch('/admin/comments/count', { headers: { accept: 'application/json' } })
+        // العدد المنتظر — الطلب بيمرّ من نفس بوابة Access
+        function refreshCount(opt, L) {
+          return fetch(L.count, { headers: { accept: 'application/json' } })
             .then(function (r) {
               return r.ok ? r.json() : null;
             })
             .then(function (d) {
-              if (!d || !d.ok) return;
-              var badge = opt.querySelector('.count');
-              if (!badge) return;
+              if (!d || !d.ok) return d;
+              var badge = opt && opt.querySelector('.count');
+              if (!badge) return d;
               if (d.pending > 0) {
                 badge.textContent = String(d.pending);
                 badge.style.display = '';
@@ -91,36 +93,49 @@
                 badge.textContent = '';
                 badge.style.display = 'none';
               }
+              return d;
             })
-            .catch(function () {});
+            .catch(function () {
+              return null;
+            });
+        }
+
+        function injectOne(g, L) {
+          if (g.querySelector('[data-' + L.mark + ']')) return;
+          if (!L.always && storeOpen !== true) return;
+          var sample = g.querySelector('button[role="option"]');
+          sample = sample && sample.parentElement;
+          if (!sample) return;
+          var opt = build(sample, L);
+          if (!opt) return;
+          g.appendChild(opt);
+          refreshCount(opt, L);
+          setInterval(function () {
+            if (document.body.contains(opt)) refreshCount(opt, L);
+          }, 120000);
         }
 
         function inject() {
           try {
             var g = group();
             if (!g) return false;
-            if (g.querySelector('[data-' + MARK + ']')) return true;
-
-            var sample = g.querySelector('button[role="option"]');
-            sample = sample && sample.parentElement;
-            if (!sample) return false;
-
-            var opt = build(sample);
-            if (!opt) return false;
-
-            g.appendChild(opt);
-            refreshCount(opt);
-            setInterval(function () {
-              if (document.body.contains(opt)) refreshCount(opt);
-            }, 120000);
+            LINKS.forEach(function (L) {
+              injectOne(g, L);
+            });
             return true;
           } catch (err) {
             return false;
           }
         }
 
+        // هل المتجر مفتوح؟ (مرة وحدة)
+        refreshCount(null, LINKS[1]).then(function (d) {
+          storeOpen = !!(d && d.ok);
+          inject();
+        });
+
         // اللوحة بتبني نفسها بعد ما تحمّل، وبتعيد بناء القائمة أحياناً —
-        // فمنراقب ومنرجّع الزر إذا اختفى.
+        // فمنراقب ومنرجّع الأزرار إذا اختفت.
         var observer = new MutationObserver(function () {
           inject();
         });

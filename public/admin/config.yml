@@ -1586,6 +1586,12 @@ collections:
             widget: string
             required: false
             default: "بالضغط على «متابعة» إنت موافق على شروط الشراء وسياسة الاسترجاع."
+          - name: termsLink
+            label: "طلب الشراء — رابط صفحة الشروط"
+            widget: string
+            required: false
+            default: "اقرأ الشروط"
+            hint: "بيفتح صفحة «شروط الشراء وسياسة الاسترجاع» (الصفحات ← store-terms)"
           - name: orderOpen
             label: "طلب الشراء — تنبيه طلب سابق"
             widget: string
