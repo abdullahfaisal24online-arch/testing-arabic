@@ -1,0 +1,205 @@
+---
+// زخارف الرئيسية فقط. لا تغيّر الهيكل أو ترتيب أقسام الـCMS.
+const bugs = [0, 1];
+---
+<div id="home-atmosphere" aria-hidden="true">
+  <svg class="home-web" viewBox="0 0 160 120" fill="none">
+    <g stroke="currentColor" stroke-width=".75">
+      <path d="M0 0H160M0 0 156 30M0 0 137 60M0 0 112 87M0 0 79 105M0 0 40 116M0 0V120" />
+      {[.2, .4, .6, .8, 1].map((scale) => (
+        <path transform={`scale(${scale})`} d="M160 0Q151 12 156 30Q138 39 137 60Q118 66 112 87Q91 89 79 105Q58 101 40 116Q18 107 0 120" />
+      ))}
+    </g>
+  </svg>
+  {bugs.map((n) => (
+    <div class:list={['home-bug', { 'home-bug-second': n === 1 }]}>
+      <div class="home-bug-turn"><div class="home-bug-art">
+        <span class="bug-leg l1"></span><span class="bug-leg l2"></span><span class="bug-leg l3"></span>
+        <span class="bug-leg r1"></span><span class="bug-leg r2"></span><span class="bug-leg r3"></span>
+        <span class="bug-head"></span><span class="bug-shell"></span>
+      </div></div>
+    </div>
+  ))}
+</div>
+<button type="button" class="home-motion-toggle" aria-pressed="false" hidden>إيقاف التأثيرات</button>
+
+<style is:global>
+  .home-effects .hero { position: relative; isolation: isolate; }
+  .home-effects .hero-in { position: relative; z-index: 1; }
+  /* أقل كثافة، وثابتة: حركة الدعسوقات هي الحركة المحيطية الوحيدة. */
+  .home-effects .bgfx-dots,
+  html:not([data-theme='light']) .home-effects .dots.bgfx-band::before {
+    background-image: radial-gradient(circle at 1px 1px, rgba(56,189,248,.065) .8px, transparent 0);
+    background-size: 28px 28px;
+    animation: none;
+    will-change: auto;
+  }
+  .home-effects .bgfx-glow,
+  html:not([data-theme='light']) .home-effects .dots.bgfx-band::after { display: none; }
+  #home-atmosphere { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 2; }
+  .home-web { position: absolute; top: 0; left: 0; width: 138px; height: 62px; color: var(--cyan); opacity: .24; transform-origin: 0 0; }
+  .home-web.is-shivering { animation: home-web-sway .85s ease-out; }
+  @keyframes home-web-sway { 20% { transform: skewY(1.2deg); } 45% { transform: skewY(-.7deg); } 70% { transform: skewY(.3deg); } }
+  .home-bug { position: absolute; left: 0; top: 0; width: var(--bug-size, 18px); height: calc(var(--bug-size, 18px) * 1.118); visibility: hidden; filter: drop-shadow(0 3px 2px rgba(0,0,0,.3)); }
+  .home-bug-turn { width: 100%; height: 100%; transition: rotate .6s ease; }
+  .home-bug-art { width: 34px; height: 38px; position: relative; transform: scale(var(--bug-scale, .5294)); transform-origin: 0 0; }
+  .bug-head { position: absolute; top: 4px; left: 11px; width: 12px; height: 12px; background: #16151c; border-radius: 50%; }
+  .bug-head::before,.bug-head::after { content: ''; position: absolute; top: -4px; width: 1px; height: 7px; background: #8c7780; rotate: -28deg; left: 2px; }
+  .bug-head::after { left: auto; right: 2px; rotate: 28deg; }
+  .bug-shell { position: absolute; top: 10px; left: 6px; width: 23px; height: 27px; border-radius: 48% 48% 45% 45%;
+    background: radial-gradient(circle at 28% 30%,#281720 0 2px,transparent 2.6px),radial-gradient(circle at 72% 30%,#281720 0 2px,transparent 2.6px),radial-gradient(circle at 23% 61%,#281720 0 2.3px,transparent 2.9px),radial-gradient(circle at 77% 61%,#281720 0 2.3px,transparent 2.9px),radial-gradient(circle at 40% 83%,#281720 0 1.5px,transparent 2px),radial-gradient(circle at 63% 83%,#281720 0 1.5px,transparent 2px),linear-gradient(115deg,#f15a50,#bc2634 65%,#7e1c2b);
+    box-shadow: inset 1px 1px 2px #ff978077,inset -2px -2px 3px #360e1b66;
+  }
+  .bug-shell::after { content: ''; position: absolute; top: 1px; bottom: 0; left: 11px; width: 1px; background: #531b28; }
+  .bug-shell::before { content: ''; position: absolute; width: 5px; height: 10px; border-radius: 50%; background: #ffd8c835; left: 3px; top: 3px; rotate: 20deg; }
+  .bug-leg { position: absolute; width: 12px; height: 1.5px; background: #968088; left: 0; top: 18px; transform-origin: right center; transform: rotate(25deg); border-radius: 2px; }
+  .bug-leg.l2 { top: 25px; transform: rotate(-5deg); }
+  .bug-leg.l3 { top: 31px; transform: rotate(-35deg); }
+  .bug-leg.r1,.bug-leg.r2,.bug-leg.r3 { left: auto; right: 0; transform-origin: left center; }
+  .bug-leg.r1 { transform: rotate(-25deg); }
+  .bug-leg.r2 { top: 25px; transform: rotate(5deg); }
+  .bug-leg.r3 { top: 31px; transform: rotate(35deg); }
+  .home-bug.is-walking .bug-leg { animation: home-bug-step .16s alternate infinite; }
+  .home-bug.is-walking :is(.r1,.l2,.r3) { animation-delay: -.16s; }
+  @keyframes home-bug-step { to { rotate: 13deg; } }
+  .home-motion-toggle { position: absolute; left: max(24px, calc((100% - 1152px) / 2)); bottom: 8px; z-index: 3; min-height: 44px; padding: 8px 4px; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 11px; cursor: pointer; }
+  .home-motion-toggle:hover { color: var(--ink); }
+  .home-effects :is(a.card, a.game-card) { transition: border-color .22s ease, box-shadow .22s ease, transform .22s ease; }
+  .home-effects .welcome { transform: none; }
+  .home-effects .welcome .thumb { isolation: isolate; }
+  .home-effects .welcome :is(.vf-play, .play) { transition: scale .22s ease, box-shadow .22s ease; }
+  @media (hover: hover) and (pointer: fine) {
+    .home-effects :is(a.card, a.game-card):hover { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan-soft), 0 12px 32px var(--cyan-soft); transform: translateY(-3px); }
+    .home-effects .welcome:hover { border-color: var(--cyan); box-shadow: var(--shadow-lg), 0 0 22px var(--cyan-soft); }
+    .home-effects .welcome:hover :is(.vf-play, .play) { scale: 1.06; box-shadow: 0 0 0 7px var(--orange-soft), 0 8px 28px var(--orange-soft); }
+  }
+  .home-effects :is(a.card, a.game-card):focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; }
+  @media (hover: none) {
+    .home-effects :is(a.card, a.game-card):hover { transform: none; }
+    .home-effects :is(a.card, a.game-card):active { border-color: var(--cyan); }
+  }
+  .home-effects[data-home-motion='paused'] :is(.card, .game-card, .vf-play, .play, .home-bug-turn) { transition: none; }
+  .home-effects[data-home-motion='paused'] :is(a.card, a.game-card):hover { transform: none; }
+  .home-effects[data-home-motion='paused'] .welcome :is(.vf-play, .play) { scale: 1; }
+  .home-effects[data-home-motion='paused'] .home-web { animation: none; }
+  @media (max-width: 760px) { .home-bug-second { display: none; } .home-web { width: 96px; height: 40px; opacity: .2; } }
+  @media (prefers-reduced-motion: reduce) {
+    .home-bug, .home-motion-toggle { display: none; }
+    .home-web { animation: none !important; }
+    .home-effects :is(a.card, a.game-card):hover { transform: none; }
+    .home-effects .welcome :is(.vf-play, .play) { scale: 1 !important; }
+  }
+</style>
+
+<script>
+  const layer = document.getElementById('home-atmosphere');
+  const hero = layer?.parentElement;
+  const toggle = hero?.querySelector<HTMLButtonElement>('.home-motion-toggle');
+  if (layer && hero && toggle) {
+    const bugs = [...layer.querySelectorAll<HTMLElement>('.home-bug')];
+    const turns = bugs.map(bug => bug.querySelector<HTMLElement>('.home-bug-turn')!);
+    const web = layer.querySelector<SVGElement>('.home-web')!;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+    let manualPause = false;
+    try { manualPause = localStorage.getItem('ta-home-motion') === 'paused'; } catch { /* storage optional */ }
+    let inView = false, videoPlaying = false, frame = 0, last = 0, elapsed = 0, burst = 0, cooldown = 0;
+    let width = 0, height = 0, size = 18, left = 3;
+    let positions: { x: number; y: number; moving: boolean }[] = [];
+    const animations = new Set<Animation>();
+    const paused = () => manualPause || reduced.matches;
+    const canRun = () => !paused() && inView && !document.hidden && !videoPlaying;
+
+    const measure = () => {
+      width = hero.clientWidth; height = hero.clientHeight;
+      const wrap = hero.querySelector<HTMLElement>('.hero-in');
+      const gutter = wrap ? (width - wrap.clientWidth) / 2 + parseFloat(getComputedStyle(wrap).paddingLeft) : 24;
+      size = gutter >= 44 ? 28 : 16;
+      left = Math.max(2, (gutter - size) / 2);
+      layer.style.setProperty('--bug-size', `${size}px`);
+      layer.style.setProperty('--bug-scale', String(size / 34));
+      paint();
+    };
+    const paint = () => {
+      const phase = elapsed % 34, reverse = Math.floor(elapsed / 34) % 2 === 1;
+      positions = bugs.map((bug, i) => {
+        const start = i ? 18 : 1, end = i ? 24 : 8;
+        let k = Math.max(0, Math.min(1, (phase - start) / (end - start)));
+        k = k * k * (3 - 2 * k);
+        if (reverse) k = 1 - k;
+        const bottom = i ? Math.min(height - 68, 405) : Math.min(height - 70, width <= 760 ? 320 : 350);
+        const top = i ? Math.max(100, bottom - 100) : 95;
+        const x = i ? width - left - size : left, y = bottom - (bottom - top) * k;
+        const moving = phase > start && phase < end;
+        bug.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+        turns[i].style.rotate = reverse ? '180deg' : '0deg';
+        bug.style.visibility = reduced.matches ? 'hidden' : 'visible';
+        bug.classList.toggle('is-walking', moving && canRun());
+        return { x, y, moving };
+      });
+    };
+    const tick = (now: number) => {
+      frame = 0;
+      if (!layer.isConnected || !canRun()) { last = 0; return; }
+      const dt = last ? Math.min((now - last) / 1000, .05) : 0;
+      last = now; elapsed += dt * (burst > 0 ? 3.5 : 1);
+      burst = Math.max(0, burst - dt); cooldown = Math.max(0, cooldown - dt);
+      paint(); frame = requestAnimationFrame(tick);
+    };
+    const sync = () => {
+      document.body.dataset.homeMotion = paused() ? 'paused' : 'running';
+      toggle.hidden = reduced.matches;
+      toggle.textContent = manualPause ? 'تشغيل التأثيرات' : 'إيقاف التأثيرات';
+      toggle.setAttribute('aria-pressed', String(paused()));
+      if (paused()) { animations.forEach(a => a.cancel()); animations.clear(); web.classList.remove('is-shivering'); }
+      if (canRun() && !frame) { last = 0; frame = requestAnimationFrame(tick); }
+      else if (!canRun()) { cancelAnimationFrame(frame); frame = 0; last = 0; }
+      paint();
+    };
+    toggle.addEventListener('click', () => {
+      manualPause = !manualPause;
+      try { localStorage.setItem('ta-home-motion', manualPause ? 'paused' : 'running'); } catch { /* optional */ }
+      sync();
+    });
+    reduced.addEventListener('change', sync);
+    document.addEventListener('visibilitychange', sync);
+    const visibility = new IntersectionObserver(entries => { inView = entries[0].isIntersecting; sync(); });
+    visibility.observe(hero);
+    const resize = new ResizeObserver(measure); resize.observe(hero);
+    hero.addEventListener('pointermove', event => {
+      if (!canRun() || !finePointer.matches || event.pointerType === 'touch') return;
+      const box = hero.getBoundingClientRect(), x = event.clientX - box.left, y = event.clientY - box.top;
+      if (x < (width <= 760 ? 96 : 138) && y < (width <= 760 ? 40 : 62)) web.classList.add('is-shivering');
+      if (cooldown > 0) return;
+      positions.forEach((p, i) => {
+        if (i === 1 && width <= 760) return;
+        if (p.moving && Math.hypot(x - p.x - size / 2, y - p.y - size / 2) < 60) { burst = .65; cooldown = 2; }
+      });
+    }, { passive: true });
+    web.addEventListener('animationend', () => web.classList.remove('is-shivering'));
+    const player = hero.querySelector<HTMLIFrameElement>('iframe[src*="iframe.mediadelivery.net"]');
+    window.addEventListener('message', event => {
+      if (!player || event.origin !== 'https://iframe.mediadelivery.net' || event.source !== player.contentWindow) return;
+      if (event.data?.channel !== 'bunnystream') return;
+      if (event.data.event === 'play') videoPlaying = true;
+      else if (event.data.event === 'pause' || event.data.event === 'ended') videoPlaying = false;
+      else return;
+      sync();
+    });
+    // المحتوى ظاهر افتراضياً؛ نحرك القسم عند دخوله فقط، ولا نخفيه بانتظار JavaScript.
+    const reveal = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        reveal.unobserve(entry.target);
+        if (paused() || typeof entry.target.animate !== 'function') return;
+        const animation = entry.target.animate([{ opacity: .7, transform: 'translateY(10px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 340, easing: 'cubic-bezier(.2,.7,.3,1)' });
+        animations.add(animation);
+        animation.finished.then(() => animations.delete(animation), () => animations.delete(animation));
+      });
+    }, { threshold: .04 });
+    document.querySelectorAll('#main > .section').forEach(section => reveal.observe(section));
+    window.addEventListener('pagehide', () => { cancelAnimationFrame(frame); frame = 0; last = 0; });
+    window.addEventListener('pageshow', sync);
+    measure(); sync();
+  }
+</script>
