@@ -1,6 +1,6 @@
 ---
 // Native vector artwork: jointed legs, seven spots, shell highlights and flight wings.
-const bugs = [0, 1, 2, 3, 4];
+const bugs = [0, 1, 2];
 ---
 <div id="home-atmosphere" aria-hidden="true">
   <svg class="home-web" viewBox="0 0 160 120" fill="none"><g stroke="currentColor" stroke-width=".75">
@@ -109,7 +109,7 @@ const bugs = [0, 1, 2, 3, 4];
   }
 </style>
 <style is:global>
-  .home-effects :is(#main > section, .site-foot) { position: relative; }
+  .home-effects .hero { position: relative; }
   #home-bug-swarm { position: absolute; inset: 0; pointer-events: none; z-index: 3; overflow: clip; }
   #home-bug-swarm[hidden], .home-bug[hidden] { display: none !important; }
   .home-bug { position: absolute; left: 0; top: 0; width: 44px; height: 44px; margin: 0; padding: 0; border: 0; background: transparent; border-radius: 50%; pointer-events: auto; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }

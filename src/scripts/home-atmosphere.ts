@@ -10,14 +10,14 @@ if (hero && layer && swarm && toggle) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const fine = matchMedia('(hover: hover) and (pointer: fine)');
   const mobile = matchMedia('(max-width: 760px)');
-  // One bounded swarm follows the visible homepage section, including the newsletter/footer.
-  // Reuse five buttons rather than creating dozens of animated elements down the page.
-  const regions = [...document.querySelectorAll<HTMLElement>('#main > section, .home-effects > .site-foot')];
+  // Keep exactly three ladybugs around the hero web; never follow the reader down the page.
+  const regions = [hero];
   const visible = new Map<HTMLElement, number>();
   const animations = new Set<Animation>();
   type Bug = { button: HTMLButtonElement; turn: HTMLElement; p: Point; angle: number; mode: 'idle'|'inspect'|'walk'|'fly'; route: Route|null; started: number; duration: number; next: number; cooldown: number; hover: boolean; flightDue: number; away: Point|null };
   const bugs: Bug[] = buttons.map((button, i) => ({ button, turn: button.querySelector<HTMLElement>('.lady-turn')!, p: {x:22,y:22}, angle: i*65, mode: 'idle', route: null, started: 0, duration: 0, next: 1+i*3, cooldown: 0, hover: false, flightDue: 18+i*11, away: null }));
-  let active = hero, space: Space = {width:0,height:0,obstacles:[]}, points: Point[] = [], count = 0;
+  const active = hero;
+  let space: Space = {width:0,height:0,obstacles:[]}, points: Point[] = [], count = 0;
   let manualPause = false, videoPlaying = false, frame = 0, last = 0, now = 0, measuring = 0;
   try { manualPause = localStorage.getItem('ta-home-motion') === 'paused'; } catch { /* optional preference */ }
   const paused = () => manualPause || reduced.matches;
@@ -43,9 +43,11 @@ if (hero && layer && swarm && toggle) {
     const rect=active.getBoundingClientRect();
     const obstacles=[...active.querySelectorAll<HTMLElement>(active===hero?'.hero-txt, .feat, .home-motion-toggle':'.section-head, .card, .game-card, .nl, .resume, .brand-col, .col, .bottom > *')]
       .filter(el=>!el.hidden).map(el=>{const r=el.getBoundingClientRect();return{left:r.left-rect.left,top:r.top-rect.top,right:r.right-rect.left,bottom:r.bottom-rect.top};});
-    space={width:active.clientWidth,height:active.clientHeight,obstacles};
+    const webRect=web.getBoundingClientRect();
+    // A small margin lets them perch beside the web without reaching the rest of the hero.
+    space={width:Math.min(active.clientWidth,webRect.width+64),height:Math.min(active.clientHeight,webRect.height+22),obstacles};
     points=perches(space);
-    const seats=spread(points,mobile.matches?2:5);
+    const seats=spread(points,3);
     count=seats.length;
     bugs.forEach((b,i)=>{
       if(i>=count)return;
@@ -145,10 +147,6 @@ if (hero && layer && swarm && toggle) {
   document.addEventListener('visibilitychange',sync);
   const visibility=new IntersectionObserver(entries=>{
     entries.forEach(e=>visible.set(e.target as HTMLElement,e.isIntersecting?e.intersectionRect.width*e.intersectionRect.height:0));
-    const next=regions.reduce((best,r)=>(visible.get(r)??0)>(visible.get(best)??0)?r:best,active);
-    if(next!==active&&!buttons.includes(document.activeElement as HTMLButtonElement)){
-      active=next;active.appendChild(swarm!);measure();
-    }
     sync();
   },{threshold:[0,.1,.25,.5,.75,1]});
   regions.forEach(r=>visibility.observe(r));
