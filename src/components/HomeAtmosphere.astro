@@ -1,25 +1,56 @@
 ---
-// زخارف الرئيسية فقط. لا تغيّر الهيكل أو ترتيب أقسام الـCMS.
-const bugs = [0, 1];
+// Native vector artwork: jointed legs, seven spots, shell highlights and flight wings.
+const bugs = [0, 1, 2, 3];
 ---
 <div id="home-atmosphere" aria-hidden="true">
-  <svg class="home-web" viewBox="0 0 160 120" fill="none">
-    <g stroke="currentColor" stroke-width=".75">
-      <path d="M0 0H160M0 0 156 30M0 0 137 60M0 0 112 87M0 0 79 105M0 0 40 116M0 0V120" />
-      {[.2, .4, .6, .8, 1].map((scale) => (
-        <path transform={`scale(${scale})`} d="M160 0Q151 12 156 30Q138 39 137 60Q118 66 112 87Q91 89 79 105Q58 101 40 116Q18 107 0 120" />
-      ))}
-    </g>
-  </svg>
-  {bugs.map((n) => (
-    <div class:list={['home-bug', { 'home-bug-second': n === 1 }]}>
-      <div class="home-bug-turn"><div class="home-bug-art">
-        <span class="bug-leg l1"></span><span class="bug-leg l2"></span><span class="bug-leg l3"></span>
-        <span class="bug-leg r1"></span><span class="bug-leg r2"></span><span class="bug-leg r3"></span>
-        <span class="bug-head"></span><span class="bug-shell"></span>
-      </div></div>
-    </div>
-  ))}
+  <svg class="home-web" viewBox="0 0 160 120" fill="none"><g stroke="currentColor" stroke-width=".75">
+    <path d="M0 0H160M0 0 156 30M0 0 137 60M0 0 112 87M0 0 79 105M0 0 40 116M0 0V120" />
+    {[.2,.4,.6,.8,1].map(scale => <path transform={`scale(${scale})`} d="M160 0Q151 12 156 30Q138 39 137 60Q118 66 112 87Q91 89 79 105Q58 101 40 116Q18 107 0 120" />)}
+  </g></svg>
+</div>
+<div id="home-bug-swarm" hidden>
+  {bugs.map(n => <button type="button" class="home-bug" aria-label={`طيّر الدعسوقة ${n + 1}`} title="اضغط لتطير" hidden>
+    <span class="lady-shadow" aria-hidden="true"></span>
+    <span class="lady-turn" aria-hidden="true"><span class="lady-lift">
+      <svg class="lady-art" viewBox="0 0 64 76" fill="none">
+        <defs>
+          <radialGradient id={`shell-${n}`} cx="23" cy="33" r="38" gradientUnits="userSpaceOnUse"><stop stop-color="#ff9a65"/><stop offset=".28" stop-color="#e95127"/><stop offset=".68" stop-color="#b02819"/><stop offset="1" stop-color="#49151a"/></radialGradient>
+          <linearGradient id={`body-${n}`} x1="12" y1="18" x2="46" y2="65" gradientUnits="userSpaceOnUse"><stop stop-color="#53535a"/><stop offset=".4" stop-color="#181a20"/><stop offset="1" stop-color="#05090e"/></linearGradient>
+          <linearGradient id={`wing-${n}`} x1="32" y1="29" x2="14" y2="67" gradientUnits="userSpaceOnUse"><stop stop-color="#e0e5d7" stop-opacity=".82"/><stop offset="1" stop-color="#a4cbdc" stop-opacity=".23"/></linearGradient>
+        </defs>
+        <g class="lady-legs" stroke="#40322e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path class="leg-a" d="M21 31 13 26 10 17 7 15M43 44 53 44 58 50 60 49M23 55 16 63 15 69 11 70"/>
+          <path class="leg-b" d="M43 31 51 26 54 17 57 15M21 44 11 44 6 50 4 49M41 55 48 63 49 69 53 70"/>
+        </g>
+        <path d="M25 16 22 8 18 5M39 16 42 8 46 5" stroke="#393330" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="18" cy="5" r="1.5" fill="#423a33"/><circle cx="46" cy="5" r="1.5" fill="#423a33"/>
+        <ellipse cx="32" cy="45" rx="19" ry="25" fill={`url(#body-${n})`}/>
+        <path d="M19 28Q18 13 32 12Q46 13 45 28Z" fill={`url(#body-${n})`}/>
+        <path d="M21 20Q24 16 27 18L26 24 21 25ZM43 20Q40 16 37 18L38 24 43 25Z" fill="#e7e0ca"/>
+        <circle cx="25" cy="14" r="1.8" fill="#11171c"/><circle cx="39" cy="14" r="1.8" fill="#11171c"/>
+        <g class="lady-wings" fill={`url(#wing-${n})`} stroke="#d0dfdb" stroke-opacity=".38" stroke-width=".65">
+          <path class="wing-left" d="M31 29C9 26-7 41 3 61C13 74 30 47 31 29ZM29 33 6 59M24 37 8 45M20 43 15 57"/>
+          <path class="wing-right" d="M33 29C55 26 71 41 61 61C51 74 34 47 33 29ZM35 33 58 59M40 37 56 45M44 43 49 57"/>
+        </g>
+        <g class="shell-left">
+          <path d="M31.6 26C5 22 5 63 24 69Q28 71 31.6 69Z" fill={`url(#shell-${n})`} stroke="#671824" stroke-width=".6"/>
+          <path d="M30 27Q25 27 25 32Q26 36 31 36Z" fill="#1c1b22"/>
+          <ellipse cx="19.5" cy="40" rx="4.1" ry="4.8" fill="#1c1b22" transform="rotate(16 19.5 40)"/>
+          <ellipse cx="18" cy="55" rx="3.5" ry="4" fill="#1c1b22"/>
+          <ellipse cx="27" cy="63" rx="2.7" ry="3" fill="#1c1b22"/>
+          <path d="M24 29Q14 33 15 44" stroke="#ffd5b0" stroke-opacity=".5" stroke-width="2.8" stroke-linecap="round"/>
+        </g>
+        <g class="shell-right">
+          <path d="M32.4 26C59 22 59 63 40 69Q36 71 32.4 69Z" fill={`url(#shell-${n})`} stroke="#671824" stroke-width=".6"/>
+          <path d="M34 27Q39 27 39 32Q38 36 33 36Z" fill="#1c1b22"/>
+          <ellipse cx="44.5" cy="40" rx="4.1" ry="4.8" fill="#1c1b22" transform="rotate(-16 44.5 40)"/>
+          <ellipse cx="46" cy="55" rx="3.5" ry="4" fill="#1c1b22"/>
+          <ellipse cx="37" cy="63" rx="2.7" ry="3" fill="#1c1b22"/>
+          <path d="M48 38Q54 56 41 66" stroke="#fb7960" stroke-opacity=".28" stroke-width="1.4"/>
+        </g>
+      </svg>
+    </span></span>
+  </button>)}
 </div>
 <button type="button" class="home-motion-toggle" aria-pressed="false" hidden>إيقاف التأثيرات</button>
 
@@ -40,28 +71,6 @@ const bugs = [0, 1];
   .home-web { position: absolute; top: 0; left: 0; width: 138px; height: 62px; color: var(--cyan); opacity: .24; transform-origin: 0 0; }
   .home-web.is-shivering { animation: home-web-sway .85s ease-out; }
   @keyframes home-web-sway { 20% { transform: skewY(1.2deg); } 45% { transform: skewY(-.7deg); } 70% { transform: skewY(.3deg); } }
-  .home-bug { position: absolute; left: 0; top: 0; width: var(--bug-size, 18px); height: calc(var(--bug-size, 18px) * 1.118); visibility: hidden; filter: drop-shadow(0 3px 2px rgba(0,0,0,.3)); }
-  .home-bug-turn { width: 100%; height: 100%; transition: rotate .6s ease; }
-  .home-bug-art { width: 34px; height: 38px; position: relative; transform: scale(var(--bug-scale, .5294)); transform-origin: 0 0; }
-  .bug-head { position: absolute; top: 4px; left: 11px; width: 12px; height: 12px; background: #16151c; border-radius: 50%; }
-  .bug-head::before,.bug-head::after { content: ''; position: absolute; top: -4px; width: 1px; height: 7px; background: #8c7780; rotate: -28deg; left: 2px; }
-  .bug-head::after { left: auto; right: 2px; rotate: 28deg; }
-  .bug-shell { position: absolute; top: 10px; left: 6px; width: 23px; height: 27px; border-radius: 48% 48% 45% 45%;
-    background: radial-gradient(circle at 28% 30%,#281720 0 2px,transparent 2.6px),radial-gradient(circle at 72% 30%,#281720 0 2px,transparent 2.6px),radial-gradient(circle at 23% 61%,#281720 0 2.3px,transparent 2.9px),radial-gradient(circle at 77% 61%,#281720 0 2.3px,transparent 2.9px),radial-gradient(circle at 40% 83%,#281720 0 1.5px,transparent 2px),radial-gradient(circle at 63% 83%,#281720 0 1.5px,transparent 2px),linear-gradient(115deg,#f15a50,#bc2634 65%,#7e1c2b);
-    box-shadow: inset 1px 1px 2px #ff978077,inset -2px -2px 3px #360e1b66;
-  }
-  .bug-shell::after { content: ''; position: absolute; top: 1px; bottom: 0; left: 11px; width: 1px; background: #531b28; }
-  .bug-shell::before { content: ''; position: absolute; width: 5px; height: 10px; border-radius: 50%; background: #ffd8c835; left: 3px; top: 3px; rotate: 20deg; }
-  .bug-leg { position: absolute; width: 12px; height: 1.5px; background: #968088; left: 0; top: 18px; transform-origin: right center; transform: rotate(25deg); border-radius: 2px; }
-  .bug-leg.l2 { top: 25px; transform: rotate(-5deg); }
-  .bug-leg.l3 { top: 31px; transform: rotate(-35deg); }
-  .bug-leg.r1,.bug-leg.r2,.bug-leg.r3 { left: auto; right: 0; transform-origin: left center; }
-  .bug-leg.r1 { transform: rotate(-25deg); }
-  .bug-leg.r2 { top: 25px; transform: rotate(5deg); }
-  .bug-leg.r3 { top: 31px; transform: rotate(35deg); }
-  .home-bug.is-walking .bug-leg { animation: home-bug-step .16s alternate infinite; }
-  .home-bug.is-walking :is(.r1,.l2,.r3) { animation-delay: -.16s; }
-  @keyframes home-bug-step { to { rotate: 13deg; } }
   .home-motion-toggle { position: absolute; left: max(24px, calc((100% - 1152px) / 2)); bottom: 8px; z-index: 3; min-height: 44px; padding: 8px 4px; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 11px; cursor: pointer; }
   .home-motion-toggle:hover { color: var(--ink); }
   .home-effects :is(a.card, a.game-card) { transition: border-color .22s ease, box-shadow .22s ease, transform .22s ease; }
@@ -90,116 +99,39 @@ const bugs = [0, 1];
     .home-effects .welcome :is(.vf-play, .play) { scale: 1 !important; }
   }
 </style>
-
+<style is:global>
+  .home-effects .games { position: relative; }
+  #home-bug-swarm { position: absolute; inset: 0; pointer-events: none; z-index: 3; overflow: clip; }
+  #home-bug-swarm[hidden], .home-bug[hidden] { display: none !important; }
+  .home-bug { position: absolute; left: 0; top: 0; width: 44px; height: 44px; margin: 0; padding: 0; border: 0; background: transparent; border-radius: 50%; pointer-events: auto; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  .home-bug:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  .lady-turn { position: absolute; inset: 0; display: grid; place-items: center; transition: rotate .32s ease; }
+  .lady-lift { display: block; width: 42px; height: 50px; transition: scale .25s ease, translate .25s ease; }
+  .lady-art { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 2px 1px #0004); }
+  .lady-shadow { position: absolute; width: 23px; height: 27px; left: 11px; top: 13px; border-radius: 50%; background: #0005; filter: blur(2px); transition: scale .25s ease, opacity .25s ease; }
+  .lady-wings { opacity: 0; transition: opacity .12s; }
+  .shell-left { transform-origin: 31px 27px; transition: transform .2s ease; }
+  .shell-right { transform-origin: 33px 27px; transition: transform .2s ease; }
+  .home-bug.is-flying .shell-left { transform: rotate(32deg); }
+  .home-bug.is-flying .shell-right { transform: rotate(-32deg); }
+  .home-bug.is-flying .lady-wings { opacity: 1; }
+  .home-bug.is-flying .wing-left { transform-origin: 31px 29px; animation: lady-wing-left .055s alternate infinite; }
+  .home-bug.is-flying .wing-right { transform-origin: 33px 29px; animation: lady-wing-right .055s alternate infinite; }
+  .home-bug.is-flying .lady-lift { scale: 1.15; translate: 0 -3px; }
+  .home-bug.is-flying .lady-shadow { scale: 1.5; opacity: .3; }
+  .home-bug.is-walking .leg-a { transform-origin: 32px 42px; animation: lady-step .15s alternate infinite; }
+  .home-bug.is-walking .leg-b { transform-origin: 32px 42px; animation: lady-step .15s -.15s alternate infinite; }
+  @keyframes lady-step { to { transform: rotate(7deg); } }
+  @keyframes lady-wing-left { to { transform: rotate(17deg) scaleX(.7); } }
+  @keyframes lady-wing-right { to { transform: rotate(-17deg) scaleX(.7); } }
+  .home-bug.is-resting .lady-turn { transition-duration: .6s; }
+  .home-bug.is-peeking .lady-lift { animation: lady-peek 1s ease-out both; }
+  @keyframes lady-peek { 0% { clip-path: inset(0 0 72% 0); opacity: .35; translate: 0 7px; } 45% { clip-path: inset(0 0 35% 0); opacity: 1; translate: 0 3px; } 100% { clip-path: inset(0); translate: 0 0; } }
+  .home-effects[data-home-motion='paused'] .home-bug * { animation-play-state: paused !important; transition: none; }
+  .home-effects .home-bug.is-still * { animation-play-state: paused !important; transition: none; }
+  @media(max-width:760px) { .lady-lift { width: 34px; height: 40px; } .lady-shadow { scale: .8; } }
+  @media(prefers-reduced-motion:reduce) { #home-bug-swarm { display: none; } }
+</style>
 <script>
-  const layer = document.getElementById('home-atmosphere');
-  const hero = layer?.parentElement;
-  const toggle = hero?.querySelector<HTMLButtonElement>('.home-motion-toggle');
-  if (layer && hero && toggle) {
-    const bugs = [...layer.querySelectorAll<HTMLElement>('.home-bug')];
-    const turns = bugs.map(bug => bug.querySelector<HTMLElement>('.home-bug-turn')!);
-    const web = layer.querySelector<SVGElement>('.home-web')!;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
-    let manualPause = false;
-    try { manualPause = localStorage.getItem('ta-home-motion') === 'paused'; } catch { /* storage optional */ }
-    let inView = false, videoPlaying = false, frame = 0, last = 0, elapsed = 0, burst = 0, cooldown = 0;
-    let width = 0, height = 0, size = 18, left = 3;
-    let positions: { x: number; y: number; moving: boolean }[] = [];
-    const animations = new Set<Animation>();
-    const paused = () => manualPause || reduced.matches;
-    const canRun = () => !paused() && inView && !document.hidden && !videoPlaying;
-
-    const measure = () => {
-      width = hero.clientWidth; height = hero.clientHeight;
-      const wrap = hero.querySelector<HTMLElement>('.hero-in');
-      const gutter = wrap ? (width - wrap.clientWidth) / 2 + parseFloat(getComputedStyle(wrap).paddingLeft) : 24;
-      size = gutter >= 44 ? 28 : 16;
-      left = Math.max(2, (gutter - size) / 2);
-      layer.style.setProperty('--bug-size', `${size}px`);
-      layer.style.setProperty('--bug-scale', String(size / 34));
-      paint();
-    };
-    const paint = () => {
-      const phase = elapsed % 34, reverse = Math.floor(elapsed / 34) % 2 === 1;
-      positions = bugs.map((bug, i) => {
-        const start = i ? 18 : 1, end = i ? 24 : 8;
-        let k = Math.max(0, Math.min(1, (phase - start) / (end - start)));
-        k = k * k * (3 - 2 * k);
-        if (reverse) k = 1 - k;
-        const bottom = i ? Math.min(height - 68, 405) : Math.min(height - 70, width <= 760 ? 320 : 350);
-        const top = i ? Math.max(100, bottom - 100) : 95;
-        const x = i ? width - left - size : left, y = bottom - (bottom - top) * k;
-        const moving = phase > start && phase < end;
-        bug.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
-        turns[i].style.rotate = reverse ? '180deg' : '0deg';
-        bug.style.visibility = reduced.matches ? 'hidden' : 'visible';
-        bug.classList.toggle('is-walking', moving && canRun());
-        return { x, y, moving };
-      });
-    };
-    const tick = (now: number) => {
-      frame = 0;
-      if (!layer.isConnected || !canRun()) { last = 0; return; }
-      const dt = last ? Math.min((now - last) / 1000, .05) : 0;
-      last = now; elapsed += dt * (burst > 0 ? 3.5 : 1);
-      burst = Math.max(0, burst - dt); cooldown = Math.max(0, cooldown - dt);
-      paint(); frame = requestAnimationFrame(tick);
-    };
-    const sync = () => {
-      document.body.dataset.homeMotion = paused() ? 'paused' : 'running';
-      toggle.hidden = reduced.matches;
-      toggle.textContent = manualPause ? 'تشغيل التأثيرات' : 'إيقاف التأثيرات';
-      toggle.setAttribute('aria-pressed', String(paused()));
-      if (paused()) { animations.forEach(a => a.cancel()); animations.clear(); web.classList.remove('is-shivering'); }
-      if (canRun() && !frame) { last = 0; frame = requestAnimationFrame(tick); }
-      else if (!canRun()) { cancelAnimationFrame(frame); frame = 0; last = 0; }
-      paint();
-    };
-    toggle.addEventListener('click', () => {
-      manualPause = !manualPause;
-      try { localStorage.setItem('ta-home-motion', manualPause ? 'paused' : 'running'); } catch { /* optional */ }
-      sync();
-    });
-    reduced.addEventListener('change', sync);
-    document.addEventListener('visibilitychange', sync);
-    const visibility = new IntersectionObserver(entries => { inView = entries[0].isIntersecting; sync(); });
-    visibility.observe(hero);
-    const resize = new ResizeObserver(measure); resize.observe(hero);
-    hero.addEventListener('pointermove', event => {
-      if (!canRun() || !finePointer.matches || event.pointerType === 'touch') return;
-      const box = hero.getBoundingClientRect(), x = event.clientX - box.left, y = event.clientY - box.top;
-      if (x < (width <= 760 ? 96 : 138) && y < (width <= 760 ? 40 : 62)) web.classList.add('is-shivering');
-      if (cooldown > 0) return;
-      positions.forEach((p, i) => {
-        if (i === 1 && width <= 760) return;
-        if (p.moving && Math.hypot(x - p.x - size / 2, y - p.y - size / 2) < 60) { burst = .65; cooldown = 2; }
-      });
-    }, { passive: true });
-    web.addEventListener('animationend', () => web.classList.remove('is-shivering'));
-    const player = hero.querySelector<HTMLIFrameElement>('iframe[src*="iframe.mediadelivery.net"]');
-    window.addEventListener('message', event => {
-      if (!player || event.origin !== 'https://iframe.mediadelivery.net' || event.source !== player.contentWindow) return;
-      if (event.data?.channel !== 'bunnystream') return;
-      if (event.data.event === 'play') videoPlaying = true;
-      else if (event.data.event === 'pause' || event.data.event === 'ended') videoPlaying = false;
-      else return;
-      sync();
-    });
-    // المحتوى ظاهر افتراضياً؛ نحرك القسم عند دخوله فقط، ولا نخفيه بانتظار JavaScript.
-    const reveal = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        reveal.unobserve(entry.target);
-        if (paused() || typeof entry.target.animate !== 'function') return;
-        const animation = entry.target.animate([{ opacity: .7, transform: 'translateY(10px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 340, easing: 'cubic-bezier(.2,.7,.3,1)' });
-        animations.add(animation);
-        animation.finished.then(() => animations.delete(animation), () => animations.delete(animation));
-      });
-    }, { threshold: .04 });
-    document.querySelectorAll('#main > .section').forEach(section => reveal.observe(section));
-    window.addEventListener('pagehide', () => { cancelAnimationFrame(frame); frame = 0; last = 0; });
-    window.addEventListener('pageshow', sync);
-    measure(); sync();
-  }
+  import '../scripts/home-atmosphere';
 </script>
