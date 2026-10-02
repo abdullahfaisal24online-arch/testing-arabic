@@ -10,7 +10,9 @@ if (hero && layer && swarm && toggle) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const fine = matchMedia('(hover: hover) and (pointer: fine)');
   const mobile = matchMedia('(max-width: 760px)');
-  const regions = [hero, document.querySelector<HTMLElement>('#main .games')].filter((el): el is HTMLElement => !!el);
+  // One bounded swarm follows the visible homepage section, including the newsletter/footer.
+  // Reuse five buttons rather than creating dozens of animated elements down the page.
+  const regions = [...document.querySelectorAll<HTMLElement>('#main > section, .home-effects > .site-foot')];
   const visible = new Map<HTMLElement, number>();
   const animations = new Set<Animation>();
   type Bug = { button: HTMLButtonElement; turn: HTMLElement; p: Point; angle: number; mode: 'idle'|'inspect'|'walk'|'fly'; route: Route|null; started: number; duration: number; next: number; cooldown: number; hover: boolean; flightDue: number; away: Point|null };
@@ -39,11 +41,11 @@ if (hero && layer && swarm && toggle) {
   }
   function measure() {
     const rect=active.getBoundingClientRect();
-    const obstacles=[...active.querySelectorAll<HTMLElement>(active===hero?'.hero-txt, .feat, .home-motion-toggle':'.section-head, .game-card')]
+    const obstacles=[...active.querySelectorAll<HTMLElement>(active===hero?'.hero-txt, .feat, .home-motion-toggle':'.section-head, .card, .game-card, .nl, .resume, .brand-col, .col, .bottom > *')]
       .filter(el=>!el.hidden).map(el=>{const r=el.getBoundingClientRect();return{left:r.left-rect.left,top:r.top-rect.top,right:r.right-rect.left,bottom:r.bottom-rect.top};});
     space={width:active.clientWidth,height:active.clientHeight,obstacles};
     points=perches(space);
-    const seats=spread(points,mobile.matches?2:4);
+    const seats=spread(points,mobile.matches?2:5);
     count=seats.length;
     bugs.forEach((b,i)=>{
       if(i>=count)return;
@@ -55,6 +57,7 @@ if (hero && layer && swarm && toggle) {
   }
   function sync() {
     document.body.dataset.homeMotion=paused()?'paused':'running';
+    layer!.dataset.running=String(!paused()&&!document.hidden&&!videoPlaying&&(visible.get(hero!)??0)>0);
     toggle!.hidden=reduced.matches;
     toggle!.textContent=manualPause?'تشغيل التأثيرات':'إيقاف التأثيرات';
     toggle!.setAttribute('aria-pressed',String(paused()));
@@ -123,7 +126,8 @@ if (hero && layer && swarm && toggle) {
   regions.forEach(region=>region.addEventListener('pointermove',e=>{
     if(region!==active||!running()||!fine.matches||e.pointerType==='touch')return;
     const rect=active.getBoundingClientRect(),pointer={x:e.clientX-rect.left,y:e.clientY-rect.top};
-    if(active===hero&&pointer.x<138&&pointer.y<62)web.classList.add('is-shivering');
+    const webRect=web.getBoundingClientRect();
+    if(active===hero&&pointer.x<webRect.width&&pointer.y<webRect.height)web.classList.add('is-shivering');
     // Outside the click target: inspect, turn away, then walk along a different safe curve.
     if(e.target instanceof Element&&e.target.closest('.home-bug'))return;
     const closest=bugs.slice(0,count).filter(b=>b.mode!=='fly'&&!b.hover&&document.activeElement!==b.button&&now>b.cooldown)

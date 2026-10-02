@@ -1,12 +1,13 @@
 ---
 // Native vector artwork: jointed legs, seven spots, shell highlights and flight wings.
-const bugs = [0, 1, 2, 3];
+const bugs = [0, 1, 2, 3, 4];
 ---
 <div id="home-atmosphere" aria-hidden="true">
   <svg class="home-web" viewBox="0 0 160 120" fill="none"><g stroke="currentColor" stroke-width=".75">
     <path d="M0 0H160M0 0 156 30M0 0 137 60M0 0 112 87M0 0 79 105M0 0 40 116M0 0V120" />
     {[.2,.4,.6,.8,1].map(scale => <path transform={`scale(${scale})`} d="M160 0Q151 12 156 30Q138 39 137 60Q118 66 112 87Q91 89 79 105Q58 101 40 116Q18 107 0 120" />)}
   </g></svg>
+  <div class="home-web-air"><span class="web-wisp"></span><span class="web-wisp wisp-second"></span><span class="web-dust"></span></div>
 </div>
 <div id="home-bug-swarm" hidden>
   {bugs.map(n => <button type="button" class="home-bug" aria-label={`طيّر الدعسوقة ${n + 1}`} title="اضغط لتطير" hidden>
@@ -67,8 +68,15 @@ const bugs = [0, 1, 2, 3];
   }
   .home-effects .bgfx-glow,
   html:not([data-theme='light']) .home-effects .dots.bgfx-band::after { display: none; }
-  #home-atmosphere { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 2; }
-  .home-web { position: absolute; top: 0; left: 0; width: 138px; height: 62px; color: var(--cyan); opacity: .24; transform-origin: 0 0; }
+  #home-atmosphere { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+  .home-web { position: absolute; top: 0; left: 0; width: clamp(190px, 20vw, 270px); height: auto; color: var(--cyan); opacity: .25; transform-origin: 0 0; }
+  .home-web-air { position: absolute; top: 0; left: 0; width: clamp(230px, 25vw, 340px); height: 220px; overflow: hidden; mask-image: radial-gradient(ellipse at 12% 18%, #000 18%, transparent 73%); }
+  .web-wisp { position: absolute; top: 15px; left: -100%; width: 110%; height: 100px; border-radius: 50%; background: radial-gradient(ellipse at 50% 50%, color-mix(in srgb, var(--ink-2) 19%, transparent), transparent 68%); filter: blur(12px); opacity: 0; animation: home-air-pass 17s ease-in-out infinite; animation-play-state: paused; }
+  .web-wisp.wisp-second { top: 70px; height: 70px; animation-delay: -8s; animation-duration: 21s; }
+  .web-dust { position: absolute; inset: 0; background-image: radial-gradient(circle at 14% 24%, var(--ink-2) .7px, transparent 1.3px), radial-gradient(circle at 44% 55%, var(--ink-2) .6px, transparent 1.2px), radial-gradient(circle at 62% 30%, var(--ink-2) .8px, transparent 1.4px), radial-gradient(circle at 30% 70%, var(--ink-2) .6px, transparent 1.1px); background-size: 110px 90px; opacity: 0; animation: home-dust-pass 19s linear infinite; animation-play-state: paused; }
+  #home-atmosphere[data-running='true'] :is(.web-wisp, .web-dust) { animation-play-state: running; }
+  @keyframes home-air-pass { 0%,12% { transform: translateX(0) translateY(20px) rotate(-18deg); opacity: 0; } 30% { opacity: .6; } 58% { opacity: .35; } 78%,100% { transform: translateX(195%) translateY(-32px) rotate(-8deg); opacity: 0; } }
+  @keyframes home-dust-pass { 0%,15% { transform: translate(-35px,22px); opacity: 0; } 32%,65% { opacity: .17; } 90%,100% { transform: translate(58px,-26px); opacity: 0; } }
   .home-web.is-shivering { animation: home-web-sway .85s ease-out; }
   @keyframes home-web-sway { 20% { transform: skewY(1.2deg); } 45% { transform: skewY(-.7deg); } 70% { transform: skewY(.3deg); } }
   .home-motion-toggle { position: absolute; left: max(24px, calc((100% - 1152px) / 2)); bottom: 8px; z-index: 3; min-height: 44px; padding: 8px 4px; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 11px; cursor: pointer; }
@@ -91,16 +99,17 @@ const bugs = [0, 1, 2, 3];
   .home-effects[data-home-motion='paused'] :is(a.card, a.game-card):hover { transform: none; }
   .home-effects[data-home-motion='paused'] .welcome :is(.vf-play, .play) { scale: 1; }
   .home-effects[data-home-motion='paused'] .home-web { animation: none; }
-  @media (max-width: 760px) { .home-bug-second { display: none; } .home-web { width: 96px; height: 40px; opacity: .2; } }
+  @media (max-width: 760px) { .home-web { width: 156px; height: auto; opacity: .2; } .home-web-air { width: 205px; height: 145px; } .web-wisp { filter: blur(8px); } }
   @media (prefers-reduced-motion: reduce) {
     .home-bug, .home-motion-toggle { display: none; }
     .home-web { animation: none !important; }
+    .home-web-air { display: none; }
     .home-effects :is(a.card, a.game-card):hover { transform: none; }
     .home-effects .welcome :is(.vf-play, .play) { scale: 1 !important; }
   }
 </style>
 <style is:global>
-  .home-effects .games { position: relative; }
+  .home-effects :is(#main > section, .site-foot) { position: relative; }
   #home-bug-swarm { position: absolute; inset: 0; pointer-events: none; z-index: 3; overflow: clip; }
   #home-bug-swarm[hidden], .home-bug[hidden] { display: none !important; }
   .home-bug { position: absolute; left: 0; top: 0; width: 44px; height: 44px; margin: 0; padding: 0; border: 0; background: transparent; border-radius: 50%; pointer-events: auto; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
