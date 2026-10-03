@@ -9,6 +9,7 @@ import NewsCard from '../components/NewsCard.astro';
 import ResourceCard from '../components/ResourceCard.astro';
 import Newsletter from '../components/Newsletter.astro';
 import GamesSection from '../components/GamesSection.astro';
+import HomeAtmosphere from '../components/HomeAtmosphere.astro';
 import OptimizedImage from '../components/OptimizedImage.astro';
 import { getSite, getHome, splitHighlight } from '../lib/site';
 import { bunnyThumb, bunnyEmbed } from '../lib/utils';
@@ -69,9 +70,10 @@ const courseTitleOf = (l: (typeof lessons)[number]) =>
 const jsonLd: Record<string, unknown>[] = [
 ];
 ---
-<Base title={site.name} description={site.description} jsonLd={jsonLd}>
+<Base title={site.name} description={site.description} jsonLd={jsonLd} homeEffects videoPoster={home.showWelcome && welcomeEmbed ? home.welcomeThumbnail : undefined}>
   <!-- ===== البطل ===== -->
   <section class="hero dots">
+    <HomeAtmosphere />
     <div class="wrap hero-in">
       <div class="hero-txt">
         {home.heroEyebrow && (
@@ -147,9 +149,12 @@ const jsonLd: Record<string, unknown>[] = [
             )}
           </div>
           {(home.welcomeTitle || home.welcomeText) && (
-            <div class="card-body">
-              {home.welcomeTitle && <span class="feat-ttl">{home.welcomeTitle}</span>}
-              {home.welcomeText && <span class="w-text">{home.welcomeText}</span>}
+            <div class="card-body welcome-caption">
+              <span class="welcome-mark" aria-hidden="true"><Icon name="play" size={18} /></span>
+              <div class="welcome-copy">
+                {home.welcomeTitle && <span class="feat-ttl">{home.welcomeTitle}</span>}
+                {home.welcomeText && <span class="w-text">{home.welcomeText}</span>}
+              </div>
             </div>
           )}
         </div>
@@ -346,6 +351,11 @@ const jsonLd: Record<string, unknown>[] = [
   .feat-ttl { font-size: 20px; font-weight: 700; line-height: 1.6; }
   .welcome .thumb iframe { width: 100%; height: 100%; border: 0; display: block; }
   .welcome .card-body { gap: 8px; }
+  .welcome { border-color: var(--line-strong); }
+  .welcome .welcome-caption { flex-direction: row; align-items: center; gap: 16px; background: linear-gradient(120deg, var(--surface), var(--navy)); }
+  .welcome-copy { display: grid; gap: 7px; min-width: 0; }
+  .welcome .feat-ttl { font-size: 18px; }
+  .welcome-mark { display: grid; place-items: center; flex: none; width: 42px; height: 42px; border-radius: 50%; background: var(--orange); color: var(--on-orange); box-shadow: 0 5px 20px var(--orange-soft); }
   .w-text { font-size: 15px; color: var(--ink-3); line-height: 1.85; }
   .go { color: var(--cyan); font-weight: 600; }
 

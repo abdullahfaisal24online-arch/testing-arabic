@@ -31,6 +31,9 @@ interface Props {
   publishDate?: Date;
   updatedDate?: Date;
   noindex?: boolean;
+  /** تأثيرات الرئيسية فقط، دون تغيير ترتيب المكونات. */
+  homeEffects?: boolean;
+  videoPoster?: string;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 const props = Astro.props;
@@ -53,7 +56,7 @@ const props = Astro.props;
       })();
     </script>
   </head>
-  <body>
+  <body class:list={{ 'home-effects': props.homeEffects }}>
     <a href="#main" class="skip-link">تخطَّ إلى المحتوى</a>
     <AnnouncementBar />
     <Header />
@@ -64,7 +67,7 @@ const props = Astro.props;
     <CursorFx />
     <BgFx />
         <StoreSoon />
-    <VideoFacade poster={props.type === 'video.other' ? props.image : undefined} />
+    <VideoFacade poster={props.videoPoster || (props.type === 'video.other' ? props.image : undefined)} />
     <ChatBot />
     <Analytics />
     <!-- نسخة احتياطية من إيميلات المشتركين بقاعدة البيانات عندنا — ما بتلمس مسار الاشتراك نفسه -->
