@@ -7,7 +7,7 @@ section: "4.1.3"
 title: "The Role of LLM-Powered Agents in Automating Test Processes"
 titleAr: "دور الوكلاء المدعومين بالنماذج في أتمتة عمليات الاختبار"
 objectives: "GenAI-4.1.3 · K2 / HO-4.1.3 · H0"
-minutes: 6
+minutes: 10
 lo:
   GenAI-4.1.3: "Explain how LLM-powered agents help automate test processes."
   HO-4.1.3: "Observe an LLM-powered agent automating a repetitive test task."
@@ -40,11 +40,15 @@ terms:
 | Semi-autonomous | يتوقف لمراجعة بشرية عند نقاط محددة | اقتراح تعديل سكربت ينتظر اعتماد المختبِر |
 | Multi-agent | عدة وكلاء بأدوار متخصصة يُنسَّق بينهم | تحليل ثم تصميم ثم مراجعة عبر Orchestration |
 
+كيف تختار الدرجة المناسبة؟ كلما زاد أثر الخطأ، قلّ الاستقلال المسموح. تجميع تقرير يومي من بيانات غير حساسة يمكن أن يكون مستقلًا. تعديل سكربتات الانحدار يجب أن يكون شبه مستقل، لأن تعديلًا خاطئًا قد يخفي عيبًا. والأنظمة متعددة الوكلاء تناسب سير عمل طويلًا تتوزع فيه الأدوار: وكيل يحلل، وآخر يصمم، وثالث يراجع.
+
 **Orchestration** هو تنسيق الأدوار والرسائل وتسلسل العمل. تعدد الوكلاء لا يضمن أن رأي المراجع مستقل أو أن المخرجات صحيحة؛ قد يتوارثون افتراضًا خاطئًا واحدًا.
 
 ### المساعدات المدمجة — AI Assistants
 
 يمكن لمساعد مدمج في أدوات الفريق تحويل قصة مستخدم إلى تحليل وشروط، ثم حالات وسكربتات، ثم تشغيل وتحليل تقارير. هذا يوسّع الأتمتة من اتباع سكربت محدد إلى أتمتة قائمة على الوكلاء وموجّهة بهدف. حين يكون الدمج جيدًا، تقلّ بعض الأعمال اليدوية وتقصر دورة التغذية الراجعة، وتزداد أهمية تحديد حدود التصرف والتحقق من المخرجات.
+
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>Know the three autonomy levels (autonomous, semi-autonomous, multi-agent) and what makes an agent different from a chatbot: it can call tools and take actions. Note the v1.1 addition: AI assistants that extend automation to goal-driven, agent-based work across the test process.</p></aside>
 
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label">Common mistake</p><p>Taking “I will open a ticket” as proof the agent opened one. You need the tool result and the ticket ID from the system. Text intent is not a completed, verified action.</p></aside>
 

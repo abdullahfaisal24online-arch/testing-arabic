@@ -7,7 +7,7 @@ section: "2.1.1"
 title: "Structure of Prompts for Generative AI in Software Testing"
 titleAr: "بنية التوجيه للذكاء التوليدي في اختبار البرمجيات"
 objectives: "GenAI-2.1.1 · K2 / HO-2.1.1 · H0"
-minutes: 6
+minutes: 9
 lo:
   GenAI-2.1.1: "Give examples of how prompts for testing tasks are structured."
   HO-2.1.1: "Observe structured prompts and identify each of their six components."
@@ -44,9 +44,25 @@ terms:
 | Constraints | قيود أو اعتبارات يجب على النموذج احترامها | لا تضف تحققًا هاتفيًا غير مذكور |
 | Output format | البنية أو الشكل المتوقع للاستجابة | جدول: المعرّف، المصدر، الشرط، السؤال المفتوح |
 
+### كل مكوّن بالتفصيل — Each Component in Detail
+
+**Role:** يحدد زاوية النظر. «بصفتك مهندس أتمتة» يدفع النموذج للتفكير في المحددات والانتظار والبيانات القابلة لإعادة الاستخدام، بينما «بصفتك محلل اختبار» يدفعه نحو الغموض والتغطية. الدور لا يمنح النموذج خبرة لا يملكها، لكنه يوجّه أسلوب الإجابة ومستواها.
+
+**Context:** كل ما يحتاج النموذج معرفته عن موضوع الاختبار والظروف المحيطة: نوع النظام، والجمهور، والبيئة، والقيود التقنية. بدون سياق، يملأ النموذج الفراغ بافتراضات عامة قد لا تنطبق على مشروعك.
+
+**Instruction:** الفعل المطلوب بدقة: «استخرج»، «صنّف»، «ولّد»، «قارن». تعليمات مثل «ساعدني في الاختبار» واسعة جدًا، بينما «استخرج شروط الاختبار من معايير القبول المرفقة» محددة وقابلة للتقييم.
+
+**Input data:** المادة التي سيعمل عليها النموذج فعلًا: قصص المستخدم، معايير القبول، لقطات الشاشة، الشيفرة، الاختبارات الموجودة، أو مخرجات مرجعية. جودة هذه المدخلات تحدد سقف جودة النتيجة.
+
+**Constraints:** الحدود التي يجب احترامها: «لا تضف متطلبات غير مذكورة»، «استخدم المكتبة الموثقة فقط»، «لا تتجاوز عشر حالات». القيود هي أقوى أداة لتقليل الهلوسة في هذه المرحلة.
+
+**Output format:** الشكل المطلوب للنتيجة: جدول بأعمدة محددة، أو JSON، أو Gherkin. التنسيق الواضح يسهّل المراجعة ويسمح بالفحص الآلي ودمج الناتج في الأدوات.
+
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label">Common mistake</p><p>Mixing up neighbouring components. That the system is an e-learning site is <strong>context</strong>; the text of the password rule is <strong>input data</strong>. “Generate the test cases” is an <strong>instruction</strong>; “do not invent requirements” is a <strong>constraint</strong> on it.</p></aside>
 
 هذه المكونات أساس يُبنى عليه، وتُدمج مع تقنيات التوجيه في القسم التالي بحسب المهمة والنموذج المستخدم.
+
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>Expect questions that show a prompt fragment and ask which component it is. Quick test: who or how (role), background (context), the verb (instruction), the material analysed (input data), a limit (constraint), the shape of the answer (output format).</p></aside>
 
 <section class="gx-lab" data-lab="HO-2.1.1"><header class="gx-lab-head"><span class="gx-lab-title">Demo · Spot the Six Components</span><span class="gx-lab-meta">HO-2.1.1 · H0</span></header><div class="gx-lab-body"><p><strong>Goal:</strong> read a structured prompt and name the role, context, instruction, input data, constraints and output format.</p><pre class="gx-lab-prompt"><code>Role: Functional test analyst.
 Context: "Taallam" e-learning platform, new account sign-up on the web.

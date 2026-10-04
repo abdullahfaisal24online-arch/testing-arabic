@@ -7,7 +7,7 @@ section: "5.1.1"
 title: "Risks of Shadow AI"
 titleAr: "مخاطر الذكاء الاصطناعي الخفي"
 objectives: "GenAI-5.1.1 · K1"
-minutes: 3
+minutes: 5
 lo:
   GenAI-5.1.1: "Recall the risks of shadow AI."
 takeaways:
@@ -27,4 +27,12 @@ terms:
 - **الامتثال:** عدم الالتزام بالمتطلبات التنظيمية أو المعايير المطلوبة.
 - **الملكية الفكرية والترخيص:** غموض الحقوق عند معالجة بيانات أو شيفرة محمية دون صلاحية.
 
+### لماذا يحدث؟ — Why It Happens
+
+غالبًا لا يبدأ Shadow AI بنية سيئة. مختبِر تحت ضغط موعد تسليم، والأداة المعتمدة غير موجودة أو بطيئة أو لا تكفي، فيستخدم حسابه الشخصي في أداة عامة «لمرة واحدة». المشكلة أن المؤسسة لا تعرف ما الذي أُرسل، ولا أين خُزِّن، ولا من يستطيع الوصول إليه.
+
+أمثلة شائعة في فرق الاختبار: لصق سجلات إنتاج فيها بيانات عملاء في أداة دردشة عامة، أو رفع شيفرة مملوكة للمؤسسة لأداة توليد سكربتات مجانية، أو استخدام إضافة متصفح تقرأ محتوى أدوات إدارة الاختبار.
+
 <aside class="gx-callout" data-kind="key"><p class="gx-callout-label">Key idea</p><p>Good intentions do not remove the risk. An approved strategy, approved tools and clear training reduce the need for unmanaged individual workarounds.</p></aside>
+
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>Know the three risk areas: security and privacy, compliance with regulations and standards, and intellectual property and licensing. The answer to shadow AI is an approved strategy, approved tools and training, not just a ban.</p></aside>

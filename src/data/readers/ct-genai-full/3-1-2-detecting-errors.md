@@ -7,7 +7,7 @@ section: "3.1.2"
 title: "Identify Hallucinations, Reasoning Errors and Biases in LLM Output"
 titleAr: "كشف الهلوسة وأخطاء الاستدلال والتحيز في مخرجات النماذج"
 objectives: "GenAI-3.1.2 · K3 / HO-3.1.2a · H1 / HO-3.1.2b · H1"
-minutes: 8
+minutes: 12
 lo:
   GenAI-3.1.2: "Identify hallucinations, reasoning errors and biases in LLM output."
   HO-3.1.2a: "Experiment with hallucinations when using GenAI for testing."
@@ -28,6 +28,8 @@ terms:
 - **استشارة خبير المجال:** للتحقق من صحة المحتوى والتقاط تفاصيل دقيقة قد تفوت الأدوات.
 - **فحص الاتساق:** التأكد أن المخرجات متسقة داخليًا ومتوافقة مع المعلومات المعروفة.
 
+مثال: يولّد النموذج 20 حالة لصفحة التسجيل. تطابق كل حالة مع قائمة المتطلبات بمعرّفاتها؛ حالتان تتحققان من «إرسال رمز SMS» لا يوجد له متطلب. هذه هلوسة كشفتها المقارنة المتقاطعة. وحالة ثالثة تقول إن الحد الأدنى لكلمة المرور 8 بينما المتطلب 12؛ هذه كشفها فحص الاتساق مع المعلومات المعروفة.
+
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label">Common mistake</p><p>Treating repetition as proof. A claim that appears in several answers is not true just because it repeats.</p></aside>
 
 ### كشف أخطاء الاستدلال — Detecting Reasoning Errors
@@ -35,12 +37,18 @@ terms:
 - **التحقق المنطقي:** مراجعة تسلسل المنطق واتساقه وترابطه وترتيب الخطوات. الأدوات تساعد، لكن الحالات المعقّدة تحتاج حكمًا بشريًا.
 - **اختبار الناتج:** تنفيذ الحالات أو السكربتات المولّدة على موضوع الاختبار والتحقق من صحة النتائج، آليًا كليًا أو جزئيًا بحسب نوع المادة.
 
+مثال: يقترح النموذج ترتيب تنفيذ يضع حالة «إصدار الشهادة» أولًا لأنها الأعلى أولوية. التحقق المنطقي يكشف أن هذه الحالة تعتمد على «إكمال الدورة»، فالترتيب غير قابل للتنفيذ. ومثال آخر: يولّد النموذج سكربتًا يبدو سليمًا، لكن تشغيله على البيئة الفعلية يفشل لأنه يستخدم دالة غير موجودة في الإطار؛ هذا ما يكشفه اختبار الناتج.
+
 ### كشف التحيز — Detecting Biases
 
-- **مراجعة العدالة والتمثيل:** مقارنة مواد الاختبار المولّدة، مثل البيانات التركيبية، باستراتيجية الاختبار. هل أغفل النموذج العربية وRTL؟ هل ركّز على المسار الناجح فقط؟
+- **مراجعة العدالة والتمثيل:** مقارنة مواد الاختبار المولّدة، مثل البيانات التركيبية، باستراتيجية الاختبار. هل أغفل النموذج العربية و RTL؟ هل ركّز على المسار الناجح فقط؟
 - **تقييم تغطية أنواع الاختبار:** البحث عن فئات ضعيفة التمثيل، مثل الاختبارات غير الوظيفية كالأداء وقابلية الوصول.
 
 <aside class="gx-callout" data-kind="practice"><p class="gx-callout-label">In practice</p><p>A model produced 100 test cases, all for English-language accounts on one browser. Start with the coverage strategy: if the product supports Arabic and several browsers, this is a gap caused by biased representation, even if each case is correct on its own. Count is not diversity.</p></aside>
+
+<aside class="gx-callout" data-kind="key"><p class="gx-callout-label">Key idea</p><p>How deep you check depends on the estimated risk of hallucinations, reasoning errors or biases for that task. A brainstorm of test ideas needs a lighter review than expected results for a payment calculation.</p></aside>
+
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>GenAI-3.1.2 is K3 (in v1.1 the verb is “Identify”). Map the method to the problem: cross-verification, domain experts and consistency checks for hallucinations; logical validation and executing the output for reasoning errors; fairness and representation review and test-type coverage for biases.</p></aside>
 
 <section class="gx-lab" data-lab="HO-3.1.2a"><header class="gx-lab-head"><span class="gx-lab-title">Experiment · Provoke a Hallucination</span><span class="gx-lab-meta">HO-3.1.2a · H1</span></header><div class="gx-lab-body"><p><strong>Given rules:</strong> email is required and unique; password is 12–64 characters.</p><ol class="gx-lab-steps"><li>Give the same rules to at least two LLMs and ask for acceptance criteria with no extra constraint.</li><li>Repeat with: <em>“Use only the text provided, and mark anything missing as a question.”</em></li><li>Record every criterion that has no source, and compare across runs and models.</li></ol><p>Additions such as “a phone number is required” or “the account locks after three attempts” are unsupported. Record what your models actually produced; do not assume a given model produces these.</p></div></section>
 

@@ -7,7 +7,7 @@ section: "2.2.4"
 title: "Test Monitoring and Test Control with Generative AI"
 titleAr: "مراقبة الاختبار والتحكم فيه باستخدام الذكاء التوليدي"
 objectives: "GenAI-2.2.4 · K3 / HO-2.2.4 · H0"
-minutes: 6
+minutes: 9
 lo:
   GenAI-2.2.4: "Apply GenAI to test monitoring and test control tasks."
   HO-2.2.4: "Observe how an LLM turns test data into monitoring metrics."
@@ -33,7 +33,15 @@ terms:
 - **تقارير الإكمال والتعلّم المستمر:** إعداد تقرير الإكمال بما أُنجز والدروس المستفادة لتحسين العمليات القادمة.
 - **عرض المقاييس:** لوحات مؤشرات وملخصات مكتوبة تعطي كل صاحب مصلحة المقاييس المناسبة لقرارات أسرع وأوضح.
 
+### مثال من سبرنت — A Sprint Example
+
+في منتصف السبرنت، يقرأ النموذج بيانات أداة إدارة الاختبار: نسبة التنفيذ أقل من المخطط بـ15%، والعيوب المفتوحة في مكوّن الدفع تزداد منذ ثلاثة أيام. يقترح النموذج تنبيهًا للفريق، ويقترح للتحكم: نقل مختبِر من مكوّن مستقر إلى الدفع، وتأجيل حالات منخفضة الأولوية، وتقديم حالات الدفع الحرجة. مدير الاختبار يقرر، لأن النموذج لا يعرف مثلًا أن المختبِر المقترح نقله في إجازة.
+
+وفي نهاية الإصدار، يجهّز النموذج مسودة تقرير إكمال: ما الذي أُنجز، والعيوب المتبقية، والمخاطر، والدروس المستفادة للإصدار القادم. ثم يحوّل المقاييس إلى لوحة لمدير المنتج، وملخص مكتوب للإدارة، ومستوى تفصيل أعلى للفريق التقني.
+
 <aside class="gx-callout" data-kind="key"><p class="gx-callout-label">Key idea</p><p>Define every metric and review the calculations. Do not turn a forecast about a future risk into a stated fact.</p></aside>
+
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>Know the four uses: monitoring and metrics analysis, test control, test completion insights and continuous learning, and metrics visualisation and reporting. Monitoring observes and compares with the plan; control takes action.</p></aside>
 
 <section class="gx-lab" data-lab="HO-2.2.4"><header class="gx-lab-head"><span class="gx-lab-title">Demo · Metrics from Test Data</span><span class="gx-lab-meta">HO-2.2.4 · H0</span></header><div class="gx-lab-body"><p><strong>Given:</strong> 100 planned cases: 60 passed, 15 failed, 5 blocked (not run), 20 not started. Executed means passed + failed.</p><table><thead><tr><th>Metric</th><th>Calculation</th><th>Meaning</th></tr></thead><tbody><tr><td>Execution progress</td><td>(60 + 15) ÷ 100 = 75%</td><td>Executed vs planned</td></tr><tr><td>Pass rate of executed</td><td>60 ÷ 75 = 80%</td><td>Pass rate of what actually ran</td></tr><tr><td>Pass rate of plan</td><td>60 ÷ 100 = 60%</td><td>A different metric; name it clearly</td></tr><tr><td>Blocked</td><td>5 ÷ 100 = 5%</td><td>Work waiting for an obstacle to be removed</td></tr></tbody></table><pre class="gx-lab-prompt"><code>Analyse the attached execution data against the plan.
 Define the numerator and denominator for every ratio.

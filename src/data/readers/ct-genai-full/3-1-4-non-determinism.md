@@ -7,7 +7,7 @@ section: "3.1.4"
 title: "Mitigation of Non-Deterministic Behavior of LLMs"
 titleAr: "تخفيف السلوك غير الحتمي للنماذج اللغوية"
 objectives: "GenAI-3.1.4 · K1"
-minutes: 4
+minutes: 7
 lo:
   GenAI-3.1.4: "Recall ways to reduce the non-deterministic behaviour of LLMs."
 takeaways:
@@ -25,6 +25,8 @@ terms:
 ---
 قد ينتج المدخل نفسه مخرجات مختلفة بسبب عملية أخذ العينات الاحتمالية أثناء **Inference**، ويزيد التباين مع المخرجات الطويلة، فيصعب الحصول على نتائج متسقة وقابلة للإعادة.
 
+لماذا يهمك ذلك كمختبِر؟ لأن الاختبار يقوم على قابلية التكرار: إذا شغّلت التوجيه نفسه على القصة نفسها مرتين وحصلت على حالات مختلفة، فمن الصعب أن تقارن أو تراجع أو تعيد إنتاج نتيجة. وفي التقييم، قد تحكم على توجيه بأنه ممتاز بناءً على تشغيل محظوظ.
+
 ### Temperature
 
 خفض درجة الحرارة أثناء التوليد يضيّق توزيع الاحتمالات ويقلّل العشوائية، فتصبح المخرجات أكثر اتساقًا. المقابل: تنوع وإبداع أقل، واستجابات أكثر تكرارًا وحتمية. لا تختر قيمة واحدة لكل المهام؛ توليد أفكار استكشافية يختلف عن إخراج جدول محدد.
@@ -32,6 +34,8 @@ terms:
 ### Random Seed
 
 تسمح بعض التطبيقات بتحديد بذرة تضمن استخدام تسلسل الأعداد شبه العشوائية نفسه، فتتحسن قابلية إعادة النتائج. الدعم وحدوده يختلفان، والبذرة لا تضمن تطابق النتائج إذا تغيّر النموذج أو الخدمة أو الإعدادات.
+
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>K1: recall the two techniques, lowering temperature and setting a random seed, and the trade-off of low temperature (less creativity and diversity, more repetitive output). Also remember that longer outputs increase variability.</p></aside>
 
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label">Common mistake</p><p>Believing temperature 0 prevents hallucinations. Less randomness does not turn wrong knowledge or wrong reasoning into right answers. You still need suitable context and independent verification.</p></aside>
 

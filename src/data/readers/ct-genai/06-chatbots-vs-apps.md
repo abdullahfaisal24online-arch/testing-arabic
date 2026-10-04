@@ -7,7 +7,7 @@ section: "1.2.2"
 title: "AI Chatbots and LLM-Powered Testing Applications for Software Testing"
 titleAr: "روبوتات المحادثة وتطبيقات الاختبار المدعومة بالنماذج"
 objectives: "GenAI-1.2.2 · K2"
-minutes: 4
+minutes: 7
 lo:
   GenAI-1.2.2: "Compare the ways of interacting with GenAI in testing: chatbots and integrated applications."
 takeaways:
@@ -31,11 +31,15 @@ terms:
     def: "An application that uses a model to understand a task and can call tools to take actions. Covered in Chapter 4."
     match: ["AI Agents"]
 ---
+يحدد السيليبس طريقتين رئيسيتين للتفاعل مع الذكاء التوليدي في الاختبار: المحادثة المباشرة مع النموذج، أو تطبيقات اختبار تدمج النموذج داخلها. الفرق بينهما ليس في «ذكاء» النموذج، بل في طريقة الوصول إليه، ومن يوفّر السياق، ومدى قابلية العمل للتكرار والتوسع.
+
 ### المحادثة المباشرة — AI Chatbots
 
 يتفاعل المستخدم بلغة طبيعية مع النموذج: يسأل، ويزوّد السياق، ويعدّل الطلب، ثم يراجع الرد. هذا مفيد للتغذية الراجعة السريعة، والمهام الروتينية، والاختبار الاستكشافي، وتوضيح المفاهيم، ومساعدة أعضاء جدد على فهم العمل.
 
 تدعم المحادثة **Prompt Chaining**: تحسين النتيجة عبر توجيهات مترابطة، مثل تحليل قصة مستخدم، ثم توضيح الغموض، ثم اقتراح الحالات. سهولة الواجهة تجعلها متاحة أيضًا لأصحاب مصلحة غير تقنيين.
+
+مثال: مختبِر جديد في الفريق يلصق قصة مستخدم في المحادثة ويسأل «ما الذي قد يكون غامضًا هنا؟»، ثم يطلب اقتراح حالات للأجزاء الواضحة، ثم يسأل عن الفرق بين حالتين لم يفهمهما. كل خطوة مبنية على السابقة، والمختبِر يراجع ويعدّل في كل مرة. هذا الاستخدام سريع ومرن، لكنه يعتمد على ما ينسخه المستخدم بنفسه من سياق، ويصعب تكراره بنفس الجودة لمئة قصة.
 
 ### قدرات مدمجة في أدوات الاختبار — LLM-Powered Testing Applications
 
@@ -51,10 +55,14 @@ terms:
 | Scale | يعتمد على طريقة استخدام المحادثات | يتيح دمج الاستدعاءات ضمن سير عمل آلي |
 | Review | يقيّم المستخدم الرد | تحتاج الأداة كذلك ضوابط تحقق ومراجعة |
 
+مثال: أداة إدارة اختبار تضيف زرًّا «اقترح حالات» بجانب كل قصة مستخدم. عند الضغط، تجمع الأداة القصة ومعايير القبول والمكوّن المرتبط من النظام، وتبني التوجيه بقالب ثابت أعدّه الفريق، وترسله للنموذج، ثم تحفظ المسودة مرتبطة بالقصة لمراجعة المختبِر. المستخدم لم يكتب أي توجيه؛ التكامل هو الذي وفّر السياق.
+
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label">Common mistake</p><p>Assuming the interface decides security. An integrated application is not secure just because it is integrated, and not every chat is insecure. What matters is how data, permissions, the runtime environment and controls are handled. Chapter 3 covers this in detail.</p></aside>
 
 ### اختيار طريقة التفاعل — Choosing the Interaction
 
 لفهم مفهوم واكتشاف الغموض في قصة مستخدم واحدة، قد تكون المحادثة مناسبة. ولإعداد مسودات حالات اختبار بصورة متكررة من نظام إدارة المتطلبات، قد يناسبك تطبيق مدمج. في الحالتين تحتاج **Prompt Engineering** واضحة، ومدخلات مناسبة، وتحققًا من النتائج.
+
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>GenAI-1.2.2 asks you to compare interaction models. Match the scenario: ad-hoc questions, exploration, onboarding, iterative refinement through prompt chaining → AI chatbot. Repeated, well-defined, automated tasks inside existing test frameworks, more customisation and scale, or agents with specific roles → LLM-powered testing application. In both, strong prompt engineering is essential.</p></aside>
 
 <aside class="gx-callout" data-kind="key"><p class="gx-callout-label">Key idea · The tester's role</p><p>The tester still sets the goal, provides the test basis, checks coverage and evidence, corrects the output and makes the decision. A generated draft or a tidy report does not prove the system passed the test.</p></aside>

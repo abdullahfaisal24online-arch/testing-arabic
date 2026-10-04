@@ -7,13 +7,14 @@ section: "1.1.2"
 title: "Basics of Generative AI and LLMs"
 titleAr: "أساسيات الذكاء التوليدي والنماذج اللغوية الكبيرة"
 objectives: "GenAI-1.1.2 · K2 / HO-1.1.2 · H1"
-minutes: 7
+minutes: 12
 lo:
   GenAI-1.1.2: "Explain at a basic level how generative AI and large language models work."
   HO-1.1.2: "Tokenize sample text and evaluate token counts for a testing task."
 takeaways:
   - "Tokenization splits text into tokens; word count and token count rarely match."
   - "Embeddings turn tokens into vectors, and the Transformer processes the relations between them."
+  - "During inference the model predicts the next token repeatedly to build the answer."
   - "The context window caps the context a model can consider, measured in tokens."
   - "Output is probabilistic: one successful run does not prove reliability, so verification is part of the job."
 terms:
@@ -48,37 +49,63 @@ terms:
     def: "Small Language Model. Fewer parameters, lighter to run, focused on specific needs."
     match: ["SLMs", "SLM"]
 ---
-النماذج اللغوية الكبيرة تُدرَّب على مجموعات ضخمة من النصوص، مثل الكتب والمقالات والمواقع، لتتعلّم العلاقات والأنماط اللغوية. يعرض المنهج عملها بالاستناد إلى **Generative Pre-trained Transformer (GPT)**. توجد أيضًا **نماذج لغوية صغيرة (Small Language Models / SLMs)**، بعدد أقل من المعاملات، لتوفير حلول أخف ومركّزة على احتياجات محددة.
+النماذج اللغوية الكبيرة تُدرَّب على مجموعات ضخمة من النصوص، مثل الكتب والمقالات والمواقع، لتتعلّم العلاقات والأنماط اللغوية. يعرض المنهج عملها بالاستناد إلى بنية **Generative Pre-trained Transformer (GPT)**، والاسم نفسه يشرح الفكرة:
 
-لفهم أثر صياغة طلبك وطوله، تتبّع المفاهيم التالية.
+- **Generative:** يولّد محتوى جديدًا.
+- **Pre-trained:** دُرِّب مسبقًا على بيانات عامة واسعة قبل أن تستخدمه أنت.
+- **Transformer:** نوع البنية العصبية التي يعتمد عليها، وسنشرحها بعد قليل.
+
+توجد أيضًا **نماذج لغوية صغيرة (Small Language Models / SLMs)**، بعدد أقل من المعاملات (Parameters). هي أخف في التشغيل وأقل كلفة، ومصمّمة لحلول مركّزة على احتياجات محددة. النموذج الأكبر ليس دائمًا الأنسب؛ مهمة ضيقة ومتكررة قد يكفيها نموذج صغير، وهذا موضوع نعود له في الفصل الخامس.
+
+لفهم أثر صياغة طلبك وطوله على النتيجة، تتبّع رحلة النص داخل النموذج عبر المفاهيم التالية.
 
 ### التقطيع إلى رموز — Tokenization
 
-يُقسّم النص إلى وحدات تسمّى **Tokens**. قد تكون الوحدة حرفًا أو جزءًا من كلمة أو كلمة كاملة؛ لذلك **عدد الكلمات لا يساوي بالضرورة عدد Tokens**. يختلف التقطيع باختلاف أداة الترميز واللغة والنص نفسه.
+أول ما يحدث لنصّك أنه يُقسّم إلى وحدات تسمّى **Tokens**. قد تكون الوحدة حرفًا، أو جزءًا من كلمة، أو كلمة كاملة؛ لذلك **عدد الكلمات لا يساوي بالضرورة عدد Tokens**. يختلف التقطيع باختلاف أداة الترميز (Tokenizer) واللغة والنص نفسه. هذا التقطيع هو ما يسمح للنموذج بمعالجة النص مع الحفاظ على سياقه.
 
 <figure class="gx-figure gx-tokens" aria-label="Example: four words split into five tokens"><div class="gx-tokens-row"><span class="gx-tokens-label">Input</span><span class="gx-tokens-input">Verify the login page</span></div><div class="gx-tokens-row"><span class="gx-tokens-label">Tokens</span><span class="gx-token">Ver</span><span class="gx-token gx-token--alt">ify</span><span class="gx-token">·the</span><span class="gx-token gx-token--alt">·login</span><span class="gx-token">·page</span></div><div class="gx-tokens-row gx-tokens-count"><span class="gx-tokens-label"></span><span>4 words</span><span class="gx-accent">5 tokens</span></div><figcaption>Illustrative split. Actual tokens depend on the tokenizer.</figcaption></figure>
 
-الجملة «اختبر تسجيل الدخول» تحتوي ثلاث كلمات، لكن لا نستطيع تحديد عدد Tokens الفعلي دون معرفة الـTokenizer المستخدم. لا تعتمد معامل تحويل ثابتًا بين الكلمات والرموز، خصوصًا عند خلط العربية والإنجليزية أو إضافة شيفرة.
+لماذا يهمك هذا كمختبِر؟ لثلاثة أسباب عملية:
+
+1. **حدود النموذج تُقاس بالـ Tokens لا بالكلمات.** الطلب الذي يبدو قصيرًا قد يستهلك سياقًا أكثر مما تتوقع.
+2. **الكلفة غالبًا تُحسب بالـ Tokens.** في الخدمات التجارية تدفع على عدد رموز الإدخال والإخراج.
+3. **اللغة والمحتوى يغيّران العدد.** الجملة «اختبر تسجيل الدخول» ثلاث كلمات، لكن لا نستطيع تحديد عدد رموزها دون معرفة الـ Tokenizer. وكثيرًا ما يختلف العدد بين العربية والإنجليزية للمعنى نفسه، ويتغيّر أكثر عند إضافة شيفرة أو JSON.
 
 <aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>Be careful with any option that assumes one word equals one token, or a fixed word-to-token ratio. Token counts depend on the tokenizer, the language and the content.</p></aside>
 
 ### التضمينات المتجهية — Embeddings
 
-تتحول الرموز إلى تمثيلات عددية تسمّى **Vectors** ضمن فضاء متعدد الأبعاد. تمثّل هذه القيم علاقات دلالية ونحوية وسياقية تعلّمها النموذج. كلما تقاربت تمثيلات رموز في هذا الفضاء، دلّ ذلك غالبًا على معانٍ أو أدوار سياقية متشابهة، مما يساعد على معالجة العلاقات داخل النص.
+بعد التقطيع، يتحول كل رمز إلى تمثيل عددي يسمّى **Vector**، أي قائمة طويلة من الأرقام تحدد موقعه في فضاء متعدد الأبعاد. هذه الأرقام تحمل علاقات دلالية ونحوية وسياقية تعلّمها النموذج أثناء التدريب. كلما تقاربت تمثيلات رموز في هذا الفضاء، دلّ ذلك غالبًا على معانٍ أو أدوار سياقية متشابهة.
 
-مثال توضيحي: قد يرتبط «عيب» و«Defect» في سياق الاختبار، لكن التشابه بين تمثيلات الكلمات لا يجعل النموذج مرجعًا يضمن صحة المصطلح أو الاستنتاج.
+تخيّل خريطة: الكلمات المتقاربة في المعنى تقع متجاورة. «Bug» و«Defect» و«عيب» قد تقع في منطقة متقاربة في سياق الاختبار، بينما «Release» في منطقة أخرى. هذا ما يسمح للنموذج بفهم أن سؤالك عن «عيب» مرتبط بسؤال آخر عن «Defect».
+
+<aside class="gx-callout" data-kind="warn"><p class="gx-callout-label">Common mistake</p><p>Treating closeness of embeddings as proof of correctness. Similar vectors mean related usage, not that the model's term or conclusion is right for your project.</p></aside>
+
+ستقابل الـ Embeddings مرة أخرى في الفصل الرابع، لأنها أساس البحث الدلالي في أنظمة RAG.
 
 ### بنية المحوّل — Transformer
 
-تساعد بنية Transformer النموذج على معالجة السياق وتعلّم العلاقات بين الرموز. أثناء **الاستدلال (Inference)**، يتوقّع النموذج الرمز التالي استنادًا إلى المدخل والرموز التي سبق توليدها، ويتكرر ذلك لبناء الاستجابة.
+**Transformer** بنية شبكة عصبية تتفوق في المهام اللغوية لأنها تعالج تسلسلات نصية طويلة وتتعلّم العلاقات بين الرموز، حتى البعيدة منها داخل النص. فهي تفهم مثلًا أن «هو» في نهاية فقرة يعود على «النظام» في أولها.
+
+أثناء **الاستدلال (Inference)**، أي حين تستخدم النموذج المدرَّب، يعمل النموذج بطريقة بسيطة في جوهرها: يتوقّع **الرمز التالي** الأكثر ملاءمة استنادًا إلى المدخل والرموز التي ولّدها حتى الآن، ثم يضيفه ويكرر العملية رمزًا بعد رمز حتى تكتمل الاستجابة.
+
+<figure class="gx-figure" aria-label="Inference loop: input and generated tokens, predict next token, append, repeat"><div class="gx-flow-row"><span class="gx-flow-node">Input + tokens so far</span><span class="gx-flow-arrow" aria-hidden="true">→</span><span class="gx-flow-node gx-flow-node--accent">Predict next token</span><span class="gx-flow-arrow" aria-hidden="true">→</span><span class="gx-flow-node">Append<small>repeat until done</small></span></div><figcaption>Generation is a loop of next-token predictions, not a lookup of a stored answer.</figcaption></figure>
+
+هذا يفسّر لماذا تكون إجابات النموذج سلسة لغويًا: هو مدرَّب على إنتاج النص الأكثر احتمالًا. لكن «الأكثر احتمالًا» ليس بالضرورة «الأصح».
 
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label">Common mistake</p><p>Treating a fluent answer as a correct one. A model can write a convincing report that includes a requirement that does not exist. Fluency is not accuracy, and it is not alignment with the test basis.</p></aside>
 
 ### نافذة السياق — Context Window
 
-هي كمية النص السابق التي يأخذها النموذج بعين الاعتبار عند توليد الاستجابة، وتُقاس بالـTokens. النافذة الأكبر تساعد النموذج على الحفاظ على الترابط في نصوص أطول، مثل متطلبات طويلة أو سجلات اختبار، لكنها تزيد التعقيد الحسابي وتحتاج موارد ووقتًا أكبر.
+هي كمية النص السابق التي يأخذها النموذج بعين الاعتبار عند توليد الاستجابة، وتُقاس بالـ Tokens. النافذة الأكبر تساعد النموذج على الحفاظ على الترابط في نصوص أطول، مثل متطلبات طويلة أو سجلات اختبار، لكنها تزيد التعقيد الحسابي وتحتاج موارد ووقتًا أكبر.
 
-حدود المدخل والمخرج وتوزيع السعة تختلف بين النماذج. راجع حدود النموذج، ووفّر مساحة كافية للإجابة، وحدّد المعلومات المهمة بدل إرسال سجلات غير مرتبطة بالمهمة. النافذة الكبيرة لا تضمن استخدام كل معلومة بدقة.
+حدود المدخل والمخرج وتوزيع السعة تختلف بين النماذج. في كثير من النماذج يتشارك المدخل والمخرج الميزانية نفسها، فإذا ملأت النافذة بالمدخلات لم يبقَ مكان كافٍ للإجابة. لذلك:
+
+- راجع حدود النموذج الذي تستخدمه قبل إرسال وثائق طويلة.
+- احجز مساحة كافية للإجابة.
+- أرسل المعلومات المرتبطة بالمهمة فقط، بدل سجلات كاملة لا علاقة لمعظمها بالسؤال.
+
+النافذة الكبيرة لا تضمن أن النموذج سيستخدم كل معلومة فيها بدقة.
 
 <figure class="gx-figure gx-budget" aria-label="Hypothetical context budget: 8,000 tokens. Prompt 6,200 plus reserved answer 1,500 leaves 300. Adding a 1,000-token log goes 700 over."><div class="gx-budget-head"><span>Context window · 8,000 tokens</span><span class="gx-danger">+700 over</span></div><div class="gx-budget-bar"><span class="gx-budget-prompt" style="flex:62">Prompt · 6,200</span><span class="gx-budget-answer" style="flex:15">Answer · 1,500</span><span class="gx-budget-free" style="flex:3"></span></div><div class="gx-budget-bar gx-budget-extra"><span style="flex:70"></span><span class="gx-budget-log" style="flex:10">+ Log · 1,000</span></div><figcaption>Hypothetical budget for practice, not a real model limit.</figcaption></figure>
 
@@ -86,6 +113,10 @@ terms:
 
 ### السلوك غير الحتمي — Non-Deterministic Behavior
 
-قد تختلف النتيجة عند تكرار المدخل نفسه، لأن آلية الاستدلال احتمالية، ولأن إعدادات النموذج (Hyperparameters) مثل درجة العشوائية تؤثر في التوليد. لذلك لا يكفي نجاح طلب واحد للحكم على موثوقية استخدامه. خفض العشوائية قد يزيد الاتساق، لكنه لا يضمن تطابق النتائج أو صحتها؛ تُناقَش وسائل التخفيف في الفصل الثالث.
+قد تختلف النتيجة عند تكرار المدخل نفسه، لأن آلية الاستدلال احتمالية: في كل خطوة يختار النموذج الرمز التالي من بين عدة احتمالات، لا من إجابة ثابتة. كما أن إعدادات النموذج (Hyperparameters) مثل درجة العشوائية تؤثر في هذا الاختيار.
+
+النتيجة العملية للمختبِر مهمة جدًا: **لا يكفي نجاح طلب واحد للحكم على موثوقية استخدامه.** إذا جرّبت توجيهًا مرة وأعطاك حالات ممتازة، فقد يعطيك في المرة التالية حالات ناقصة. خفض العشوائية قد يزيد الاتساق، لكنه لا يضمن تطابق النتائج أو صحتها. نناقش وسائل التخفيف بالتفصيل في الفصل الثالث.
+
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>Know the two sources of non-determinism: probabilistic inference and hyperparameter settings. And remember that consistent output is not the same as correct output.</p></aside>
 
 <section class="gx-lab" data-lab="HO-1.1.2"><header class="gx-lab-head"><span class="gx-lab-title">Lab · Compare Two Prompt Lengths</span><span class="gx-lab-meta">HO-1.1.2 · H1</span></header><div class="gx-lab-body"><p><strong>Goal:</strong> compare the input length of two prompts for a test-case generation task.</p><ol class="gx-lab-steps"><li>Open a tokenizer that matches a model you choose and enter: <em>“Generate test cases for login.”</em></li><li>Add the user story, acceptance criteria, field constraints and output format. Record the token count of this second prompt.</li><li>Try an Arabic text and an English text with the same meaning, then a text that contains JSON data. Record the actual values. Do not assume they are equal.</li><li>Compare the counts with the model limits and decide what you can remove without losing essential context.</li></ol><p class="gx-lab-subhead">Worked example (hypothetical numbers)</p><p>A shared budget of 8,000 tokens, a 6,200-token prompt and 1,500 tokens reserved for the answer leave 300. Adding a 1,000-token log exceeds the budget by 700. Fix it by shortening the input or splitting the task while keeping the essential information.</p><details class="gx-lab-answer"><summary>What good looks like</summary><p>You can explain why token counts differ between inputs, calculate how length affects the context limit, and decide what the model actually needs for the task. The number itself is not the goal; the decision that keeps context and efficiency is.</p></details></div></section>

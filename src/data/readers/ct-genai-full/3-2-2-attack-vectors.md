@@ -7,7 +7,7 @@ section: "3.2.2"
 title: "Data Privacy and Vulnerabilities in Generative AI for Test Processes and Tools"
 titleAr: "خصوصية البيانات والثغرات في أدوات وعمليات الاختبار بالذكاء التوليدي"
 objectives: "GenAI-3.2.2 · K2"
-minutes: 4
+minutes: 7
 lo:
   GenAI-3.2.2: "Give examples of privacy issues and vulnerabilities when using GenAI in testing."
 takeaways:
@@ -34,6 +34,16 @@ terms:
 | Request Manipulation | إدخال مادة تغيّر اتجاه الاستجابة | صورة تجرّ النموذج إلى سياق آخر فيهلوس في معايير القبول |
 | Data Poisoning | تلويث بيانات التدريب أو التحسين | تقييمات مزيفة عند تقييم تقارير اختبار مولّدة |
 | Malicious Code Generation | استدراج النموذج لتوليد أبواب خلفية أو استدعاءات أوامر | سكربت اختبار يفتح اتصالًا خارجيًا غير مبرر |
+
+### كل متجه بالتفصيل — Each Vector
+
+**Context Manipulation:** يحاول المهاجم إغراق السياق بطلبات طويلة أو مصممة بطريقة معينة ليدفع النموذج للخروج عن مهمته وكشف معلومات لا يُفترض أن يكشفها، مثل أجزاء من بيانات التدريب أو معلومات سرية في سياق الأداة.
+
+**Request Manipulation:** إدخال مادة تغيّر اتجاه الاستجابة. في الاختبار متعدد الوسائط مثلًا: صورة شاشة مرفقة تحتوي نصًا خفيًا أو تعليمات تجرّ النموذج إلى سياق مختلف، فيولّد معايير قبول لا علاقة لها بالمتطلب.
+
+**Data Poisoning:** التلاعب بالبيانات التي يتعلم منها النموذج. مثال: أداة تحسّن نفسها بناءً على تقييمات المستخدمين لتقارير الاختبار المولّدة؛ تقييمات مزيفة متعمدة قد تدفعها لتفضيل تقارير سيئة.
+
+**Malicious Code Generation:** دفع النموذج لتوليد شيفرة تحتوي باب خلفي أو استدعاء أوامر غير مقصود. سكربت اختبار يفتح اتصالًا بخادم خارجي، أو يرسل بيانات البيئة، يجب أن يُرفض قبل أي تشغيل.
 
 <aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip · v1.1</p><p>Syllabus v1.1 renamed the first vector from “Data exfiltration” to <strong>Context Manipulation</strong>. Expect the new name in questions.</p></aside>
 

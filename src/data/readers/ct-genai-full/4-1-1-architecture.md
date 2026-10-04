@@ -7,7 +7,7 @@ section: "4.1.1"
 title: "Key Architectural Components and Concepts of LLM-Powered Test Infrastructure"
 titleAr: "المكونات والمفاهيم المعمارية لبنية الاختبار المدعومة بالنماذج اللغوية"
 objectives: "GenAI-4.1.1 · K2"
-minutes: 5
+minutes: 9
 lo:
   GenAI-4.1.1: "Explain the main components and concepts of LLM-powered test infrastructure."
 takeaways:
@@ -36,8 +36,18 @@ terms:
 | Vector database | استرجاع دلالي بواسطة Embeddings | مقاطع توثيق ذات صلة بالسؤال |
 | Post-processing | فحص وتحويل الناتج قبل العرض | التحقق من البنية وربط الحالات بالمصادر |
 
+### لماذا نوعان من قواعد البيانات؟ — Two Kinds of Database
+
+**قاعدة البيانات العلائقية** تخزن البيانات المنظمة التي تُسأل بدقة: حالة الاختبار رقم 42، ومتطلباتها، ونتيجة آخر تشغيل لها. السؤال هنا «أعطني بالضبط هذا السجل».
+
+**قاعدة البيانات المتجهية** تخزن Embeddings لمقاطع نصية وتسمح بالبحث بالمعنى: «أعطني الأجزاء الأقرب لسؤال عن قواعد كلمة المرور» حتى لو لم تحتوِ الوثيقة على الكلمات نفسها. هذا أساس RAG الذي نشرحه في القسم التالي.
+
+الأداة الجيدة تستخدم الاثنين: العلائقية للدقة والعلاقات، والمتجهية للعثور على السياق المناسب.
+
 يمكن أن يكون النموذج خدمة طرف ثالث عبر API أو نموذجًا داخل المؤسسة. ويختلف هذا النظام عن شاتبوت قواعد ثابتة لأنه يولّد الاستجابات من السياق، وعن تطبيق عميل/خادم بسيط لأن الخلفية تنسّق مصادر متعددة ومراحل معالجة.
 
 <aside class="gx-callout" data-kind="practice"><p class="gx-callout-label">In practice · Tracing one request</p><p>The tester picks the “sign-up” story. The back-end checks the user's permissions, retrieves the approved version and builds the prompt. The model returns a draft, and the tool checks the fields and requirement IDs before showing it for review.</p></aside>
+
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>Know the six components and the job of each: front-end (user interaction), back-end (orchestration: auth, retrieval, prompt building, model calls), LLM (generation), relational database (structured data), vector database (semantic retrieval) and post-processing (checking and transforming output).</p></aside>
 
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label">Common mistake</p><p>Trusting structurally valid output. Post-processing can reject missing fields, but it cannot fix every reasoning error. And authentication and permissions remain the application's responsibility; the model does not replace them.</p></aside>

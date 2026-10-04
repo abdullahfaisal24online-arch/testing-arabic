@@ -7,7 +7,7 @@ section: "2.2.1"
 title: "Test Analysis with Generative AI"
 titleAr: "تحليل الاختبار باستخدام الذكاء التوليدي"
 objectives: "GenAI-2.2.1 · K3 / HO-2.2.1a · H2 / HO-2.2.1b · H2"
-minutes: 8
+minutes: 12
 lo:
   GenAI-2.2.1: "Use GenAI to support test analysis tasks."
   HO-2.2.1a: "Write structured multimodal prompts that turn a user story and a wireframe into acceptance criteria."
@@ -28,7 +28,7 @@ terms:
     ar: "تحليل القيم الحدّية"
     def: "A test technique that targets the edges of valid and invalid ranges."
 ---
-تطبيق التوجيه المنظّم على مهام الاختبار يجعل GenAI يدعم التحليل والتصميم والأتمتة وترتيب الحالات وكشف العيوب وتقييم التغطية والمراقبة. والجمع بين Prompt chaining وFew-shot وMeta prompting يسمح للفريق بتكييف الأسلوب مع هدف الاختبار، فتصبح المخرجات أدق وأنفع.
+تطبيق التوجيه المنظّم على مهام الاختبار يجعل GenAI يدعم التحليل والتصميم والأتمتة وترتيب الحالات وكشف العيوب وتقييم التغطية والمراقبة. والجمع بين Prompt chaining و Few-shot و Meta prompting يسمح للفريق بتكييف الأسلوب مع هدف الاختبار، فتصبح المخرجات أدق وأنفع.
 
 التحليل يجيب أساسًا: **ماذا ينبغي أن نختبر؟** المدخلات قد تكون متطلبات، أو قصص مستخدم، أو مواصفات تقنية، أو مخططات واجهة، وكلها أجزاء محتملة من **Test Basis**. والمخرجات هي نواتج التحليل المعتادة، مثل شروط اختبار منظمة ومعايير قبول.
 
@@ -39,6 +39,18 @@ terms:
 3. **ترتيب الشروط حسب المخاطر:** عند توفر احتمال الخطر وأثره لكل شرط، مع مراعاة الالتزامات التنظيمية والوظائف المواجهة للعميل مثل الدخول والدفع وأنماط العيوب السابقة.
 4. **دعم تقييم التغطية:** ربط كل متطلب أو قصة بشروطها لمعرفة ما غُطّي وما لم يُغطَّ، وهذا مهم خصوصًا في المتطلبات المعقّدة.
 5. **اقتراح تقنيات الاختبار:** مثل تقسيم التكافؤ أو تحليل القيم الحدّية بحسب نوع المتطلب.
+
+### كيف تبدو كل مهمة عمليًا؟ — Each Task in Practice
+
+**كشف عيوب أساس الاختبار:** متطلبان يقولان «كلمة المرور 8 محارف على الأقل» و«كلمة المرور 12 محرفًا على الأقل» في وثيقتين مختلفتين. يستطيع النموذج إظهار هذا التناقض إذا أعطيته الوثيقتين معًا. وقد يلاحظ أيضًا أن المتطلبات لا تذكر ما يحدث عند نسيان كلمة المرور؛ هذا نقص يستحق سؤالًا.
+
+**توليد شروط الاختبار:** من متطلب «يستطيع المستخدم إلغاء الطلب قبل الشحن»، يشتق النموذج شروطًا مثل: الإلغاء متاح قبل الشحن، الإلغاء غير متاح بعد الشحن، ماذا يحدث للمبلغ المدفوع عند الإلغاء. كل شرط قابل للاختبار ومرتبط بالمتطلب.
+
+**الترتيب حسب المخاطر:** إذا أعطيت النموذج احتمال الخطر وأثره لكل شرط، يستطيع ترتيبها. الدفع والدخول وما تفرضه الأنظمة عادةً أعلى أثرًا. لكنه يعتمد على المعلومات التي تعطيه إياها، ولا يعرف وحده أن مكوّنًا معيّنًا تكررت فيه العيوب الإصدار الماضي.
+
+**تقييم التغطية:** تطلب مصفوفة تربط كل متطلب بالشروط المشتقة منه، فتظهر المتطلبات التي لا يقابلها أي شرط. هذا مفيد خصوصًا في المتطلبات المعقّدة التي قد يفلت منها جزء دون أن يلاحظه أحد.
+
+**اقتراح التقنيات:** لحقل رقمي له مدى، يقترح تحليل القيم الحدّية. لحقل له فئات قيم، يقترح تقسيم التكافؤ. لقواعد أعمال مركّبة، قد يقترح جدول القرارات.
 
 <aside class="gx-callout" data-kind="key"><p class="gx-callout-label">Key idea</p><p>The quality and relevance of the inputs directly decide how accurate and precise the analysis output is.</p></aside>
 
@@ -57,6 +69,8 @@ terms:
 لا نخلط شرط «رفض الطول غير المقبول» بحالة تفصيلية فيها كلمة مرور محددة وخطوات ونتيجة. هذا التفصيل يأتي في التصميم.
 
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label">Common mistake</p><p>Accepting a number the model invented. If it turns “fast” into “under one second” with no approved source, record it as a question for the requirement owner instead. Likewise, a condition is not high risk just because the model says so: give it likelihood and impact data.</p></aside>
+
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>GenAI-2.2.1 is K3 (apply). Be ready to pick the right use of GenAI for an analysis scenario: finding test basis defects, generating test conditions, risk-based prioritisation, coverage evaluation, or suggesting a test technique. Also remember the inputs (requirements, user stories, specifications, wireframes) and the outputs (test conditions, acceptance criteria).</p></aside>
 
 <section class="gx-lab" data-lab="HO-2.2.1a"><header class="gx-lab-head"><span class="gx-lab-title">Lab · Acceptance Criteria from Story + Wireframe</span><span class="gx-lab-meta">HO-2.2.1a · H2</span></header><div class="gx-lab-body"><p><strong>Goal:</strong> write structured multimodal prompts that turn the sign-up story and the wireframe from section 1.1.4 into clear, testable acceptance criteria. Attach the wireframe image to a tool that accepts images; text alone is not a multimodal run.</p><ol class="gx-lab-steps"><li>Run a short prompt with the task only.</li><li>Run a structured prompt with all six components (below). Optionally add constraints or business rules.</li><li>Compare clarity, completeness and faithfulness to the source between the two outputs.</li></ol><pre class="gx-lab-prompt"><code>Role: Test analyst.
 Context: Sign-up for the "Taallam" e-learning platform.

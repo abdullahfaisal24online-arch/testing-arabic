@@ -7,7 +7,7 @@ section: "5.1.3"
 title: "Selecting LLMs/SLMs for Software Test Tasks"
 titleAr: "اختيار النماذج الكبيرة أو الصغيرة لمهام الاختبار"
 objectives: "GenAI-5.1.3 · K2 / HO-5.1.3 · H1"
-minutes: 6
+minutes: 9
 lo:
   GenAI-5.1.3: "Explain what to consider when selecting LLMs or SLMs for test tasks."
   HO-5.1.3: "Estimate the recurring cost of using an LLM for a test task."
@@ -30,6 +30,16 @@ terms:
 - **الكلفة المتكررة**، بما فيها الترخيص والتشغيل.
 - **المجتمع والدعم والتوثيق.**
 
+### LLM أم SLM؟ — LLM or SLM?
+
+**النموذج الكبير** مناسب للمهام المتنوعة والمعقّدة التي تحتاج فهمًا واسعًا أو استدلالًا متعدد الخطوات، مثل تحليل متطلبات غامضة في مجال جديد. كلفته وزمن استجابته أعلى غالبًا.
+
+**النموذج الصغير** مناسب لمهمة ضيقة ومتكررة ومحددة جيدًا، مثل تصنيف تقارير العيوب حسب المكوّن، خصوصًا بعد ضبطه على بيانات المؤسسة. أخف في التشغيل، ويمكن تشغيله داخليًا بسهولة أكبر، وهذا مفيد للخصوصية.
+
+القرار يُبنى على القياس: جرّب الاثنين على عينة ممثلة من مهمتك، وقارن الجودة والكلفة والزمن.
+
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label">Common mistake</p><p>Picking the model with the top public benchmark score. Measure it on data and tasks that represent your team, and review integration, privacy, licensing, cost and support.</p></aside>
+
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>Know the selection criteria: performance on targeted tasks measured with your own metrics, fine-tuning possibilities, recurring costs (licensing and operation), and community, support and documentation. Check required capabilities first: modality, reasoning, context window, licence.</p></aside>
 
 <section class="gx-lab" data-lab="HO-5.1.3"><header class="gx-lab-head"><span class="gx-lab-title">Exercise · Recurring Cost Estimate</span><span class="gx-lab-meta">HO-5.1.3 · H1</span></header><div class="gx-lab-body"><p>All numbers are hypothetical training values, not provider prices.</p><p class="gx-lab-subhead">Commercial service</p><p>1,000 tasks per month, each with 2,000 input tokens and 500 output tokens. Assumed price: $2 per million input tokens and $8 per million output tokens.</p><table><thead><tr><th>Item</th><th>Calculation</th><th>Cost</th></tr></thead><tbody><tr><td>Input</td><td>2M × $2</td><td>$4</td></tr><tr><td>Output</td><td>0.5M × $8</td><td>$4</td></tr><tr><td>Generation total</td><td>one pass per task</td><td>$8</td></tr><tr><td>Two passes per task</td><td>same size each</td><td>$16</td></tr></tbody></table><p class="gx-lab-subhead">Self-hosted open-licence model</p><p>$40 compute + $10 storage and monitoring + 2 maintenance hours at $15 = <strong>$80 per month</strong> in this scenario.</p><ol class="gx-lab-steps"><li>Repeat the comparison with documented, dated prices and terms for several options, including one commercial and one open-licence model.</li><li>Change the task count, passes, and input and output length, and see where the answer flips.</li><li>Label one-off setup costs separately from recurring costs.</li></ol><p>Do not conclude that commercial is always cheaper: volume, usage, infrastructure, privacy and output quality all change the decision.</p></div></section>

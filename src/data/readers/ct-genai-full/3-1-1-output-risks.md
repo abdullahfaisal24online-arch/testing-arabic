@@ -7,7 +7,7 @@ section: "3.1.1"
 title: "Hallucinations, Reasoning Errors and Biases in Generative AI"
 titleAr: "الهلوسة وأخطاء الاستدلال والتحيز في الذكاء التوليدي"
 objectives: "GenAI-3.1.1 · K1"
-minutes: 5
+minutes: 8
 lo:
   GenAI-3.1.1: "Recall what hallucinations, reasoning errors and biases are in GenAI systems."
 takeaways:
@@ -42,8 +42,14 @@ terms:
 
 سوء تفسير للبنى المنطقية: علاقة السبب والنتيجة، أو المنطق الشرطي، أو حل المسائل خطوة بخطوة. السبب أن النماذج تعتمد على مطابقة الأنماط أكثر من الاستدلال المنطقي الحقيقي. تظهر في مهام مثل الحساب، وتخطيط الاختبار، وترتيب أولوية الحالات.
 
+الفرق بينها وبين الهلوسة: في الهلوسة **المعلومة نفسها** خاطئة أو مخترعة. في خطأ الاستدلال **المعلومات صحيحة** لكن الاستنتاج منها خاطئ. مثال: تعطي النموذج مدد خمس حالات واعتمادياتها بشكل صحيح، فيحسب الزمن الكلي بجمع المدد وقسمتها على عدد المنفذين، متجاهلًا أن بعض الحالات لا تبدأ قبل انتهاء غيرها. كل المعطيات صحيحة، والنتيجة خاطئة.
+
 ### التحيز — Biases
 
 ميل المخرجات لصالح معلومات أو أساليب أو افتراضات معينة، وغالبًا مصدره تركيبة بيانات التدريب. في الاختبار قد يظهر كضعف تمثيل المنظورات غير الإنجليزية أو قيود مرتبطة باللغة، ويؤثر خصوصًا في توليد بيانات الاختبار وتحسين معايير القبول.
+
+أمثلة يعرفها المختبِر العربي جيدًا: بيانات اختبار كلها أسماء إنجليزية وعناوين أمريكية بينما المستخدمون عرب، أو حالات لا تختبر اتجاه الكتابة من اليمين لليسار، أو معايير قبول تفترض صيغة تاريخ معيّنة. وقد يظهر التحيز أيضًا في نوع الاختبارات نفسها: تركيز على الاختبارات الوظيفية وإهمال الأداء وقابلية الوصول.
+
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>K1: recall the definitions. Hallucination = output that is factually wrong or irrelevant (invented tests, non-working scripts, checks for non-existent criteria). Reasoning error = wrong logic about cause and effect, conditions or steps, because LLMs match patterns. Bias = favouring certain information or assumptions, from the training data.</p></aside>
 
 <aside class="gx-callout" data-kind="key"><p class="gx-callout-label">Key idea</p><p>The three types can overlap. Classifying an error is useful because it points to how to detect and fix it, not because every error must fit one box. Their root causes are the nature of the training data and the inherent limits of transformer models.</p></aside>

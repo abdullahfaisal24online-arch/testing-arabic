@@ -7,7 +7,7 @@ section: "3.4.1"
 title: "AI Regulations, Standards and Frameworks Relevant to GenAI in Software Testing"
 titleAr: "التنظيمات والمعايير والأطر المرتبطة بالذكاء التوليدي في الاختبار"
 objectives: "GenAI-3.4.1 · K1"
-minutes: 4
+minutes: 7
 lo:
   GenAI-3.4.1: "Recall examples of AI regulations, standards and frameworks relevant to GenAI in testing."
 takeaways:
@@ -30,6 +30,16 @@ terms:
 | ISO/IEC 23053:2022 | Standard | إطار لأنظمة AI التي تستخدم تعلّم الآلة؛ يساعد على فهم دورة الحياة وجودة البيانات والشفافية والسلامة |
 | EU AI Act | Regulation | إطار قانوني قائم على المخاطر؛ ترتبط به الشفافية والمساءلة والتحيز بحسب التطبيق |
 | NIST AI RMF 1.0 | Framework | إرشادات لإدارة مخاطر AI، بما فيها الإنصاف والشفافية والأمن |
+
+### ما الذي يعنيه كل مرجع للمختبِر؟ — What Each Means for Testers
+
+**ISO/IEC 42001** يتعلق بإدارة الذكاء الاصطناعي على مستوى المؤسسة: سياسات، ومسؤوليات، وعمليات. قد يعني للمختبِر أن استخدام أدوات GenAI يتم ضمن سياسة موثقة وأدوار واضحة.
+
+**ISO/IEC 23053** يصف إطارًا لأنظمة AI المبنية على تعلّم الآلة، فيساعد على فهم مكوّنات النظام ودورة حياته، وهذا مفيد عند اختبار أنظمة AI نفسها.
+
+**EU AI Act** قانون يصنّف أنظمة AI حسب مستوى خطرها، ويفرض متطلبات أكثر على الأنظمة عالية الخطر. قد يؤثر على متطلبات التوثيق والشفافية التي يحتاج الفريق اختبارها أو إثباتها.
+
+**NIST AI RMF** إطار إرشادي طوعي لإدارة مخاطر AI، يساعد الفريق على تحديد المخاطر وقياسها ومعالجتها بطريقة منظمة.
 
 <aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>This is a K1 objective: recall the name and match it to its type and purpose. Do not mix up a standard (ISO/IEC), a regulation (EU AI Act) and a framework (NIST AI RMF).</p></aside>
 

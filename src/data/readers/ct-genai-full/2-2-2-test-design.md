@@ -7,7 +7,7 @@ section: "2.2.2"
 title: "Test Design and Test Implementation with Generative AI"
 titleAr: "تصميم الاختبار وتجهيزه باستخدام الذكاء التوليدي"
 objectives: "GenAI-2.2.2 · K3 / HO-2.2.2a · H2 / HO-2.2.2b · H2 / HO-2.2.2c · H2"
-minutes: 9
+minutes: 13
 lo:
   GenAI-2.2.2: "Use GenAI to support test design and test implementation tasks."
   HO-2.2.2a: "Generate functional test cases from user stories with chaining, structured prompts and meta prompting."
@@ -41,7 +41,19 @@ terms:
 - **توليد السكربتات:** تحويل الحالات المنظمة إلى إجراءات يدوية أو سكربتات تتوافق مع إطار الأتمتة، وتحديثها مع تغيّر المتطلبات.
 - **جدولة التنفيذ وترتيبه:** بحسب الأولوية والمخاطر والاعتماديات وتوفر الموارد وأهداف الاختبار.
 
+### أمثلة لكل مهمة — Examples
+
+**توليد الحالات:** من متطلب وظيفي مثل «يحصل العميل على خصم 10% عند شراء أكثر من 3 قطع»، يقترح النموذج حالات بشروط مسبقة (سلة فيها 3 قطع، 4 قطع)، ومدخلات، ونتائج متوقعة. ومن متطلب غير وظيفي مثل «تُحمَّل الصفحة خلال ثانيتين»، يقترح شروط القياس والحمل والبيئة.
+
+**البيانات التركيبية:** تحتاج 500 عميل لاختبار تقرير؟ يولّد النموذج أسماء وعناوين وأرقامًا واقعية الشكل لكنها غير حقيقية، مع حالات حدّية مثل أسماء طويلة جدًا، وأحرف عربية وإنجليزية مختلطة، وتواريخ ميلاد على الحدود. هذا يخدم الاختبار دون كشف بيانات عملاء فعلية.
+
+**السكربتات:** من حالة منظمة بخطوات واضحة، يولّد النموذج سكربتًا للإطار الذي يستخدمه الفريق، وعند تغيّر المتطلب يحدّث السكربت المتأثر.
+
+**الجدولة:** يقرأ النموذج الحالات واعتمادياتها ويقترح ترتيب تنفيذ يراعي الأولوية والمخاطر والموارد المتاحة وأهداف الاختبار.
+
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label">Common mistake</p><p>Treating generated data as safe by default, or treating a script that runs as a correct test. Check data for sensitivity and validity, and check every script's expected result and coverage before approving it.</p></aside>
+
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>Know the four design and implementation tasks: test case generation, synthetic test data, test script generation, and execution scheduling and prioritisation. Remember that test implementation prepares testware for execution; it is not execution itself.</p></aside>
 
 <section class="gx-lab" data-lab="HO-2.2.2a"><header class="gx-lab-head"><span class="gx-lab-title">Lab · Generate, Check Coverage, Then Meta-Prompt</span><span class="gx-lab-meta">HO-2.2.2a · H2</span></header><div class="gx-lab-body"><p><strong>Goal:</strong> generate functional test cases for the rule “password length is 12–64 characters”, assuming all other fields are valid.</p><ol class="gx-lab-steps"><li>Ask for test cases in the format ID / Preconditions / Input / Steps / Expected / Requirement.</li><li>Ask for a coverage table per acceptance criterion and review it.</li><li>Use a meta prompt to design a prompt for an end-to-end procedure: sign up, then reach the allowed feature. Fix the prompt when you find a gap and regenerate only the affected part.</li></ol><table><thead><tr><th>Case</th><th>Input</th><th>Expected</th><th>Source</th></tr></thead><tbody><tr><td>TC-01</td><td>11 characters</td><td>Sign-up rejected for length</td><td>Lower boundary</td></tr><tr><td>TC-02</td><td>12 characters</td><td>Length rule accepted</td><td>Lower boundary</td></tr><tr><td>TC-03</td><td>64 characters</td><td>Length rule accepted</td><td>Upper boundary</td></tr><tr><td>TC-04</td><td>65 characters</td><td>Sign-up rejected for length</td><td>Upper boundary</td></tr></tbody></table><pre class="gx-lab-prompt"><code>Design a prompt that generates an end-to-end procedure from the approved
 acceptance criteria and test cases. Ask for missing data first, define the

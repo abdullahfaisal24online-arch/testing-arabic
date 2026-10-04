@@ -7,7 +7,7 @@ section: "2.2.3"
 title: "Automated Regression Testing with Generative AI"
 titleAr: "اختبار الانحدار المؤتمت باستخدام الذكاء التوليدي"
 objectives: "GenAI-2.2.3 · K3 / HO-2.2.3a · H2 / HO-2.2.3b · H2"
-minutes: 8
+minutes: 12
 lo:
   GenAI-2.2.3: "Use GenAI to support automated regression testing."
   HO-2.2.3a: "Use few-shot prompting to create, maintain and debug keyword-driven test scripts."
@@ -47,11 +47,25 @@ terms:
 
 تنطبق هذه الاستخدامات على الانحدار الوظيفي وغير الوظيفي، لكن مخرجات GenAI تحتاج مراجعة تتناسب مع مستوى الخطر (انظر الفصل الثالث).
 
+### كل استخدام بالتفصيل — Each Activity
+
+**السكربتات بالكلمات المفتاحية:** في إطار Keyword-driven، كل خطوة متكررة لها كلمة مفتاحية موثقة (مثل OpenLogin أو FillEmail). يربط النموذج خطوات الحالة بالكلمات المناسبة ويولّد السكربت، فيدعم المختبرين ومهندسي الأتمتة دون الحاجة لكتابة الشيفرة من الصفر.
+
+**تحليل الأثر:** يقرأ النموذج تغييرات الشيفرة (مثل Diff في طلب الدمج) ويقترح المكوّنات والاختبارات الأكثر تأثرًا. بدل تشغيل مجموعة الانحدار كاملة لكل تغيير صغير، يُوجَّه الجهد إلى المناطق عالية الخطر.
+
+**الإصلاح الذاتي:** عندما يتغيّر معرّف زر أو مسار API تغييرًا بسيطًا، يكيّف النموذج السكربت تلقائيًا، فلا تفشل الاختبارات فشلًا لا علاقة له بالجودة الفعلية، وتبقى المجموعة مستقرة.
+
+**التقارير والرؤى:** ينتج تقارير ولوحات في الوقت المناسب، تتضمن نسب النجاح والمشكلات والاتجاهات، وقد يقدّم توقعات عن مناطق الفشل المحتملة.
+
+**تقارير العيوب وتحليل السبب الجذري:** يجمع السجلات ولقطات الشاشة ومعلومات البيئة في تقرير عيب كامل، ويقترح أسبابًا محتملة يتحقق منها المختبِر.
+
 ### واجهة المستخدم مقابل API — GUI vs API
 
 اختبارات GUI غير مستقرة غالبًا بسبب تغيّر الواجهة: محددات ديناميكية وتغيرات بصرية وتفاعلات. يعدّل GenAI السكربتات مع تغيّر المحددات والتفاعلات فيقلّ التدخل اليدوي. أما اختبارات API فتتأثر بتغيّر بنية الطلب والاستجابة والمسارات والمصادقة؛ يعدّل GenAI السكربتات مع تغيّر المواصفات ويولّد بيانات متنوعة، فتبقى التغطية جيدة بجهد أقل.
 
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label">Common mistake</p><p>Accepting any self-heal that makes the test pass. If the “Submit” button changed and self-healing picked “Delete”, the run passes but the test is wrong. Check the intent of the step and the expected result; reject the fix if needed. For APIs, give the model the approved specification so it does not “fix” a test to tolerate an unintended contract change.</p></aside>
+
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>Know the five regression activities by name and purpose: keyword-driven script implementation, impact analysis and test optimisation, self-healing and adaptive tests, automated reporting and insights, and enhanced defect reporting and root cause analysis. Know the typical GUI problem (frequent interface changes, locators) and the API problems (changed request/response structures, endpoints, authentication).</p></aside>
 
 <section class="gx-lab" data-lab="HO-2.2.3a"><header class="gx-lab-head"><span class="gx-lab-title">Lab · Keyword-driven Scripts with Few-shot</span><span class="gx-lab-meta">HO-2.2.3a · H2</span></header><div class="gx-lab-body"><p><strong>Part 1 · Automation.</strong> This is a hypothetical training keyword library, not an installable package.</p><table><thead><tr><th>Keyword</th><th>Arguments</th><th>Documented behaviour</th></tr></thead><tbody><tr><td>OpenRegistration</td><td>none</td><td>Opens the sign-up screen</td></tr><tr><td>FillEmail</td><td>email</td><td>Fills the email field</td></tr><tr><td>FillPassword</td><td>password</td><td>Fills the password field</td></tr><tr><td>SubmitRegistration</td><td>none</td><td>Submits the form</td></tr><tr><td>ExpectAccountCreated</td><td>none</td><td>Checks the account was created</td></tr><tr><td>ExpectNoAccount</td><td>none</td><td>Checks no new account was created</td></tr></tbody></table><ol class="gx-lab-steps"><li>Give the model a valid sign-up example and an empty-email example written with these keywords.</li><li>Ask for an 11-character password case, with the constraint “use the documented library only”.</li><li>Review the draft, then run it with your real tool in a test environment.</li></ol><pre class="gx-lab-prompt"><code>OpenRegistration
 FillEmail learner01@example.test

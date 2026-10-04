@@ -7,7 +7,7 @@ section: "4.2.1"
 title: "Fine-Tuning LLMs for Test Tasks"
 titleAr: "الضبط الدقيق للنماذج لمهام الاختبار"
 objectives: "GenAI-4.2.1 · K2 / HO-4.2.1 · H0"
-minutes: 6
+minutes: 9
 lo:
   GenAI-4.2.1: "Explain how fine-tuning adapts a model to specialised test tasks."
   HO-4.2.1: "Observe the steps of fine-tuning a model for a test task."
@@ -27,9 +27,13 @@ terms:
     ar: "الغموض"
     def: "Difficulty explaining or correcting why a model produces a given output."
 ---
-الضبط الدقيق تدريب إضافي لنموذج مسبق التدريب على بيانات موجّهة لمهمة أو مجال. يساعد النموذج على استخدام مصطلحات المجال، أو اتباع قالب المؤسسة، أو تحسين الأداء في مهام متخصصة. وينطبق على LLM وSLM؛ قد يحقق نموذج صغير مضبوط أداءً مناسبًا لمهمة ضيقة بكلفة حوسبة أقل، لكن ذلك يحتاج قياسًا.
+الضبط الدقيق تدريب إضافي لنموذج مسبق التدريب على بيانات موجّهة لمهمة أو مجال. يساعد النموذج على استخدام مصطلحات المجال، أو اتباع قالب المؤسسة، أو تحسين الأداء في مهام متخصصة. وينطبق على LLM و SLM؛ قد يحقق نموذج صغير مضبوط أداءً مناسبًا لمهمة ضيقة بكلفة حوسبة أقل، لكن ذلك يحتاج قياسًا.
 
 مثال: لدينا قصص مستخدم وحالات اختبار معتمدة مكتوبة بقالب المؤسسة. نستخدم أزواجًا عالية الجودة لتعليم النموذج القالب والمفردات المطلوبة.
+
+### متى يستحق الضبط الدقيق؟ — When It Is Worth It
+
+الضبط الدقيق مكلف ويحتاج بيانات جيدة وخبرة، فلا تبدأ به. جرّب أولًا التوجيه الجيد، ثم الأمثلة (Few-shot)، ثم RAG. إذا بقيت المشكلة في **سلوك** النموذج نفسه، مثل أنه لا يلتزم بقالب مؤسستك المعقّد رغم الأمثلة، أو لا يفهم مصطلحات مجالك المتخصص (بنوك، طيران، أجهزة طبية)، فهنا قد يستحق الضبط الدقيق.
 
 ### التحديات — Challenges
 
@@ -39,6 +43,8 @@ terms:
 | Overfitting | أداء جيد على التدريب وضعيف على الجديد | تقييم على قصص لم تُستخدم في التدريب |
 | Opacity | صعوبة تفسير القرارات وتصحيحها | تتبّع المدخلات والمخرجات والقياسات |
 | Heavy compute | وقت وكلفة وتشغيل أعقد | مقارنة الفائدة بالكلفة وبحل أبسط |
+
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>Know the four challenges: biased or poor-quality data, overfitting, opacity, and high compute cost. And the key contrast: RAG adds current context at request time; fine-tuning changes the model's behaviour through extra training.</p></aside>
 
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label">Common mistake</p><p>Putting weak answers in the training data and expecting training to fix them. Fine-tuning learns what you give it, including the mistakes.</p></aside>
 
