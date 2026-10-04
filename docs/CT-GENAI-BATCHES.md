@@ -29,6 +29,13 @@ Body headings: `### Arabic — English` (rendered as English heading + Arabic li
 `<aside class="gx-callout" data-kind="key|practice|tip|warn"><p class="gx-callout-label">…</p><p>…</p></aside>`,
 `<section class="gx-lab" data-lab="HO-x.y.z">…<ol class="gx-lab-steps">…</ol>…</section>`, `<figure class="gx-figure">…</figure>`.
 
+## Batch 2 — all chapters converted
+
+- Chapter 1 aligned with syllabus v1.1: corrected chapter/group/section titles, own-wording learning objectives (`lo` field), coverage gaps filled.
+- Chapters 2–5 split into one page per syllabus section (2: 10, 3: 9, 4: 5, 5: 7) in `src/data/readers/ct-genai-full/` (the old `ct-genai-draft/` files are no longer loaded and can be deleted), in the same format as Chapter 1: English headings and boxes, takeaways, terms, labs; embedded self-check questions removed.
+- v1.1 changes reflected: one-shot in HO-2.1.2b, Context Manipulation in 3.2.2, AI assistants paragraph in 4.1.3, GenAI-3.1.2 "Identify".
+- Still to verify against the English v1.1 PDF: exact section titles and K/H levels for chapters 3–5 (taken from v1.0 and the earlier drafts).
+
 ## Review links (staging only)
 
 /store/ct-genai-guide/full/ (all chapters)

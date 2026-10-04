@@ -46,7 +46,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
           {objectives.map((o) => (
             <li>
               <span class:list={['gx-level', `gx-level--${o.level.charAt(0).toLowerCase()}`]}>{o.code.replace('GenAI-', '')} · {o.level}</span>
-              <a href={pageUrl(view, o.page)}>{o.page.title}</a>
+              <a href={pageUrl(view, o.page)}>{o.text || o.page.title}</a>
             </li>
           ))}
         </ul>

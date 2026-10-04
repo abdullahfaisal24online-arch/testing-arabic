@@ -8,6 +8,9 @@ title: "Multimodal LLMs and Vision-Language Models"
 titleAr: "النماذج متعددة الوسائط ونماذج الرؤية واللغة"
 objectives: "GenAI-1.1.4 · K2 / HO-1.1.4 · H1"
 minutes: 6
+lo:
+  GenAI-1.1.4: "Summarize how multimodal LLMs and vision-language models work."
+  HO-1.1.4: "Write and run a prompt that gives a multimodal LLM both text and an image for a test task."
 takeaways:
   - "Multimodal input widens the context available to the tester and the model."
   - "The value comes from linking visual evidence with the written description."
@@ -27,7 +30,7 @@ terms:
 ---
 تتعامل **النماذج متعددة الوسائط (Multimodal LLMs)** مع أكثر من نوع من البيانات، مثل النص والصورة والصوت والفيديو. إمكانات الإدخال والإخراج تختلف من نموذج لآخر؛ دعم الصور لا يعني تلقائيًا دعم الفيديو أو توليد الصوت.
 
-تتكيّف طريقة تمثيل المدخلات مع نوع الوسيط. لا تُعامل الصورة حرفيًا كجملة نصية، بل تُحوّل معلوماتها إلى تمثيلات يستطيع النظام معالجتها وربطها بالنص.
+تمدّ هذه النماذج بنية Transformer لتشمل وسائط متعددة، وتُدرَّب على بيانات متنوعة لتتعلّم العلاقات بين هذه الوسائط. ويتكيّف التقطيع مع نوع الوسيط: لا تُعامل الصورة حرفيًا كجملة نصية، بل تُحوّل أولًا إلى Embeddings، ثم يعالجها الـTransformer ويربطها بالنص.
 
 **نماذج الرؤية واللغة (Vision-Language Models / VLMs)** تجمع المعلومات المرئية والنصية. يمكن استخدامها لوصف صورة، والإجابة عن أسئلة مرتبطة بها، وتحليل مدى اتساق النص مع ما يظهر بصريًا.
 
@@ -36,7 +39,7 @@ terms:
 يمكن تزويد النموذج بصورة شاشة أو مخطط واجهة **GUI Wireframe**، مع قصة مستخدم أو وصف عيب. يتيح ذلك:
 
 - مقارنة عنصر مرئي بنتيجة متوقعة مكتوبة، والإشارة إلى اختلاف محتمل.
-- اقتراح حالات اختبار تجمع المتطلبات النصية مع عناصر الواجهة المرئية.
+- توليد حالات اختبار أغنى وأقرب للواقع تجمع المتطلبات النصية مع عناصر الواجهة المرئية، مما يزيد التغطية.
 - تحليل اتساق وصف العيب مع لقطة الشاشة، وطلب معلومات مفقودة.
 
 <aside class="gx-callout" data-kind="key"><p class="gx-callout-label">Key idea</p><p>An image does not reveal server behaviour or every application state. Keep <strong>what the evidence shows</strong> separate from <strong>what needs execution to verify</strong>.</p></aside>

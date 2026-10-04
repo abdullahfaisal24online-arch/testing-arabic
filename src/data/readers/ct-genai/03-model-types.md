@@ -8,6 +8,8 @@ title: "Foundation, Instruction-Tuned and Reasoning LLMs"
 titleAr: "النماذج الأساسية والموجّهة بالتعليمات والاستدلالية"
 objectives: "GenAI-1.1.3 · K2"
 minutes: 5
+lo:
+  GenAI-1.1.3: "Tell foundation, instruction-tuned and reasoning LLMs apart."
 takeaways:
   - "General foundation → instruction following → specialised for complex reasoning."
   - "The category reflects how a model was prepared, not its brand name or the size of its context window."
@@ -23,7 +25,7 @@ terms:
     match: ["Instruction-Tuned LLMs", "Instruction-tuned"]
   - en: "Reasoning LLM"
     ar: "النموذج الاستدلالي"
-    def: "Specialised further for multi-step problems that need logical inference and linking complex information."
+    def: "Builds on instruction-tuned models with extra training on complex tasks to strengthen logical inference, multi-step problem solving and chain-of-thought reasoning."
     match: ["Reasoning LLMs", "Reasoning"]
 ---
 يفرّق المنهج بين ثلاث فئات تنتج عن مراحل تدريب وتخصيص متدرّجة. الفرق يتعلق بما تم إعداد النموذج للقيام به، وليس بمجرد الاسم التجاري أو حجم نافذة السياق.
@@ -42,7 +44,7 @@ terms:
 
 ### النماذج الاستدلالية — Reasoning LLMs
 
-تُخصّص بصورة أكبر لمهام تتطلب استنتاجًا منطقيًا، وحلًا متعدد الخطوات، وربط معلومات معقّدة. تتضمن عملية إعدادها مهام تتطلب فهم السياق والتركيب بين معلومات مختلفة. قد تناسب مهام اختبار فيها أولويات واعتماديات وشروط متداخلة.
+تبني على النماذج الموجّهة بالتعليمات، وتُدرَّب أو تُضبط بصورة إضافية على مهام معقّدة مختارة بعناية، لتقوية قدرات منظمة مثل الاستنتاج المنطقي، والحل متعدد الخطوات، والاستدلال المتسلسل **Chain-of-Thought**. لذلك تناسب المهام ذات العبء المعرفي العالي في المجالات التقنية. قد تناسب مهام اختبار فيها أولويات واعتماديات وشروط متداخلة.
 
 هذا لا يجعلها معصومة من أخطاء الاستدلال. راجع الاستنتاجات باستخدام قواعد المهمة ومراجع مستقلة، ولا تعتبر تسمية «Reasoning» ضمانًا.
 

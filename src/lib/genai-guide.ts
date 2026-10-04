@@ -31,11 +31,14 @@ interface Frontmatter {
   minutes?: number;
   takeaways?: string[];
   terms?: GuideTerm[];
+  /** صياغتنا المختصرة لكل هدف تعلّم (بالإنجليزي)، مفتاحها رمز الهدف */
+  lo?: Record<string, string>;
 }
 
 export interface Objective {
   code: string;
   level: string;
+  text?: string;
 }
 
 export interface HeadingRef {
@@ -69,17 +72,28 @@ export interface GuideChapter {
 }
 
 export const CHAPTERS: GuideChapter[] = [
-  { number: 1, en: 'Foundations of Generative AI for Software Testing', ar: 'أساسيات الذكاء الاصطناعي التوليدي لاختبار البرمجيات' },
-  { number: 2, en: 'Prompt Engineering for Software Testing', ar: 'هندسة التوجيه لاختبار البرمجيات' },
-  { number: 3, en: 'Managing Risks of Generative AI', ar: 'إدارة مخاطر الذكاء الاصطناعي التوليدي' },
-  { number: 4, en: 'Infrastructure for Generative AI', ar: 'البنية التحتية للذكاء الاصطناعي التوليدي' },
-  { number: 5, en: 'Adoption of Generative AI in Organizations', ar: 'تبنّي الذكاء الاصطناعي التوليدي في المؤسسات' },
+  { number: 1, en: 'Introduction to Generative AI for Software Testing', ar: 'مدخل إلى الذكاء الاصطناعي التوليدي لاختبار البرمجيات' },
+  { number: 2, en: 'Prompt Engineering for Effective Software Testing', ar: 'هندسة التوجيه لاختبار برمجيات فعّال' },
+  { number: 3, en: 'Managing Risks of Generative AI in Software Testing', ar: 'إدارة مخاطر الذكاء التوليدي في اختبار البرمجيات' },
+  { number: 4, en: 'LLM-Powered Test Infrastructure for Software Testing', ar: 'بنية اختبار تحتية مدعومة بالنماذج اللغوية' },
+  { number: 5, en: 'Deploying and Integrating Generative AI in Test Organizations', ar: 'نشر الذكاء التوليدي ودمجه في مؤسسات الاختبار' },
 ];
 
 /** عناوين المجموعات (المستوى الثاني بالسيليبس). بتنضاف لكل فصل لما ينقسم بدفعته. */
 export const GROUPS: Record<string, { en: string; ar: string }> = {
   '1.1': { en: 'Generative AI Foundations and Key Concepts', ar: 'أساسيات الذكاء التوليدي ومفاهيمه الرئيسية' },
-  '1.2': { en: 'Leveraging Generative AI in Software Testing', ar: 'الاستفادة من الذكاء التوليدي في اختبار البرمجيات' },
+  '1.2': { en: 'Leveraging Generative AI in Software Testing: Core Principles', ar: 'الاستفادة من الذكاء التوليدي في الاختبار: المبادئ الأساسية' },
+  '2.1': { en: 'Effective Prompt Development', ar: 'تطوير توجيهات فعّالة' },
+  '2.2': { en: 'Applying Prompt Engineering Techniques to Software Test Tasks', ar: 'تطبيق تقنيات هندسة التوجيه على مهام الاختبار' },
+  '2.3': { en: 'Evaluate Generative AI Results and Refine Prompts for Software Test Tasks', ar: 'تقييم نتائج الذكاء التوليدي وتنقيح التوجيهات' },
+  '3.1': { en: 'Hallucinations, Reasoning Errors and Biases', ar: 'الهلوسة وأخطاء الاستدلال والتحيز' },
+  '3.2': { en: 'Data Privacy and Security Risks of Generative AI in Software Testing', ar: 'مخاطر خصوصية البيانات والأمن' },
+  '3.3': { en: 'Energy Consumption and Environmental Impact of Generative AI for Software Testing', ar: 'استهلاك الطاقة والأثر البيئي' },
+  '3.4': { en: 'AI Regulations, Standards, and Best Practice Frameworks', ar: 'التنظيمات والمعايير وأطر الممارسات' },
+  '4.1': { en: 'Architectural Approaches for LLM-Powered Test Infrastructure', ar: 'المقاربات المعمارية لبنية الاختبار المدعومة بالنماذج' },
+  '4.2': { en: 'Fine-Tuning and LLMOps: Operationalizing Generative AI for Software Testing', ar: 'الضبط الدقيق وLLMOps: تشغيل الذكاء التوليدي في الاختبار' },
+  '5.1': { en: 'Roadmap for the Adoption of Generative AI in Software Testing', ar: 'خارطة طريق تبنّي الذكاء التوليدي في الاختبار' },
+  '5.2': { en: 'Manage Change when Adopting Generative AI for Software Testing', ar: 'إدارة التغيير عند تبنّي الذكاء التوليدي' },
 };
 
 export const LEVELS: Record<string, { name: string; hint: string }> = {
@@ -92,16 +106,16 @@ export const LEVELS: Record<string, { name: string; hint: string }> = {
 };
 
 const sampleModules = import.meta.glob<MarkdownInstance<Frontmatter>>('../data/readers/ct-genai/*.md', { eager: true });
-const draftModules = import.meta.glob<MarkdownInstance<Frontmatter>>('../data/readers/ct-genai-draft/*.md', { eager: true });
+const draftModules = import.meta.glob<MarkdownInstance<Frontmatter>>('../data/readers/ct-genai-full/*.md', { eager: true });
 
-const parseObjectives = (raw = ''): Objective[] =>
+const parseObjectives = (raw = '', lo: Record<string, string> = {}): Objective[] =>
   raw
     .split('/')
     .map((part) => part.trim())
     .filter(Boolean)
     .map((part) => {
       const [code, level = ''] = part.split('·').map((s) => s.trim());
-      return { code, level };
+      return { code, level, text: lo[code] };
     });
 
 const ARABIC = /[؀-ۿ]/;
@@ -157,7 +171,7 @@ function transform(html: string): { html: string; headings: HeadingRef[] } {
 function toPage(mod: MarkdownInstance<Frontmatter>): GuidePage {
   const fm = mod.frontmatter;
   const legacy = Boolean(fm.english);
-  const objectives = parseObjectives(fm.objectives);
+  const objectives = parseObjectives(fm.objectives, fm.lo);
   return {
     slug: String(fm.slug),
     chapter: fm.chapter || 1,

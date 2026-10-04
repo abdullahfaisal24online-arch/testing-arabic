@@ -41,7 +41,7 @@ const nextIsNewChapter = next && next.chapter !== page.chapter;
             <span>
               <b>{LEVELS[o.level]?.name || o.level}</b>
               <small class="gx-mono">{o.code}</small>
-              {LEVELS[o.level] && <span class="gx-objective-hint">{LEVELS[o.level].hint}</span>}
+              {(o.text || LEVELS[o.level]) && <span class="gx-objective-hint">{o.text || LEVELS[o.level].hint}</span>}
             </span>
           </div>
         ))}

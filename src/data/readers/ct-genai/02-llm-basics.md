@@ -8,6 +8,9 @@ title: "Basics of Generative AI and LLMs"
 titleAr: "أساسيات الذكاء التوليدي والنماذج اللغوية الكبيرة"
 objectives: "GenAI-1.1.2 · K2 / HO-1.1.2 · H1"
 minutes: 7
+lo:
+  GenAI-1.1.2: "Explain at a basic level how generative AI and large language models work."
+  HO-1.1.2: "Tokenize sample text and evaluate token counts for a testing task."
 takeaways:
   - "Tokenization splits text into tokens; word count and token count rarely match."
   - "Embeddings turn tokens into vectors, and the Transformer processes the relations between them."
@@ -36,6 +39,10 @@ terms:
   - en: "Non-Deterministic Behavior"
     ar: "السلوك غير الحتمي"
     def: "The same input can produce different outputs because generation is probabilistic."
+  - en: "Generative Pre-trained Transformer"
+    ar: "المحوّل التوليدي المدرّب مسبقًا"
+    def: "GPT. The deep-learning architecture that many foundation LLMs are based on."
+    match: ["Generative Pre-trained Transformer"]
   - en: "SLM"
     ar: "نموذج لغوي صغير"
     def: "Small Language Model. Fewer parameters, lighter to run, focused on specific needs."
@@ -57,7 +64,7 @@ terms:
 
 ### التضمينات المتجهية — Embeddings
 
-تتحول الرموز إلى تمثيلات عددية تسمّى **Vectors** ضمن فضاء متعدد الأبعاد. تمثّل هذه القيم علاقات دلالية ونحوية وسياقية تعلّمها النموذج. قد تتقارب تمثيلات رموز ذات معانٍ أو أدوار سياقية متشابهة، مما يساعد على معالجة العلاقات داخل النص.
+تتحول الرموز إلى تمثيلات عددية تسمّى **Vectors** ضمن فضاء متعدد الأبعاد. تمثّل هذه القيم علاقات دلالية ونحوية وسياقية تعلّمها النموذج. كلما تقاربت تمثيلات رموز في هذا الفضاء، دلّ ذلك غالبًا على معانٍ أو أدوار سياقية متشابهة، مما يساعد على معالجة العلاقات داخل النص.
 
 مثال توضيحي: قد يرتبط «عيب» و«Defect» في سياق الاختبار، لكن التشابه بين تمثيلات الكلمات لا يجعل النموذج مرجعًا يضمن صحة المصطلح أو الاستنتاج.
 
@@ -69,7 +76,7 @@ terms:
 
 ### نافذة السياق — Context Window
 
-هي حدّ لكمية السياق التي يمكن للنموذج أخذها بعين الاعتبار، ويُقاس بالـTokens. تساعد النافذة الأكبر عند تحليل متطلبات طويلة أو سجلات اختبار، لكن معالجة سياق أطول تحتاج موارد ووقتًا أكبر.
+هي كمية النص السابق التي يأخذها النموذج بعين الاعتبار عند توليد الاستجابة، وتُقاس بالـTokens. النافذة الأكبر تساعد النموذج على الحفاظ على الترابط في نصوص أطول، مثل متطلبات طويلة أو سجلات اختبار، لكنها تزيد التعقيد الحسابي وتحتاج موارد ووقتًا أكبر.
 
 حدود المدخل والمخرج وتوزيع السعة تختلف بين النماذج. راجع حدود النموذج، ووفّر مساحة كافية للإجابة، وحدّد المعلومات المهمة بدل إرسال سجلات غير مرتبطة بالمهمة. النافذة الكبيرة لا تضمن استخدام كل معلومة بدقة.
 
@@ -79,6 +86,6 @@ terms:
 
 ### السلوك غير الحتمي — Non-Deterministic Behavior
 
-قد تختلف النتيجة عند تكرار المدخل نفسه بسبب الطبيعة الاحتمالية للتوليد وإعداداته. لذلك لا يكفي نجاح طلب واحد للحكم على موثوقية استخدامه. خفض العشوائية قد يزيد الاتساق، لكنه لا يضمن تطابق النتائج أو صحتها؛ تُناقَش وسائل التخفيف في الفصل الثالث.
+قد تختلف النتيجة عند تكرار المدخل نفسه، لأن آلية الاستدلال احتمالية، ولأن إعدادات النموذج (Hyperparameters) مثل درجة العشوائية تؤثر في التوليد. لذلك لا يكفي نجاح طلب واحد للحكم على موثوقية استخدامه. خفض العشوائية قد يزيد الاتساق، لكنه لا يضمن تطابق النتائج أو صحتها؛ تُناقَش وسائل التخفيف في الفصل الثالث.
 
 <section class="gx-lab" data-lab="HO-1.1.2"><header class="gx-lab-head"><span class="gx-lab-title">Lab · Compare Two Prompt Lengths</span><span class="gx-lab-meta">HO-1.1.2 · H1</span></header><div class="gx-lab-body"><p><strong>Goal:</strong> compare the input length of two prompts for a test-case generation task.</p><ol class="gx-lab-steps"><li>Open a tokenizer that matches a model you choose and enter: <em>“Generate test cases for login.”</em></li><li>Add the user story, acceptance criteria, field constraints and output format. Record the token count of this second prompt.</li><li>Try an Arabic text and an English text with the same meaning, then a text that contains JSON data. Record the actual values. Do not assume they are equal.</li><li>Compare the counts with the model limits and decide what you can remove without losing essential context.</li></ol><p class="gx-lab-subhead">Worked example (hypothetical numbers)</p><p>A shared budget of 8,000 tokens, a 6,200-token prompt and 1,500 tokens reserved for the answer leave 300. Adding a 1,000-token log exceeds the budget by 700. Fix it by shortening the input or splitting the task while keeping the essential information.</p><details class="gx-lab-answer"><summary>What good looks like</summary><p>You can explain why token counts differ between inputs, calculate how length affects the context limit, and decide what the model actually needs for the task. The number itself is not the goal; the decision that keeps context and efficiency is.</p></details></div></section>
