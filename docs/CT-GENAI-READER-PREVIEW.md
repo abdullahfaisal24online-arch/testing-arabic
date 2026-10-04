@@ -25,3 +25,7 @@ Chapters 2–5, full syllabus coverage review, CMS editorial fields, product ent
 ## Verification
 
 Build with `ASTRO_TELEMETRY_DISABLED=1 STORE_OPEN=1 CMS_BRANCH=staging npm run build`. Confirm preview route exists; production build without CMS_BRANCH must omit it. Check search, last-unit navigation, completion undo, reload/resume, font bounds, corrupt/unavailable storage, keyboard access and 390px/desktop layouts.
+
+## Internal full-draft review
+
+The staging-only route `/store/ct-genai-guide/full/` contains 15 editorial units covering Chapters 2–5. It is a review draft and is not linked from the store or payment flow. The five-unit preview route remains the free Chapter 1 sample. Before a paid launch, the draft still needs editorial review, CMS fields, entitlement checks and the agreed free/paid boundary.
