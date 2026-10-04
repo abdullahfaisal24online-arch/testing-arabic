@@ -1,0 +1,105 @@
+---
+import { CHAPTERS, GROUPS, LEVELS, glossaryUrl, pageUrl, pagesFor, sectionLabel, termId, type GuidePage, type GuideView } from '../../lib/genai-guide';
+
+interface Props { view: GuideView; chapter: number }
+const { view, chapter } = Astro.props;
+const meta = CHAPTERS.find((c) => c.number === chapter)!;
+const pages = pagesFor(view).filter((p) => p.chapter === chapter);
+const minutes = pages.reduce((n, p) => n + p.minutes, 0);
+const labs = pages.reduce((n, p) => n + p.labs.length, 0);
+
+// العناوين مجمّعة حسب المستوى الثاني بالسيليبس (1.1، 1.2…). الصفحات القديمة بدون مجموعة بتنعرض لحالها.
+const blocks: { key: string; group?: { en: string; ar: string }; pages: GuidePage[] }[] = [];
+for (const p of pages) {
+  const key = p.group || `page:${p.slug}`;
+  const last = blocks[blocks.length - 1];
+  if (last && last.key === key && p.group) last.pages.push(p);
+  else blocks.push({ key, group: p.group ? GROUPS[p.group] : undefined, pages: [p] });
+}
+
+const objectives = pages.flatMap((p) =>
+  p.objectives.filter((o) => o.code.startsWith('GenAI-')).map((o) => ({ ...o, page: p })),
+);
+const levelsUsed = Object.keys(LEVELS).filter((lvl) => pages.some((p) => p.objectives.some((o) => o.level === lvl)));
+const termMap = new Map<string, { en: string; ar: string }>();
+for (const p of pages) for (const t of p.terms) if (!termMap.has(t.en)) termMap.set(t.en, t);
+const terms = [...termMap.values()];
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+<div class="wrap gx-chapter">
+  <div class="gx-chapter-main">
+    <header dir="ltr" class="gx-page-head">
+      <span class="gx-kicker">CHAPTER {pad(chapter)} / {pad(CHAPTERS.length)}</span>
+      <h1 lang="en">{meta.en}</h1>
+      <span dir="rtl" class="gx-page-head-ar">{meta.ar}</span>
+      <div class="gx-chapter-meta">
+        <span>{pages.length} {pages.length === 1 ? 'section' : 'sections'}</span>
+        <span>~{minutes} min reading</span>
+        {labs > 0 && <span>{labs} hands-on {labs === 1 ? 'lab' : 'labs'}</span>}
+      </div>
+    </header>
+
+    {objectives.length > 0 && (
+      <section class="gx-card gx-objectives-list" aria-labelledby="gx-lo-title">
+        <h2 id="gx-lo-title" dir="ltr" lang="en">Learning Objectives</h2>
+        <ul dir="ltr">
+          {objectives.map((o) => (
+            <li>
+              <span class:list={['gx-level', `gx-level--${o.level.charAt(0).toLowerCase()}`]}>{o.code.replace('GenAI-', '')} · {o.level}</span>
+              <a href={pageUrl(view, o.page)}>{o.page.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <section class="gx-contents" aria-labelledby="gx-contents-title">
+      <h2 id="gx-contents-title" dir="ltr" lang="en">Contents</h2>
+      {blocks.map((b) => (
+        <div class="gx-contents-block">
+          {b.group && (
+            <div class="gx-contents-group" dir="ltr">
+              <span class="gx-mono gx-cyan">{b.pages[0].group}</span>
+              <span><b lang="en">{b.group.en}</b><span dir="rtl">{b.group.ar}</span></span>
+            </div>
+          )}
+          {b.pages.map((p) => (
+            <a href={pageUrl(view, p)} class:list={['gx-contents-row', { 'is-nested': Boolean(b.group) }]} dir="ltr" data-guide-row={p.slug}>
+              <span class="gx-mono gx-contents-num">{sectionLabel(p)}</span>
+              <span class="gx-contents-title">
+                <b lang="en">{p.title}</b>
+                <span dir="rtl">{p.titleAr}{p.labs.length > 0 && ' · فيه Lab'}</span>
+              </span>
+              <span class="gx-contents-min">{p.minutes} min</span>
+              <span class="gx-state" data-guide-state aria-hidden="true"></span>
+            </a>
+          ))}
+        </div>
+      ))}
+    </section>
+  </div>
+
+  <aside class="gx-chapter-side">
+    {terms.length > 0 && (
+      <section class="gx-card">
+        <h2 dir="ltr" lang="en">Key Terms</h2>
+        <div class="gx-term-chips" dir="ltr">
+          {terms.map((t) => <a href={`${glossaryUrl(view)}#${termId(t.en)}`} title={t.ar}>{t.en}</a>)}
+        </div>
+      </section>
+    )}
+    {levelsUsed.length > 0 && (
+      <section class="gx-card" dir="ltr">
+        <h2 lang="en">Levels in this Chapter</h2>
+        <ul class="gx-levels">
+          {levelsUsed.map((lvl) => (
+            <li>
+              <span class:list={['gx-level', `gx-level--${lvl.charAt(0).toLowerCase()}`]}>{lvl}</span>
+              <span><b>{LEVELS[lvl].name}</b> — {LEVELS[lvl].hint}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </aside>
+</div>

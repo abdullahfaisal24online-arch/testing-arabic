@@ -1,0 +1,124 @@
+---
+import { CHAPTERS, GROUPS, LEVELS, chapterUrl, glossaryUrl, pageUrl, pagesFor, termId, type GuidePage, type GuideView } from '../../lib/genai-guide';
+
+interface Props { view: GuideView; page: GuidePage }
+const { view, page } = Astro.props;
+const pages = pagesFor(view);
+const index = pages.findIndex((p) => p.slug === page.slug);
+const prev = index > 0 ? pages[index - 1] : undefined;
+const next = index < pages.length - 1 ? pages[index + 1] : undefined;
+const chapter = CHAPTERS.find((c) => c.number === page.chapter)!;
+const group = page.group ? GROUPS[page.group] : undefined;
+const { html, headings } = await page.load();
+const toc = headings.filter((h) => h.level === 3 || (h.level === 2 && (h.en || h.ar)));
+const termsJson = JSON.stringify(
+  page.terms.map((t) => ({ en: t.en, ar: t.ar, def: t.def, match: t.match?.length ? t.match : [t.en], href: `${glossaryUrl(view)}#${termId(t.en)}` })),
+);
+const nextIsNewChapter = next && next.chapter !== page.chapter;
+---
+<div class="wrap gx-section">
+  <article class="gx-article" data-guide-article={page.slug}>
+    <header dir="ltr" class="gx-page-head">
+      {group && <span class="gx-group-line"><span class="gx-mono">{page.group}</span> {group.en}</span>}
+      <span class="gx-kicker gx-mono">{page.section}</span>
+      <h1 lang="en">{page.title}</h1>
+      {page.titleAr && <span dir="rtl" class="gx-page-head-ar">{page.titleAr}</span>}
+      <span class="gx-page-meta">{page.minutes} min read{page.labs.length > 0 && ' · includes a lab'}</span>
+    </header>
+
+    {page.takeaways.length > 0 && (
+      <section class="gx-takeaways" dir="ltr" lang="en" aria-labelledby="gx-takeaways-title">
+        <h2 id="gx-takeaways-title">Key Takeaways</h2>
+        <ul>{page.takeaways.map((t) => <li>{t}</li>)}</ul>
+      </section>
+    )}
+
+    {page.objectives.length > 0 && (
+      <section class="gx-objectives" dir="ltr" lang="en" aria-label="Learning objectives">
+        {page.objectives.map((o) => (
+          <div class="gx-objective">
+            <span class:list={['gx-level', `gx-level--${o.level.charAt(0).toLowerCase()}`]}>{o.level}</span>
+            <span>
+              <b>{LEVELS[o.level]?.name || o.level}</b>
+              <small class="gx-mono">{o.code}</small>
+              {LEVELS[o.level] && <span class="gx-objective-hint">{LEVELS[o.level].hint}</span>}
+            </span>
+          </div>
+        ))}
+      </section>
+    )}
+
+    <div class="gx-prose" data-guide-prose data-guide-terms={termsJson} set:html={html} />
+
+    <footer class="gx-article-foot">
+      <button type="button" class="gx-read-btn" data-guide-read={page.slug} aria-pressed="false" hidden>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"></path></svg>
+        <span data-guide-read-label>خلّصت هالعنوان</span>
+      </button>
+
+      {next ? (
+        <a class="gx-next" href={pageUrl(view, next)} rel="next" data-guide-next>
+          <span dir="ltr">
+            <small>{nextIsNewChapter ? `Next chapter · ${next.section}` : `Next · ${next.section}`} · {next.minutes} min</small>
+            <b lang="en">{next.title}</b>
+          </span>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+        </a>
+      ) : (
+        <div class="gx-end">
+          <b>{view === 'full' ? 'وصلت لنهاية المسودة.' : 'وصلت لنهاية المعاينة.'}</b>
+          <p>{view === 'full' ? 'هاد آخر عنوان بالدليل.' : 'هاي عناوين الفصل الأول. باقي الفصول بالدليل الكامل.'}</p>
+          <a href={chapterUrl(view, page.chapter)}>ارجع لفهرس <span dir="ltr">Chapter {chapter.number}</span> ←</a>
+        </div>
+      )}
+
+      <div class="gx-prev-row">
+        {prev ? <a href={pageUrl(view, prev)} rel="prev" data-guide-prev>→ <span dir="ltr">{prev.section} {prev.title}</span></a> : <span></span>}
+        <span class="gx-key-hint">استخدم الأسهم ← → للتنقل</span>
+      </div>
+
+      <p class="gx-source-line">مرجع الموضوع: ISTQB® CT-GenAI Syllabus v1.1، الفصل {page.chapter}. الأمثلة والشروحات التطبيقية من إعداد Testing بالعربي.</p>
+    </footer>
+  </article>
+
+  <aside class="gx-side">
+    {toc.length > 1 && (
+      <nav class="gx-card gx-onpage" dir="ltr" aria-label="On this page">
+        <span class="gx-side-title">On this page</span>
+        {toc.map((h) => (
+          <a href={`#${h.id}`} class:list={{ 'is-sub': h.level === 3 && toc.some((x) => x.level === 2) }} data-guide-onpage={h.id}>
+            {h.num && <span class="gx-mono">{h.num}</span>}
+            {h.en ? <span lang="en">{h.en}</span> : <span dir="rtl">{h.ar}</span>}
+          </a>
+        ))}
+        {page.labs.map((lab) => <span class="gx-onpage-lab">Lab · {lab}</span>)}
+      </nav>
+    )}
+    {page.terms.length > 0 && (
+      <section class="gx-card gx-side-terms">
+        <span class="gx-side-title" dir="ltr">Key Terms</span>
+        <dl>
+          {page.terms.map((t) => (
+            <div>
+              <dt dir="ltr" lang="en"><a href={`${glossaryUrl(view)}#${termId(t.en)}`}>{t.en}</a></dt>
+              <dd>{t.ar}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    )}
+  </aside>
+</div>
+
+<nav class="gx-mobilebar" aria-label="التنقل بين العناوين">
+  {prev
+    ? <a href={pageUrl(view, prev)} class="gx-mb-btn" aria-label={`العنوان السابق: ${prev.section}`}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+    : <span class="gx-mb-btn is-disabled" aria-hidden="true"></span>}
+  <button type="button" class="gx-mb-toc" data-guide-toc-open aria-controls="gx-toc" aria-haspopup="dialog">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
+    الفهرس <span class="gx-mono" dir="ltr">{page.section}</span>
+  </button>
+  {next
+    ? <a href={pageUrl(view, next)} class="gx-mb-btn gx-mb-next" aria-label={`العنوان التالي: ${next.section}`}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+    : <span class="gx-mb-btn is-disabled" aria-hidden="true"></span>}
+</nav>

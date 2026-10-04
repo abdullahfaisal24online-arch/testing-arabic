@@ -1,3 +1,5 @@
+> Superseded layout: the reader was rebuilt in Batch 1b (see `docs/CT-GENAI-BATCHES.md`). Chapter 1 now lives in six section files (1.1.1–1.2.2).
+
 # CT-GenAI reader editorial preview
 
 Staging-only route: `/store/ct-genai-guide/preview/`. Generated only with `CMS_BRANCH=staging`; noindex and excluded by the existing store sitemap filter. No product listing, payment, entitlement or production changes.

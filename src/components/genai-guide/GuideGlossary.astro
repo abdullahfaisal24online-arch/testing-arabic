@@ -1,0 +1,33 @@
+---
+import { pageUrl, pagesFor, termId, type GuidePage, type GuideTerm, type GuideView } from '../../lib/genai-guide';
+
+interface Props { view: GuideView }
+const { view } = Astro.props;
+const map = new Map<string, GuideTerm & { page: GuidePage }>();
+for (const page of pagesFor(view)) for (const t of page.terms) if (!map.has(t.en)) map.set(t.en, { ...t, page });
+const terms = [...map.values()].sort((a, b) => a.en.localeCompare(b.en, 'en'));
+---
+<div class="wrap gx-glossary">
+  <header dir="ltr" class="gx-page-head">
+    <span class="gx-kicker">CT-GenAI</span>
+    <h1 lang="en">Glossary</h1>
+    <span dir="rtl" class="gx-page-head-ar">مصطلحات الدليل، مع رابط للعنوان اللي انشرح فيه كل مصطلح.</span>
+  </header>
+
+  {terms.length === 0 ? (
+    <p class="gx-muted">المصطلحات بتنضاف مع مراجعة كل فصل.</p>
+  ) : (
+    <dl class="gx-glossary-list">
+      {terms.map((t) => (
+        <div class="gx-glossary-item" id={termId(t.en)}>
+          <dt dir="ltr"><b lang="en">{t.en}</b><span dir="rtl">{t.ar}</span></dt>
+          <dd>
+            <p dir="ltr" lang="en">{t.def}</p>
+            <a href={pageUrl(view, t.page)} dir="ltr">{t.page.section} {t.page.title} →</a>
+          </dd>
+        </div>
+      ))}
+    </dl>
+  )}
+  <p class="gx-muted gx-glossary-note">المصطلحات حاليًا من الفصل الأول. باقي الفصول بتنضاف مصطلحاتها مع مراجعتها.</p>
+</div>

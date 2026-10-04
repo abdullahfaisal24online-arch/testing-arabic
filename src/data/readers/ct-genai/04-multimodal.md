@@ -1,21 +1,37 @@
 ---
 order: 4
-slug: multimodal
-title: عندما يجتمع النص والصورة
-english: Multimodal LLMs and Vision-Language Models
+slug: "1-1-4"
+chapter: 1
+group: "1.1"
 section: "1.1.4"
+title: "Multimodal LLMs and Vision-Language Models"
+titleAr: "النماذج متعددة الوسائط ونماذج الرؤية واللغة"
 objectives: "GenAI-1.1.4 · K2 / HO-1.1.4 · H1"
 minutes: 6
+takeaways:
+  - "Multimodal input widens the context available to the tester and the model."
+  - "The value comes from linking visual evidence with the written description."
+  - "Keep what the image shows separate from what needs execution to verify."
+terms:
+  - en: "Multimodal LLM"
+    ar: "النموذج متعدد الوسائط"
+    def: "A model that handles more than one data type, such as text, images, audio or video. Supported inputs and outputs differ per model."
+    match: ["Multimodal LLMs", "Multimodal"]
+  - en: "VLM"
+    ar: "نموذج الرؤية واللغة"
+    def: "Vision-Language Model. Combines visual and textual information to describe images, answer questions about them, or check text against visuals."
+    match: ["Vision-Language Models", "VLMs"]
+  - en: "GUI Wireframe"
+    ar: "مخطط الواجهة"
+    def: "A simple layout sketch of a screen that shows its elements without final visual design."
 ---
-## 1.1.4 النماذج متعددة الوسائط ونماذج الرؤية واللغة
-
 تتعامل **النماذج متعددة الوسائط (Multimodal LLMs)** مع أكثر من نوع من البيانات، مثل النص والصورة والصوت والفيديو. إمكانات الإدخال والإخراج تختلف من نموذج لآخر؛ دعم الصور لا يعني تلقائيًا دعم الفيديو أو توليد الصوت.
 
 تتكيّف طريقة تمثيل المدخلات مع نوع الوسيط. لا تُعامل الصورة حرفيًا كجملة نصية، بل تُحوّل معلوماتها إلى تمثيلات يستطيع النظام معالجتها وربطها بالنص.
 
 **نماذج الرؤية واللغة (Vision-Language Models / VLMs)** تجمع المعلومات المرئية والنصية. يمكن استخدامها لوصف صورة، والإجابة عن أسئلة مرتبطة بها، وتحليل مدى اتساق النص مع ما يظهر بصريًا.
 
-### كيف نستفيد منها في الاختبار؟
+### الاستخدام في الاختبار — Use in Testing
 
 يمكن تزويد النموذج بصورة شاشة أو مخطط واجهة **GUI Wireframe**، مع قصة مستخدم أو وصف عيب. يتيح ذلك:
 
@@ -23,49 +39,10 @@ minutes: 6
 - اقتراح حالات اختبار تجمع المتطلبات النصية مع عناصر الواجهة المرئية.
 - تحليل اتساق وصف العيب مع لقطة الشاشة، وطلب معلومات مفقودة.
 
-وجود صورة لا يكشف سلوك الخادم أو كل حالات التطبيق. يظل على المختبِر فصل **ما يظهر في الدليل** عن **ما يحتاج تنفيذًا للتحقق منه**.
+<aside class="gx-callout" data-kind="key"><p class="gx-callout-label">Key idea</p><p>An image does not reveal server behaviour or every application state. Keep <strong>what the evidence shows</strong> separate from <strong>what needs execution to verify</strong>.</p></aside>
 
-### تطبيق موجّه — HO-1.1.4
-
-**المطلوب:** مراجعة نموذج تسجيل اعتمادًا على الصورة والمتطلبات معًا. التصميم التالي مثال تعليمي أصلي، ويمكن أخذ لقطة له واستخدامها في التمرين؛ الحقول هنا للعرض فقط.
-
-<div class="example-wireframe" role="img" aria-label="مخطط تسجيل تعليمي: عنوان إنشاء حساب، حقل البريد الإلكتروني، حقل كلمة المرور، وزر إنشاء حساب. لا تظهر رسالة تشرح شروط كلمة المرور.">
-<strong>إنشاء حساب</strong>
-<span>البريد الإلكتروني</span><div class="wire-input" dir="ltr">name@example.com</div>
-<span>كلمة المرور</span><div class="wire-input" dir="ltr">••••••••</div>
-<div class="wire-button">إنشاء حساب</div>
-</div>
-
-**المتطلبات النصية:** البريد مطلوب، وكلمة المرور لا تقل عن 12 محرفًا. يجب عرض شروط كلمة المرور للمستخدم قبل الإرسال. لا توجد في المتطلبات قاعدة لإضافة رموز خاصة أو التحقق عبر SMS.
-
-**الخطوة الأولى — راجع المدخلات:** تأكّد أن الصورة مقروءة، وأن المتطلبات كاملة، وأنها لا تحتوي بيانات شخصية فعلية.
-
-**الخطوة الثانية — أرسل النص والصورة إلى نموذج يدعم الإدخال المرئي، ثم تحقّق من استجابته.** يمكنك استخدام التوجيه التالي:
-
-```text
-راجع صورة نموذج التسجيل والمتطلبات المرفقة.
-حدّد الاختلافات التي يمكن ملاحظتها من الصورة فقط.
-لكل نتيجة، اذكر الدليل المرئي والمتطلب المرتبط بها.
-اقترح حالات اختبار، وافصل ما يحتاج تنفيذًا عن الملاحظة البصرية.
-لا تضف متطلبات جديدة، واذكر المعلومات التي لا يمكنك تأكيدها.
-```
-
-### تحليل نموذجي للنتيجة
-
-| النتيجة | التقييم | السبب |
-| --- | --- | --- |
-| شروط كلمة المرور غير ظاهرة في المخطط | ملاحظة مدعومة | النص يطلب عرضها، والمخطط لا يعرضها |
-| التطبيق يقبل كلمة مرور من 8 محارف | غير مثبتة بالصورة | عدد النقاط الظاهر لا يثبت سلوك التحقق أو طول كلمة المرور الفعلية |
-| يجب إرسال رمز SMS | متطلب مختلق | المتطلبات لم تنص على ذلك |
-| جرّب كلمة مرور من 11 و12 محرفًا | اقتراح اختبار مناسب | يرتبط مباشرة بالحد الأدنى المذكور |
-
-هذه **إجابة تعليمية مقترحة** وليست مخرجات تجربة حيّة مضمونة. عند التنفيذ، قارن النتيجة الفعلية بالأدلة، وسجّل أي هلوسة أو عنصر أغفله النموذج.
-
-<details>
-<summary>نقطة مهمة للمراجعة</summary>
-<p>المطلوب ليس رفع صورة فقط؛ بل دمج <strong>النص والصورة</strong> في مهمة اختبار واضحة، ثم مراجعة النتيجة. من التحديات: رداءة الصورة، وغموض المتطلبات، واستنتاج سلوك لا يمكن رؤيته.</p>
-</details>
-
-### خلاصة الوحدة
-
-المدخلات متعددة الوسائط توسّع السياق المتاح للمختبِر والنموذج. فائدتها تأتي من الربط بين الأدلة المرئية والوصف النصي، مع التحقق من حدود ما يمكن استنتاجه.
+<section class="gx-lab" data-lab="HO-1.1.4"><header class="gx-lab-head"><span class="gx-lab-title">Lab · Review a Sign-up Form with Image + Text</span><span class="gx-lab-meta">HO-1.1.4 · H1</span></header><div class="gx-lab-body"><p><strong>Goal:</strong> review a sign-up form using the image and the requirements together. The wireframe below is an original teaching example. Take a screenshot of it to use in the lab; the fields are display only.</p><div class="example-wireframe" role="img" aria-label="Teaching wireframe: Create account heading, Email field, Password field and Create account button. No message explains the password rules."><strong>Create account</strong><span>Email</span><div class="wire-input">name@example.com</div><span>Password</span><div class="wire-input">••••••••</div><div class="wire-button">Create account</div></div><p><strong>Written requirements:</strong> Email is required. The password must be at least 12 characters. Password rules must be shown to the user before submitting. The requirements contain no rule about special characters or SMS verification.</p><ol class="gx-lab-steps"><li>Check the inputs: the image is readable, the requirements are complete, and nothing contains real personal data.</li><li>Send the text and the image to a model that accepts visual input, using the prompt below.</li><li>Compare each finding in the response with the evidence and record any hallucination or anything the model missed.</li></ol><pre class="gx-lab-prompt"><code>Review the attached sign-up form image and requirements.
+List the differences you can observe from the image only.
+For each finding, cite the visual evidence and the related requirement.
+Suggest test cases, and separate what needs execution from visual observations.
+Do not add new requirements, and state what you cannot confirm.</code></pre><p class="gx-lab-subhead">Model analysis</p><table><thead><tr><th>Finding</th><th>Assessment</th><th>Why</th></tr></thead><tbody><tr><td>Password rules are not shown in the wireframe</td><td>Supported observation</td><td>The text requires them; the wireframe does not show them.</td></tr><tr><td>The app accepts an 8-character password</td><td>Not proven by the image</td><td>The number of dots shown proves neither the validation nor the real length.</td></tr><tr><td>An SMS code must be sent</td><td>Invented requirement</td><td>The requirements do not say so.</td></tr><tr><td>Try passwords of 11 and 12 characters</td><td>Suitable test idea</td><td>Directly tied to the stated minimum.</td></tr></tbody></table><p>This is a suggested teaching answer, not guaranteed output from a live run.</p><details class="gx-lab-answer"><summary>What to watch</summary><p>The task is not just uploading an image. It is combining <strong>text and image</strong> in a clear testing task, then reviewing the result. Typical challenges: poor image quality, ambiguous requirements, and inferring behaviour that cannot be seen.</p></details></div></section>

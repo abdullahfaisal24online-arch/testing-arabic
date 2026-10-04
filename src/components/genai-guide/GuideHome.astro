@@ -1,0 +1,107 @@
+---
+import { chapterUrl, chaptersFor, glossaryUrl, pageUrl, pagesFor, type GuideView } from '../../lib/genai-guide';
+
+interface Props { view: GuideView }
+const { view } = Astro.props;
+const isFull = view === 'full';
+const chapters = chaptersFor(view);
+const pages = pagesFor(view);
+const first = pages[0];
+const labCount = pages.reduce((n, p) => n + p.labs.length, 0);
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+<div class="wrap gx-home">
+  <a href="/store/" class="gx-back">المتجر / أدلة الدراسة</a>
+
+  <section class="gx-hero">
+    <div class="gx-hero-text">
+      <span class="gx-kicker" dir="ltr">ISTQB® CT-GenAI · Syllabus v1.1</span>
+      <h1>دليل CT-GenAI بالعربي</h1>
+      <p class="gx-lead">الشرح بالعربي، والعناوين والمصطلحات بالإنجليزي متل ما رح تشوفها بالسيليبس والشغل. الفصول بترتيب السيليبس، وبتقدر ترجع لأي عنوان وقت ما بدك.</p>
+      <div class="gx-chips" dir="ltr">
+        <span>{isFull ? '5 Chapters' : 'Chapter 1 · Free preview'}</span>
+        <span>{pages.length} Sections</span>
+        <span>{labCount} Hands-on labs</span>
+        <span>عربي + English</span>
+      </div>
+      <p class="gx-note">{isFull
+        ? 'مسودة مراجعة داخلية: الفصل الأول مقسّم حسب السيليبس، والفصول 2–5 لسا بشكلها القديم لحد ما تنراجع بدفعاتها.'
+        : 'معاينة مجانية من الفصل الأول. الدليل الكامل وربط الشراء قيد الإعداد.'}</p>
+    </div>
+
+    {first && (
+      <div class="gx-continue" data-guide-continue>
+        <div class="gx-continue-top">
+          <span data-guide-continue-label>ابدأ القراءة</span>
+          <span class="gx-mono" dir="ltr" data-guide-continue-chapter>Chapter {first.chapter}</span>
+        </div>
+        <div dir="ltr" class="gx-continue-title">
+          <span class="gx-mono gx-cyan" data-guide-continue-num>{first.section}</span>
+          <b data-guide-continue-title>{first.title}</b>
+          <span dir="rtl" class="gx-muted" data-guide-continue-ar>{first.titleAr}</span>
+        </div>
+        <div class="gx-meter" aria-hidden="true"><span data-guide-total-meter></span></div>
+        <a class="gx-btn-primary" href={pageUrl(view, first)} data-guide-continue-link>
+          <span data-guide-continue-cta>ابدأ القراءة</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+        </a>
+      </div>
+    )}
+  </section>
+
+  <section class="gx-home-chapters" aria-labelledby="gx-chapters-title">
+    <div class="gx-section-head">
+      <h2 id="gx-chapters-title">فصول الدليل</h2>
+      <span class="gx-muted" data-guide-total-label>{pages.length} عنوان</span>
+    </div>
+    <div class="gx-chapter-grid">
+      {chapters.map((c) => {
+        const minutes = c.pages.reduce((n, p) => n + p.minutes, 0);
+        const labs = c.pages.reduce((n, p) => n + p.labs.length, 0);
+        return c.pages.length ? (
+          <a class="gx-chapter-card" href={chapterUrl(view, c.number)} data-guide-chapter-card={c.pages.map((p) => p.slug).join(' ')}>
+            <div class="gx-chapter-card-top">
+              <span class="gx-chapter-num" dir="ltr">{pad(c.number)}</span>
+              <span class="gx-status" data-guide-chapter-status>ما بلّشت</span>
+            </div>
+            <div dir="ltr" class="gx-chapter-card-title">
+              <b>{c.en}</b>
+              <span dir="rtl">{c.ar}</span>
+            </div>
+            <div class="gx-chapter-meta" dir="ltr">
+              <span>{c.pages.length} {c.pages.length === 1 ? 'section' : 'sections'}</span>
+              <span>~{minutes} min</span>
+              {labs > 0 && <span>{labs} {labs === 1 ? 'lab' : 'labs'}</span>}
+            </div>
+            <div class="gx-meter" aria-hidden="true"><span data-guide-chapter-meter></span></div>
+          </a>
+        ) : (
+          <div class="gx-chapter-card is-locked">
+            <div class="gx-chapter-card-top">
+              <span class="gx-chapter-num" dir="ltr">{pad(c.number)}</span>
+              <span class="gx-status">بالدليل الكامل</span>
+            </div>
+            <div dir="ltr" class="gx-chapter-card-title">
+              <b>{c.en}</b>
+              <span dir="rtl">{c.ar}</span>
+            </div>
+          </div>
+        );
+      })}
+
+      <a class="gx-chapter-card gx-glossary-card" href={glossaryUrl(view)}>
+        <div class="gx-glossary-head" dir="ltr">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"></path><path d="M8 7h8M8 11h6"></path></svg>
+          <b>Glossary</b>
+        </div>
+        <p>كل مصطلحات الدليل بمكان واحد، مع تعريف قصير ورابط للعنوان اللي انشرحت فيه.</p>
+        <span class="gx-cyan">افتح المصطلحات ←</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="gx-source">
+    <strong>عن هذا الدليل</strong>
+    <p>شرح دراسي مستقل من Testing بالعربي، مبني على ISTQB® CT-GenAI Syllabus v1.1 (27 أبريل 2026). حقوق السيليبس لـISTQB® ومؤلفيه Abbas Ahmad وGualtiero Bazzana وAlessandro Collino وOlivier Denoo وBruno Legeard. هذا الدليل مش مادة تدريب معتمدة ولا ضمان لنتيجة الامتحان.</p>
+  </section>
+</div>

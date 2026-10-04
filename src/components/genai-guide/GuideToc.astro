@@ -1,0 +1,85 @@
+---
+import { CHAPTERS, GROUPS, chapterUrl, glossaryUrl, pageUrl, pagesFor, sectionLabel, type GuideView } from '../../lib/genai-guide';
+
+interface Props { view: GuideView; current?: string }
+const { view, current } = Astro.props;
+const pages = pagesFor(view);
+const currentChapter = pages.find((p) => p.slug === current)?.chapter ?? 1;
+
+// فهرس بحث خفيف: العناوين والمصطلحات فقط، مش نص الشرح كامل.
+const index = await Promise.all(
+  pages.map(async (p) => {
+    const { headings } = await p.load();
+    const text = [p.section, p.title, p.titleAr, ...headings.flatMap((h) => [h.en, h.ar]), ...p.terms.flatMap((t) => [t.en, t.ar])]
+      .filter(Boolean)
+      .join(' | ');
+    return { slug: p.slug, text };
+  }),
+);
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+<dialog id="gx-toc" class="gx-toc" aria-labelledby="gx-toc-title">
+  <div class="gx-toc-panel">
+    <span class="gx-toc-grip" aria-hidden="true"></span>
+    <div class="gx-toc-head">
+      <h2 id="gx-toc-title">فهرس الدليل</h2>
+      <button type="button" class="gx-icon-btn" data-guide-toc-close aria-label="إغلاق الفهرس">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+    </div>
+    <div class="gx-toc-search">
+      <label for="gx-toc-search">ابحث بالدليل</label>
+      <input id="gx-toc-search" type="search" placeholder="مثل: Tokens أو Hallucination" autocomplete="off" maxlength="80" />
+      <p class="gx-toc-status" role="status" aria-live="polite" data-guide-toc-status></p>
+    </div>
+    <nav class="gx-toc-tree" dir="ltr" aria-label="فصول الدليل">
+      {CHAPTERS.map((c) => {
+        const list = pages.filter((p) => p.chapter === c.number);
+        if (!list.length) {
+          return (
+            <div class="gx-toc-chapter is-locked">
+              <span class="gx-mono">{pad(c.number)}</span>
+              <span lang="en">{c.en}</span>
+              <small dir="rtl">بالدليل الكامل</small>
+            </div>
+          );
+        }
+        let lastGroup = '';
+        return (
+          <details class="gx-toc-group" open={c.number === currentChapter} data-guide-toc-chapter={c.number}>
+            <summary class="gx-toc-chapter">
+              <span class="gx-mono">{pad(c.number)}</span>
+              <span lang="en">{c.en}</span>
+              <small class="gx-mono" data-guide-toc-count={list.map((p) => p.slug).join(' ')}>0/{list.length}</small>
+            </summary>
+            <a class="gx-toc-overview" href={chapterUrl(view, c.number)}>Chapter overview</a>
+            {list.map((p) => {
+              const showGroup = p.group && p.group !== lastGroup;
+              if (p.group) lastGroup = p.group;
+              return (
+                <>
+                  {showGroup && p.group && <span class="gx-toc-subgroup"><span class="gx-mono">{p.group}</span> {GROUPS[p.group]?.en}</span>}
+                  <a
+                    href={pageUrl(view, p)}
+                    class="gx-toc-link"
+                    aria-current={p.slug === current ? 'page' : undefined}
+                    data-guide-toc-link={p.slug}
+                    data-chapter={p.chapter}
+                    data-section={p.section}
+                    data-title-ar={p.titleAr}
+                  >
+                    <span class="gx-mono">{sectionLabel(p)}</span>
+                    <span class="gx-toc-link-title" lang="en">{p.title}</span>
+                    <span class="gx-state" data-guide-state aria-hidden="true"></span>
+                  </a>
+                </>
+              );
+            })}
+          </details>
+        );
+      })}
+      <a class="gx-toc-glossary" href={glossaryUrl(view)}>Glossary</a>
+    </nav>
+  </div>
+  <script is:inline type="application/json" data-guide-search-index set:html={JSON.stringify(index).replace(/</g, '\\u003c')} />
+</dialog>

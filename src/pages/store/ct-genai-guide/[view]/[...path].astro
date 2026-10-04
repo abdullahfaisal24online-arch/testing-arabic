@@ -1,0 +1,67 @@
+---
+/**
+ * دليل CT-GenAI — مسارات المراجعة (staging فقط).
+ *   /store/ct-genai-guide/{preview|full}/              الرئيسية
+ *   /store/ct-genai-guide/{preview|full}/chapter-N/    افتتاح الفصل
+ *   /store/ct-genai-guide/{preview|full}/<slug>/       عنوان فرعي (مثل 1-1-2)
+ *   /store/ct-genai-guide/{preview|full}/glossary/     مصطلحات الدليل
+ * preview = الفصل الأول (المعاينة المجانية)، full = المسودة الكاملة.
+ * ما بينبنوا أبداً بدون CMS_BRANCH=staging.
+ */
+import Base from '../../../../layouts/Base.astro';
+import GuideBar from '../../../../components/genai-guide/GuideBar.astro';
+import GuideHome from '../../../../components/genai-guide/GuideHome.astro';
+import GuideChapterPage from '../../../../components/genai-guide/GuideChapter.astro';
+import GuideSection from '../../../../components/genai-guide/GuideSection.astro';
+import GuideGlossary from '../../../../components/genai-guide/GuideGlossary.astro';
+import GuideToc from '../../../../components/genai-guide/GuideToc.astro';
+import { CHAPTERS, pagesFor, type GuideView } from '../../../../lib/genai-guide';
+import '../../../../styles/genai-guide.css';
+
+export function getStaticPaths() {
+  if (process.env.CMS_BRANCH !== 'staging') return [];
+  const views: GuideView[] = ['preview', 'full'];
+  return views.flatMap((view) => {
+    const pages = pagesFor(view);
+    const chapters = CHAPTERS.filter((c) => pages.some((p) => p.chapter === c.number));
+    return [
+      { params: { view, path: undefined }, props: { view, kind: 'home' as const } },
+      { params: { view, path: 'glossary' }, props: { view, kind: 'glossary' as const } },
+      ...chapters.map((c) => ({ params: { view, path: `chapter-${c.number}` }, props: { view, kind: 'chapter' as const, chapter: c.number } })),
+      ...pages.map((p) => ({ params: { view, path: p.slug }, props: { view, kind: 'section' as const, slug: p.slug } })),
+    ];
+  });
+}
+
+interface Props {
+  view: GuideView;
+  kind: 'home' | 'chapter' | 'section' | 'glossary';
+  chapter?: number;
+  slug?: string;
+}
+const { view, kind, chapter, slug } = Astro.props;
+const page = kind === 'section' ? pagesFor(view).find((p) => p.slug === slug) : undefined;
+const chapterNumber = page?.chapter ?? chapter;
+const chapterMeta = CHAPTERS.find((c) => c.number === chapterNumber);
+
+const title =
+  kind === 'section' && page ? `${page.section} ${page.title} — دليل CT-GenAI`
+  : kind === 'chapter' && chapterMeta ? `Chapter ${chapterMeta.number}: ${chapterMeta.en} — دليل CT-GenAI`
+  : kind === 'glossary' ? 'Glossary — دليل CT-GenAI'
+  : view === 'full' ? 'مسودة دليل CT-GenAI الكامل'
+  : 'معاينة دليل CT-GenAI';
+---
+<Base title={title} description="دليل Testing بالعربي لدراسة CT-GenAI — مراجعة تحريرية." noindex hideChat>
+  <div class="gx" data-guide-view={view} data-guide-kind={kind} data-guide-slug={page?.slug}>
+    <GuideBar view={view} kind={kind} chapter={chapterNumber} page={page} />
+    {kind === 'home' && <GuideHome view={view} />}
+    {kind === 'chapter' && chapterNumber && <GuideChapterPage view={view} chapter={chapterNumber} />}
+    {kind === 'section' && page && <GuideSection view={view} page={page} />}
+    {kind === 'glossary' && <GuideGlossary view={view} />}
+    <GuideToc view={view} current={page?.slug} />
+  </div>
+</Base>
+
+<script>
+  import '../../../../scripts/genai-guide';
+</script>
