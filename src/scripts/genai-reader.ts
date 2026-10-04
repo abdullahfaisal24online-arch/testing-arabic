@@ -4,6 +4,7 @@ if (root) {
   const articles = [...root.querySelectorAll<HTMLElement>('[data-reader-unit]')];
   const links = [...root.querySelectorAll<HTMLAnchorElement>('[data-reader-link]')];
   const ids = articles.map(a => a.id);
+  const groups = [...root.querySelectorAll<HTMLDetailsElement>('[data-reader-chapter]')];
   const isFull = root.dataset.readerMode === 'full';
   const key = isFull ? 'ta:ct-genai:reader-full:v1' : 'ta:ct-genai:reader-preview:v1';
   const state: {unit:string; positions:Record<string,number>; completed:string[]; fontSize:number} = {unit:ids[0],positions:{},completed:[],fontSize:18};
@@ -51,16 +52,22 @@ if (root) {
     });
     root.querySelectorAll<HTMLButtonElement>('[data-reader-complete]').forEach(b => {
       const done = state.completed.includes(b.dataset.readerComplete!); b.hidden = false;
-      b.setAttribute('aria-pressed',String(done)); b.textContent = done ? '✓ مكتملة — تراجع عن الإكمال' : 'تحديد الوحدة كمكتملة';
+      b.setAttribute('aria-pressed',String(done)); b.textContent = done ? '✓ مكتمل — تراجع عن الإكمال' : 'تحديد القسم كمكتمل';
     });
-    q('#gr-position').textContent = `الوحدة ${index+1} من ${ids.length}`;
+    q('#gr-position').textContent = articles[index].dataset.readerSection || '';
+    groups.forEach(group => {
+      const groupLinks = [...group.querySelectorAll<HTMLAnchorElement>('[data-reader-link]')];
+      const completed = groupLinks.filter(a => state.completed.includes(a.dataset.readerLink!)).length;
+      group.querySelector<HTMLElement>('[data-chapter-completion]')!.textContent = `${completed} / ${groupLinks.length}`;
+      if (groupLinks.some(a => a.dataset.readerLink === current)) group.open = true;
+    });
     q('#gr-completion').textContent = `${state.completed.length} من ${ids.length} مكتملة`;
     q<HTMLProgressElement>('#gr-progress').max = ids.length;
     q<HTMLProgressElement>('#gr-progress').value = state.completed.length;
     q('#gr-page-number').textContent = `${index+1} / ${ids.length}`;
     q<HTMLButtonElement>('#gr-prev').disabled = index === 0;
     q<HTMLButtonElement>('#gr-next').disabled = index === ids.length-1;
-    q('#gr-next').textContent = index === ids.length-1 ? (isFull ? 'نهاية المسودة' : 'نهاية المعاينة') : 'الوحدة التالية ←';
+    q('#gr-next').textContent = index === ids.length-1 ? (isFull ? 'نهاية المسودة' : 'نهاية المعاينة') : 'القسم التالي ←';
     q('.gr-end').hidden = index !== ids.length-1;
     root.style.setProperty('--gr-size',`${state.fontSize}px`);
     q('#gr-font-size').textContent = String(state.fontSize);
@@ -99,6 +106,11 @@ if (root) {
       a.hidden = !match; if(match) count++;
       a.querySelector('.gr-search-snippet')?.remove();
       if(term && match) { const snippet=document.createElement('span'); snippet.className='gr-search-snippet'; const at=normalize(texts[i]).indexOf(term); snippet.textContent=`…${texts[i].slice(Math.max(0,at-30),Math.max(0,at-30)+110)}…`; a.children[1].append(snippet); }
+    });
+    groups.forEach(group => {
+      const visible = [...group.querySelectorAll<HTMLAnchorElement>('[data-reader-link]')].some(a => !a.hidden);
+      group.hidden = !visible;
+      group.open = term ? visible : !!group.querySelector('[aria-current="page"]');
     });
     q('#gr-search-status').textContent = term ? (count ? `${count} وحدات تطابق البحث` : 'لا نتائج. جرّب مصطلحًا آخر بالعربي أو الإنجليزي.') : '';
   });
