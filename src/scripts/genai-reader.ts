@@ -4,7 +4,8 @@ if (root) {
   const articles = [...root.querySelectorAll<HTMLElement>('[data-reader-unit]')];
   const links = [...root.querySelectorAll<HTMLAnchorElement>('[data-reader-link]')];
   const ids = articles.map(a => a.id);
-  const key = 'ta:ct-genai:reader-preview:v1';
+  const isFull = root.dataset.readerMode === 'full';
+  const key = isFull ? 'ta:ct-genai:reader-full:v1' : 'ta:ct-genai:reader-preview:v1';
   const state: {unit:string; positions:Record<string,number>; completed:string[]; fontSize:number} = {unit:ids[0],positions:{},completed:[],fontSize:18};
   try {
     const saved = JSON.parse(localStorage.getItem(key) || 'null');
@@ -54,11 +55,12 @@ if (root) {
     });
     q('#gr-position').textContent = `الوحدة ${index+1} من ${ids.length}`;
     q('#gr-completion').textContent = `${state.completed.length} من ${ids.length} مكتملة`;
+    q<HTMLProgressElement>('#gr-progress').max = ids.length;
     q<HTMLProgressElement>('#gr-progress').value = state.completed.length;
     q('#gr-page-number').textContent = `${index+1} / ${ids.length}`;
     q<HTMLButtonElement>('#gr-prev').disabled = index === 0;
     q<HTMLButtonElement>('#gr-next').disabled = index === ids.length-1;
-    q('#gr-next').textContent = index === ids.length-1 ? 'نهاية المعاينة' : 'الوحدة التالية ←';
+    q('#gr-next').textContent = index === ids.length-1 ? (isFull ? 'نهاية المسودة' : 'نهاية المعاينة') : 'الوحدة التالية ←';
     q('.gr-end').hidden = index !== ids.length-1;
     root.style.setProperty('--gr-size',`${state.fontSize}px`);
     q('#gr-font-size').textContent = String(state.fontSize);

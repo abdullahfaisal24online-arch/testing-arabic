@@ -3,7 +3,7 @@ import type { MarkdownInstance } from 'astro';
 interface Unit { order: number; slug: string; title: string; english: string; section: string; objectives: string; minutes: number; chapter?: number }
 const previewModules = import.meta.glob<MarkdownInstance<Unit>>('../../data/readers/ct-genai/*.md', { eager: true });
 const fullModules = import.meta.glob<MarkdownInstance<Unit>>('../../data/readers/ct-genai-draft/*.md', { eager: true });
-const units = Object.values(Astro.props.mode === 'full' ? fullModules : previewModules).sort((a,b)=>a.frontmatter.order-b.frontmatter.order);
+const units = Object.values(Astro.props.mode === 'full' ? {...previewModules, ...fullModules} : previewModules).sort((a,b)=>a.frontmatter.order-b.frontmatter.order);
 const isFull = Astro.props.mode === 'full';
 const upcoming = ['هندسة الأوامر للاختبار', 'إدارة المخاطر', 'البنية التحتية وLLMOps', 'التبنّي داخل المؤسسات'];
 ---
@@ -11,8 +11,8 @@ const upcoming = ['هندسة الأوامر للاختبار', 'إدارة ال
   <div class="wrap gr-intro">
     <a href="/store/" class="gr-back">المتجر / أدلة الدراسة</a>
     <div class="gr-heading">
-      <div class="gr-book" aria-hidden="true"><span>TESTING بالعربي</span><strong>Gen<span>AI</span></strong><small>دليل الفهم والتطبيق</small><b>01 / 05</b></div>
-      <div><span class="gr-kicker">دليل دراسي تفاعلي · CT-GenAI v1.1</span><h1>افهم الفكرة.<br/>وطبّقها في الاختبار.</h1><p>اقرأ على مهلك، جرّب الأمثلة، وارجع من المكان اللي وصلت له.</p><div class="gr-tags"><span>عربي + English</span><span>{isFull ? `${units.length} وحدة للدليل الكامل` : '5 وحدات للمعاينة'}</span><span>الفصل الأول</span></div></div>
+      <div class="gr-book" aria-hidden="true"><span>TESTING بالعربي</span><strong>Gen<span>AI</span></strong><small>دليل الفهم والتطبيق</small><b>{isFull ? '05 / 05' : '01 / 05'}</b></div>
+      <div><span class="gr-kicker">دليل دراسي تفاعلي · CT-GenAI v1.1</span><h1>افهم الفكرة.<br/>وطبّقها في الاختبار.</h1><p>اقرأ على مهلك، جرّب الأمثلة، وارجع من المكان اللي وصلت له.</p><div class="gr-tags"><span>عربي + English</span><span>{isFull ? `${units.length} وحدة للدليل الكامل` : '5 وحدات للمعاينة'}</span><span>{isFull ? 'الفصول الخمسة' : 'الفصل الأول'}</span></div></div>
     </div>
     <p class="gr-preview-note">{isFull ? 'مسودة مراجعة داخلية: المحتوى الكامل قيد التدقيق التحريري قبل ربطه بالمنتج المدفوع.' : 'معاينة قيد المراجعة: المحتوى المتاح هنا من الفصل الأول. الدليل الكامل وربط الشراء قيد الإعداد.'}</p>
   </div>
@@ -25,7 +25,7 @@ const upcoming = ['هندسة الأوامر للاختبار', 'إدارة ال
           <input id="gr-search" type="search" placeholder="مثل: Tokens أو مخاطر" autocomplete="off" maxlength="100" disabled />
           <p id="gr-search-status" role="status" aria-live="polite"></p>
           <p class="gr-chapter"><span>01</span> {isFull ? 'الدليل الكامل · CT-GenAI v1.1' : 'أساسيات GenAI للاختبار'}</p>
-          <nav aria-label="وحدات الفصل الأول">
+          <nav aria-label={isFull ? "وحدات الدليل" : "وحدات الفصل الأول"}>
             {units.map(({frontmatter:u})=><a href={`#${u.slug}`} data-reader-link={u.slug}><span class="gr-unit-number" aria-hidden="true">{String(u.order).padStart(2,'0')}</span><span><b>{u.title}</b><small dir="ltr">{u.section}</small></span><span data-reader-check aria-label="مكتملة" hidden>✓</span></a>)}
           </nav>
           {!isFull && <div class="gr-upcoming"><p>لاحقًا في الدليل الكامل</p>{upcoming.map((title,i)=><div><span>{String(i+2).padStart(2,'0')}</span>{title}</div>)}</div>}
@@ -35,20 +35,20 @@ const upcoming = ['هندسة الأوامر للاختبار', 'إدارة ال
     </aside>
     <div class="gr-reading">
       <div class="gr-tools" aria-label="أدوات القراءة" hidden>
-        <div><span id="gr-position">الوحدة 1 من 5</span><small id="gr-completion">0 من 5 مكتملة</small></div>
+        <div><span id="gr-position">الوحدة 1 من {units.length}</span><small id="gr-completion">0 من {units.length} مكتملة</small></div>
         <div class="gr-font-tools"><button type="button" id="gr-font-less" aria-label="تصغير خط القراءة">A−</button><span id="gr-font-size" aria-live="polite">18</span><button type="button" id="gr-font-more" aria-label="تكبير خط القراءة">A+</button></div>
-        <progress id="gr-progress" value="0" max="5" aria-label="الوحدات المكتملة"></progress>
+        <progress id="gr-progress" value="0" max={units.length} aria-label="الوحدات المكتملة"></progress>
       </div>
       <div class="gr-resume" hidden><span id="gr-resume-text"></span><button type="button" id="gr-resume">متابعة القراءة</button><button type="button" id="gr-dismiss" aria-label="إخفاء تذكير المتابعة">×</button></div>
       <noscript><p class="gr-preview-note">يمكنك قراءة جميع الوحدات هنا. فعّل JavaScript لاستخدام البحث وحفظ التقدّم.</p></noscript>
       {units.map(({frontmatter:u,Content})=><article class="gr-article" id={u.slug} data-reader-unit={u.slug}>
-        <header class="gr-article-head"><div class="gr-meta"><span>{isFull ? `الفصل ${u.chapter || (u.order < 12 ? 2 : u.order < 16 ? 3 : u.order < 19 ? 4 : 5)} /` : 'الفصل الأول /'} الوحدة {u.order}</span><span>قراءة نحو {u.minutes} دقائق</span></div><h2 tabindex="-1">{u.title}</h2><p class="gr-en" dir="ltr">{u.english}</p><div class="gr-objectives"><b>أهداف التعلّم</b><span dir="ltr">{u.objectives}</span></div></header>
+        <header class="gr-article-head"><div class="gr-meta"><span>{isFull ? `الفصل ${u.chapter || 1} /` : 'الفصل الأول /'} الوحدة {u.order}</span><span>قراءة نحو {u.minutes} دقائق</span></div><h2 tabindex="-1">{u.title}</h2><p class="gr-en" dir="ltr">{u.english}</p><div class="gr-objectives"><b>أهداف التعلّم</b><span dir="ltr">{u.objectives}</span></div></header>
         <div class="gr-prose"><Content /></div>
-        <footer class="gr-unit-footer"><p>مرجع الموضوع: ISTQB® CT-GenAI Syllabus v1.1، {isFull ? 'الفصول 2–5' : 'الفصل الأول'}. الأمثلة والشروحات التطبيقية من إعداد Testing بالعربي.</p><button type="button" class="gr-complete" data-reader-complete={u.slug} aria-pressed="false" hidden>تحديد الوحدة كمكتملة</button></footer>
+        <footer class="gr-unit-footer"><p>مرجع الموضوع: ISTQB® CT-GenAI Syllabus v1.1، {`الفصل ${u.chapter || 1}`}. الأمثلة والشروحات التطبيقية من إعداد Testing بالعربي.</p><button type="button" class="gr-complete" data-reader-complete={u.slug} aria-pressed="false" hidden>تحديد الوحدة كمكتملة</button></footer>
       </article>)}
-      <nav class="gr-pagination" aria-label="التنقل بين الوحدات" hidden><button type="button" id="gr-prev">→ الوحدة السابقة</button><span id="gr-page-number" aria-live="polite">1 / 5</span><button type="button" id="gr-next">الوحدة التالية ←</button></nav>
+      <nav class="gr-pagination" aria-label="التنقل بين الوحدات" hidden><button type="button" id="gr-prev">→ الوحدة السابقة</button><span id="gr-page-number" aria-live="polite">1 / {units.length}</span><button type="button" id="gr-next">الوحدة التالية ←</button></nav>
       <div class="gr-end" hidden><span class="gr-kicker">{isFull ? 'وصلت لنهاية المسودة' : 'وصلت لنهاية المعاينة'}</span><h2>خطوة أقرب للفهم والتطبيق.</h2><p>{isFull ? 'هذه مسودة كاملة للمراجعة التحريرية. بعد اعتماد المحتوى نربطها بحدود المعاينة والمنتج المدفوع.' : 'هذه الوحدات نموذج الفصل الأول. نُكمل بعد المراجعة هندسة الأوامر، والمخاطر، والبنية التحتية، والتبنّي المؤسسي.'}</p><a href="#ai-spectrum" data-reader-restart>ارجع لأول وحدة ←</a></div>
-      <div class="gr-source"><strong>عن هذا الدليل</strong><p>شرح دراسي مستقل من Testing بالعربي، مبني على ISTQB® CT-GenAI Syllabus v1.1 (27 أبريل 2026)، الفصل الأول، الصفحات 13–18. حقوق السيليبس لـISTQB® ومؤلفيه Abbas Ahmad وGualtiero Bazzana وAlessandro Collino وOlivier Denoo وBruno Legeard. لا يمثل هذا النموذج مادة تدريب معتمدة أو ضمانًا لنتيجة الامتحان.</p></div>
+      <div class="gr-source"><strong>عن هذا الدليل</strong><p>شرح دراسي مستقل من Testing بالعربي، مبني على ISTQB® CT-GenAI Syllabus v1.1 (27 أبريل 2026)، {isFull ? 'الفصول 1–5.' : 'الفصل الأول، الصفحات 13–18.'} حقوق السيليبس لـISTQB® ومؤلفيه Abbas Ahmad وGualtiero Bazzana وAlessandro Collino وOlivier Denoo وBruno Legeard. لا يمثل هذا النموذج مادة تدريب معتمدة أو ضمانًا لنتيجة الامتحان.</p></div>
     </div>
   </div>
 </div>
