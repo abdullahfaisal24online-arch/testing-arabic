@@ -1,0 +1,12 @@
+---
+import Base from '../../../layouts/Base.astro';
+import GenAIReader from '../../../components/readers/GenAIReader.astro';
+
+// Editorial preview only. Never generate this route in a production build.
+export function getStaticPaths() {
+  return process.env.CMS_BRANCH === 'staging' ? [{ params: { view: 'preview' } }] : [];
+}
+---
+<Base title="معاينة دليل CT-GenAI — تجربة القراءة" description="نموذج الفصل الأول من دليل Testing بالعربي لدراسة CT-GenAI." noindex hideChat>
+  <GenAIReader />
+</Base>
