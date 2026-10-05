@@ -5,12 +5,13 @@ import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { STORE_OPEN, STORE_GROUPS, usd, getStoreSettings } from '../../lib/store';
 
+const showCtflPreview = process.env.CMS_BRANCH === 'staging';
 const products = STORE_OPEN
   ? (await getCollection('products')).filter((p) => !p.data.draft).sort((a, b) => a.data.order - b.data.order)
   : [];
 const t = STORE_OPEN ? await getStoreSettings() : undefined;
 const groups = STORE_GROUPS.map((g) => ({ ...g, title: t ? t[g.title] : '', items: products.filter((p) => (g.kinds as readonly string[]).includes(p.data.kind)) })).filter(
-  (g) => g.items.length > 0,
+  (g) => g.items.length > 0 || (showCtflPreview && g.key === 'summaries'),
 );
 ---
 
@@ -81,6 +82,23 @@ const groups = STORE_GROUPS.map((g) => ({ ...g, title: t ? t[g.title] : '', item
                 </div>
               </a>
             ))}
+            {showCtflPreview && g.key === 'summaries' && (
+              <a class="pcard" href="/store/ctfl-guide/preview/">
+                <div class="thumb">
+                  <span class="ctfl-cover" lang="en" dir="ltr">CTFL <small>STUDY GUIDE · v4.0.1</small></span>
+                  <span class="flag">قيد التجهيز</span>
+                </div>
+                <div class="body">
+                  <span class="kind">ملخصات</span>
+                  <h3>دليل CTFL بالعربي</h3>
+                  <p>عاين المحتوى الحالي للفصل الأول: Fundamentals of Testing. بقية الفصول قيد الإعداد.</p>
+                  <div class="foot">
+                    <span class="kind">معاينة الفصل الأول</span>
+                    <span class="go">افتح الملخّص ←</span>
+                  </div>
+                </div>
+              </a>
+            )}
           </div>
         </section>
       ))}
@@ -145,6 +163,8 @@ const groups = STORE_GROUPS.map((g) => ({ ...g, title: t ? t[g.title] : '', item
   .pcard:hover { transform: translateY(-3px); border-color: var(--cyan); color: var(--ink); }
   .thumb { position: relative; aspect-ratio: 16 / 9; background: linear-gradient(135deg, #12213d, #0a1428); display: grid; place-items: center; }
   .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .ctfl-cover { color: var(--cyan); font-size: 48px; font-weight: 800; text-align: center; }
+  .ctfl-cover small { display: block; font-size: 13px; letter-spacing: .12em; color: var(--muted); margin-top: 6px; }
   .thumb .ph { font-size: 34px; }
   .flag { position: absolute; top: 12px; right: 12px; font-size: 12.5px; font-weight: 700; padding: 2px 12px; border-radius: 999px; background: var(--orange); color: var(--on-orange); }
   .body { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
