@@ -159,6 +159,11 @@ collections:
         max: 20
         default: 10
         hint: "أول كم سؤال من البنك بيطلعوا بالعيّنة"
+      - name: sampleHref
+        label: "العيّنة المجانية — رابط معاينة جاهز"
+        widget: string
+        required: false
+        hint: "للمنتجات اللي مش بنك أسئلة، مثل دليل الدراسة: /store/ct-genai-guide/preview/ — اتركه فاضي لبنوك الأسئلة"
       - name: sampleEyebrow
         label: "صفحة العيّنة — الكلمة الصغيرة فوق العنوان"
         widget: string

@@ -1,8 +1,8 @@
 ---
-import { chapterUrl, chaptersFor, glossaryUrl, pageUrl, pagesFor, type GuideView } from '../../lib/genai-guide';
+import { chapterUrl, chaptersFor, glossaryUrl, pageUrl, pagesFor, type GuideBuy, type GuideView } from '../../lib/genai-guide';
 
-interface Props { view: GuideView }
-const { view } = Astro.props;
+interface Props { view: GuideView; buy?: GuideBuy }
+const { view, buy } = Astro.props;
 const isFull = view === 'full';
 const chapters = chaptersFor(view);
 const pages = pagesFor(view);
@@ -26,7 +26,12 @@ const pad = (n: number) => String(n).padStart(2, '0');
       </div>
       <p class="gx-note">{isFull
         ? 'مسودة مراجعة داخلية: الفصل الأول مقسّم حسب السيليبس، والفصول 2–5 لسا بشكلها القديم لحد ما تنراجع بدفعاتها.'
-        : 'معاينة مجانية من الفصل الأول. الدليل الكامل وربط الشراء قيد الإعداد.'}</p>
+        : buy ? 'معاينة مجانية: الفصل الأول كامل. باقي الفصول بالدليل الكامل.' : 'معاينة مجانية من الفصل الأول. الدليل الكامل وربط الشراء قيد الإعداد.'}</p>
+      {buy && (
+        <a class="gx-buy-cta" href={buy.href} data-track="guide_buy_home">
+          اشترِ الدليل كامل · <b dir="ltr">{buy.price}</b>{buy.old && <s dir="ltr">{buy.old}</s>}
+        </a>
+      )}
     </div>
 
     {first && (
@@ -79,7 +84,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
           <div class="gx-chapter-card is-locked">
             <div class="gx-chapter-card-top">
               <span class="gx-chapter-num" dir="ltr">{pad(c.number)}</span>
-              <span class="gx-status">بالدليل الكامل</span>
+              {buy ? <a class="gx-status gx-status-buy" href={buy.href}>بالدليل الكامل ←</a> : <span class="gx-status">بالدليل الكامل</span>}
             </div>
             <div dir="ltr" class="gx-chapter-card-title">
               <b>{c.en}</b>

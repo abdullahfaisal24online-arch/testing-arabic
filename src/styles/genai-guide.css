@@ -1038,3 +1038,41 @@ a.gx-chapter-card:hover { border-color: var(--line-strong); color: var(--ink); }
 
 /* الجداول: الكلمة ما بتنكسر حرف حرف */
 .gx-table th, .gx-table td { overflow-wrap: normal; word-break: normal; hyphens: manual; }
+
+/* ---------- الشراء من المعاينة المجانية ---------- */
+.gx-buy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 8px;
+  background: var(--orange);
+  color: var(--on-orange);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.gx-buy-btn:hover { background: var(--orange-hover); color: var(--on-orange); }
+.gx-buy-btn b { font-family: 'IBM Plex Mono', monospace; }
+.gx-buy-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-self: flex-start;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 12px;
+  background: var(--orange);
+  color: var(--on-orange);
+  font-weight: 700;
+}
+.gx-buy-cta:hover { background: var(--orange-hover); color: var(--on-orange); }
+.gx-buy-cta s { opacity: 0.7; font-weight: 500; }
+.gx-hero-text .gx-buy-cta { margin-top: 14px; }
+.gx-status-buy { color: var(--orange); background: var(--orange-soft); font-weight: 600; }
+.gx-status-buy:hover { color: var(--orange-hover); }
+@media (max-width: 560px) {
+  .gx-buy-full { display: none; }
+}

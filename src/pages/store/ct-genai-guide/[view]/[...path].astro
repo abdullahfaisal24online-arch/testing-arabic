@@ -15,7 +15,9 @@ import GuideChapterPage from '../../../../components/genai-guide/GuideChapter.as
 import GuideSection from '../../../../components/genai-guide/GuideSection.astro';
 import GuideGlossary from '../../../../components/genai-guide/GuideGlossary.astro';
 import GuideToc from '../../../../components/genai-guide/GuideToc.astro';
-import { CHAPTERS, pagesFor, type GuideView } from '../../../../lib/genai-guide';
+import { getEntry } from 'astro:content';
+import { CHAPTERS, GUIDE_PRODUCT, pagesFor, type GuideBuy, type GuideView } from '../../../../lib/genai-guide';
+import { STORE_OPEN, usd } from '../../../../lib/store';
 import '../../../../styles/genai-guide.css';
 
 export function getStaticPaths() {
@@ -44,6 +46,18 @@ const page = kind === 'section' ? pagesFor(view).find((p) => p.slug === slug) : 
 const chapterNumber = page?.chapter ?? chapter;
 const chapterMeta = CHAPTERS.find((c) => c.number === chapterNumber);
 
+// بالمعاينة المجانية: زر شراء الدليل من منتج المتجر (إذا المتجر مفتوح والمنتج منشور)
+const product = STORE_OPEN && view === 'preview' ? await getEntry('products', GUIDE_PRODUCT).catch(() => undefined) : undefined;
+const buy: GuideBuy | undefined =
+  product && !product.data.draft
+    ? {
+        href: `/store/${product.id}/`,
+        order: `/store/${product.id}/order/`,
+        price: usd(product.data.offerPrice ?? product.data.price),
+        old: product.data.offerPrice != null ? usd(product.data.price) : undefined,
+      }
+    : undefined;
+
 const title =
   kind === 'section' && page ? `${page.section} ${page.title} — دليل CT-GenAI`
   : kind === 'chapter' && chapterMeta ? `Chapter ${chapterMeta.number}: ${chapterMeta.en} — دليل CT-GenAI`
@@ -53,10 +67,10 @@ const title =
 ---
 <Base title={title} description="دليل Testing بالعربي لدراسة CT-GenAI — مراجعة تحريرية." noindex hideChat>
   <div class="gx" data-guide-view={view} data-guide-kind={kind} data-guide-slug={page?.slug}>
-    <GuideBar view={view} kind={kind} chapter={chapterNumber} page={page} />
-    {kind === 'home' && <GuideHome view={view} />}
+    <GuideBar view={view} kind={kind} chapter={chapterNumber} page={page} buy={buy} />
+    {kind === 'home' && <GuideHome view={view} buy={buy} />}
     {kind === 'chapter' && chapterNumber && <GuideChapterPage view={view} chapter={chapterNumber} />}
-    {kind === 'section' && page && <GuideSection view={view} page={page} />}
+    {kind === 'section' && page && <GuideSection view={view} page={page} buy={buy} />}
     {kind === 'glossary' && <GuideGlossary view={view} />}
     <GuideToc view={view} current={page?.slug} />
   </div>

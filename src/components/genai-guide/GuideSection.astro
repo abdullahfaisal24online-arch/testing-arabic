@@ -1,8 +1,8 @@
 ---
-import { CHAPTERS, GROUPS, LEVELS, chapterUrl, glossaryUrl, pageUrl, pagesFor, termId, type GuidePage, type GuideView } from '../../lib/genai-guide';
+import { CHAPTERS, GROUPS, LEVELS, chapterUrl, glossaryUrl, pageUrl, pagesFor, termId, type GuideBuy, type GuidePage, type GuideView } from '../../lib/genai-guide';
 
-interface Props { view: GuideView; page: GuidePage }
-const { view, page } = Astro.props;
+interface Props { view: GuideView; page: GuidePage; buy?: GuideBuy }
+const { view, page, buy } = Astro.props;
 const pages = pagesFor(view);
 const index = pages.findIndex((p) => p.slug === page.slug);
 const prev = index > 0 ? pages[index - 1] : undefined;
@@ -79,6 +79,11 @@ const nextIsNewChapter = next && next.chapter !== page.chapter;
         <div class="gx-end">
           <b>{view === 'full' ? 'وصلت لنهاية المسودة.' : 'وصلت لنهاية المعاينة.'}</b>
           <p>{view === 'full' ? 'هاد آخر عنوان بالدليل.' : 'هاي عناوين الفصل الأول. باقي الفصول بالدليل الكامل.'}</p>
+          {buy && (
+            <a class="gx-buy-cta" href={buy.href} data-track="guide_buy_end">
+              كمّل باقي الفصول: اشترِ الدليل كامل · <b dir="ltr">{buy.price}</b>{buy.old && <s dir="ltr">{buy.old}</s>}
+            </a>
+          )}
           <a href={chapterUrl(view, page.chapter)}>ارجع لفهرس <span dir="ltr">Chapter {chapter.number}</span> ←</a>
         </div>
       )}

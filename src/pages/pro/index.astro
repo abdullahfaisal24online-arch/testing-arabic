@@ -2,12 +2,15 @@
 // «موادي»: المواد المفتوحة على هاد الجهاز (من /api/pro/me).
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import { STORE_OPEN, getStoreSettings } from '../../lib/store';
+import { STORE_OPEN, GUIDE_PRODUCT, getStoreSettings } from '../../lib/store';
 
 if (!STORE_OPEN) return Astro.redirect('/store/');
 const t = await getStoreSettings();
 const covers = Object.fromEntries(
-  (await getCollection('products')).filter((p) => !p.data.draft).map((p) => [p.id, { cover: p.data.cover ?? '', kind: p.data.kind }]),
+  (await getCollection('products'))
+    .filter((p) => !p.data.draft)
+    // دليل الدراسة بينفتح بصفحاته، مش بصفحة بنك الأسئلة
+    .map((p) => [p.id, { cover: p.data.cover ?? '', kind: p.data.kind, href: p.id === GUIDE_PRODUCT ? '/store/ct-genai-guide/full/' : `/pro/${p.id}/` }]),
 );
 ---
 
@@ -32,7 +35,7 @@ const covers = Object.fromEntries(
 
 <script>
   const root = document.getElementById('mine')!;
-  const covers = JSON.parse(root.dataset.covers!) as Record<string, { cover: string; kind: string }>;
+  const covers = JSON.parse(root.dataset.covers!) as Record<string, { cover: string; kind: string; href: string }>;
   const $ = (id: string) => document.getElementById(id)!;
 
   async function load() {
@@ -47,7 +50,7 @@ const covers = Object.fromEntries(
     grid.replaceChildren(...products.map((p) => {
       const a = document.createElement('a');
       a.className = 'mcard';
-      a.href = `/pro/${p.slug}/`;
+      a.href = covers[p.slug]?.href || `/pro/${p.slug}/`;
       const c = covers[p.slug];
       if (c?.cover) { const img = document.createElement('img'); img.src = c.cover; img.alt = ''; img.loading = 'lazy'; a.append(img); }
       const box = document.createElement('div');

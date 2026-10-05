@@ -1214,6 +1214,10 @@ if (root) {
 
   refresh();
   fillContinue();
+  // أزرار الشراء بالمعاينة: نفس تتبّع صفحات المتجر
+  document.querySelectorAll<HTMLAnchorElement>('.gx [data-track]').forEach((a) =>
+    a.addEventListener('click', () => (window as unknown as { taTrack?: (e: string, d: object) => void }).taTrack?.(a.dataset.track!, { page: location.pathname })),
+  );
   if (!storageOk) {
     document.querySelectorAll<HTMLElement>('[data-guide-read]').forEach((b) => (b.title = 'حفظ التقدّم غير متاح على هذا المتصفح'));
   }

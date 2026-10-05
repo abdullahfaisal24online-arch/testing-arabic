@@ -1,13 +1,14 @@
 ---
-import { CHAPTERS, chapterUrl, guideBase, pageUrl, pagesFor, type GuidePage, type GuideView } from '../../lib/genai-guide';
+import { CHAPTERS, chapterUrl, guideBase, pageUrl, pagesFor, type GuideBuy, type GuidePage, type GuideView } from '../../lib/genai-guide';
 
 interface Props {
   view: GuideView;
   kind: 'home' | 'chapter' | 'section' | 'glossary';
   chapter?: number;
   page?: GuidePage;
+  buy?: GuideBuy;
 }
-const { view, kind, chapter, page } = Astro.props;
+const { view, kind, chapter, page, buy } = Astro.props;
 const pages = pagesFor(view);
 const siblings = page ? pages.filter((p) => p.chapter === page.chapter) : [];
 const available = new Set(pages.map((p) => p.chapter));
@@ -39,6 +40,11 @@ const available = new Set(pages.map((p) => p.chapter));
     </nav>
 
     <div class="gx-bar-tools">
+      {buy && (
+        <a class="gx-buy-btn" href={buy.href} data-track="guide_buy_bar">
+          <span class="gx-buy-full">اشترِ الدليل كامل · </span><b dir="ltr">{buy.price}</b>
+        </a>
+      )}
       {kind === 'section' ? (
         <nav class="gx-dots" aria-label="عناوين الفصل">
           {siblings.map((p) => (

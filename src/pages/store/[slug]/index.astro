@@ -26,7 +26,9 @@ const saving = data.offerPrice != null ? Math.round((1 - data.offerPrice / data.
 const orderHref = `/store/${product.id}/order/`;
 const bank = getBank(product.id);
 const sampleN = Math.min(Math.max(0, Math.round(data.sampleCount)), bank.length);
-const hasSample = data.sampleEnabled && sampleN > 0;
+// العيّنة: إما أسئلة من بنك المنتج، أو رابط معاينة جاهز (زي الفصل الأول من دليل الدراسة)
+const sampleHref = data.sampleHref || (sampleN > 0 ? `/store/${product.id}/sample/` : '');
+const hasSample = data.sampleEnabled && !!sampleHref;
 const trust = data.trust.length ? data.trust : t.trust;
 
 type Item = (typeof all)[number];
@@ -78,7 +80,7 @@ const jsonLd = [
         {data.offerNote && <p class="note">{data.offerNote}</p>}
         <a class="btn btn-primary" href={orderHref} data-track="store_buy">{data.buyButton || t.buyButton}</a>
         {hasSample && (
-          <a class="btn btn-ghost" href={`/store/${product.id}/sample/`} data-track="store_sample_open">
+          <a class="btn btn-ghost" href={sampleHref} data-track="store_sample_open">
             {tpl(data.sampleButton || t.sampleButton, { n: sampleN })}
           </a>
         )}
@@ -111,7 +113,7 @@ const jsonLd = [
         <p>{data.title} · <b>{usd(finalPrice)}</b>{data.offerPrice != null && <s> {usd(data.price)}</s>}</p>
       </div>
       <div class="cta-acts">
-        {hasSample && <a class="btn btn-ghost" href={`/store/${product.id}/sample/`}>{tpl(data.sampleButton || t.sampleButton, { n: sampleN })}</a>}
+        {hasSample && <a class="btn btn-ghost" href={sampleHref}>{tpl(data.sampleButton || t.sampleButton, { n: sampleN })}</a>}
         <a class="btn btn-primary" href={orderHref}>{data.endButton || t.endButton}</a>
       </div>
     </section>

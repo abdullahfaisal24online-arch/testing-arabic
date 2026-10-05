@@ -10,6 +10,9 @@ export const STORE_OPEN: boolean =
   (typeof process !== 'undefined' && process.env?.STORE_OPEN === '1') ||
   import.meta.env.STORE_OPEN === '1';
 
+/** منتج دليل CT-GenAI بالمتجر (صفحات الدليل تحت /store/ct-genai-guide/) */
+export const GUIDE_PRODUCT = 'ct-genai-guide';
+
 /** ترتيب التصنيفات بالمتجر */
 // title = اسم الخانة بإعدادات المتجر اللي فيها اسم التصنيف
 export const STORE_GROUPS = [

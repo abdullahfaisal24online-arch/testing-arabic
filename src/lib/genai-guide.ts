@@ -8,6 +8,9 @@
 import type { MarkdownInstance } from 'astro';
 
 export type GuideView = 'preview' | 'full';
+/** زر الشراء بالمعاينة المجانية (من منتج المتجر ct-genai-guide) */
+export interface GuideBuy { href: string; order: string; price: string; old?: string }
+export { GUIDE_PRODUCT } from './store';
 
 export interface GuideTerm {
   en: string;
