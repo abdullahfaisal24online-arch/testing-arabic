@@ -24,7 +24,8 @@ if (root) {
   const view = root.dataset.guideView || 'preview';
   const kind = root.dataset.guideKind || 'home';
   const slug = root.dataset.guideSlug || '';
-  const key = `ta:ct-genai:guide:${view}:v2`;
+  // مفتاح الحفظ من الصفحة (لكل دليل مفتاحه). القيمة الاحتياطية = مفتاح CT-GenAI القديم.
+  const key = root.dataset.guideKey || `ta:ct-genai:guide:${view}:v2`;
   const toc = document.querySelector<HTMLDialogElement>('#gx-toc');
   const tocLinks = [...document.querySelectorAll<HTMLAnchorElement>('[data-guide-toc-link]')];
   const allSlugs = tocLinks.map((a) => a.dataset.guideTocLink!);

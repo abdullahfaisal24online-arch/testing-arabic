@@ -1,0 +1,13 @@
+---
+/**
+ * دليل CTFL v4.0.1 — مسارات المراجعة (staging فقط)، بنفس شكل دليل CT-GenAI:
+ *   /store/ctfl-guide/{preview|full}/ ، chapter-N/ ، <slug>/ ، glossary/
+ * ما بينبنوا أبداً بدون CMS_BRANCH=staging، ولا قبل ما ينضاف محتوى
+ * بـ src/data/readers/ctfl/ أو src/data/readers/ctfl-full/.
+ */
+import GuideView from '../../../../components/genai-guide/GuideView.astro';
+import { CTFL } from '../../../../lib/guides';
+
+export const getStaticPaths = () => CTFL.staticPaths();
+---
+<GuideView g={CTFL} {...Astro.props} />

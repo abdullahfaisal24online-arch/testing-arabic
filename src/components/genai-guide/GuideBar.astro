@@ -1,22 +1,24 @@
 ---
-import { CHAPTERS, chapterUrl, guideBase, pageUrl, pagesFor, type GuideBuy, type GuidePage, type GuideView } from '../../lib/genai-guide';
+import type { Guide, GuideBuy, GuideKind, GuidePage, GuideView } from '../../lib/guide';
 
 interface Props {
+  g: Guide;
   view: GuideView;
-  kind: 'home' | 'chapter' | 'section' | 'glossary';
+  kind: GuideKind;
   chapter?: number;
   page?: GuidePage;
   buy?: GuideBuy;
 }
-const { view, kind, chapter, page, buy } = Astro.props;
-const pages = pagesFor(view);
+const { g, view, kind, chapter, page, buy } = Astro.props;
+const { chapterUrl, guideBase, pageUrl } = g;
+const pages = g.pagesFor(view);
 const siblings = page ? pages.filter((p) => p.chapter === page.chapter) : [];
 const available = new Set(pages.map((p) => p.chapter));
 ---
 <div class="gx-bar">
   <div class="wrap gx-bar-inner">
     <nav class="gx-crumbs" aria-label="مسار الصفحة">
-      <a href={guideBase(view)}>دليل CT-GenAI</a>
+      <a href={guideBase(view)}>دليل {g.name}</a>
       {chapter && kind !== 'home' && kind !== 'glossary' && (
         <>
           <span aria-hidden="true">/</span>
@@ -59,7 +61,7 @@ const available = new Set(pages.map((p) => p.chapter));
         </nav>
       ) : (
         <nav class="gx-pills" aria-label="الفصول">
-          {CHAPTERS.map((c) =>
+          {g.chapters.map((c) =>
             available.has(c.number) ? (
               <a
                 href={chapterUrl(view, c.number)}

@@ -2,7 +2,8 @@
 // «موادي»: المواد المفتوحة على هاد الجهاز (من /api/pro/me).
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import { STORE_OPEN, GUIDE_PRODUCT, getStoreSettings } from '../../lib/store';
+import { STORE_OPEN, getStoreSettings } from '../../lib/store';
+import { GUIDES } from '../../lib/guides';
 
 if (!STORE_OPEN) return Astro.redirect('/store/');
 const t = await getStoreSettings();
@@ -10,7 +11,7 @@ const covers = Object.fromEntries(
   (await getCollection('products'))
     .filter((p) => !p.data.draft)
     // دليل الدراسة بينفتح بصفحاته، مش بصفحة بنك الأسئلة
-    .map((p) => [p.id, { cover: p.data.cover ?? '', kind: p.data.kind, href: p.id === GUIDE_PRODUCT ? '/store/ct-genai-guide/full/' : `/pro/${p.id}/` }]),
+    .map((p) => [p.id, { cover: p.data.cover ?? '', kind: p.data.kind, href: GUIDES[p.id] ? GUIDES[p.id].guideBase('full') : `/pro/${p.id}/` }]),
 );
 ---
 

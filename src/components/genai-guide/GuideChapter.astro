@@ -1,8 +1,9 @@
 ---
-import { CHAPTERS, GROUPS, LEVELS, glossaryUrl, pageUrl, pagesFor, sectionLabel, termId, type GuidePage, type GuideView } from '../../lib/genai-guide';
+import { LEVELS, sectionLabel, termId, type Guide, type GuidePage, type GuideView } from '../../lib/guide';
 
-interface Props { view: GuideView; chapter: number }
-const { view, chapter } = Astro.props;
+interface Props { g: Guide; view: GuideView; chapter: number }
+const { g, view, chapter } = Astro.props;
+const { chapters: CHAPTERS, groups: GROUPS, glossaryUrl, pageUrl, pagesFor } = g;
 const meta = CHAPTERS.find((c) => c.number === chapter)!;
 const pages = pagesFor(view).filter((p) => p.chapter === chapter);
 const minutes = pages.reduce((n, p) => n + p.minutes, 0);
@@ -18,7 +19,7 @@ for (const p of pages) {
 }
 
 const objectives = pages.flatMap((p) =>
-  p.objectives.filter((o) => o.code.startsWith('GenAI-')).map((o) => ({ ...o, page: p })),
+  p.objectives.filter((o) => o.code.startsWith(g.loPrefix)).map((o) => ({ ...o, page: p })),
 );
 const levelsUsed = Object.keys(LEVELS).filter((lvl) => pages.some((p) => p.objectives.some((o) => o.level === lvl)));
 const termMap = new Map<string, { en: string; ar: string; def: string; defAr?: string }>();
@@ -45,7 +46,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
         <ul>
           {objectives.map((o) => (
             <li>
-              <span class:list={['gx-level', `gx-level--${o.level.charAt(0).toLowerCase()}`]}>{o.code.replace('GenAI-', '')} · {o.level}</span>
+              <span class:list={['gx-level', `gx-level--${o.level.charAt(0).toLowerCase()}`]}>{o.code.replace(g.loPrefix, '')} · {o.level}</span>
               <a href={pageUrl(view, o.page)}>
                 <span class="gx-en" lang="en" dir="ltr">{o.text || o.page.title}</span>
                 {o.textAr && <span class="gx-ar" lang="ar" dir="rtl">{o.textAr}</span>}

@@ -1,15 +1,16 @@
 ---
-import { pageUrl, pagesFor, termId, type GuidePage, type GuideTerm, type GuideView } from '../../lib/genai-guide';
+import { termId, type Guide, type GuidePage, type GuideTerm, type GuideView } from '../../lib/guide';
 
-interface Props { view: GuideView }
-const { view } = Astro.props;
+interface Props { g: Guide; view: GuideView }
+const { g, view } = Astro.props;
+const { pageUrl, pagesFor } = g;
 const map = new Map<string, GuideTerm & { page: GuidePage }>();
 for (const page of pagesFor(view)) for (const t of page.terms) if (!map.has(t.en)) map.set(t.en, { ...t, page });
 const terms = [...map.values()].sort((a, b) => a.en.localeCompare(b.en, 'en'));
 ---
 <div class="wrap gx-glossary">
   <header dir="ltr" class="gx-page-head">
-    <span class="gx-kicker">CT-GenAI</span>
+    <span class="gx-kicker">{g.name}</span>
     <h1 lang="en">Glossary</h1>
     <span dir="rtl" class="gx-page-head-ar">مصطلحات الدليل، مع رابط للعنوان اللي انشرح فيه كل مصطلح.</span>
   </header>

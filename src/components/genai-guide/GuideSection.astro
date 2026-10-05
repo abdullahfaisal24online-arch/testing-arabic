@@ -1,8 +1,9 @@
 ---
-import { CHAPTERS, GROUPS, LEVELS, chapterUrl, glossaryUrl, pageUrl, pagesFor, termId, type GuideBuy, type GuidePage, type GuideView } from '../../lib/genai-guide';
+import { LEVELS, termId, type Guide, type GuideBuy, type GuidePage, type GuideView } from '../../lib/guide';
 
-interface Props { view: GuideView; page: GuidePage; buy?: GuideBuy }
-const { view, page, buy } = Astro.props;
+interface Props { g: Guide; view: GuideView; page: GuidePage; buy?: GuideBuy }
+const { g, view, page, buy } = Astro.props;
+const { chapters: CHAPTERS, groups: GROUPS, chapterUrl, glossaryUrl, pageUrl, pagesFor } = g;
 const pages = pagesFor(view);
 const index = pages.findIndex((p) => p.slug === page.slug);
 const prev = index > 0 ? pages[index - 1] : undefined;
@@ -100,7 +101,7 @@ const nextIsNewChapter = next && next.chapter !== page.chapter;
         </a>
       )}
 
-      <p class="gx-source-line">مرجع الموضوع: ISTQB® CT-GenAI Syllabus v1.1، الفصل {page.chapter}. الأمثلة والشروحات التطبيقية من إعداد Testing بالعربي.</p>
+      <p class="gx-source-line">مرجع الموضوع: {g.syllabus}، الفصل {page.chapter}. الأمثلة والشروحات التطبيقية من إعداد Testing بالعربي.</p>
     </footer>
   </article>
 

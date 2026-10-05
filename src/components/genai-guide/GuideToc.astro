@@ -1,8 +1,9 @@
 ---
-import { CHAPTERS, GROUPS, chapterUrl, glossaryUrl, pageUrl, pagesFor, sectionLabel, type GuideView } from '../../lib/genai-guide';
+import { sectionLabel, type Guide, type GuideView } from '../../lib/guide';
 
-interface Props { view: GuideView; current?: string }
-const { view, current } = Astro.props;
+interface Props { g: Guide; view: GuideView; current?: string }
+const { g, view, current } = Astro.props;
+const { chapters: CHAPTERS, groups: GROUPS, chapterUrl, glossaryUrl, pageUrl, pagesFor } = g;
 const pages = pagesFor(view);
 const currentChapter = pages.find((p) => p.slug === current)?.chapter ?? 1;
 
@@ -29,7 +30,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
     </div>
     <div class="gx-toc-search">
       <label for="gx-toc-search">ابحث بالدليل</label>
-      <input id="gx-toc-search" type="search" placeholder="مثل: Tokens أو Hallucination" autocomplete="off" maxlength="80" />
+      <input id="gx-toc-search" type="search" placeholder={g.searchHint} autocomplete="off" maxlength="80" />
       <p class="gx-toc-status" role="status" aria-live="polite" data-guide-toc-status></p>
     </div>
     <nav class="gx-toc-tree" dir="ltr" aria-label="فصول الدليل">

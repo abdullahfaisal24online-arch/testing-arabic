@@ -1,8 +1,9 @@
 ---
-import { chapterUrl, chaptersFor, glossaryUrl, pageUrl, pagesFor, type GuideBuy, type GuideView } from '../../lib/genai-guide';
+import type { Guide, GuideBuy, GuideView } from '../../lib/guide';
 
-interface Props { view: GuideView; buy?: GuideBuy }
-const { view, buy } = Astro.props;
+interface Props { g: Guide; view: GuideView; buy?: GuideBuy }
+const { g, view, buy } = Astro.props;
+const { chapterUrl, chaptersFor, glossaryUrl, pageUrl, pagesFor } = g;
 const isFull = view === 'full';
 const chapters = chaptersFor(view);
 const pages = pagesFor(view);
@@ -15,17 +16,17 @@ const pad = (n: number) => String(n).padStart(2, '0');
 
   <section class="gx-hero">
     <div class="gx-hero-text">
-      <span class="gx-kicker" dir="ltr">ISTQB® CT-GenAI · Syllabus v1.1</span>
-      <h1>دليل CT-GenAI بالعربي</h1>
+      <span class="gx-kicker" dir="ltr">{g.kicker}</span>
+      <h1>{g.homeTitle}</h1>
       <p class="gx-lead">الشرح بالعربي، والعناوين والمصطلحات بالإنجليزي متل ما رح تشوفها بالسيليبس والشغل. الفصول بترتيب السيليبس، وبتقدر ترجع لأي عنوان وقت ما بدك.</p>
       <div class="gx-chips" dir="ltr">
-        <span>{isFull ? '5 Chapters' : 'Chapter 1 · Free preview'}</span>
+        <span>{isFull ? `${g.chapters.length} Chapters` : 'Chapter 1 · Free preview'}</span>
         <span>{pages.length} Sections</span>
         <span>{labCount} Hands-on labs</span>
         <span>عربي + English</span>
       </div>
       <p class="gx-note">{isFull
-        ? 'مسودة مراجعة داخلية: الفصل الأول مقسّم حسب السيليبس، والفصول 2–5 لسا بشكلها القديم لحد ما تنراجع بدفعاتها.'
+        ? g.fullNote
         : buy ? 'معاينة مجانية: الفصل الأول كامل. باقي الفصول بالدليل الكامل.' : 'معاينة مجانية من الفصل الأول. الدليل الكامل وربط الشراء قيد الإعداد.'}</p>
       {buy && (
         <a class="gx-buy-cta" href={buy.href} data-track="guide_buy_home">
@@ -107,6 +108,6 @@ const pad = (n: number) => String(n).padStart(2, '0');
 
   <section class="gx-source">
     <strong>عن هذا الدليل</strong>
-    <p>شرح دراسي مستقل من Testing بالعربي، مبني على ISTQB® CT-GenAI Syllabus v1.1 (27 أبريل 2026). حقوق السيليبس لـISTQB® ومؤلفيه Abbas Ahmad وGualtiero Bazzana وAlessandro Collino وOlivier Denoo وBruno Legeard. هذا الدليل مش مادة تدريب معتمدة ولا ضمان لنتيجة الامتحان.</p>
+    <p>{g.about}</p>
   </section>
 </div>
