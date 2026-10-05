@@ -662,3 +662,116 @@ a.gx-chapter-card:hover { border-color: var(--line-strong); color: var(--ink); }
 .gx-lab-steps li.has-check > :not(.gx-lab-check) { grid-column: 2; }
 .gx-lab-steps li.has-check > .gx-lab-check { grid-row: 1 / span 2; }
 .gx-table .gx-ar, .gx-lab td .gx-ar, .gx-lab th .gx-ar { text-align: left; }
+
+/* ---------- وضع البطاقات (بيشغّله الـ JavaScript؛ بدونه الصفحة مقال عادي) ---------- */
+.gx-stage { display: contents; }
+.gx-deck-top, .gx-deck-nav { display: none; }
+.gx-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.gx-mode-btn:hover { color: var(--ink); }
+
+.gx-cards .gx-section { padding-top: 16px; gap: 24px 32px; }
+.gx-cards .gx-article { gap: 12px; max-width: 840px; }
+.gx-cards .gx-deck-top { display: flex; flex-direction: column; gap: 2px; }
+.gx-deck-dots { display: flex; gap: 5px; }
+.gx-deck-dot {
+  flex: 1 1 0;
+  min-width: 6px;
+  height: 22px;
+  padding: 8px 0;
+  border: 0;
+  border-radius: 6px;
+  background: var(--surface-2);
+  background-clip: content-box;
+  cursor: pointer;
+}
+.gx-deck-dot.is-done { background-color: var(--cyan); }
+.gx-deck-dot.is-current { background-color: var(--orange); }
+.gx-deck-label { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--ink-3); }
+.gx-deck-label > span:first-child { direction: rtl; unicode-bidi: plaintext; color: var(--ink-2); }
+.gx-deck-upnext { color: var(--muted); }
+
+.gx-cards .gx-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: var(--gx-card-h, 70vh);
+  box-sizing: border-box;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding: 30px 34px;
+  border-radius: 20px;
+  background: var(--navy);
+  border: 1px solid var(--line);
+  outline: none;
+}
+.gx-cards .gx-split > :not(.is-shown) { display: none !important; }
+.gx-cards .gx-prose > h2, .gx-cards .gx-prose > h3 { margin-top: 0; }
+.gx-cards .gx-prose { gap: 18px; }
+.gx-cards .gx-page-head { margin-block: auto 0; }
+.gx-cards .gx-objectives { margin-block: 0 auto; }
+.gx-cards .gx-takeaways { padding: 0; background: transparent; }
+.gx-cards .gx-key-hint { display: none; }
+
+.gx-cards .gx-deck-nav { display: flex; align-items: center; gap: 12px; }
+.gx-deck-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.gx-deck-btn:disabled { opacity: 0.35; cursor: default; }
+.gx-deck-prev { border: 1px solid var(--line-strong); background: transparent; color: var(--ink-2); }
+.gx-deck-prev:hover:not(:disabled) { color: var(--ink); }
+.gx-deck-toc { display: none; }
+.gx-deck-next { margin-inline-start: auto; min-width: 160px; border: 0; background: var(--cyan); color: var(--on-orange); }
+.gx-deck-next:hover:not(:disabled) { background: var(--cyan-bright); }
+.gx-deck-next.is-page { background: var(--orange); }
+.gx-deck-next.is-page:hover { background: var(--orange-hover); }
+
+@media (max-width: 900px) {
+  .gx-cards .gx-mobilebar { display: none; }
+  .gx-cards .gx-side { display: none; }
+  .gx-cards .gx-section { padding-top: 12px; padding-bottom: 84px; }
+  .gx-cards .gx-stage { padding: 20px 18px; border-radius: 16px; gap: 16px; }
+  .gx-deck-upnext { display: none; }
+  .gx-cards .gx-deck-nav {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 35;
+    gap: 8px;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    background: var(--navy);
+    border-top: 1px solid var(--line);
+  }
+  .gx-deck-prev { width: 52px; padding: 0; flex: none; }
+  .gx-deck-prev .gx-deck-btn-text { display: none; }
+  .gx-deck-toc { display: inline-flex; width: 52px; padding: 0; flex: none; border: 0; background: var(--surface-2); color: var(--ink); }
+  .gx-deck-next { flex: 1; min-width: 0; }
+  .gx-mode-btn span { display: none; }
+  .gx-mode-btn { padding: 0 11px; }
+}
+/* البطاقة اللي فيها تكملة تحت: ظل خفيف بأسفلها بيلمّح إنها بتنسحب */
+.gx-cards .gx-stage.has-more { box-shadow: inset 0 -28px 22px -18px rgba(0, 0, 0, 0.45); }

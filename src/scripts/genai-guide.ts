@@ -8,6 +8,7 @@ interface GuideState {
   last: string | null;
   font: number;
   labs: Record<string, number[]>;
+  mode: 'cards' | 'article';
 }
 interface TermData { en: string; ar: string; def: string; defAr?: string; match: string[]; href: string }
 
@@ -24,7 +25,7 @@ if (root) {
   const allSlugs = tocLinks.map((a) => a.dataset.guideTocLink!);
 
   /* ---------- الحالة المحفوظة ---------- */
-  const state: GuideState = { read: [], last: null, font: 18, labs: {} };
+  const state: GuideState = { read: [], last: null, font: 18, labs: {}, mode: 'cards' };
   let storageOk = true;
   try {
     const saved = JSON.parse(localStorage.getItem(key) || 'null');
@@ -32,6 +33,7 @@ if (root) {
       if (Array.isArray(saved.read)) state.read = saved.read.filter((s: unknown) => typeof s === 'string' && allSlugs.includes(s as string));
       if (typeof saved.last === 'string' && allSlugs.includes(saved.last)) state.last = saved.last;
       if (FONT_SIZES.includes(saved.font)) state.font = saved.font;
+      if (saved.mode === 'article' || saved.mode === 'cards') state.mode = saved.mode;
       if (saved.labs && typeof saved.labs === 'object') {
         for (const [id, steps] of Object.entries(saved.labs)) {
           if (Array.isArray(steps)) state.labs[id] = steps.filter((n) => Number.isInteger(n));
@@ -164,6 +166,364 @@ if (root) {
     });
   }
 
+  /* ---------- وضع البطاقات ----------
+   * نفس محتوى الصفحة بالضبط، بس بينعرض بطاقة بطاقة بدل مقال طويل.
+   * ما في نسخ ولا إعادة كتابة: البطاقة = مجموعة عناصر من الصفحة بتنعرض والباقي بيختفي.
+   * كل عنوان فرعي (h3) بطاقة، الـ Lab بطاقة لحاله، وصناديق الامتحان اللي بآخر العنوان بطاقة.
+   * البطاقة اللي ما بتوسعها الشاشة بتنقسم لأكثر من بطاقة. */
+  const setupDeck = (article: HTMLElement) => {
+    const prose = article.querySelector<HTMLElement>('[data-guide-prose]');
+    if (!prose) return null;
+    const pick = (sel: string) => article.querySelector<HTMLElement>(sel);
+    const headEl = pick('.gx-page-head');
+    const objEl = pick('.gx-objectives');
+    const takeEl = pick('.gx-takeaways');
+    const footEl = pick('.gx-article-foot');
+    const nextLink = document.querySelector<HTMLAnchorElement>('[data-guide-next]');
+    const prevLink = document.querySelector<HTMLAnchorElement>('[data-guide-prev]');
+    const section = article.closest<HTMLElement>('.gx-section');
+    const bar = document.querySelector<HTMLElement>('.gx-bar');
+    const readbar = document.querySelector<HTMLElement>('[data-guide-readbar]');
+    const onpage = [...document.querySelectorAll<HTMLAnchorElement>('[data-guide-onpage]')];
+
+    // الهيكل: شريط تقدّم فوق، البطاقة، وأزرار تحت
+    const stage = document.createElement('div');
+    stage.className = 'gx-stage';
+    stage.tabIndex = -1;
+    stage.append(...article.childNodes);
+    const top = document.createElement('div');
+    top.className = 'gx-deck-top';
+    const dots = document.createElement('div');
+    dots.className = 'gx-deck-dots';
+    const label = document.createElement('div');
+    label.className = 'gx-deck-label';
+    const labelNow = document.createElement('span');
+    labelNow.setAttribute('aria-live', 'polite');
+    const labelNext = document.createElement('span');
+    labelNext.className = 'gx-deck-upnext';
+    label.append(labelNow, labelNext);
+    top.append(dots, label);
+    const nav = document.createElement('nav');
+    nav.className = 'gx-deck-nav';
+    nav.setAttribute('aria-label', 'التنقل بين البطاقات');
+    const mkBtn = (cls: string, html: string, aria?: string) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = `gx-deck-btn ${cls}`;
+      b.innerHTML = html;
+      if (aria) b.setAttribute('aria-label', aria);
+      return b;
+    };
+    const prevBtn = mkBtn('gx-deck-prev', '<span aria-hidden="true">→</span><span class="gx-deck-btn-text">السابق</span>', 'البطاقة السابقة');
+    const tocBtn = mkBtn('gx-deck-toc', '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>', 'الفهرس');
+    const nextBtn = mkBtn('gx-deck-next', '');
+    const nextText = document.createElement('span');
+    nextBtn.append(nextText);
+    nav.append(prevBtn, tocBtn, nextBtn);
+    article.append(top, stage, nav);
+    tocBtn.addEventListener('click', () => document.querySelector<HTMLElement>('.gx-toc-btn, [data-guide-toc-open]')?.click());
+
+    // البطاقات المنطقية من محتوى الصفحة
+    type Slide = { title: string; nodes: HTMLElement[] };
+    const headTitle = (h: Element) =>
+      (h.querySelector('.gx-h-en')?.textContent || h.querySelector('.gx-h-ar')?.textContent || h.textContent || '').trim();
+    const logical: Slide[] = [];
+    logical.push({ title: 'Start', nodes: [headEl, objEl].filter(Boolean) as HTMLElement[] });
+    let cur: Slide | null = null;
+    let lastTitle = 'Overview';
+    for (const el of [...prose.children] as HTMLElement[]) {
+      if (/^H[23]$/.test(el.tagName)) {
+        lastTitle = headTitle(el);
+        cur = { title: lastTitle, nodes: [el] };
+        logical.push(cur);
+      } else if (el.matches('.gx-lab')) {
+        logical.push({ title: (el.querySelector('.gx-lab-title .gx-en')?.textContent || 'Lab').trim(), nodes: [el] });
+        cur = null;
+      } else {
+        if (!cur) {
+          cur = { title: lastTitle, nodes: [] };
+          logical.push(cur);
+        }
+        cur.nodes.push(el);
+      }
+    }
+    // صناديق التلميح/الخطأ الشائع اللي بآخر العنوان بتصير بطاقة «للامتحان»
+    for (let i = logical.length - 1; i > 0; i--) {
+      const s = logical[i];
+      let k = s.nodes.length;
+      while (k > 0 && s.nodes[k - 1].matches('aside.gx-callout')) k--;
+      const run = s.nodes.slice(k);
+      const rest = s.nodes.slice(0, k).filter((n) => !/^H[23]$/.test(n.tagName));
+      if (run.length && rest.length && run.some((n) => /^(tip|warn)$/.test(n.dataset.kind || ''))) {
+        s.nodes = s.nodes.slice(0, k);
+        logical.splice(i + 1, 0, { title: 'Exam focus', nodes: run });
+      }
+    }
+    logical.push({ title: takeEl ? 'Key Takeaways' : 'Finish', nodes: [takeEl, footEl].filter(Boolean) as HTMLElement[] });
+    const slides = logical.filter((s) => s.nodes.length);
+
+    // البطاقة الطويلة بتنقسم على مستوى أصغر: خطوات الـ Lab، صفوف الجداول، عناصر القوائم.
+    // عنوان الـ Lab ورأس الجدول بيتكرروا ببداية البطاقة اللي بتكمّل.
+    const SPLIT = '.gx-callout, .gx-lab, .gx-lab-body, .gx-lab-steps, .gx-table, table, tbody, .gx-takeaways, .gx-takeaways > ul, .gx-objectives, .gx-prose > ul, .gx-prose > ol, .gx-article-foot';
+    const STICKY = ':scope > .gx-lab-head, :scope > thead, :scope > .gx-callout-label';
+    stage.classList.add('gx-split');
+    prose.classList.add('gx-split');
+    const unitsOf = (el: HTMLElement): HTMLElement[] => {
+      if (!el.matches(SPLIT)) return [el];
+      el.classList.add('gx-split');
+      if (el.tagName === 'OL') [...el.children].forEach((li, i) => li.setAttribute('value', String(i + 1)));
+      return ([...el.children] as HTMLElement[]).filter((c) => !c.matches('thead')).flatMap(unitsOf);
+    };
+    const units = new Map(slides.map((sl) => [sl, sl.nodes.flatMap(unitsOf)]));
+    const stickiesFor = (u: HTMLElement) => {
+      const out: HTMLElement[] = [];
+      for (let el = u.parentElement; el && el !== stage; el = el.parentElement) {
+        if (el.classList.contains('gx-split')) out.push(...el.querySelectorAll<HTMLElement>(STICKY));
+      }
+      return out.filter((x) => x !== u && !x.contains(u));
+    };
+
+    type Page = { title: string; nodes: HTMLElement[]; part: number; parts: number };
+    let pages: Page[] = [];
+    let idx = 0;
+    let shown: HTMLElement[] = [];
+
+    const show = (nodes: HTMLElement[]) => {
+      shown.forEach((n) => n.classList.remove('is-shown'));
+      const set = new Set<HTMLElement>();
+      for (const u of nodes) {
+        set.add(u);
+        stickiesFor(u).forEach((x) => set.add(x));
+        for (let el = u.parentElement; el && el !== stage; el = el.parentElement) set.add(el);
+      }
+      shown = [...set];
+      shown.forEach((n) => n.classList.add('is-shown'));
+    };
+
+    const sizeStage = () => {
+      const narrow = matchMedia('(max-width: 900px)').matches;
+      const topH = Number.parseFloat(getComputedStyle(root).getPropertyValue('--gx-top')) || 64;
+      const barH = bar?.getBoundingClientRect().height || 0;
+      const chrome = top.offsetHeight + nav.offsetHeight + 12 * 2 + (narrow ? 26 : 40);
+      const h = Math.max(320, Math.floor(innerHeight - topH - barH - chrome));
+      root.style.setProperty('--gx-card-h', `${h}px`);
+    };
+
+    const isHead = (n: HTMLElement) => /^H[23]$/.test(n.tagName);
+    const paginate = () => {
+      const anchor = pages[idx]?.nodes[0];
+      sizeStage();
+      const cs = getComputedStyle(stage);
+      const avail = stage.clientHeight - Number.parseFloat(cs.paddingTop) - Number.parseFloat(cs.paddingBottom) - 30;
+      // على الموبايل البطاقة بتتحمّل سكرول قصير من جوّا بدل ما تنقسم لبطاقات كثيرة
+      const limit = matchMedia('(max-width: 900px)').matches ? avail * 1.8 : avail;
+      pages = [];
+      for (const sl of slides) {
+        const list = units.get(sl) || [];
+        show(list);
+        const rects = list.map((n) => n.getBoundingClientRect());
+        const groups: HTMLElement[][] = [];
+        let group: HTMLElement[] = [];
+        let base = rects[0].top;
+        const reserve = (u: HTMLElement) =>
+          stickiesFor(u).reduce((h, x) => h + x.getBoundingClientRect().height + 12, 0);
+        list.forEach((n, i) => {
+          if (group.length && rects[i].bottom - base > limit) {
+            // ما بنترك عنوان لحاله بآخر البطاقة
+            const carry = group.length > 1 && isHead(group[group.length - 1]) ? group.pop()! : null;
+            groups.push(group);
+            const first = carry || n;
+            group = carry ? [carry] : [];
+            base = first.getBoundingClientRect().top - reserve(first);
+          }
+          group.push(n);
+        });
+        groups.push(group);
+        groups.forEach((g, part) => pages.push({ title: sl.title, nodes: g, part: part + 1, parts: groups.length }));
+      }
+      const found = anchor ? pages.findIndex((pg) => pg.nodes.includes(anchor)) : -1;
+      idx = found >= 0 ? found : Math.max(0, Math.min(idx, pages.length - 1));
+      dots.replaceChildren(
+        ...pages.map((pg, i) => {
+          const d = document.createElement('button');
+          d.type = 'button';
+          d.className = 'gx-deck-dot';
+          d.setAttribute('aria-label', `${i + 1} · ${pg.title}`);
+          d.addEventListener('click', () => go(i, true));
+          return d;
+        }),
+      );
+      render();
+    };
+
+    const fitView = () => {
+      if (!section) return;
+      const topH = Number.parseFloat(getComputedStyle(root).getPropertyValue('--gx-top')) || 64;
+      const barH = bar?.getBoundingClientRect().height || 0;
+      const target = Math.max(0, section.getBoundingClientRect().top + scrollY - topH - barH);
+      if (Math.abs(scrollY - target) > 2) scrollTo({ top: target });
+    };
+
+    const paintScrollHint = () => {
+      const more = stage.scrollHeight - stage.clientHeight - stage.scrollTop > 8;
+      stage.classList.toggle('has-more', more);
+    };
+    stage.addEventListener('scroll', paintScrollHint, { passive: true });
+    const render = () => {
+      const p = pages[idx];
+      if (!p) return;
+      show(p.nodes);
+      stage.scrollTop = 0;
+      requestAnimationFrame(paintScrollHint);
+      [...dots.children].forEach((d, i) => {
+        d.classList.toggle('is-done', i < idx);
+        d.classList.toggle('is-current', i === idx);
+        if (i === idx) d.setAttribute('aria-current', 'step');
+        else d.removeAttribute('aria-current');
+      });
+      const part = p.parts > 1 ? ` (${p.part}/${p.parts})` : '';
+      labelNow.textContent = `${idx + 1} / ${pages.length} · ${p.title}${part}`;
+      const nxt = pages[idx + 1];
+      labelNext.textContent = nxt ? `التالي: ${nxt.title}` : '';
+      const last = idx === pages.length - 1;
+      nextText.textContent = !last ? (idx === 0 ? 'ابدأ ←' : 'التالي ←') : nextLink ? 'العنوان التالي ←' : 'خلصت ✓';
+      nextBtn.classList.toggle('is-page', last && !!nextLink);
+      nextBtn.disabled = last && !nextLink;
+      prevBtn.disabled = idx === 0 && !prevLink;
+      if (readbar) readbar.style.width = `${Math.round(((idx + 1) / pages.length) * 100)}%`;
+      const heads = new Set(pages.slice(0, idx + 1).flatMap((x) => x.nodes).filter(isHead).map((n) => n.id));
+      const curHead = [...heads].pop();
+      onpage.forEach((a) => a.classList.toggle('is-active', a.dataset.guideOnpage === curHead));
+      try {
+        history.replaceState(null, '', `#card-${idx + 1}`);
+      } catch {
+        /* ما في مشكلة */
+      }
+    };
+
+    const go = (i: number, focus = false) => {
+      if (i < 0) {
+        if (prevLink) location.href = `${prevLink.href.split('#')[0]}#end`;
+        return;
+      }
+      if (i >= pages.length) {
+        if (nextLink) nextLink.click();
+        return;
+      }
+      idx = i;
+      render();
+      fitView();
+      if (focus) stage.focus({ preventScroll: true });
+    };
+
+    nextBtn.addEventListener('click', () => go(idx + 1));
+    prevBtn.addEventListener('click', () => go(idx - 1));
+
+    // السحب على الموبايل: لليمين = التالي (اتجاه القراءة بالعربي)
+    let sx = 0;
+    let sy = 0;
+    stage.addEventListener('touchstart', (e) => {
+      sx = e.touches[0].clientX;
+      sy = e.touches[0].clientY;
+    }, { passive: true });
+    stage.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - sx;
+      const dy = e.changedTouches[0].clientY - sy;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5 && !(e.target as HTMLElement).closest('table, pre, .gx-figure')) {
+        go(dx > 0 ? idx + 1 : idx - 1);
+      }
+    }, { passive: true });
+
+    // «في هذه الصفحة»: بوضع البطاقات بتنقلك للبطاقة
+    onpage.forEach((a) =>
+      a.addEventListener('click', (e) => {
+        if (!on()) return;
+        const target = document.getElementById(a.dataset.guideOnpage || '');
+        const i = pages.findIndex((p) => !!target && p.nodes.some((n) => n === target || n.contains(target)));
+        if (i >= 0) {
+          e.preventDefault();
+          go(i, true);
+        }
+      }),
+    );
+
+    // زر التبديل بين البطاقات والمقال
+    const modeBtn = document.createElement('button');
+    modeBtn.type = 'button';
+    modeBtn.className = 'gx-mode-btn';
+    document.querySelector('.gx-bar-tools')?.prepend(modeBtn);
+    const on = () => root.classList.contains('gx-cards');
+    const paintMode = () => {
+      const cards = on();
+      modeBtn.setAttribute('aria-pressed', String(!cards));
+      modeBtn.innerHTML = cards
+        ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 5h14M5 10h14M5 15h14M5 20h9"></path></svg><span>اعرض كمقال</span>'
+        : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="3"></rect></svg><span>اعرض كبطاقات</span>';
+    };
+    const setMode = (mode: GuideState['mode'], persist = true) => {
+      const anchor = pages[idx]?.nodes[0];
+      root.classList.toggle('gx-cards', mode === 'cards');
+      if (persist) {
+        state.mode = mode;
+        save();
+      }
+      paintMode();
+      if (mode === 'cards') {
+        paginate();
+        fitView();
+      } else {
+        shown.forEach((n) => n.classList.remove('is-shown'));
+        try {
+          history.replaceState(null, '', location.pathname + location.search);
+        } catch {
+          /* ما في مشكلة */
+        }
+        if (anchor && idx > 0) anchor.scrollIntoView({ block: 'start' });
+        else scrollTo({ top: 0 });
+      }
+    };
+    modeBtn.addEventListener('click', () => setMode(on() ? 'article' : 'cards'));
+
+    // البداية: من الرابط (#card-3 أو #end أو #عنوان) أو من أول بطاقة
+    root.classList.toggle('gx-cards', state.mode === 'cards');
+    paintMode();
+    if (on()) {
+      paginate();
+      const h = decodeURIComponent(location.hash.slice(1));
+      const m = /^card-(\d+)$/.exec(h);
+      if (h === 'end') idx = pages.length - 1;
+      else if (m) idx = Math.min(pages.length - 1, Math.max(0, Number(m[1]) - 1));
+      else if (h) {
+        const t = document.getElementById(h);
+        const i = pages.findIndex((p) => t && p.nodes.some((n) => n === t || n.contains(t)));
+        if (i >= 0) idx = i;
+      }
+      render();
+      fitView();
+    }
+
+    // إعادة التقسيم لما يتغيّر حجم الشاشة أو الخط
+    let lastW = innerWidth;
+    let lastH = innerHeight;
+    let timer = 0;
+    const relayout = () => {
+      if (!on()) return;
+      clearTimeout(timer);
+      timer = window.setTimeout(paginate, 120);
+    };
+    addEventListener('resize', () => {
+      // شريط المتصفح بالموبايل بيغيّر الارتفاع شوي؛ بنتجاهل الفرق الصغير
+      if (innerWidth === lastW && Math.abs(innerHeight - lastH) < 90) return;
+      lastW = innerWidth;
+      lastH = innerHeight;
+      relayout();
+    });
+    root.addEventListener('gx:relayout', relayout);
+    document.fonts?.ready.then(relayout);
+
+    return { on, next: () => go(idx + 1, true), prev: () => go(idx - 1, true) };
+  };
+
   /* ---------- صفحة العنوان الفرعي ---------- */
   if (kind === 'section' && slug) {
     state.last = slug;
@@ -203,6 +563,7 @@ if (root) {
         state.font = FONT_SIZES[Math.max(0, Math.min(FONT_SIZES.length - 1, i))];
         save();
         applyFont();
+        root.dispatchEvent(new Event('gx:relayout'));
       }),
     );
     applyFont();
@@ -214,6 +575,7 @@ if (root) {
       let ticking = false;
       const update = () => {
         ticking = false;
+        if (root.classList.contains('gx-cards')) return;
         const rect = article.getBoundingClientRect();
         const total = Math.max(1, rect.height - innerHeight * 0.6);
         const ratio = Math.max(0, Math.min(1, -rect.top / total));
@@ -381,11 +743,18 @@ if (root) {
       });
     }
 
-    // الأسهم: بالعربي ← هو التالي
+    const deck = article ? setupDeck(article) : null;
+
+    // الأسهم: بالعربي ← هو التالي (بطاقة بوضع البطاقات، وعنوان بوضع المقال)
     document.addEventListener('keydown', (e) => {
       if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
       const el = e.target as HTMLElement;
       if (el.closest('input, textarea, select, [contenteditable], dialog[open]')) return;
+      if (deck?.on()) {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); deck.next(); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); deck.prev(); }
+        return;
+      }
       if (e.key === 'ArrowLeft') document.querySelector<HTMLAnchorElement>('[data-guide-next]')?.click();
       if (e.key === 'ArrowRight') document.querySelector<HTMLAnchorElement>('[data-guide-prev]')?.click();
     });
