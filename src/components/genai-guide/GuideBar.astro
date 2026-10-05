@@ -21,13 +21,13 @@ const available = new Set(pages.map((p) => p.chapter));
           <span aria-hidden="true">/</span>
           {kind === 'chapter'
             ? <span aria-current="page" dir="ltr">Chapter {chapter}</span>
-            : <a href={chapterUrl(view, chapter)} dir="ltr">Chapter {chapter}</a>}
+            : <a href={chapterUrl(view, chapter)} dir="ltr" class="gx-crumb-chapter">Chapter {chapter}</a>}
         </>
       )}
       {page && (
         <>
           <span aria-hidden="true">/</span>
-          <span class="gx-crumb-num" aria-current="page" dir="ltr">{page.section}</span>
+          <span class="gx-crumb-here" aria-current="page" dir="ltr"><span class="gx-crumb-num">{page.section}</span> <span class="gx-crumb-title" lang="en">{page.title}</span></span>
         </>
       )}
       {kind === 'glossary' && (

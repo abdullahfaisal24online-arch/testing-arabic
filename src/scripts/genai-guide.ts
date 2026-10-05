@@ -231,6 +231,13 @@ if (root) {
   /* ---------- تقدّم الفصل: دائرة + الوقت الباقي ---------- */
   const ring = document.createElement('span');
   ring.className = 'gx-ring';
+  const progCard = document.createElement('section');
+  progCard.className = 'gx-card gx-progress-card';
+  const ringSvg = (size: number, stroke: number, pct: number) => {
+    const r = (size - stroke) / 2;
+    const c = 2 * Math.PI * r;
+    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true"><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="${stroke}"></circle><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="var(--orange)" stroke-width="${stroke}" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - pct / 100)}" transform="rotate(-90 ${size / 2} ${size / 2})"></circle></svg>`;
+  };
   const paintRing = () => {
     const ch = tocFor(slug)?.dataset.chapter;
     if (kind !== 'section' || !ch) return;
@@ -238,11 +245,16 @@ if (root) {
     const done = list.filter(isRead).length;
     const pct = Math.round((done / Math.max(1, list.length)) * 100);
     const left = list.filter((s) => !isRead(s)).reduce((n, s) => n + (Number(tocFor(s)?.dataset.minutes) || 0), 0);
-    const c = 2 * Math.PI * 9;
-    ring.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="var(--surface-2)" stroke-width="3"></circle><circle cx="12" cy="12" r="9" fill="none" stroke="var(--cyan)" stroke-width="3" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - pct / 100)}" transform="rotate(-90 12 12)"></circle></svg><span class="gx-ring-text"><b dir="ltr">Ch ${ch} · ${pct}%</b>${left ? `<small>باقي ~${left} د</small>` : '<small>خلص ✓</small>'}</span>`;
-    ring.setAttribute('title', `Chapter ${ch}: ${done} من ${list.length} عنوان${left ? ` · باقي تقريبًا ${left} دقيقة` : ''}`);
-    ring.setAttribute('aria-label', ring.getAttribute('title')!);
+    const leftText = left ? `باقي حوالي ${left} دقيقة` : 'خلّصت الفصل ✓';
+    const label = `Chapter ${ch}: ${done} من ${list.length} عنوان · ${leftText}`;
+    // الموبايل: شارة بالشريط العلوي
+    ring.innerHTML = `${ringSvg(30, 4, pct)}<span class="gx-ring-text"><b dir="ltr">${pct}%</b><small>${left ? `~${left} د` : '✓'}</small></span>`;
     ring.setAttribute('role', 'img');
+    ring.setAttribute('aria-label', label);
+    ring.title = label;
+    // الكمبيوتر: بطاقة واضحة فوق العمود الجانبي
+    progCard.setAttribute('aria-label', label);
+    progCard.innerHTML = `<div class="gx-progress-ring">${ringSvg(64, 7, pct)}<b dir="ltr">${pct}%</b></div><div class="gx-progress-text"><span class="gx-progress-ch" dir="ltr">Chapter ${ch} progress</span><b>${done} من ${list.length} عناوين</b><span>${leftText}</span></div>`;
   };
 
   /* ---------- مراجعتي: البطاقات المحفوظة + العناوين اللي بدها رجعة ---------- */
@@ -290,6 +302,12 @@ if (root) {
       box.append(ul);
       reviewBody.append(box);
     };
+    if (!again.length && !unsure.length && !state.saved.length) {
+      const empty = el('div', 'gx-review-empty');
+      empty.innerHTML = '<span class="gx-review-empty-icon" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"></path></svg></span><b>لسا ما في إشي بمراجعتي</b><ul><li>اكبس <b>«احفظ»</b> فوق أي بطاقة بدك ترجعلها.</li><li>بآخر كل عنوان اختار <b>«مش متأكد»</b> أو <b>«بدي أرجعلها»</b>، وبيتجمّعوا هون.</li></ul>';
+      reviewBody.append(empty);
+      return;
+    }
     sectionList('بدي أرجعلها', 'conf-again', again);
     sectionList('مش متأكد منها', 'conf-unsure', unsure);
     // البطاقات المحفوظة
@@ -338,6 +356,7 @@ if (root) {
     tools.prepend(reviewBtn);
     if (kind === 'section') tools.prepend(ring);
   }
+  if (kind === 'section') document.querySelector('.gx-side')?.prepend(progCard);
   const refresh = () => {
     paintProgress();
     paintRing();
