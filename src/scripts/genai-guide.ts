@@ -309,11 +309,13 @@ if (root) {
         def.textContent = t.def;
         const defAr = document.createElement('p');
         defAr.className = 'gx-ar';
+        defAr.lang = 'ar';
+        defAr.dir = 'rtl';
         defAr.textContent = t.defAr || '';
         const link = document.createElement('a');
         link.href = t.href;
         link.textContent = 'افتح في المصطلحات ←';
-        pop.append(top, ...(t.defAr ? [defAr] : []), def, link);
+        pop.append(top, def, ...(t.defAr ? [defAr] : []), link);
         pop.setAttribute('aria-label', t.en);
         pop.hidden = false;
         const r = btn.getBoundingClientRect();

@@ -28,12 +28,12 @@ const nextIsNewChapter = next && next.chapter !== page.chapter;
 
     {page.takeaways.length > 0 && (
       <section class="gx-takeaways" aria-labelledby="gx-takeaways-title">
-        <h2 id="gx-takeaways-title" class="gx-bi-label"><span>الخلاصة</span><span lang="en">Key Takeaways</span></h2>
+        <h2 id="gx-takeaways-title" class="gx-bi-label"><span lang="en">Key Takeaways</span><span>الخلاصة</span></h2>
         <ul>
           {page.takeaways.map((t) => (
             <li>
-              {t.ar && <span class="gx-ar">{t.ar}</span>}
               <span class="gx-en" lang="en" dir="ltr">{t.en}</span>
+              {t.ar && <span class="gx-ar" lang="ar" dir="rtl">{t.ar}</span>}
             </li>
           ))}
         </ul>
@@ -48,10 +48,10 @@ const nextIsNewChapter = next && next.chapter !== page.chapter;
             <div class="gx-objective">
               <span class:list={['gx-level', `gx-level--${o.level.charAt(0).toLowerCase()}`]}>{o.level}</span>
               <span>
-                <b class="gx-bi-label">{lvl ? <><span>{lvl.ar}</span><span lang="en">{lvl.name}</span></> : o.level}</b>
+                <b class="gx-bi-label">{lvl ? <><span lang="en">{lvl.name}</span><span>{lvl.ar}</span></> : o.level}</b>
                 <small class="gx-mono">{o.code}</small>
-                {(o.textAr || lvl) && <span class="gx-objective-hint gx-ar">{o.textAr || lvl?.hintAr}</span>}
                 {(o.text || lvl) && <span class="gx-objective-hint gx-en" lang="en" dir="ltr">{o.text || lvl?.hint}</span>}
+                {(o.textAr || lvl) && <span class="gx-objective-hint gx-ar" lang="ar" dir="rtl">{o.textAr || lvl?.hintAr}</span>}
               </span>
             </div>
           );
@@ -95,7 +95,7 @@ const nextIsNewChapter = next && next.chapter !== page.chapter;
   <aside class="gx-side">
     {toc.length > 1 && (
       <nav class="gx-card gx-onpage" dir="ltr" aria-label="On this page">
-        <span class="gx-side-title gx-bi-label" dir="rtl"><span>في هذه الصفحة</span><span lang="en">On this page</span></span>
+        <span class="gx-side-title gx-bi-label" dir="rtl"><span lang="en">On this page</span><span>في هذه الصفحة</span></span>
         {toc.map((h) => (
           <a href={`#${h.id}`} class:list={{ 'is-sub': h.level === 3 && toc.some((x) => x.level === 2) }} data-guide-onpage={h.id}>
             {h.num && <span class="gx-mono">{h.num}</span>}
@@ -107,7 +107,7 @@ const nextIsNewChapter = next && next.chapter !== page.chapter;
     )}
     {page.terms.length > 0 && (
       <section class="gx-card gx-side-terms">
-        <span class="gx-side-title gx-bi-label"><span>المصطلحات</span><span lang="en">Key Terms</span></span>
+        <span class="gx-side-title gx-bi-label"><span lang="en">Key Terms</span><span>المصطلحات</span></span>
         <dl>
           {page.terms.map((t) => (
             <div>

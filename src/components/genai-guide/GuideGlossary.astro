@@ -22,8 +22,8 @@ const terms = [...map.values()].sort((a, b) => a.en.localeCompare(b.en, 'en'));
         <div class="gx-glossary-item" id={termId(t.en)}>
           <dt dir="ltr"><b lang="en">{t.en}</b><span dir="rtl">{t.ar}</span></dt>
           <dd>
-            {t.defAr && <p class="gx-ar">{t.defAr}</p>}
             <p class="gx-en" dir="ltr" lang="en">{t.def}</p>
+            {t.defAr && <p class="gx-ar" dir="rtl" lang="ar">{t.defAr}</p>}
             <a href={pageUrl(view, t.page)} dir="ltr">{t.page.section} {t.page.title} →</a>
           </dd>
         </div>
