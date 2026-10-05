@@ -59,7 +59,7 @@ export const CTFL = createGuide({
   syllabus: 'ISTQB® CTFL Syllabus v4.0.1',
   about:
     'شرح دراسي مستقل من Testing بالعربي، مبني على ISTQB® Certified Tester Foundation Level Syllabus v4.0.1 (15 سبتمبر 2024). حقوق السيليبس لـISTQB®. هذا الدليل مش مادة تدريب معتمدة ولا ضمان لنتيجة الامتحان.',
-  fullNote: 'مسودة مراجعة داخلية: الفصول بتنضاف بدفعات لحد ما يكتمل الدليل.',
+  fullNote: 'نسخة مراجعة داخلية: الفصول الستة كاملة حسب السيليبس، مع الأدوات التفاعلية.',
   searchHint: 'مثل: Boundary Value أو Regression',
   loPrefix: 'FL-',
   chapters: [

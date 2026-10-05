@@ -5,14 +5,11 @@ import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { STORE_OPEN, STORE_GROUPS, usd, getStoreSettings } from '../../lib/store';
 
-const showCtflPreview = process.env.CMS_BRANCH === 'staging';
 const products = STORE_OPEN
   ? (await getCollection('products')).filter((p) => !p.data.draft).sort((a, b) => a.data.order - b.data.order)
   : [];
 const t = STORE_OPEN ? await getStoreSettings() : undefined;
-const groups = STORE_GROUPS.map((g) => ({ ...g, title: t ? t[g.title] : '', items: products.filter((p) => (g.kinds as readonly string[]).includes(p.data.kind)) })).filter(
-  (g) => g.items.length > 0 || (showCtflPreview && g.key === 'summaries'),
-);
+const groups = STORE_GROUPS.map((g) => ({ ...g, title: t ? t[g.title] : '', items: products.filter((p) => (g.kinds as readonly string[]).includes(p.data.kind)) })).filter((g) => g.items.length > 0);
 ---
 
 {!STORE_OPEN ? (
@@ -82,23 +79,6 @@ const groups = STORE_GROUPS.map((g) => ({ ...g, title: t ? t[g.title] : '', item
                 </div>
               </a>
             ))}
-            {showCtflPreview && g.key === 'summaries' && (
-              <a class="pcard" href="/store/ctfl-guide/preview/">
-                <div class="thumb">
-                  <img src="/uploads/store/ctfl-guide.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" />
-                  <span class="flag">معاينة</span>
-                </div>
-                <div class="body">
-                  <span class="kind">ملخصات</span>
-                  <h3>دليل CTFL بالعربي</h3>
-                  <p>منهج CTFL v4.0.1 كامل بالعربي في 6 فصول، مع أدوات تفاعلية لتقنيات الفصل الرابع والمصطلحات بالإنجليزي زي الامتحان.</p>
-                  <div class="foot">
-                    <span class="kind">الفصل الأول مجاني</span>
-                    <span class="go">افتح الملخّص ←</span>
-                  </div>
-                </div>
-              </a>
-            )}
           </div>
         </section>
       ))}
