@@ -12,9 +12,9 @@
 |---|---|---|
 | 0 | تعميم محرّك الأدلة (`src/lib/guide.ts` + `src/lib/guides.ts`)، مسار `/store/ctfl-guide/` | ✅ |
 | 1 | الفصل 1: Fundamentals of Testing (14 عنوان، 7 تمارين، 43 مصطلح) — المعاينة المجانية | ✅ |
-| 2 | الفصل 2: Testing Throughout the SDLC (10) + الفصل 3: Static Testing (8) | ⏳ |
-| 3 | الفصل 4: Test Analysis and Design (14) — أغلب التمارين التفاعلية | ⏳ |
-| 4 | الفصل 5: Managing the Test Activities (16) + الفصل 6: Test Tools (2) | ⏳ |
+| 2 | الفصل 2: Testing Throughout the SDLC (10) + الفصل 3: Static Testing (8) |✅ |
+| 3 | الفصل 4: Test Analysis and Design (14) — أغلب التمارين التفاعلية |✅ |
+| 4 | الفصل 5: Managing the Test Activities (16) + الفصل 6: Test Tools (2) |✅ |
 | 5 | القاموس، منتج المتجر `ctfl-guide`، حزمة «دليل + بنك CTFL» | ⏳ |
 
 ## المحتوى
@@ -28,10 +28,19 @@
 تمارين عملية بخطوات تنحفظ (`LAB-1.1.2`، `LAB-1.2.3`، `LAB-1.3`، `LAB-1.4.1`، `LAB-1.4.4`، `LAB-1.5.1`، `LAB-1.5.3`)،
 كلها على مشروع القارئ نفسه، ومعها «كيف يبدو الحل الجيد». ما فيها أسئلة امتحان.
 
-## التمارين التفاعلية المخطط لها (الفصل 4 وما بعده)
+## الأدوات التفاعلية (الدفعات 2–4)
 
-EP Builder، BVA Calculator، Decision Table، State Transition، Statement/Branch Coverage،
-Three-point Estimation، Risk Matrix، Test Prioritization، Pyramid/Quadrants، أدوار المراجعة.
+- المحرّك: `src/scripts/guide-widgets.ts` + `src/styles/guide-widgets.css`، وبتنحمّل من `GuideView.astro`.
+- بالمحتوى: `<figure class="gx-figure gx-widget" data-widget="…" data-config="(JSON)">` (أداة البناء بتولّدها من `:::widget`).
+- الأنواع: `ep` (4.2.1)، `bva` (4.2.2، قيمتين/ثلاث قيم)، `dt` (4.2.3)، `st` (4.2.4، تغطية الحالات والانتقالات)،
+  `cov` (4.3.1 Statement، 4.3.2 Branch)، `est` (5.1.4 ثلاث نقاط)، `prio` (5.1.5 أولوية مع اعتماديات)، `risk` (5.2.1 مصفوفة 4×4).
+- أشكال ثابتة: `gx-pyramid` (5.1.6) و`gx-quad` (5.1.7).
+- تمارين خطوات: `LAB-2.1.3`، `LAB-2.1.6`، `LAB-2.2.1`، `LAB-3.2.2`، `LAB-4.4.1`، `LAB-4.4.2`، `LAB-4.5.3`، `LAB-5.2.3`، `LAB-5.5`، `LAB-6.2`.
+- كل العناوين الـ64 ورموز الأهداف ومستوياتها (K1/K2/K3) اتطابقت مع السيليبس v4.0.1.
+
+## صورة الكارد
+
+`public/uploads/store/ctfl-guide.webp` (1280×720، نفس ستايل باقي الكاردات، وفيها أداة BVA تفاعلية كعلامة مميزة).
 
 ## ملاحظات تقنية (الدفعة 0)
 
