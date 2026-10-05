@@ -66,7 +66,6 @@ const groups = STORE_GROUPS.map((g) => ({ ...g, title: t ? t[g.title] : '', item
               <a class="pcard" href={`/store/${p.id}/`}>
                 <div class="thumb">
                   {p.data.cover ? <img src={p.data.cover} alt="" width="1280" height="720" loading="lazy" decoding="async" /> : <span class="ph">🔻</span>}
-                  {p.data.cardBadge && <span class="flag">{p.data.cardBadge}</span>}
                 </div>
                 <div class="body">
                   <span class="kind">{p.data.kind}</span>

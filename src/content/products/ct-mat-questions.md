@@ -21,7 +21,7 @@ featured: false
 draft: false
 cardTitle: ''
 cardText: ''
-cardBadge: جديد
+cardBadge: ''
 cardButton: ''
 eyebrow: ''
 heroTitle: ''
