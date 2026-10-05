@@ -11,7 +11,7 @@
 | الدفعة | المحتوى | الحالة |
 |---|---|---|
 | 0 | تعميم محرّك الأدلة (`src/lib/guide.ts` + `src/lib/guides.ts`)، مسار `/store/ctfl-guide/` | ✅ |
-| 1 | الفصل 1: Fundamentals of Testing (14 عنوان) — المعاينة المجانية | ⏳ |
+| 1 | الفصل 1: Fundamentals of Testing (14 عنوان، 7 تمارين، 43 مصطلح) — المعاينة المجانية | ✅ |
 | 2 | الفصل 2: Testing Throughout the SDLC (10) + الفصل 3: Static Testing (8) | ⏳ |
 | 3 | الفصل 4: Test Analysis and Design (14) — أغلب التمارين التفاعلية | ⏳ |
 | 4 | الفصل 5: Managing the Test Activities (16) + الفصل 6: Test Tools (2) | ⏳ |
@@ -23,7 +23,12 @@
 - `src/data/readers/ctfl-full/` — الفصول 2–6 (بالدليل الكامل).
 - رموز أهداف التعلّم بشكل `FL-1.1.1 · K1`، والتمارين التفاعلية بحقل `labs` بالـ frontmatter.
 
-## التمارين التفاعلية المخطط لها
+## تمارين الفصل 1
+
+تمارين عملية بخطوات تنحفظ (`LAB-1.1.2`، `LAB-1.2.3`، `LAB-1.3`، `LAB-1.4.1`، `LAB-1.4.4`، `LAB-1.5.1`، `LAB-1.5.3`)،
+كلها على مشروع القارئ نفسه، ومعها «كيف يبدو الحل الجيد». ما فيها أسئلة امتحان.
+
+## التمارين التفاعلية المخطط لها (الفصل 4 وما بعده)
 
 EP Builder، BVA Calculator، Decision Table، State Transition، Statement/Branch Coverage،
 Three-point Estimation، Risk Matrix، Test Prioritization، Pyramid/Quadrants، أدوار المراجعة.
