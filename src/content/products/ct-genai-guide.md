@@ -3,8 +3,8 @@ title: دليل ISTQB CT-GenAI التفاعلي
 slug: ct-genai-guide
 kind: ملخصات
 pitch: شرح منهج CT-GenAI v1.1 كامل بالعربي، على شكل بطاقات دراسة تفاعلية. العناوين والمصطلحات بالإنجليزي زي السيليبس والامتحان.
-price: 25
-offerPrice: 18
+price: 50
+offerPrice: 40
 offerNote: سعر الإطلاق
 includes:
   - الفصول الخمسة بترتيب سيليبس ISTQB CT-GenAI v1.1، في 37 عنوان
@@ -13,11 +13,10 @@ includes:
   - 23 تمرين عملي (Lab) فيهم برومبتات جاهزة للنسخ
   - صناديق «تلميح امتحان» و«خطأ شائع» بالإنجليزي وترجمتها بالعربي
   - أكثر من 80 مصطلح بتعريف بالعربي والإنجليزي، مع بطاقات مصطلحات بتنقلب
-  - "«مراجعتي»: احفظ البطاقات وعلّم العناوين اللي بدك ترجعلها"
+  - '«مراجعتي»: احفظ البطاقات وعلّم العناوين اللي بدك ترجعلها'
   - تقدّمك بكل فصل محفوظ، وبتكمل من وين ما وقفت
 course: ''
 bundleOf: []
-sampleHref: /store/ct-genai-guide/preview/
 cover: /uploads/store/ct-genai-guide.webp
 order: 3
 featured: false
@@ -35,6 +34,7 @@ trust: []
 includesTitle: ''
 sampleEnabled: true
 sampleCount: 5
+sampleHref: /store/ct-genai-guide/preview/
 sampleEyebrow: ''
 sampleTitle: ''
 sampleText: ''
