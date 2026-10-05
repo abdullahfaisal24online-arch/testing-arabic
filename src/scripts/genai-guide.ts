@@ -11,6 +11,7 @@ interface GuideState {
   mode: 'cards' | 'article';
   saved: SavedCard[];
   conf: Record<string, Conf>;
+  prog: Record<string, number>;
 }
 type Conf = 'ok' | 'unsure' | 'again';
 interface SavedCard { k: string; slug: string; sec: string; title: string; text: string }
@@ -29,7 +30,7 @@ if (root) {
   const allSlugs = tocLinks.map((a) => a.dataset.guideTocLink!);
 
   /* ---------- الحالة المحفوظة ---------- */
-  const state: GuideState = { read: [], last: null, font: 18, labs: {}, mode: 'cards', saved: [], conf: {} };
+  const state: GuideState = { read: [], last: null, font: 18, labs: {}, mode: 'cards', saved: [], conf: {}, prog: {} };
   let storageOk = true;
   try {
     const saved = JSON.parse(localStorage.getItem(key) || 'null');
@@ -42,6 +43,11 @@ if (root) {
         state.saved = saved.saved
           .filter((c: SavedCard) => c && typeof c.k === 'string' && allSlugs.includes(c.slug))
           .map((c: SavedCard) => ({ k: c.k, slug: c.slug, sec: String(c.sec || ''), title: String(c.title || ''), text: String(c.text || '').slice(0, 200) }));
+      }
+      if (saved.prog && typeof saved.prog === 'object') {
+        for (const [k, v] of Object.entries(saved.prog)) {
+          if (allSlugs.includes(k) && typeof v === 'number' && v >= 0 && v <= 1) state.prog[k] = v;
+        }
       }
       if (saved.conf && typeof saved.conf === 'object') {
         for (const [k, v] of Object.entries(saved.conf)) {
@@ -243,8 +249,10 @@ if (root) {
     if (kind !== 'section' || !ch) return;
     const list = chapterSlugs(ch);
     const done = list.filter(isRead).length;
-    const pct = Math.round((done / Math.max(1, list.length)) * 100);
-    const left = list.filter((s) => !isRead(s)).reduce((n, s) => n + (Number(tocFor(s)?.dataset.minutes) || 0), 0);
+    // التقدّم بيحسب البطاقات اللي قطعتها بالعنوان الحالي كمان، مش بس العناوين المخلّصة
+    const frac = (s: string) => (isRead(s) ? 1 : state.prog[s] || 0);
+    const pct = Math.round((list.reduce((n, s) => n + frac(s), 0) / Math.max(1, list.length)) * 100);
+    const left = Math.round(list.reduce((n, s) => n + (Number(tocFor(s)?.dataset.minutes) || 0) * (1 - frac(s)), 0));
     const leftText = left ? `باقي حوالي ${left} دقيقة` : 'خلّصت الفصل ✓';
     const label = `Chapter ${ch}: ${done} من ${list.length} عنوان · ${leftText}`;
     // الموبايل: شارة بالشريط العلوي
@@ -650,6 +658,14 @@ if (root) {
       nextBtn.disabled = last && !nextLink;
       prevBtn.disabled = idx === 0 && !prevLink;
       if (readbar) readbar.style.width = `${Math.round(((idx + 1) / pages.length) * 100)}%`;
+      const f = Math.round(((idx + 1) / pages.length) * 100) / 100;
+      if (f > (state.prog[slug] || 0) || (last && !isRead(slug))) {
+        state.prog[slug] = Math.max(f, state.prog[slug] || 0);
+        if (last) markRead(slug);
+        save();
+        refresh();
+        root.dispatchEvent(new Event('gx:progress'));
+      }
       const heads = new Set(pages.slice(0, idx + 1).flatMap((x) => x.nodes).filter(isHead).map((n) => n.id));
       const curHead = [...heads].pop();
       onpage.forEach((a) => a.classList.toggle('is-active', a.dataset.guideOnpage === curHead));
@@ -707,6 +723,32 @@ if (root) {
 
     nextBtn.addEventListener('click', () => go(idx + 1));
     prevBtn.addEventListener('click', () => go(idx - 1));
+
+    // بوضع البطاقات الصفحة ما بتتحرك: السكرول بيشتغل بس جوّا البطاقة إذا فيها تكملة
+    const canScroll = (box: HTMLElement, dy: number) =>
+      dy > 0 ? box.scrollTop + box.clientHeight < box.scrollHeight - 1 : box.scrollTop > 0;
+    const lockTarget = section || article;
+    lockTarget.addEventListener('wheel', (e) => {
+      if (!on() || e.ctrlKey) return;
+      const t = e.target as HTMLElement;
+      const side = t.closest<HTMLElement>('.gx-side');
+      if (side && canScroll(side, e.deltaY)) return;
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && t.closest('.gx-table, pre')) return;
+      if (stage.contains(t) && canScroll(stage, e.deltaY)) return;
+      e.preventDefault();
+    }, { passive: false });
+    let ty = 0;
+    lockTarget.addEventListener('touchstart', (e) => {
+      ty = e.touches[0].clientY;
+    }, { passive: true });
+    lockTarget.addEventListener('touchmove', (e) => {
+      if (!on() || e.touches.length > 1) return;
+      const t = e.target as HTMLElement;
+      const dy = ty - e.touches[0].clientY;
+      if (t.closest('.gx-table, pre') ) return;
+      if (stage.contains(t) && canScroll(stage, dy)) return;
+      e.preventDefault();
+    }, { passive: false });
 
     // السحب على الموبايل: لليمين = التالي (اتجاه القراءة بالعربي)
     let sx = 0;
@@ -837,6 +879,7 @@ if (root) {
       refresh();
     });
     paintRead();
+    root.addEventListener('gx:progress', paintRead);
 
     // حجم الخط
     const fontValue = document.querySelector<HTMLElement>('[data-guide-font-value]');
