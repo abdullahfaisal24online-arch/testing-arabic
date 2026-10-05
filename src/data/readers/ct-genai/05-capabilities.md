@@ -10,17 +10,25 @@ objectives: "GenAI-1.2.1 · K2"
 minutes: 8
 lo:
   GenAI-1.2.1: "Give examples of what LLMs can do for test tasks."
+loAr:
+  GenAI-1.2.1: "تعطي أمثلة على ما تستطيع النماذج اللغوية فعله في مهام الاختبار."
 takeaways:
   - "LLM capabilities are general; the value comes from aiming them at a specific test task and evaluating the result."
   - "Each capability comes with something to verify: coverage, oracle correctness, data validity, script correctness."
   - "Quality of context is part of the quality of the result."
+takeawaysAr:
+  - "قدرات النماذج عامة؛ القيمة تأتي من توجيهها لمهمة اختبار محددة وتقييم النتيجة."
+  - "كل قدرة يرافقها شيء يجب التحقق منه: التغطية، وصحة مرجع الحكم، وصلاحية البيانات، وصحة السكربت."
+  - "جودة السياق جزء من جودة النتيجة."
 terms:
   - en: "Test Oracle"
     ar: "مرجع الحكم"
     def: "A source used to determine the expected result of a test, such as a business rule or a calculation."
+    defAr: "مصدر يُستخدم لتحديد النتيجة المتوقعة للاختبار، مثل قاعدة أعمال أو عملية حسابية."
   - en: "Testware"
     ar: "مواد الاختبار"
     def: "Work products created during testing, such as plans, test cases, scripts, data and reports."
+    defAr: "نواتج العمل التي تُنشأ أثناء الاختبار، مثل الخطط والحالات والسكربتات والبيانات والتقارير."
 ---
 تستطيع النماذج اللغوية معالجة اللغة والشيفرات، وتوليد محتوى، والإجابة عن أسئلة، والتلخيص والترجمة، وتحليل الصور عندما تدعم الوسائط المتعددة. هذه قدرات عامة؛ القيمة العملية تأتي من توجيهها لمهمة اختبار محددة وتقييم الناتج.
 
@@ -50,10 +58,10 @@ terms:
 
 **إنشاء مواد الاختبار:** مسودات لخطة الاختبار أو تقرير الإكمال أو تقارير العيوب، وتحديثها مع تطور المشروع.
 
-<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label">In practice · Test oracle</p><p>If the requirement says a 10% discount applies to a price of 100, the expected result is 90 before any fees that are not mentioned. A number from the model is not a trusted oracle just because it is a number: check it against the rule and the calculation, and flag missing information such as rounding or tax.</p></aside>
+<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-ar">من الواقع العملي · مرجع الحكم</span><span class="gx-en" lang="en" dir="ltr">In practice · Test oracle</span></p><p class="gx-ar">إذا قال المتطلب إن خصم 10% يُطبّق على سعر 100، فالنتيجة المتوقعة 90 قبل أي رسوم غير مذكورة. الرقم الذي يعطيه النموذج ليس مرجع حكم موثوقًا لمجرد أنه رقم: قارنه بالقاعدة والحساب، ونبّه للمعلومات الناقصة مثل التقريب أو الضريبة.</p><p class="gx-en" lang="en" dir="ltr">If the requirement says a 10% discount applies to a price of 100, the expected result is 90 before any fees that are not mentioned. A number from the model is not a trusted oracle just because it is a number: check it against the rule and the calculation, and flag missing information such as rounding or tax.</p></aside>
 
-<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>Expect “which capability is this?” questions. Learn the seven by name: requirements analysis and improvement, test case creation, test oracle generation, test data generation, test automation support, test result analysis, and testware creation. Classifying anomalies by severity and priority belongs to test result analysis.</p></aside>
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-ar">تلميح امتحان</span><span class="gx-en" lang="en" dir="ltr">Exam tip</span></p><p class="gx-ar">توقّع أسئلة من نوع «أي قدرة هذه؟». احفظ السبع بأسمائها: تحليل المتطلبات وتحسينها، وإنشاء حالات الاختبار، وتوليد مرجع الحكم، وتوليد بيانات الاختبار، ودعم الأتمتة، وتحليل نتائج الاختبار، وإنشاء مواد الاختبار. تصنيف الحالات الشاذة حسب الشدة والأولوية يتبع تحليل نتائج الاختبار.</p><p class="gx-en" lang="en" dir="ltr">Expect “which capability is this?” questions. Learn the seven by name: requirements analysis and improvement, test case creation, test oracle generation, test data generation, test automation support, test result analysis, and testware creation. Classifying anomalies by severity and priority belongs to test result analysis.</p></aside>
 
-<aside class="gx-callout" data-kind="warn"><p class="gx-callout-label">Common mistake</p><p>Accepting the model's severity or priority as final. It can propose a classification, but severity depends on impact on the system and priority on business needs, which the tester must confirm.</p></aside>
+<aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-ar">خطأ شائع</span><span class="gx-en" lang="en" dir="ltr">Common mistake</span></p><p class="gx-ar">قبول الشدة أو الأولوية التي يقترحها النموذج كقرار نهائي. يستطيع اقتراح تصنيف، لكن الشدة تعتمد على الأثر على النظام، والأولوية على احتياجات العمل، وهذا ما يجب أن يؤكده المختبِر.</p><p class="gx-en" lang="en" dir="ltr">Accepting the model's severity or priority as final. It can propose a classification, but severity depends on impact on the system and priority on business needs, which the tester must confirm.</p></aside>
 
 تمتد هذه القدرات عبر عملية الاختبار كاملة. قد يستفيد منها المختبِر اليدوي، ومهندس الأتمتة، ومدير الاختبار. المدخلات قد تكون متطلبات أو مواصفات أو صورًا أو شيفرة أو حالات اختبار أو تقارير عيوب؛ جودة السياق جزء من جودة النتيجة.

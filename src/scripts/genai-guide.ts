@@ -9,7 +9,7 @@ interface GuideState {
   font: number;
   labs: Record<string, number[]>;
 }
-interface TermData { en: string; ar: string; def: string; match: string[]; href: string }
+interface TermData { en: string; ar: string; def: string; defAr?: string; match: string[]; href: string }
 
 const FONT_SIZES = [16, 17, 18, 20, 22, 24];
 const root = document.querySelector<HTMLElement>('.gx');
@@ -304,11 +304,16 @@ if (root) {
         top.append(en, ar);
         const def = document.createElement('p');
         def.lang = 'en';
+        def.dir = 'ltr';
+        def.className = 'gx-en';
         def.textContent = t.def;
+        const defAr = document.createElement('p');
+        defAr.className = 'gx-ar';
+        defAr.textContent = t.defAr || '';
         const link = document.createElement('a');
         link.href = t.href;
-        link.textContent = 'Open in Glossary →';
-        pop.append(top, def, link);
+        link.textContent = 'افتح في المصطلحات ←';
+        pop.append(top, ...(t.defAr ? [defAr] : []), def, link);
         pop.setAttribute('aria-label', t.en);
         pop.hidden = false;
         const r = btn.getBoundingClientRect();

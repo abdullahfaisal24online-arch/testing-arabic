@@ -10,17 +10,25 @@ objectives: "GenAI-5.2.1 · K2"
 minutes: 6
 lo:
   GenAI-5.2.1: "Explain the essential skills and knowledge for testing with GenAI."
+loAr:
+  GenAI-5.2.1: "شرح المهارات والمعارف الأساسية للاختبار باستخدام الذكاء التوليدي."
 takeaways:
   - "Prompt engineering, understanding the context window, and reviewing generated testware."
   - "Domain and test-technique knowledge stay essential: good phrasing cannot replace knowing the right answer."
   - "Data sharing implications, data sanitization and privacy-preserving prompts."
   - "Right-sizing models for cost and energy, and knowing when to reject an output."
+takeawaysAr:
+  - "هندسة الـ prompts، وفهم نافذة السياق، ومراجعة أدوات الاختبار (testware) المولَّدة."
+  - "معرفة المجال وتقنيات الاختبار تبقى أساسية: الصياغة الجيدة لا تغني عن معرفة الإجابة الصحيحة."
+  - "تبعات مشاركة البيانات، وتنقية البيانات، وكتابة prompts تحافظ على الخصوصية."
+  - "اختيار حجم النموذج المناسب للكلفة والطاقة، ومعرفة متى ترفض المخرَج."
 terms:
   - en: "Data Sanitization"
     ar: "تنقيح البيانات"
     def: "Removing or masking personal and confidential information before data is shared with a GenAI tool."
+    defAr: "إزالة المعلومات الشخصية والسرية أو إخفاؤها قبل مشاركة البيانات مع أداة ذكاء توليدي."
 ---
-الدمج الناجح يجمع المهارات التقنية والتغيير التنظيمي: من يوجّه الأداة، ومن يراجع، ومن يقرر، وكيف يتعلم الفريق ويحسّن العملية مع الوقت.
+يتطلب تطبيق GenAI بنجاح نهجًا منظمًا لإدارة التغيير: بناء مهارات GenAI الأساسية، وتطوير أدوار الاختبار التقليدية لتناسب عمليات مدعومة بالذكاء الاصطناعي. الدمج الناجح يجمع المهارات التقنية والتغيير التنظيمي: من يوجّه الأداة، ومن يراجع، ومن يقرر، وكيف يتعلم الفريق ويحسّن العملية مع الوقت.
 
 ### المهارات المطلوبة — Required Skills
 
@@ -34,8 +42,8 @@ terms:
 
 قد يبدو أن الذكاء التوليدي يقلل الحاجة لمعرفة تقنيات الاختبار، والعكس هو الصحيح. لكي تحكم على حالات ولّدها النموذج، يجب أن تعرف ما الحالات الصحيحة: أين الحدود، وما الفئات المتكافئة، وما المخاطر في هذا المجال. المختبِر الذي لا يعرف تحليل القيم الحدّية لن يلاحظ أن النموذج نسي الحد الأعلى.
 
-<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label">In practice · A combined skill</p><p>The model produces a case accepting an 8-character password, but the source says 12. The tester needs to read the source, know the boundaries, check traceability and fix the prompt. If the inputs also contain real customer data, they need to sanitise it and question whether the tool is suitable.</p></aside>
+<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-ar">من الواقع العملي · مهارة مركّبة</span><span class="gx-en" lang="en" dir="ltr">In practice · A combined skill</span></p><p class="gx-ar">يُنتج النموذج حالة تقبل كلمة مرور من 8 أحرف، بينما المصدر يقول 12. يحتاج المختبِر أن يقرأ المصدر، ويعرف القيم الحدّية، ويتحقق من التتبّع، ويصلح الـ prompt. وإن احتوت المدخلات أيضًا على بيانات عملاء حقيقية، فعليه تنقيتها والتساؤل عن ملاءمة الأداة.</p><p class="gx-en" lang="en" dir="ltr">The model produces a case accepting an 8-character password, but the source says 12. The tester needs to read the source, know the boundaries, check traceability and fix the prompt. If the inputs also contain real customer data, they need to sanitise it and question whether the tool is suitable.</p></aside>
 
-<aside class="gx-callout" data-kind="key"><p class="gx-callout-label">Key idea</p><p>Know when to reject an output or ask for missing information, instead of passing it on because it looks tidy.</p></aside>
+<aside class="gx-callout" data-kind="key"><p class="gx-callout-label"><span class="gx-ar">فكرة أساسية</span><span class="gx-en" lang="en" dir="ltr">Key idea</span></p><p class="gx-ar">اعرف متى ترفض المخرَج أو تطلب المعلومات الناقصة، بدل تمريره لأنه يبدو مرتّبًا.</p><p class="gx-en" lang="en" dir="ltr">Know when to reject an output or ask for missing information, instead of passing it on because it looks tidy.</p></aside>
 
-<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>Skills span prompting and context management, domain and test-technique knowledge, evaluating model capabilities and testware, understanding risks, data sanitization and privacy-preserving prompting, and right-sizing models for cost and energy.</p></aside>
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-ar">تلميح امتحان</span><span class="gx-en" lang="en" dir="ltr">Exam tip</span></p><p class="gx-ar">تشمل المهارات: كتابة الـ prompts وإدارة السياق، ومعرفة المجال وتقنيات الاختبار، وتقييم قدرات النماذج وأدوات الاختبار، وفهم المخاطر، وتنقية البيانات وكتابة prompts تحافظ على الخصوصية، واختيار حجم النموذج المناسب للكلفة والطاقة.</p><p class="gx-en" lang="en" dir="ltr">Skills span prompting and context management, domain and test-technique knowledge, evaluating model capabilities and testware, understanding risks, data sanitization and privacy-preserving prompting, and right-sizing models for cost and energy.</p></aside>

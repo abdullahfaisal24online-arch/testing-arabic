@@ -10,22 +10,31 @@ objectives: "GenAI-1.1.3 · K2"
 minutes: 8
 lo:
   GenAI-1.1.3: "Tell foundation, instruction-tuned and reasoning LLMs apart."
+loAr:
+  GenAI-1.1.3: "تميّز بين النماذج الأساسية والموجّهة بالتعليمات والاستدلالية."
 takeaways:
   - "General foundation → instruction following → specialised for complex reasoning."
   - "The category reflects how a model was prepared, not its brand name or the size of its context window."
   - "In testing, pick instruction-tuned or reasoning models by what the task needs, and review the output of both."
+takeawaysAr:
+  - "أساسي عام ← يتبع التعليمات ← مخصص للاستدلال المعقّد."
+  - "الفئة تعكس طريقة إعداد النموذج، لا اسمه التجاري ولا حجم نافذة السياق."
+  - "في الاختبار، اختر بين النماذج الموجّهة بالتعليمات والاستدلالية حسب حاجة المهمة، وراجع ناتج الاثنين."
 terms:
   - en: "Foundation LLM"
     ar: "النموذج الأساسي"
     def: "Trained on broad, diverse data to build general capabilities. May need extra adaptation for a specialised task."
+    defAr: "مدرّب على بيانات واسعة ومتنوعة لبناء قدرات عامة. قد يحتاج تكييفًا إضافيًا لمهمة متخصصة."
     match: ["Foundation LLMs", "Foundation"]
   - en: "Instruction-Tuned LLM"
     ar: "النموذج الموجّه بالتعليمات"
     def: "A foundation model further tuned on prompt–response pairs to follow instructions and task formats more reliably."
+    defAr: "نموذج أساسي ضُبط إضافيًا على أزواج من التوجيهات والاستجابات ليتبع التعليمات وصيغ المهام بموثوقية أعلى."
     match: ["Instruction-Tuned LLMs", "Instruction-tuned"]
   - en: "Reasoning LLM"
     ar: "النموذج الاستدلالي"
     def: "Builds on instruction-tuned models with extra training on complex tasks to strengthen logical inference, multi-step problem solving and chain-of-thought reasoning."
+    defAr: "يبني على النماذج الموجّهة بالتعليمات بتدريب إضافي على مهام معقّدة، لتقوية الاستنتاج المنطقي والحل متعدد الخطوات والاستدلال المتسلسل."
     match: ["Reasoning LLMs", "Reasoning"]
 ---
 يفرّق المنهج بين ثلاث فئات تنتج عن مراحل تدريب وتخصيص متدرّجة. الفرق يتعلق بما تم إعداد النموذج للقيام به، وليس بمجرد الاسم التجاري أو حجم نافذة السياق.
@@ -47,6 +56,8 @@ terms:
 تنطلق من نموذج أساسي، ثم تُضبط باستخدام بيانات تربط التوجيهات بالاستجابات المتوقعة. الهدف تحسين الالتزام بالمهمة والتعليمات واتساق الرد، بحيث يصبح النموذج أنسب للتعامل مع طلب المستخدم.
 
 مثال: «حوّل قصة المستخدم إلى جدول حالات اختبار يتضمن الشروط المسبقة والخطوات والنتيجة المتوقعة». اتباع هذا التنسيق وتنفيذ التكليف مثال على القدرات المستهدفة بضبط التعليمات، لكنه يظل بحاجة إلى مراجعة.
+
+وتُسمّى هذه النماذج أحيانًا **غير الاستدلالية (Non-reasoning)** تمييزًا لها عن الفئة التالية.
 
 معظم أدوات الدردشة التي يستخدمها الفريق يوميًا مبنية على نماذج من هذا النوع، لأنها تفهم الطلب وتلتزم بالتنسيق المطلوب وتعطي ردودًا متماسكة. وهي مناسبة لمهام واضحة ومحددة مثل: إعادة صياغة تقرير عيب بقالب الفريق، أو تلخيص نتائج تشغيل، أو توليد بيانات اختبار بشكل معيّن.
 
@@ -72,6 +83,6 @@ terms:
 
 <figure class="gx-figure gx-flow" aria-label="Dependency order: A, then B, then C. C has the highest risk but depends on B."><div class="gx-flow-row"><span class="gx-flow-node">A</span><span class="gx-flow-arrow" aria-hidden="true">→</span><span class="gx-flow-node">B</span><span class="gx-flow-arrow" aria-hidden="true">→</span><span class="gx-flow-node gx-flow-node--accent">C<small>highest risk</small></span></div><figcaption>Dependencies come first: C cannot run before A and B pass, however high its risk.</figcaption></figure>
 
-<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>Remember the order and what each layer adds: foundation = broad general ability; instruction-tuned = trained on prompt–response pairs to follow instructions; reasoning = built on instruction-tuned, trained further on complex tasks for multi-step and chain-of-thought reasoning. In testing, both instruction-tuned and reasoning models are used, chosen by how much reasoning the task needs.</p></aside>
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-ar">تلميح امتحان</span><span class="gx-en" lang="en" dir="ltr">Exam tip</span></p><p class="gx-ar">تذكّر الترتيب وما تضيفه كل طبقة: الأساسي = قدرة عامة واسعة؛ الموجّه بالتعليمات = مدرّب على أزواج توجيه واستجابة ليتبع التعليمات؛ الاستدلالي = مبني على الموجّه بالتعليمات ومدرّب أكثر على مهام معقّدة للاستدلال متعدد الخطوات والمتسلسل. في الاختبار يُستخدم النوعان الأخيران، ويُختار بينهما حسب حاجة المهمة للاستدلال.</p><p class="gx-en" lang="en" dir="ltr">Remember the order and what each layer adds: foundation = broad general ability; instruction-tuned = trained on prompt–response pairs to follow instructions; reasoning = built on instruction-tuned, trained further on complex tasks for multi-step and chain-of-thought reasoning. In testing, both instruction-tuned and reasoning models are used, chosen by how much reasoning the task needs.</p></aside>
 
-<aside class="gx-callout" data-kind="warn"><p class="gx-callout-label">Common mistake</p><p>Assuming the biggest model is always the best fit. Model category, task complexity and results on a realistic evaluation all matter; size alone does not prove fit. Choosing between LLMs and SLMs, and their costs, is covered in Chapter 5.</p></aside>
+<aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-ar">خطأ شائع</span><span class="gx-en" lang="en" dir="ltr">Common mistake</span></p><p class="gx-ar">افتراض أن النموذج الأكبر هو الأنسب دائمًا. فئة النموذج وتعقيد المهمة ونتائجه في تقييم واقعي كلها مهمة؛ الحجم وحده لا يثبت الملاءمة. الاختيار بين LLM وSLM وكلفتهما موضوع الفصل الخامس.</p><p class="gx-en" lang="en" dir="ltr">Assuming the biggest model is always the best fit. Model category, task complexity and results on a realistic evaluation all matter; size alone does not prove fit. Choosing between LLMs and SLMs, and their costs, is covered in Chapter 5.</p></aside>

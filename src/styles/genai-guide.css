@@ -279,15 +279,18 @@ a.gx-chapter-card:hover { border-color: var(--line-strong); color: var(--ink); }
 /* ---------- صفحة العنوان الفرعي ---------- */
 .gx-article { flex: 999 1 620px; min-width: 0; max-width: 780px; display: flex; flex-direction: column; gap: 26px; }
 .gx-side { position: sticky; top: calc(var(--gx-top) + 76px); max-height: calc(100dvh - var(--gx-top) - 96px); overflow: auto; scrollbar-width: thin; }
-.gx-takeaways { background: var(--surface); border-radius: var(--r-lg); padding: 22px 24px; text-align: left; }
-.gx-takeaways h2 { font: 600 12.5px/1.6 var(--gx-en); letter-spacing: 0.06em; text-transform: uppercase; color: var(--cyan); margin-bottom: 8px; }
-.gx-takeaways ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 16px; line-height: 1.7; }
-.gx-objectives { display: flex; flex-wrap: wrap; gap: 12px; text-align: left; }
+.gx-takeaways { background: var(--surface); border-radius: var(--r-lg); padding: 22px 24px; }
+.gx-takeaways h2 { font-size: 14px; line-height: 1.6; color: var(--cyan); margin-bottom: 10px; }
+.gx-takeaways ul { margin: 0; padding-inline-start: 20px; display: flex; flex-direction: column; gap: 12px; font-size: 16px; line-height: 1.8; }
+.gx-takeaways .gx-ar { color: var(--ink); }
+.gx-objectives { display: flex; flex-wrap: wrap; gap: 12px; }
 .gx-objective { flex: 1 1 230px; display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line); }
 .gx-objective > span:last-child { display: flex; flex-direction: column; font-size: 13px; line-height: 1.6; color: var(--ink-2); }
 .gx-objective b { color: var(--ink); font-size: 14px; }
 .gx-objective small { font-size: 11px; color: var(--muted); }
 .gx-objective-hint { margin-top: 2px; }
+.gx-objective .gx-ar { color: var(--ink-2); font-size: 13.5px; }
+.gx-objective small { direction: ltr; text-align: start; }
 
 /* نص الشرح */
 .gx-prose { font-size: var(--gx-size); line-height: 2.05; color: var(--ink-2); overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 18px; }
@@ -339,23 +342,20 @@ a.gx-chapter-card:hover { border-color: var(--line-strong); color: var(--ink); }
   border-radius: 12px;
   padding: 14px 16px;
   box-shadow: var(--shadow-lg);
-  direction: ltr;
-  text-align: left;
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 .gx-pop-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 4px; }
-.gx-pop-top span { font-size: 12px; color: var(--muted); direction: rtl; }
+.gx-pop-top b { direction: ltr; }
+.gx-pop-top span { font-size: 12px; color: var(--muted); }
 .gx-pop p { color: var(--ink-2); margin: 0 0 6px; }
 .gx-pop a { font-size: 13px; }
 
 /* البوكسات (إنجليزي) */
 .gx-callout {
-  direction: ltr;
-  text-align: left;
-  font-family: var(--gx-en);
   border-radius: 14px;
-  padding: 16px 20px 16px 52px;
+  padding-block: 16px;
+  padding-inline: 52px 20px;
   position: relative;
   background: var(--cyan-soft);
   font-size: 16px;
@@ -365,7 +365,7 @@ a.gx-chapter-card:hover { border-color: var(--line-strong); color: var(--ink); }
 .gx-callout::before {
   content: '';
   position: absolute;
-  left: 18px;
+  inset-inline-start: 18px;
   top: 19px;
   width: 20px;
   height: 20px;
@@ -376,10 +376,8 @@ a.gx-chapter-card:hover { border-color: var(--line-strong); color: var(--ink); }
 }
 .gx-callout p { margin: 0; }
 .gx-callout .gx-callout-label {
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--gx-c, var(--cyan));
   margin-bottom: 2px;
 }
@@ -433,18 +431,18 @@ a.gx-chapter-card:hover { border-color: var(--line-strong); color: var(--ink); }
 .gx-flow-arrow { color: var(--muted); font-size: 20px; }
 
 /* Lab */
-.gx-lab { direction: ltr; text-align: left; font-family: var(--gx-en); border: 1px solid var(--orange-line); border-radius: var(--r-lg); overflow: hidden; font-size: 15.5px; line-height: 1.7; color: var(--ink-2); }
+.gx-lab { border: 1px solid var(--orange-line); border-radius: var(--r-lg); overflow: hidden; font-size: 15.5px; line-height: 1.7; color: var(--ink-2); }
 .gx-lab-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; padding: 14px 20px; background: var(--orange-soft); }
 .gx-lab-title { font-weight: 700; font-size: 17px; color: var(--ink); }
 .gx-lab-meta { font: 12px 'IBM Plex Mono', monospace; color: var(--orange); }
 .gx-lab-body { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 14px; }
 .gx-lab-body p { margin: 0; }
 .gx-lab-body strong { color: var(--ink); }
-.gx-lab-steps { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 10px; }
-.gx-lab-steps li.has-check { list-style: none; margin-left: -22px; display: flex; gap: 12px; align-items: flex-start; }
+.gx-lab-steps { margin: 0; padding-inline-start: 22px; display: flex; flex-direction: column; gap: 10px; }
+.gx-lab-steps li.has-check { list-style: none; margin-inline-start: -22px; display: flex; gap: 12px; align-items: flex-start; }
 .gx-lab-steps li.is-done { color: var(--muted); }
 .gx-lab-check { flex: none; width: 20px; height: 20px; margin-top: 3px; accent-color: var(--orange); cursor: pointer; }
-.gx-lab-subhead { font-weight: 700; color: var(--ink); font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; }
+.gx-lab-subhead { font-weight: 700; color: var(--ink); font-size: 14px; }
 .gx-lab-prompt { direction: ltr; text-align: left; margin: 0; }
 .gx-lab-answer { background: var(--navy); }
 .gx .example-wireframe { max-width: 320px; padding: 22px; margin: 0 auto; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--navy); display: grid; gap: 8px; font-size: 14px; }
@@ -567,7 +565,7 @@ a.gx-chapter-card:hover { border-color: var(--line-strong); color: var(--ink); }
 .gx-glossary-item dt { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .gx-glossary-item dt b { font-family: var(--gx-en); font-size: 17px; }
 .gx-glossary-item dt span { font-size: 13px; color: var(--muted); }
-.gx-glossary-item dd { margin: 6px 0 0; display: flex; flex-direction: column; gap: 6px; text-align: left; font-size: 14px; line-height: 1.7; color: var(--ink-2); }
+.gx-glossary-item dd { margin: 6px 0 0; display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.7; color: var(--ink-2); }
 .gx-glossary-item dd a { font-size: 12.5px; }
 .gx-glossary-note { font-size: 13px; }
 
@@ -617,3 +615,41 @@ a.gx-chapter-card:hover { border-color: var(--line-strong); color: var(--ink); }
 @media (prefers-reduced-motion: reduce) {
   .gx * { scroll-behavior: auto !important; transition: none !important; }
 }
+
+/* ---------- ثنائي اللغة: عربي أولًا والإنجليزي تحته ---------- */
+.gx .gx-ar, .gx-pop .gx-ar { display: block; }
+.gx .gx-en, .gx-pop .gx-en {
+  display: block;
+  direction: ltr;
+  text-align: left;
+  font-family: var(--gx-en);
+  font-size: 0.86em;
+  line-height: 1.6;
+  color: var(--ink-3);
+  margin-top: 4px;
+}
+.gx-callout p.gx-ar { color: var(--ink); }
+.gx-callout p.gx-en { margin-top: 6px; }
+.gx-lab .gx-en, .gx-table .gx-en { color: var(--muted); }
+.gx-lab td .gx-en, .gx-lab th .gx-en { font-size: 0.82em; }
+.gx-lab pre, .gx-lab-prompt { direction: ltr; text-align: left; }
+.gx-lab-meta { direction: ltr; }
+.gx-bi-label > span { display: inline; }
+.gx-bi-label > span + span::before { content: ' · '; }
+.gx-bi-label > span[lang='en'] { font-family: var(--gx-en); }
+.gx-callout-label .gx-ar, .gx-callout-label .gx-en,
+.gx-lab-title .gx-ar, .gx-lab-title .gx-en { display: inline; margin: 0; font-size: inherit; color: inherit; }
+.gx-callout-label .gx-en, .gx-lab-title .gx-en { unicode-bidi: isolate; direction: ltr; }
+.gx-callout-label .gx-ar::after { content: ' · '; }
+.gx-lab-title .gx-en { display: block; font-size: 0.82em; margin-top: 2px; text-align: right; }
+.gx-callout-label .gx-en { opacity: 0.85; }
+.gx-lab-title .gx-en { font-weight: 500; opacity: 0.8; }
+.gx-levels .gx-ar { color: var(--ink-2); }
+.gx-objectives-list a .gx-ar { color: var(--ink-2); font-family: inherit; }
+.gx-objectives-list a .gx-en { font-size: 12.5px; }
+.gx-objectives-list ul { text-align: start; }
+.gx-levels { text-align: start; }
+.gx .gx-en-inline { font-family: var(--gx-en); font-weight: 500; opacity: 0.75; unicode-bidi: isolate; direction: ltr; }
+.gx-lab-steps li.has-check { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; }
+.gx-lab-steps li.has-check > :not(.gx-lab-check) { grid-column: 2; }
+.gx-lab-steps li.has-check > .gx-lab-check { grid-row: 1 / span 2; }

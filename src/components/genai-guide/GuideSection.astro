@@ -12,7 +12,7 @@ const group = page.group ? GROUPS[page.group] : undefined;
 const { html, headings } = await page.load();
 const toc = headings.filter((h) => h.level === 3 || (h.level === 2 && (h.en || h.ar)));
 const termsJson = JSON.stringify(
-  page.terms.map((t) => ({ en: t.en, ar: t.ar, def: t.def, match: t.match?.length ? t.match : [t.en], href: `${glossaryUrl(view)}#${termId(t.en)}` })),
+  page.terms.map((t) => ({ en: t.en, ar: t.ar, def: t.def, defAr: t.defAr, match: t.match?.length ? t.match : [t.en], href: `${glossaryUrl(view)}#${termId(t.en)}` })),
 );
 const nextIsNewChapter = next && next.chapter !== page.chapter;
 ---
@@ -27,24 +27,35 @@ const nextIsNewChapter = next && next.chapter !== page.chapter;
     </header>
 
     {page.takeaways.length > 0 && (
-      <section class="gx-takeaways" dir="ltr" lang="en" aria-labelledby="gx-takeaways-title">
-        <h2 id="gx-takeaways-title">Key Takeaways</h2>
-        <ul>{page.takeaways.map((t) => <li>{t}</li>)}</ul>
+      <section class="gx-takeaways" aria-labelledby="gx-takeaways-title">
+        <h2 id="gx-takeaways-title" class="gx-bi-label"><span>الخلاصة</span><span lang="en">Key Takeaways</span></h2>
+        <ul>
+          {page.takeaways.map((t) => (
+            <li>
+              {t.ar && <span class="gx-ar">{t.ar}</span>}
+              <span class="gx-en" lang="en" dir="ltr">{t.en}</span>
+            </li>
+          ))}
+        </ul>
       </section>
     )}
 
     {page.objectives.length > 0 && (
-      <section class="gx-objectives" dir="ltr" lang="en" aria-label="Learning objectives">
-        {page.objectives.map((o) => (
-          <div class="gx-objective">
-            <span class:list={['gx-level', `gx-level--${o.level.charAt(0).toLowerCase()}`]}>{o.level}</span>
-            <span>
-              <b>{LEVELS[o.level]?.name || o.level}</b>
-              <small class="gx-mono">{o.code}</small>
-              {(o.text || LEVELS[o.level]) && <span class="gx-objective-hint">{o.text || LEVELS[o.level].hint}</span>}
-            </span>
-          </div>
-        ))}
+      <section class="gx-objectives" aria-label="أهداف التعلّم">
+        {page.objectives.map((o) => {
+          const lvl = LEVELS[o.level];
+          return (
+            <div class="gx-objective">
+              <span class:list={['gx-level', `gx-level--${o.level.charAt(0).toLowerCase()}`]}>{o.level}</span>
+              <span>
+                <b class="gx-bi-label">{lvl ? <><span>{lvl.ar}</span><span lang="en">{lvl.name}</span></> : o.level}</b>
+                <small class="gx-mono">{o.code}</small>
+                {(o.textAr || lvl) && <span class="gx-objective-hint gx-ar">{o.textAr || lvl?.hintAr}</span>}
+                {(o.text || lvl) && <span class="gx-objective-hint gx-en" lang="en" dir="ltr">{o.text || lvl?.hint}</span>}
+              </span>
+            </div>
+          );
+        })}
       </section>
     )}
 
@@ -84,7 +95,7 @@ const nextIsNewChapter = next && next.chapter !== page.chapter;
   <aside class="gx-side">
     {toc.length > 1 && (
       <nav class="gx-card gx-onpage" dir="ltr" aria-label="On this page">
-        <span class="gx-side-title">On this page</span>
+        <span class="gx-side-title gx-bi-label" dir="rtl"><span>في هذه الصفحة</span><span lang="en">On this page</span></span>
         {toc.map((h) => (
           <a href={`#${h.id}`} class:list={{ 'is-sub': h.level === 3 && toc.some((x) => x.level === 2) }} data-guide-onpage={h.id}>
             {h.num && <span class="gx-mono">{h.num}</span>}
@@ -96,7 +107,7 @@ const nextIsNewChapter = next && next.chapter !== page.chapter;
     )}
     {page.terms.length > 0 && (
       <section class="gx-card gx-side-terms">
-        <span class="gx-side-title" dir="ltr">Key Terms</span>
+        <span class="gx-side-title gx-bi-label"><span>المصطلحات</span><span lang="en">Key Terms</span></span>
         <dl>
           {page.terms.map((t) => (
             <div>

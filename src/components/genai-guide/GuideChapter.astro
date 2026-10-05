@@ -41,12 +41,15 @@ const pad = (n: number) => String(n).padStart(2, '0');
 
     {objectives.length > 0 && (
       <section class="gx-card gx-objectives-list" aria-labelledby="gx-lo-title">
-        <h2 id="gx-lo-title" dir="ltr" lang="en">Learning Objectives</h2>
-        <ul dir="ltr">
+        <h2 id="gx-lo-title" class="gx-bi-label"><span>أهداف التعلّم</span><span lang="en">Learning Objectives</span></h2>
+        <ul>
           {objectives.map((o) => (
             <li>
               <span class:list={['gx-level', `gx-level--${o.level.charAt(0).toLowerCase()}`]}>{o.code.replace('GenAI-', '')} · {o.level}</span>
-              <a href={pageUrl(view, o.page)}>{o.text || o.page.title}</a>
+              <a href={pageUrl(view, o.page)}>
+                {o.textAr && <span class="gx-ar">{o.textAr}</span>}
+                <span class="gx-en" lang="en" dir="ltr">{o.text || o.page.title}</span>
+              </a>
             </li>
           ))}
         </ul>
@@ -82,20 +85,20 @@ const pad = (n: number) => String(n).padStart(2, '0');
   <aside class="gx-chapter-side">
     {terms.length > 0 && (
       <section class="gx-card">
-        <h2 dir="ltr" lang="en">Key Terms</h2>
+        <h2 class="gx-bi-label"><span>المصطلحات</span><span lang="en">Key Terms</span></h2>
         <div class="gx-term-chips" dir="ltr">
           {terms.map((t) => <a href={`${glossaryUrl(view)}#${termId(t.en)}`} title={t.ar}>{t.en}</a>)}
         </div>
       </section>
     )}
     {levelsUsed.length > 0 && (
-      <section class="gx-card" dir="ltr">
-        <h2 lang="en">Levels in this Chapter</h2>
+      <section class="gx-card">
+        <h2 class="gx-bi-label"><span>مستويات هذا الفصل</span><span lang="en">Levels in this Chapter</span></h2>
         <ul class="gx-levels">
           {levelsUsed.map((lvl) => (
             <li>
               <span class:list={['gx-level', `gx-level--${lvl.charAt(0).toLowerCase()}`]}>{lvl}</span>
-              <span><b>{LEVELS[lvl].name}</b> — {LEVELS[lvl].hint}</span>
+              <span><b>{LEVELS[lvl].ar} · {LEVELS[lvl].name}</b><span class="gx-ar">{LEVELS[lvl].hintAr}</span><span class="gx-en" lang="en">{LEVELS[lvl].hint}</span></span>
             </li>
           ))}
         </ul>

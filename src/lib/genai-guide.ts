@@ -13,6 +13,8 @@ export interface GuideTerm {
   en: string;
   ar: string;
   def: string;
+  /** تعريف المصطلح بالعربي (يظهر أولًا، والإنجليزي تحته) */
+  defAr?: string;
   match?: string[];
 }
 
@@ -30,15 +32,20 @@ interface Frontmatter {
   objectives?: string;
   minutes?: number;
   takeaways?: string[];
+  /** ترجمة الخلاصة بالعربي، بنفس ترتيب takeaways */
+  takeawaysAr?: string[];
   terms?: GuideTerm[];
   /** صياغتنا المختصرة لكل هدف تعلّم (بالإنجليزي)، مفتاحها رمز الهدف */
   lo?: Record<string, string>;
+  /** نفس الأهداف بالعربي */
+  loAr?: Record<string, string>;
 }
 
 export interface Objective {
   code: string;
   level: string;
   text?: string;
+  textAr?: string;
 }
 
 export interface HeadingRef {
@@ -60,7 +67,7 @@ export interface GuidePage {
   minutes: number;
   objectives: Objective[];
   labs: string[];
-  takeaways: string[];
+  takeaways: { ar?: string; en: string }[];
   terms: GuideTerm[];
   load: () => Promise<{ html: string; headings: HeadingRef[] }>;
 }
@@ -96,26 +103,26 @@ export const GROUPS: Record<string, { en: string; ar: string }> = {
   '5.2': { en: 'Manage Change when Adopting Generative AI for Software Testing', ar: 'إدارة التغيير عند تبنّي الذكاء التوليدي' },
 };
 
-export const LEVELS: Record<string, { name: string; hint: string }> = {
-  K1: { name: 'Remember', hint: 'Recall a term, fact or concept.' },
-  K2: { name: 'Understand', hint: 'Explain, compare, classify or give examples.' },
-  K3: { name: 'Apply', hint: 'Use a concept or procedure in a given situation.' },
-  H0: { name: 'Demonstration', hint: 'Watch a worked example or a live demo.' },
-  H1: { name: 'Guided exercise', hint: 'Follow the lab steps yourself.' },
-  H2: { name: 'Exercise with hints', hint: 'Work through the task with hints only.' },
+export const LEVELS: Record<string, { name: string; ar: string; hint: string; hintAr: string }> = {
+  K1: { name: 'Remember', ar: 'تذكّر', hint: 'Recall a term, fact or concept.', hintAr: 'تتذكّر مصطلحًا أو حقيقة أو مفهومًا.' },
+  K2: { name: 'Understand', ar: 'فهم', hint: 'Explain, compare, classify or give examples.', hintAr: 'تشرح وتقارن وتصنّف وتعطي أمثلة.' },
+  K3: { name: 'Apply', ar: 'تطبيق', hint: 'Use a concept or procedure in a given situation.', hintAr: 'تطبّق مفهومًا أو إجراءً على موقف معطى.' },
+  H0: { name: 'Demonstration', ar: 'عرض توضيحي', hint: 'Watch a worked example or a live demo.', hintAr: 'تشاهد مثالًا محلولًا أو عرضًا مباشرًا.' },
+  H1: { name: 'Guided exercise', ar: 'تمرين موجّه', hint: 'Follow the lab steps yourself.', hintAr: 'تنفّذ خطوات التمرين بنفسك.' },
+  H2: { name: 'Exercise with hints', ar: 'تمرين بتلميحات', hint: 'Work through the task with hints only.', hintAr: 'تحل المهمة بنفسك مع تلميحات فقط.' },
 };
 
 const sampleModules = import.meta.glob<MarkdownInstance<Frontmatter>>('../data/readers/ct-genai/*.md', { eager: true });
 const draftModules = import.meta.glob<MarkdownInstance<Frontmatter>>('../data/readers/ct-genai-full/*.md', { eager: true });
 
-const parseObjectives = (raw = '', lo: Record<string, string> = {}): Objective[] =>
+const parseObjectives = (raw = '', lo: Record<string, string> = {}, loAr: Record<string, string> = {}): Objective[] =>
   raw
     .split('/')
     .map((part) => part.trim())
     .filter(Boolean)
     .map((part) => {
       const [code, level = ''] = part.split('·').map((s) => s.trim());
-      return { code, level, text: lo[code] };
+      return { code, level, text: lo[code], textAr: loAr[code] };
     });
 
 const ARABIC = /[؀-ۿ]/;
@@ -171,7 +178,7 @@ function transform(html: string): { html: string; headings: HeadingRef[] } {
 function toPage(mod: MarkdownInstance<Frontmatter>): GuidePage {
   const fm = mod.frontmatter;
   const legacy = Boolean(fm.english);
-  const objectives = parseObjectives(fm.objectives, fm.lo);
+  const objectives = parseObjectives(fm.objectives, fm.lo, fm.loAr);
   return {
     slug: String(fm.slug),
     chapter: fm.chapter || 1,
@@ -183,7 +190,7 @@ function toPage(mod: MarkdownInstance<Frontmatter>): GuidePage {
     minutes: Number(fm.minutes) || 0,
     objectives,
     labs: objectives.filter((o) => o.code.startsWith('HO-')).map((o) => o.code),
-    takeaways: fm.takeaways || [],
+    takeaways: (fm.takeaways || []).map((en, i) => ({ en, ar: fm.takeawaysAr?.[i] })),
     terms: fm.terms || [],
     load: async () => transform(await mod.compiledContent()),
   };

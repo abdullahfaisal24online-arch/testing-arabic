@@ -10,18 +10,27 @@ objectives: "GenAI-4.1.1 · K2"
 minutes: 9
 lo:
   GenAI-4.1.1: "Explain the main components and concepts of LLM-powered test infrastructure."
+loAr:
+  GenAI-4.1.1: "شرح المكوّنات والمفاهيم الرئيسية لبنية الاختبار التحتية المعتمدة على النماذج اللغوية الكبيرة."
 takeaways:
   - "Six building blocks: front-end, back-end, LLM, relational database, vector database and post-processing."
   - "The LLM can be a third-party service via API or a model hosted inside the organisation."
   - "Authentication and permissions stay the application's job, not the model's."
   - "Post-processing can reject malformed output, but well-formed text can still be wrong."
+takeawaysAr:
+  - "ستة مكوّنات أساسية: الواجهة الأمامية، والواجهة الخلفية، والنموذج اللغوي، وقاعدة البيانات العلائقية، وقاعدة البيانات المتجهية، والمعالجة اللاحقة."
+  - "يمكن أن يكون النموذج اللغوي خدمة خارجية عبر API أو نموذجًا مستضافًا داخل المؤسسة."
+  - "المصادقة والصلاحيات تبقى من مسؤولية التطبيق، لا النموذج."
+  - "المعالجة اللاحقة ترفض المخرجات المشوّهة البنية، لكن النص السليم البنية قد يبقى خاطئًا."
 terms:
   - en: "Vector Database"
     ar: "قاعدة بيانات متجهية"
     def: "A store of embeddings that supports semantic retrieval of the most relevant content for a query."
+    defAr: "مخزن للتضمينات (embeddings) يدعم الاسترجاع الدلالي لأكثر المحتوى صلةً بالاستعلام."
   - en: "Post-processing"
     ar: "المعالجة اللاحقة"
     def: "Checking and transforming model output, for example validating its schema, before it is shown or used."
+    defAr: "فحص مخرجات النموذج وتحويلها، مثل التحقق من مطابقتها للمخطط (schema)، قبل عرضها أو استخدامها."
 ---
 أداة الاختبار المدعومة بالنماذج تربط تفاعل المستخدم ببيانات العمل وإجراءات المعالجة والتوليد. قد تكون دردشة أو واجهة متخصصة؛ القيمة ليست في شكل المحادثة، بل في طريقة توفير السياق والتحقق من الناتج ودمجه في عملية الاختبار.
 
@@ -46,8 +55,8 @@ terms:
 
 يمكن أن يكون النموذج خدمة طرف ثالث عبر API أو نموذجًا داخل المؤسسة. ويختلف هذا النظام عن شاتبوت قواعد ثابتة لأنه يولّد الاستجابات من السياق، وعن تطبيق عميل/خادم بسيط لأن الخلفية تنسّق مصادر متعددة ومراحل معالجة.
 
-<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label">In practice · Tracing one request</p><p>The tester picks the “sign-up” story. The back-end checks the user's permissions, retrieves the approved version and builds the prompt. The model returns a draft, and the tool checks the fields and requirement IDs before showing it for review.</p></aside>
+<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-ar">من الواقع العملي · تتبّع طلب واحد</span><span class="gx-en" lang="en" dir="ltr">In practice · Tracing one request</span></p><p class="gx-ar">يختار المختبِر قصة «التسجيل». تتحقق الواجهة الخلفية من صلاحيات المستخدم، وتسترجع النسخة المعتمدة، وتبني الـ prompt. يعيد النموذج مسودة، وتتحقق الأداة من الحقول ومعرّفات المتطلبات قبل عرضها للمراجعة.</p><p class="gx-en" lang="en" dir="ltr">The tester picks the “sign-up” story. The back-end checks the user's permissions, retrieves the approved version and builds the prompt. The model returns a draft, and the tool checks the fields and requirement IDs before showing it for review.</p></aside>
 
-<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label">Exam tip</p><p>Know the six components and the job of each: front-end (user interaction), back-end (orchestration: auth, retrieval, prompt building, model calls), LLM (generation), relational database (structured data), vector database (semantic retrieval) and post-processing (checking and transforming output).</p></aside>
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-ar">تلميح امتحان</span><span class="gx-en" lang="en" dir="ltr">Exam tip</span></p><p class="gx-ar">اعرف المكوّنات الستة ووظيفة كلٍّ منها: الواجهة الأمامية (تفاعل المستخدم)، والواجهة الخلفية (التنسيق: المصادقة، والاسترجاع، وبناء الـ prompt، واستدعاء النموذج)، والنموذج اللغوي (التوليد)، وقاعدة البيانات العلائقية (البيانات المهيكلة)، وقاعدة البيانات المتجهية (الاسترجاع الدلالي)، والمعالجة اللاحقة (فحص المخرجات وتحويلها).</p><p class="gx-en" lang="en" dir="ltr">Know the six components and the job of each: front-end (user interaction), back-end (orchestration: auth, retrieval, prompt building, model calls), LLM (generation), relational database (structured data), vector database (semantic retrieval) and post-processing (checking and transforming output).</p></aside>
 
-<aside class="gx-callout" data-kind="warn"><p class="gx-callout-label">Common mistake</p><p>Trusting structurally valid output. Post-processing can reject missing fields, but it cannot fix every reasoning error. And authentication and permissions remain the application's responsibility; the model does not replace them.</p></aside>
+<aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-ar">خطأ شائع</span><span class="gx-en" lang="en" dir="ltr">Common mistake</span></p><p class="gx-ar">الثقة بمخرجات سليمة البنية. المعالجة اللاحقة ترفض الحقول الناقصة، لكنها لا تصلح كل أخطاء الاستدلال. كما تبقى المصادقة والصلاحيات من مسؤولية التطبيق، والنموذج لا يحلّ محلّها.</p><p class="gx-en" lang="en" dir="ltr">Trusting structurally valid output. Post-processing can reject missing fields, but it cannot fix every reasoning error. And authentication and permissions remain the application's responsibility; the model does not replace them.</p></aside>
