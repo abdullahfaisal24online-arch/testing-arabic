@@ -17,8 +17,9 @@ includes:
   - تقدّمك بكل فصل محفوظ، وبتكمل من وين ما وقفت
 course: ''
 bundleOf: []
+sampleHref: /store/ct-genai-guide/preview/
 cover: /uploads/store/ct-genai-guide.webp
-order: 3
+order: 4
 featured: false
 draft: false
 cardTitle: ''
@@ -34,7 +35,6 @@ trust: []
 includesTitle: ''
 sampleEnabled: true
 sampleCount: 5
-sampleHref: /store/ct-genai-guide/preview/
 sampleEyebrow: ''
 sampleTitle: ''
 sampleText: ''

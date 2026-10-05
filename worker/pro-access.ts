@@ -15,11 +15,13 @@ import { catalog, ensureTables, type StoreEnv } from './store';
 import { sendBuyerMail } from './store-mail';
 import ctflQuestions from '../src/data/banks/ctfl-questions.json';
 import ctflAtQuestions from '../src/data/banks/ctfl-at-questions.json';
+import ctMatQuestions from '../src/data/banks/ct-mat-questions.json';
 
 // بنوك الأسئلة المتاحة (slug المنتج ← ملف البنك). بنك جديد = سطر جديد هون.
 const BANKS: Record<string, unknown> = {
   'ctfl-questions': ctflQuestions,
   'ctfl-at-questions': ctflAtQuestions,
+  'ct-mat-questions': ctMatQuestions,
 };
 
 const DEV_COOKIE = 'ta_dev';
