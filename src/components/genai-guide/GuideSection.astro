@@ -88,6 +88,13 @@ const nextIsNewChapter = next && next.chapter !== page.chapter;
         <span class="gx-key-hint">استخدم الأسهم ← → للتنقل</span>
       </div>
 
+      {(!next || nextIsNewChapter) && (
+        <a class="gx-flash-link" href={`${chapterUrl(view, page.chapter)}#flash`}>
+          <span>راجع مصطلحات <span dir="ltr">Chapter {page.chapter}</span> كبطاقات بتنقلب</span>
+          <span aria-hidden="true">←</span>
+        </a>
+      )}
+
       <p class="gx-source-line">مرجع الموضوع: ISTQB® CT-GenAI Syllabus v1.1، الفصل {page.chapter}. الأمثلة والشروحات التطبيقية من إعداد Testing بالعربي.</p>
     </footer>
   </article>

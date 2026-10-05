@@ -21,7 +21,7 @@ const objectives = pages.flatMap((p) =>
   p.objectives.filter((o) => o.code.startsWith('GenAI-')).map((o) => ({ ...o, page: p })),
 );
 const levelsUsed = Object.keys(LEVELS).filter((lvl) => pages.some((p) => p.objectives.some((o) => o.level === lvl)));
-const termMap = new Map<string, { en: string; ar: string }>();
+const termMap = new Map<string, { en: string; ar: string; def: string; defAr?: string }>();
 for (const p of pages) for (const t of p.terms) if (!termMap.has(t.en)) termMap.set(t.en, t);
 const terms = [...termMap.values()];
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -53,6 +53,34 @@ const pad = (n: number) => String(n).padStart(2, '0');
             </li>
           ))}
         </ul>
+      </section>
+    )}
+
+    {terms.length > 0 && (
+      <section class="gx-flash" id="flash" aria-labelledby="gx-flash-title">
+        <div class="gx-flash-head">
+          <h2 id="gx-flash-title" class="gx-bi-label"><span lang="en">Term Cards</span><span>بطاقات المصطلحات</span></h2>
+          <p class="gx-muted">اكبس على البطاقة عشان تقلبها وتشوف التعريف. للحفظ والمراجعة، مش امتحان.</p>
+          <button type="button" class="gx-flash-all" data-guide-flash-all aria-pressed="false">اقلب الكل</button>
+        </div>
+        <div class="gx-flash-grid" dir="ltr">
+          {terms.map((t) => (
+            <button type="button" class="gx-flash-card" data-guide-flash aria-pressed="false">
+              <span class="gx-flash-inner">
+                <span class="gx-flash-face gx-flash-front">
+                  <b lang="en">{t.en}</b>
+                  <span dir="rtl" lang="ar">{t.ar}</span>
+                  <small dir="rtl">اكبس للتعريف</small>
+                </span>
+                <span class="gx-flash-face gx-flash-back">
+                  <b class="gx-flash-back-term" lang="en">{t.en}</b>
+                  <span class="gx-en" lang="en">{t.def}</span>
+                  {t.defAr && <span class="gx-ar" lang="ar" dir="rtl">{t.defAr}</span>}
+                </span>
+              </span>
+            </button>
+          ))}
+        </div>
       </section>
     )}
 

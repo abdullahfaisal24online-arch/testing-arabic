@@ -9,7 +9,11 @@ interface GuideState {
   font: number;
   labs: Record<string, number[]>;
   mode: 'cards' | 'article';
+  saved: SavedCard[];
+  conf: Record<string, Conf>;
 }
+type Conf = 'ok' | 'unsure' | 'again';
+interface SavedCard { k: string; slug: string; sec: string; title: string; text: string }
 interface TermData { en: string; ar: string; def: string; defAr?: string; match: string[]; href: string }
 
 const FONT_SIZES = [16, 17, 18, 20, 22, 24];
@@ -25,7 +29,7 @@ if (root) {
   const allSlugs = tocLinks.map((a) => a.dataset.guideTocLink!);
 
   /* ---------- الحالة المحفوظة ---------- */
-  const state: GuideState = { read: [], last: null, font: 18, labs: {}, mode: 'cards' };
+  const state: GuideState = { read: [], last: null, font: 18, labs: {}, mode: 'cards', saved: [], conf: {} };
   let storageOk = true;
   try {
     const saved = JSON.parse(localStorage.getItem(key) || 'null');
@@ -34,6 +38,16 @@ if (root) {
       if (typeof saved.last === 'string' && allSlugs.includes(saved.last)) state.last = saved.last;
       if (FONT_SIZES.includes(saved.font)) state.font = saved.font;
       if (saved.mode === 'article' || saved.mode === 'cards') state.mode = saved.mode;
+      if (Array.isArray(saved.saved)) {
+        state.saved = saved.saved
+          .filter((c: SavedCard) => c && typeof c.k === 'string' && allSlugs.includes(c.slug))
+          .map((c: SavedCard) => ({ k: c.k, slug: c.slug, sec: String(c.sec || ''), title: String(c.title || ''), text: String(c.text || '').slice(0, 200) }));
+      }
+      if (saved.conf && typeof saved.conf === 'object') {
+        for (const [k, v] of Object.entries(saved.conf)) {
+          if (allSlugs.includes(k) && (v === 'ok' || v === 'unsure' || v === 'again')) state.conf[k] = v;
+        }
+      }
       if (saved.labs && typeof saved.labs === 'object') {
         for (const [id, steps] of Object.entries(saved.labs)) {
           if (Array.isArray(steps)) state.labs[id] = steps.filter((n) => Number.isInteger(n));
@@ -65,6 +79,7 @@ if (root) {
       const s = el.dataset.guideTocLink || el.dataset.guideRow || '';
       el.classList.toggle('is-read', isRead(s));
       el.classList.toggle('is-last', s === state.last && !isRead(s));
+      for (const c of ['ok', 'unsure', 'again']) el.classList.toggle(`conf-${c}`, state.conf[s] === c);
     });
     document.querySelectorAll<HTMLElement>('[data-guide-dot]').forEach((el) => {
       el.classList.toggle('is-read', isRead(el.dataset.guideDot!));
@@ -108,6 +123,19 @@ if (root) {
     set('[data-guide-continue-ar]', link.dataset.titleAr || '');
     box.querySelector<HTMLAnchorElement>('[data-guide-continue-link]')!.href = link.href;
   };
+
+  /* ---------- بطاقات المصطلحات بصفحة الفصل: بتنقلب بالكبس ---------- */
+  const flashCards = [...document.querySelectorAll<HTMLButtonElement>('[data-guide-flash]')];
+  flashCards.forEach((card) =>
+    card.addEventListener('click', () => card.setAttribute('aria-pressed', String(card.getAttribute('aria-pressed') !== 'true'))),
+  );
+  document.querySelector<HTMLButtonElement>('[data-guide-flash-all]')?.addEventListener('click', (e) => {
+    const btn = e.currentTarget as HTMLButtonElement;
+    const flip = btn.getAttribute('aria-pressed') !== 'true';
+    btn.setAttribute('aria-pressed', String(flip));
+    btn.textContent = flip ? 'رجّع الكل' : 'اقلب الكل';
+    flashCards.forEach((c) => c.setAttribute('aria-pressed', String(flip)));
+  });
 
   /* ---------- الفهرس والبحث ---------- */
   if (toc) {
@@ -166,6 +194,156 @@ if (root) {
     });
   }
 
+  /* ---------- أدوات مشتركة: رسالة قصيرة، معلومات الفصل ---------- */
+  const tocFor = (s: string) => tocLinks.find((a) => a.dataset.guideTocLink === s);
+  const chapterSlugs = (ch: string) => tocLinks.filter((a) => a.dataset.chapter === ch).map((a) => a.dataset.guideTocLink!);
+  const toastEl = document.createElement('div');
+  toastEl.className = 'gx-toast';
+  toastEl.setAttribute('role', 'status');
+  toastEl.hidden = true;
+  document.body.append(toastEl);
+  let toastTimer = 0;
+  const toast = (text: string, ms = 2600) => {
+    toastEl.textContent = text;
+    toastEl.hidden = false;
+    toastEl.classList.remove('is-in');
+    void toastEl.offsetWidth;
+    toastEl.classList.add('is-in');
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => {
+      toastEl.classList.remove('is-in');
+      toastEl.hidden = true;
+    }, ms);
+  };
+  // لما يخلص آخر عنوان بالفصل: رسالة تهنئة
+  const markRead = (s: string) => {
+    if (isRead(s)) return;
+    state.read = [...state.read, s];
+    const ch = tocFor(s)?.dataset.chapter;
+    if (ch) {
+      const list = chapterSlugs(ch);
+      if (list.length && list.every(isRead)) {
+        window.setTimeout(() => toast(`أحسنت! خلّصت Chapter ${ch} كامل ✓`, 4200), 250);
+      }
+    }
+  };
+
+  /* ---------- تقدّم الفصل: دائرة + الوقت الباقي ---------- */
+  const ring = document.createElement('span');
+  ring.className = 'gx-ring';
+  const paintRing = () => {
+    const ch = tocFor(slug)?.dataset.chapter;
+    if (kind !== 'section' || !ch) return;
+    const list = chapterSlugs(ch);
+    const done = list.filter(isRead).length;
+    const pct = Math.round((done / Math.max(1, list.length)) * 100);
+    const left = list.filter((s) => !isRead(s)).reduce((n, s) => n + (Number(tocFor(s)?.dataset.minutes) || 0), 0);
+    const c = 2 * Math.PI * 9;
+    ring.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="var(--surface-2)" stroke-width="3"></circle><circle cx="12" cy="12" r="9" fill="none" stroke="var(--cyan)" stroke-width="3" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - pct / 100)}" transform="rotate(-90 12 12)"></circle></svg><span class="gx-ring-text"><b dir="ltr">Ch ${ch} · ${pct}%</b>${left ? `<small>باقي ~${left} د</small>` : '<small>خلص ✓</small>'}</span>`;
+    ring.setAttribute('title', `Chapter ${ch}: ${done} من ${list.length} عنوان${left ? ` · باقي تقريبًا ${left} دقيقة` : ''}`);
+    ring.setAttribute('aria-label', ring.getAttribute('title')!);
+    ring.setAttribute('role', 'img');
+  };
+
+  /* ---------- مراجعتي: البطاقات المحفوظة + العناوين اللي بدها رجعة ---------- */
+  const reviewBtn = document.createElement('button');
+  reviewBtn.type = 'button';
+  reviewBtn.className = 'gx-review-btn';
+  reviewBtn.setAttribute('aria-haspopup', 'dialog');
+  const review = document.createElement('dialog');
+  review.className = 'gx-review';
+  review.setAttribute('aria-labelledby', 'gx-review-title');
+  review.innerHTML = '<div class="gx-review-panel"><div class="gx-review-head"><h2 id="gx-review-title">مراجعتي</h2><button type="button" class="gx-icon-btn" data-review-close aria-label="إغلاق"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div><div class="gx-review-body" data-review-body></div></div>';
+  document.body.append(review);
+  const reviewBody = review.querySelector<HTMLElement>('[data-review-body]')!;
+  const el = <K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  };
+  const paintReview = () => {
+    const n = state.saved.length + Object.values(state.conf).filter((c) => c !== 'ok').length;
+    reviewBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"></path></svg><span class="gx-review-label">مراجعتي</span>';
+    if (n) reviewBtn.append(el('b', 'gx-review-count', String(n)));
+    reviewBtn.setAttribute('aria-label', n ? `مراجعتي: ${n}` : 'مراجعتي');
+    if (!review.open) return;
+    reviewBody.replaceChildren();
+    const hrefOf = (s: string) => tocFor(s)?.href || '#';
+    // العناوين حسب تقييمك
+    const again = allSlugs.filter((s) => state.conf[s] === 'again');
+    const unsure = allSlugs.filter((s) => state.conf[s] === 'unsure');
+    const sectionList = (title: string, cls: string, list: string[]) => {
+      if (!list.length) return;
+      const box = el('section', 'gx-review-group');
+      box.append(el('h3', '', title));
+      const ul = el('ul', 'gx-review-list');
+      for (const s of list) {
+        const a = el('a', `gx-review-sec ${cls}`) as HTMLAnchorElement;
+        a.href = hrefOf(s);
+        a.append(el('span', 'gx-mono', tocFor(s)?.dataset.section || ''), el('span', '', tocFor(s)?.querySelector('.gx-toc-link-title')?.textContent || s));
+        a.lastElementChild!.setAttribute('lang', 'en');
+        const li = el('li');
+        li.append(a);
+        ul.append(li);
+      }
+      box.append(ul);
+      reviewBody.append(box);
+    };
+    sectionList('بدي أرجعلها', 'conf-again', again);
+    sectionList('مش متأكد منها', 'conf-unsure', unsure);
+    // البطاقات المحفوظة
+    const box = el('section', 'gx-review-group');
+    box.append(el('h3', '', 'البطاقات المحفوظة'));
+    if (!state.saved.length) {
+      box.append(el('p', 'gx-muted', 'لسا ما حفظت ولا بطاقة. اكبس 🔖 فوق أي بطاقة بتحب ترجعلها.'));
+    } else {
+      const ul = el('ul', 'gx-review-list');
+      for (const c of [...state.saved].reverse()) {
+        const li = el('li', 'gx-review-card');
+        const a = el('a') as HTMLAnchorElement;
+        a.href = `${hrefOf(c.slug).split('#')[0]}#${c.k.split(':')[1]}`;
+        const top = el('span', 'gx-review-card-top');
+        top.append(el('span', 'gx-mono', c.sec), el('b', '', c.title));
+        top.lastElementChild!.setAttribute('lang', 'en');
+        a.append(top, el('span', 'gx-review-snippet', c.text));
+        const rm = el('button', 'gx-review-rm', '×') as HTMLButtonElement;
+        rm.type = 'button';
+        rm.setAttribute('aria-label', `شيل ${c.title} من المحفوظات`);
+        rm.addEventListener('click', () => {
+          state.saved = state.saved.filter((x) => x.k !== c.k);
+          save();
+          paintReview();
+          root.dispatchEvent(new Event('gx:saved'));
+        });
+        li.append(a, rm);
+        ul.append(li);
+      }
+      box.append(ul);
+    }
+    reviewBody.append(box);
+  };
+  reviewBtn.addEventListener('click', () => {
+    if (typeof review.showModal === 'function') review.showModal();
+    else review.setAttribute('open', '');
+    paintReview();
+  });
+  review.querySelector('[data-review-close]')?.addEventListener('click', () => review.close());
+  review.addEventListener('click', (e) => {
+    if (e.target === review) review.close();
+  });
+  review.addEventListener('close', () => reviewBtn.focus());
+  const tools = document.querySelector('.gx-bar-tools');
+  if (tools) {
+    tools.prepend(reviewBtn);
+    if (kind === 'section') tools.prepend(ring);
+  }
+  const refresh = () => {
+    paintProgress();
+    paintRing();
+    paintReview();
+  };
+
   /* ---------- وضع البطاقات ----------
    * نفس محتوى الصفحة بالضبط، بس بينعرض بطاقة بطاقة بدل مقال طويل.
    * ما في نسخ ولا إعادة كتابة: البطاقة = مجموعة عناصر من الصفحة بتنعرض والباقي بيختفي.
@@ -201,7 +379,11 @@ if (root) {
     labelNow.setAttribute('aria-live', 'polite');
     const labelNext = document.createElement('span');
     labelNext.className = 'gx-deck-upnext';
-    label.append(labelNow, labelNext);
+    const markBtn = document.createElement('button');
+    markBtn.type = 'button';
+    markBtn.className = 'gx-mark-btn';
+    markBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"></path></svg><span data-mark-label>احفظ</span>';
+    label.append(labelNow, labelNext, markBtn);
     top.append(dots, label);
     const nav = document.createElement('nav');
     nav.className = 'gx-deck-nav';
@@ -275,6 +457,8 @@ if (root) {
       return ([...el.children] as HTMLElement[]).filter((c) => !c.matches('thead')).flatMap(unitsOf);
     };
     const units = new Map(slides.map((sl) => [sl, sl.nodes.flatMap(unitsOf)]));
+    const allUnits = slides.flatMap((sl) => units.get(sl) || []);
+    const keyOf = (pg: { nodes: HTMLElement[] }) => `${slug}:u-${allUnits.indexOf(pg.nodes[0])}`;
     const stickiesFor = (u: HTMLElement) => {
       const out: HTMLElement[] = [];
       for (let el = u.parentElement; el && el !== stage; el = el.parentElement) {
@@ -283,7 +467,7 @@ if (root) {
       return out.filter((x) => x !== u && !x.contains(u));
     };
 
-    type Page = { title: string; nodes: HTMLElement[]; part: number; parts: number };
+    type Page = { title: string; nodes: HTMLElement[]; part: number; parts: number; short: boolean; h: number };
     let pages: Page[] = [];
     let idx = 0;
     let shown: HTMLElement[] = [];
@@ -322,24 +506,77 @@ if (root) {
         const list = units.get(sl) || [];
         show(list);
         const rects = list.map((n) => n.getBoundingClientRect());
-        const groups: HTMLElement[][] = [];
-        let group: HTMLElement[] = [];
-        let base = rects[0].top;
         const reserve = (u: HTMLElement) =>
           stickiesFor(u).reduce((h, x) => h + x.getBoundingClientRect().height + 12, 0);
-        list.forEach((n, i) => {
-          if (group.length && rects[i].bottom - base > limit) {
-            // ما بنترك عنوان لحاله بآخر البطاقة
-            const carry = group.length > 1 && isHead(group[group.length - 1]) ? group.pop()! : null;
-            groups.push(group);
-            const first = carry || n;
-            group = carry ? [carry] : [];
-            base = first.getBoundingClientRect().top - reserve(first);
+        const split = (lim: number) => {
+          const out: HTMLElement[][] = [];
+          let group: HTMLElement[] = [];
+          let base = rects[0].top;
+          list.forEach((n, i) => {
+            if (group.length && rects[i].bottom - base > lim) {
+              // ما بنترك عنوان لحاله بآخر البطاقة
+              const carry = group.length > 1 && isHead(group[group.length - 1]) ? group.pop()! : null;
+              out.push(group);
+              const first = carry || n;
+              group = carry ? [carry] : [];
+              base = rects[list.indexOf(first)].top - reserve(first);
+            }
+            group.push(n);
+          });
+          out.push(group);
+          return out;
+        };
+        let groups = split(limit);
+        // توزيع متوازن: بدل بطاقة مليانة وبطاقة فيها سطر، بطاقتين بنص الحِمل تقريبًا
+        if (groups.length > 1) {
+          const total = rects[rects.length - 1].bottom - rects[0].top;
+          for (let t = total / groups.length; t < limit; t *= 1.06) {
+            const g = split(t);
+            if (g.length <= groups.length) {
+              groups = g;
+              break;
+            }
           }
-          group.push(n);
+        }
+        groups.forEach((g, part) => {
+          const h = rects[list.indexOf(g[g.length - 1])].bottom - rects[list.indexOf(g[0])].top;
+          pages.push({ title: sl.title, nodes: g, part: part + 1, parts: groups.length, short: h < avail * 0.45, h });
         });
-        groups.push(group);
-        groups.forEach((g, part) => pages.push({ title: sl.title, nodes: g, part: part + 1, parts: groups.length }));
+      }
+      // البطاقة القصيرة بتنضم للبطاقة اللي جنبها، بس إذا جرّبناها فعليًا ووسعت الشاشة
+      const padB = Number.parseFloat(cs.paddingBottom);
+      const measure = (nodes: HTMLElement[]) => {
+        show(nodes);
+        stage.scrollTop = 0;
+        const rs = shown.filter((n) => n.offsetParent !== null).map((n) => n.getBoundingClientRect());
+        const topY = Math.min(...rs.map((r) => r.top));
+        const bottomY = Math.max(...rs.map((r) => r.bottom));
+        return { h: bottomY - topY, fits: bottomY <= stage.getBoundingClientRect().bottom - padB + 1 };
+      };
+      stage.classList.remove('is-short');
+      for (let i = 0; i < pages.length; i++) {
+        const pg = pages[i];
+        if (!pg.short) continue;
+        for (const j of [i - 1, i + 1]) {
+          const other = pages[j];
+          if (!other) continue;
+          const nodes = j < i ? [...other.nodes, ...pg.nodes] : [...pg.nodes, ...other.nodes];
+          const m = measure(nodes);
+          if (!m.fits) continue;
+          const first = j < i ? other : pg;
+          const merged: Page = {
+            title: first.title,
+            nodes,
+            part: other.title === pg.title ? Math.min(other.part, pg.part) : 1,
+            parts: other.title === pg.title ? other.parts - 1 : 1,
+            short: m.h < avail * 0.45,
+            h: m.h,
+          };
+          if (merged.parts <= 1) merged.part = merged.parts = 1;
+          pages.splice(Math.min(i, j), 2, merged);
+          i = Math.min(i, j) - 1;
+          break;
+        }
       }
       const found = anchor ? pages.findIndex((pg) => pg.nodes.includes(anchor)) : -1;
       idx = found >= 0 ? found : Math.max(0, Math.min(idx, pages.length - 1));
@@ -373,6 +610,9 @@ if (root) {
       const p = pages[idx];
       if (!p) return;
       show(p.nodes);
+      stage.classList.toggle('is-short', p.short);
+      paintMark();
+      root.dispatchEvent(new CustomEvent('gx:shown', { detail: p.nodes }));
       stage.scrollTop = 0;
       requestAnimationFrame(paintScrollHint);
       [...dots.children].forEach((d, i) => {
@@ -400,6 +640,36 @@ if (root) {
         /* ما في مشكلة */
       }
     };
+
+    const savedHere = (p: { nodes: HTMLElement[] }) =>
+      state.saved.filter((c) => c.slug === slug && p.nodes.includes(allUnits[Number(c.k.split(':u-')[1])]));
+    const paintMark = () => {
+      const p = pages[idx];
+      if (!p) return;
+      const on = savedHere(p).length > 0;
+      markBtn.setAttribute('aria-pressed', String(on));
+      markBtn.setAttribute('aria-label', on ? 'شيل البطاقة من المحفوظات' : 'احفظ البطاقة بمراجعتي');
+      markBtn.querySelector('[data-mark-label]')!.textContent = on ? 'محفوظة' : 'احفظ';
+    };
+    markBtn.addEventListener('click', () => {
+      const p = pages[idx];
+      if (!p) return;
+      const k = keyOf(p);
+      const here = savedHere(p);
+      if (here.length) {
+        state.saved = state.saved.filter((c) => !here.includes(c));
+        toast('انشالت من «مراجعتي»');
+      } else {
+        const body = p.nodes.filter((n) => !isHead(n) && !n.matches('.gx-figure, .gx-lab-head'));
+        const text = (body.length ? body : p.nodes).map((n) => n.innerText || n.textContent || '').join(' ').replace(/\s+/g, ' ').trim().slice(0, 140);
+        state.saved = [...state.saved, { k, slug, sec: tocFor(slug)?.dataset.section || '', title: p.title, text }];
+        toast('انحفظت بـ «مراجعتي» 🔖');
+      }
+      save();
+      paintMark();
+      refresh();
+    });
+    root.addEventListener('gx:saved', () => paintMark());
 
     const go = (i: number, focus = false) => {
       if (i < 0) {
@@ -491,7 +761,9 @@ if (root) {
       paginate();
       const h = decodeURIComponent(location.hash.slice(1));
       const m = /^card-(\d+)$/.exec(h);
+      const u = /^u-(\d+)$/.exec(h);
       if (h === 'end') idx = pages.length - 1;
+      else if (u && allUnits[Number(u[1])]) idx = Math.max(0, pages.findIndex((pg) => pg.nodes.includes(allUnits[Number(u[1])])));
       else if (m) idx = Math.min(pages.length - 1, Math.max(0, Number(m[1]) - 1));
       else if (h) {
         const t = document.getElementById(h);
@@ -539,10 +811,11 @@ if (root) {
       readBtn.querySelector('[data-guide-read-label]')!.textContent = done ? 'مقروء · تراجع' : 'خلّصت هالعنوان';
     };
     readBtn?.addEventListener('click', () => {
-      state.read = isRead(slug) ? state.read.filter((s) => s !== slug) : [...state.read, slug];
+      if (isRead(slug)) state.read = state.read.filter((s) => s !== slug);
+      else markRead(slug);
       save();
       paintRead();
-      paintProgress();
+      refresh();
     });
     paintRead();
 
@@ -743,6 +1016,123 @@ if (root) {
       });
     }
 
+    // انسخ البرومبت: زر على كل كود/برومبت بالشرح والـ Labs
+    document.querySelectorAll<HTMLPreElement>('[data-guide-prose] pre').forEach((pre) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'gx-copyable';
+      pre.replaceWith(wrap);
+      wrap.append(pre);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'gx-copy-btn';
+      btn.textContent = 'انسخ';
+      btn.setAttribute('aria-label', 'انسخ النص');
+      btn.addEventListener('click', async () => {
+        const text = pre.innerText.trim();
+        let ok = false;
+        try {
+          await navigator.clipboard.writeText(text);
+          ok = true;
+        } catch {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.append(ta);
+          ta.select();
+          try {
+            ok = document.execCommand('copy');
+          } catch {
+            ok = false;
+          }
+          ta.remove();
+        }
+        btn.textContent = ok ? 'انتسخ ✓' : 'ما زبط، انسخه يدوي';
+        btn.classList.toggle('is-done', ok);
+        window.setTimeout(() => {
+          btn.textContent = 'انسخ';
+          btn.classList.remove('is-done');
+        }, 1800);
+      });
+      wrap.append(btn);
+    });
+
+    // الرسومات بتظهر خطوة بخطوة، مع زر لإعادة التشغيل
+    const STEP_ROWS = '.gx-flow-row, .gx-spectrum-row, .gx-tokens-row';
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const playFigure = (fig: Element) => {
+      if (reduceMotion) return;
+      let i = 0;
+      fig.querySelectorAll<HTMLElement>(STEP_ROWS).forEach((row) => {
+        row.classList.remove('gx-anim');
+        [...row.children].forEach((c) => (c as HTMLElement).style.setProperty('--i', String(i++)));
+      });
+      void (fig as HTMLElement).offsetWidth;
+      fig.querySelectorAll(STEP_ROWS).forEach((row) => row.classList.add('gx-anim'));
+    };
+    const stepFigs = [...document.querySelectorAll<HTMLElement>('[data-guide-prose] .gx-figure')].filter((f) => f.querySelector(STEP_ROWS));
+    stepFigs.forEach((fig) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'gx-replay';
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg><span>شغّل الخطوات</span>';
+      btn.addEventListener('click', () => playFigure(fig));
+      fig.append(btn);
+    });
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting && !root.classList.contains('gx-cards')) {
+            playFigure(e.target);
+            io.unobserve(e.target);
+          }
+        }
+      }, { threshold: 0.5 });
+      stepFigs.forEach((f) => io.observe(f));
+    }
+    root.addEventListener('gx:shown', (e) => {
+      const nodes = (e as CustomEvent<HTMLElement[]>).detail || [];
+      stepFigs.filter((f) => nodes.some((n) => n === f || n.contains(f) || f.contains(n))).forEach(playFigure);
+    });
+
+    // «فهمت هالعنوان؟» تقييم ذاتي بآخر الصفحة (مش امتحان)
+    const foot = document.querySelector<HTMLElement>('.gx-article-foot');
+    if (foot) {
+      const box = document.createElement('div');
+      box.className = 'gx-conf';
+      box.setAttribute('role', 'group');
+      box.setAttribute('aria-labelledby', 'gx-conf-title');
+      box.innerHTML = '<p id="gx-conf-title" class="gx-conf-title"><b lang="en">Did it click?</b> <span>فهمت هالعنوان؟</span></p><div class="gx-conf-btns"><button type="button" data-conf="ok"><span aria-hidden="true">✓</span> فهمتها</button><button type="button" data-conf="unsure"><span aria-hidden="true">?</span> مش متأكد</button><button type="button" data-conf="again"><span aria-hidden="true">↺</span> بدي أرجعلها</button></div><p class="gx-conf-note" aria-live="polite"></p>';
+      foot.prepend(box);
+      const note = box.querySelector<HTMLElement>('.gx-conf-note')!;
+      const NOTES: Record<Conf, string> = {
+        ok: 'تمام! تعلّم كمقروء.',
+        unsure: 'انضاف لـ «مراجعتي» عشان ترجعله قبل الامتحان.',
+        again: 'انضاف لـ «مراجعتي» وبيبيّن بالفهرس بلون برتقالي.',
+      };
+      const paintConf = () => {
+        const v = state.conf[slug];
+        box.querySelectorAll<HTMLButtonElement>('[data-conf]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.conf === v)));
+        note.textContent = v ? NOTES[v] : '';
+      };
+      box.querySelectorAll<HTMLButtonElement>('[data-conf]').forEach((b) =>
+        b.addEventListener('click', () => {
+          const v = b.dataset.conf as Conf;
+          if (state.conf[slug] === v) delete state.conf[slug];
+          else {
+            state.conf[slug] = v;
+            markRead(slug);
+          }
+          save();
+          paintConf();
+          paintRead();
+          refresh();
+        }),
+      );
+      paintConf();
+    }
+
     const deck = article ? setupDeck(article) : null;
 
     // الأسهم: بالعربي ← هو التالي (بطاقة بوضع البطاقات، وعنوان بوضع المقال)
@@ -760,7 +1150,7 @@ if (root) {
     });
   }
 
-  paintProgress();
+  refresh();
   fillContinue();
   if (!storageOk) {
     document.querySelectorAll<HTMLElement>('[data-guide-read]').forEach((b) => (b.title = 'حفظ التقدّم غير متاح على هذا المتصفح'));
