@@ -19,11 +19,11 @@ takeaways:
   - "Regression suites run many times and grow over time, so they are strong candidates for automation, ideally in CI."
   - "Both apply at all test levels whenever defects are fixed or changes are made."
 takeawaysAr:
-  - "اختبار التأكيد يتحقق من أن العيب الأصلي تم إصلاحه."
+  - "اختبار التأكيد يتحقق من أن الـ defect الأصلي تم إصلاحه."
   - "اختبار الانحدار يتحقق من أن التغيير لم يسبب آثارًا سلبية في مكان آخر: في المكوّن نفسه، أو مكوّنات أخرى، أو أنظمة مرتبطة."
   - "تحليل الأثر يساعد في تحديد نطاق اختبار الانحدار."
   - "مجموعات الانحدار تُشغَّل مرات كثيرة وتكبر مع الوقت، فهي مرشّحة قوية للأتمتة، ويفضّل ضمن CI."
-  - "الاثنان ينطبقان في كل مستويات الاختبار عند إصلاح العيوب أو إجراء تغييرات."
+  - "الاثنان ينطبقان في كل مستويات الاختبار عند إصلاح الـ defects أو إجراء تغييرات."
 terms:
   - en: "Impact Analysis"
     ar: "تحليل الأثر"
@@ -31,15 +31,15 @@ terms:
     defAr: "تحديد عواقب التغيير، للمساعدة في تحديد نطاق الاختبار مثل اختبار الانحدار."
     match: ["Impact Analysis", "impact analysis"]
 ---
-عندما يُجرى تغيير على النظام، سواء لإصلاح عيب أو إضافة وظيفة أو تعديل موجودة، يجب اختباره. هناك نوعان من الاختبار المرتبط بالتغيير.
+عندما يُجرى تغيير على النظام، سواء لإصلاح defect أو إضافة وظيفة أو تعديل موجودة، يجب اختباره. هناك نوعان من الاختبار المرتبط بالتغيير.
 
 <figure class="gx-figure gx-spectrum" aria-label="Two kinds of change-related testing."><div class="gx-spectrum-row"><div class="gx-spectrum-item"><b>Confirmation testing</b><span>Was the original defect fixed? Looks at the fix itself.</span></div><div class="gx-spectrum-item gx-spectrum-item--accent"><b>Regression testing</b><span>Did the change break anything else? Looks around the fix.</span></div></div><figcaption>Two kinds of change-related testing.</figcaption></figure>
 
 ### اختبار التأكيد — Confirmation Testing
 
-يتأكد من أن **العيب الأصلي تم إصلاحه بنجاح**. حسب الخطورة، يمكن اختبار النسخة المصلحة بعدة طرق:
+يتأكد من أن **الـ defect الأصلي تم إصلاحه بنجاح**. حسب الخطورة، يمكن اختبار النسخة المصلحة بعدة طرق:
 
-- تنفيذ **كل حالات الاختبار** التي فشلت سابقًا بسبب العيب.
+- تنفيذ **كل حالات الاختبار** التي فشلت سابقًا بسبب الـ defect.
 - **إضافة اختبارات جديدة** لتغطية أي تغييرات احتاجها الإصلاح.
 
 لكن عند ضيق الوقت أو المال، قد يقتصر اختبار التأكيد على **تنفيذ الخطوات التي تعيد إنتاج العطل** والتحقق من أنه لم يعد يحدث.
@@ -58,7 +58,7 @@ terms:
 
 مجموعات اختبار الانحدار **تُشغَّل مرات كثيرة**، وعدد حالاتها **يزداد** مع كل دورة أو إصدار. لذلك هي **مرشّحة قوية للأتمتة**، ويُفضّل أن تبدأ أتمتتها مبكرًا في المشروع. وعند استخدام CI كما في DevOps، من الممارسات الجيدة تضمين اختبارات انحدار مؤتمتة، على المستويات المناسبة.
 
-اختبار التأكيد و/أو الانحدار مطلوبان **في كل مستويات الاختبار** عند إصلاح العيوب أو إجراء التغييرات.
+اختبار التأكيد و/أو الانحدار مطلوبان **في كل مستويات الاختبار** عند إصلاح الـ defects أو إجراء التغييرات.
 
 <aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">A fix changes how VAT is rounded. Confirmation: re-run the failing invoice test with 0.005 values and check the total. Regression (after impact analysis): re-run invoice PDF generation, monthly reports and the accounting export, because they all use the same rounding function.</p><p class="gx-ar" lang="ar" dir="rtl">إصلاح يغيّر طريقة تقريب ضريبة القيمة المضافة. التأكيد: إعادة تشغيل اختبار الفاتورة الذي فشل بقيم 0.005 والتحقق من المجموع. الانحدار (بعد تحليل الأثر): إعادة تشغيل توليد فواتير PDF، والتقارير الشهرية، وتصدير المحاسبة، لأنها كلها تستخدم دالة التقريب نفسها.</p></aside>
 

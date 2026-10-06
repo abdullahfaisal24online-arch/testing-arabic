@@ -21,9 +21,9 @@ takeaways:
 takeawaysAr:
   - "تحليل القيم الحدّية يختبر حدود أقسام التكافؤ، ولا يُستخدم إلا مع الأقسام المرتّبة."
   - "أصغر قيمة وأكبر قيمة في القسم هما قيمتاه الحدّيتان."
-  - "المطوّرون أكثر عرضة للخطأ عند الحدود، فالعيوب محتملة هناك."
+  - "المطوّرون أكثر عرضة للخطأ عند الحدود، فالـ defects محتملة هناك."
   - "BVA بقيمتين: كل قيمة حدّية وأقرب جار لها في القسم المجاور عناصر تغطية."
-  - "BVA بثلاث قيم: كل قيمة حدّية وجاراها الاثنان عناصر تغطية؛ وهو أكثر صرامة وقد يكتشف عيوبًا يفوّتها BVA بقيمتين."
+  - "BVA بثلاث قيم: كل قيمة حدّية وجاراها الاثنان عناصر تغطية؛ وهو أكثر صرامة وقد يكتشف defects يفوّتها BVA بقيمتين."
 terms:
   - en: "Boundary Value Analysis"
     ar: "تحليل القيم الحدّية"
@@ -44,7 +44,7 @@ terms:
 
 ### لماذا الحدود؟ — Why Boundaries?
 
-المطوّرون **أكثر عرضة لارتكاب الأخطاء عند القيم الحدّية**، مثل كتابة `<` بدل `<=`، أو تحديد بداية النطاق ونهايته بشكل خاطئ. لذلك يُتوقع أن تختبئ العيوب عند الحدود.
+المطوّرون **أكثر عرضة لارتكاب الأخطاء عند القيم الحدّية**، مثل كتابة `<` بدل `<=`، أو تحديد بداية النطاق ونهايته بشكل خاطئ. لذلك يُتوقع أن تختبئ الـ defects عند الحدود.
 
 ### BVA بقيمتين — 2-value BVA
 
@@ -56,7 +56,7 @@ terms:
 
 لكل قيمة حدّية هناك **ثلاثة عناصر تغطية**: **القيمة الحدّية** و**جاراها الاثنان**. لذلك قد يكون بعض عناصر التغطية في BVA بثلاث قيم **ليست قيمًا حدّية** أصلًا (جار داخل القسم نفسه).
 
-BVA بثلاث قيم **أكثر صرامة** من BVA بقيمتين، وقد يكتشف عيوبًا يفوّتها. مثلًا: إذا كانت القاعدة «إذا كان x ≤ 10» ونُفّذت خطأً «إذا كان x = 10»، فلن تكتشف بيانات اختبار BVA بقيمتين (x = 10 و x = 11) هذا العيب. أما x = 9 المستخرجة من BVA بثلاث قيم، فستكتشفه على الأرجح.
+BVA بثلاث قيم **أكثر صرامة** من BVA بقيمتين، وقد يكتشف defects يفوّتها. مثلًا: إذا كانت القاعدة «إذا كان x ≤ 10» ونُفّذت خطأً «إذا كان x = 10»، فلن تكتشف بيانات اختبار BVA بقيمتين (x = 10 و x = 11) هذا الـ defect. أما x = 9 المستخرجة من BVA بثلاث قيم، فستكتشفه على الأرجح.
 
 **التغطية = عدد عناصر التغطية المختبرة ÷ العدد الكلي لعناصر التغطية × 100%**
 
@@ -76,7 +76,7 @@ BVA بثلاث قيم **أكثر صرامة** من BVA بقيمتين، وقد �
 
 ### جرّبها — Try It
 
-<figure class="gx-figure gx-widget" data-widget="bva" data-config="{&quot;title&quot;:&quot;Ticket price by age: boundaries&quot;,&quot;spec&quot;:&quot;Same partitions as in EP. Switch between 2-value and 3-value BVA and enter test values.&quot;,&quot;partitions&quot;:[{&quot;label&quot;:&quot;Below zero&quot;,&quot;to&quot;:-1,&quot;valid&quot;:false},{&quot;label&quot;:&quot;Child&quot;,&quot;from&quot;:0,&quot;to&quot;:12,&quot;valid&quot;:true},{&quot;label&quot;:&quot;Adult&quot;,&quot;from&quot;:13,&quot;to&quot;:64,&quot;valid&quot;:true},{&quot;label&quot;:&quot;Senior&quot;,&quot;from&quot;:65,&quot;to&quot;:120,&quot;valid&quot;:true},{&quot;label&quot;:&quot;Above 120&quot;,&quot;from&quot;:121,&quot;valid&quot;:false}],&quot;mode&quot;:2,&quot;caption&quot;:&quot;Coverage items with an orange outline are boundary values. In 3-value BVA, their inner neighbours are added too.&quot;}" aria-label="Ticket price by age: boundaries"><figcaption>Interactive: Ticket price by age: boundaries</figcaption></figure>
+<figure class="gx-figure gx-widget" data-widget="bva" data-config="{&quot;title&quot;:&quot;Ticket price by age: boundaries&quot;,&quot;spec&quot;:&quot;Same partitions as in EP. Switch between 2-value and 3-value BVA and enter test values.&quot;,&quot;partitions&quot;:[{&quot;label&quot;:&quot;Below zero&quot;,&quot;to&quot;:-1,&quot;valid&quot;:false},{&quot;label&quot;:&quot;Child&quot;,&quot;from&quot;:0,&quot;to&quot;:12,&quot;valid&quot;:true},{&quot;label&quot;:&quot;Adult&quot;,&quot;from&quot;:13,&quot;to&quot;:64,&quot;valid&quot;:true},{&quot;label&quot;:&quot;Senior&quot;,&quot;from&quot;:65,&quot;to&quot;:120,&quot;valid&quot;:true},{&quot;label&quot;:&quot;Above 120&quot;,&quot;from&quot;:121,&quot;valid&quot;:false}],&quot;mode&quot;:2,&quot;caption&quot;:&quot;Coverage items with an orange outline are boundary values. In 3-value BVA, both neighbours of each boundary value are added too.&quot;}" aria-label="Ticket price by age: boundaries"><figcaption>Interactive: Ticket price by age: boundaries</figcaption></figure>
 
 <aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">Count carefully: in 2-value BVA the coverage items are the boundary values themselves (each boundary pair gives two values). In 3-value BVA, add each boundary value's other neighbour; values shared between boundaries count once.</p><p class="gx-ar" lang="ar" dir="rtl">عُدّ بدقة: في BVA بقيمتين، عناصر التغطية هي القيم الحدّية نفسها (كل حد بين قسمين يعطي قيمتين). وفي BVA بثلاث قيم، أضف الجار الآخر لكل قيمة حدّية؛ والقيم المشتركة بين حدّين تُحسب مرة واحدة.</p></aside>
 

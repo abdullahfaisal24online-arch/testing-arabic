@@ -52,7 +52,7 @@ terms:
   - en: "Test Suite"
     ar: "مجموعة الاختبارات"
     def: "A set of test scripts or test procedures to be executed in a specific test run."
-    defAr: "مجموعة من سكربتات الاختبار أو إجراءاته تُنفَّذ في دورة تشغيل محددة."
+    defAr: "مجموعة من الـ test scripts أو إجراءاته تُنفَّذ في دورة تشغيل محددة."
   - en: "Coverage"
     ar: "التغطية"
     def: "The degree to which specified coverage items are exercised by a test suite, expressed as a percentage."
@@ -63,7 +63,7 @@ terms:
 
 <figure class="gx-figure" aria-label="The seven groups of test activities. Planning and monitoring/control run alongside all the others."><div class="gx-flow-row"><span class="gx-flow-node gx-flow-node--accent">Planning</span><span class="gx-flow-arrow" aria-hidden="true">→</span><span class="gx-flow-node gx-flow-node--accent">Monitoring & control</span><span class="gx-flow-arrow" aria-hidden="true">→</span><span class="gx-flow-node">Analysis<small>what to test</small></span><span class="gx-flow-arrow" aria-hidden="true">→</span><span class="gx-flow-node">Design<small>how to test</small></span><span class="gx-flow-arrow" aria-hidden="true">→</span><span class="gx-flow-node">Implementation<small>get ready</small></span><span class="gx-flow-arrow" aria-hidden="true">→</span><span class="gx-flow-node">Execution<small>run & compare</small></span><span class="gx-flow-arrow" aria-hidden="true">→</span><span class="gx-flow-node">Completion<small>close & learn</small></span></div><figcaption>The seven groups of test activities. Planning and monitoring/control run alongside all the others.</figcaption></figure>
 
-تبدو هذه الأنشطة متسلسلة، لكنها في الواقع **كثيرًا ما تكون تكرارية أو تُنفَّذ بالتوازي**. في فريق Agile مثلًا قد يحدث التحليل والتصميم والتنفيذ كلها داخل السبرنت الواحد، وتتكرر مع كل قصة. كما أن هذه الأنشطة **تحتاج تكييفًا** حسب النظام والمشروع.
+تبدو هذه الأنشطة متسلسلة، لكنها في الواقع **كثيرًا ما تكون تكرارية أو تُنفَّذ بالتوازي**. في فريق Agile مثلًا قد يحدث التحليل والتصميم والتنفيذ كلها داخل الـ sprint الواحد، وتتكرر مع كل قصة. كما أن هذه الأنشطة **تحتاج تكييفًا** حسب النظام والمشروع.
 
 ### تخطيط الاختبار — Test Planning
 
@@ -82,7 +82,7 @@ terms:
 
 - تحليل **أساس الاختبار (Test Basis)** لتحديد الخصائص القابلة للاختبار.
 - تحديد **شروط الاختبار (Test Conditions)** المرتبطة بها وترتيب أولوياتها، مع مراعاة المخاطر ومستوياتها.
-- تقييم أساس الاختبار وموضوع الاختبار لاكتشاف العيوب فيهما، وتقييم قابليتهما للاختبار.
+- تقييم أساس الاختبار وموضوع الاختبار لاكتشاف الـ defects فيهما، وتقييم قابليتهما للاختبار.
 
 غالبًا يُدعم التحليل باستخدام تقنيات الاختبار، ويُقاس بمعايير تغطية قابلة للقياس.
 
@@ -103,7 +103,7 @@ terms:
 
 - إنشاء بيانات الاختبار.
 - ترتيب حالات الاختبار في **إجراءات اختبار (Test Procedures)**، وتجميعها غالبًا في **مجموعات اختبارات (Test Suites)**.
-- كتابة سكربتات الاختبار اليدوية والمؤتمتة.
+- كتابة الـ test scripts اليدوية والمؤتمتة.
 - ترتيب أولويات إجراءات الاختبار ووضعها في **جدول تنفيذ** يضمن كفاءة التشغيل.
 - بناء بيئة الاختبار والتأكد من أنها مُعدّة بشكل صحيح.
 
@@ -121,7 +121,7 @@ terms:
 
 يحدث عادة عند المحطات الرئيسية في المشروع، مثل الإطلاق أو نهاية دورة تكرار أو اكتمال مستوى اختبار. ويشمل:
 
-- إنشاء طلبات تغيير أو عناصر في قائمة المنتج (Product Backlog) للعيوب التي لم تُحل.
+- إنشاء طلبات تغيير أو عناصر في قائمة المنتج (Product Backlog) للـ defects التي لم تُحل.
 - تحديد مخرجات الاختبار التي قد تفيد مستقبلًا، وأرشفتها أو تسليمها للفرق المعنية.
 - إغلاق بيئة الاختبار وإعادتها لحالة متفق عليها.
 - تحليل أنشطة الاختبار لاستخلاص الدروس المستفادة وتحسينات للمستقبل.
@@ -129,7 +129,7 @@ terms:
 
 <aside class="gx-callout" data-kind="key"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Key idea</span><span class="gx-ar" lang="ar" dir="rtl">فكرة أساسية</span></p><p class="gx-en" lang="en" dir="ltr">Analysis = what to test (test conditions). Design = how to test (test cases). Implementation = get everything ready (procedures, data, environment). Execution = run, compare, log, report.</p><p class="gx-ar" lang="ar" dir="rtl">التحليل = ماذا نختبر (شروط الاختبار). التصميم = كيف نختبر (حالات الاختبار). التجهيز = إعداد كل شيء (الإجراءات، البيانات، البيئة). التنفيذ = شغّل، قارن، سجّل، أبلغ.</p></aside>
 
-<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">Story: "A user can reset their password by email." Analysis: test conditions such as valid email, unknown email, expired link. Design: concrete test cases with inputs and expected results, plus test data needs. Implementation: create test accounts, set up a mail catcher, order the cases. Execution: run them, compare results, log a defect if the link never expires.</p><p class="gx-ar" lang="ar" dir="rtl">القصة: «يستطيع المستخدم إعادة تعيين كلمة المرور عبر الإيميل». التحليل: شروط اختبار مثل إيميل صحيح، وإيميل غير مسجّل، ورابط منتهي الصلاحية. التصميم: حالات اختبار محددة بمدخلات ونتائج متوقعة، مع متطلبات البيانات. التجهيز: إنشاء حسابات اختبار، وتهيئة أداة لالتقاط الإيميلات، وترتيب الحالات. التنفيذ: تشغيلها، ومقارنة النتائج، وتسجيل عيب إذا كان الرابط لا تنتهي صلاحيته أبدًا.</p></aside>
+<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">Story: "A user can reset their password by email." Analysis: test conditions such as valid email, unknown email, expired link. Design: concrete test cases with inputs and expected results, plus test data needs. Implementation: create test accounts, set up a mail catcher, order the cases. Execution: run them, compare results, log a defect if the link never expires.</p><p class="gx-ar" lang="ar" dir="rtl">القصة: «يستطيع المستخدم إعادة تعيين كلمة المرور عبر الإيميل». التحليل: شروط اختبار مثل إيميل صحيح، وإيميل غير مسجّل، ورابط منتهي الصلاحية. التصميم: حالات اختبار محددة بمدخلات ونتائج متوقعة، مع متطلبات البيانات. التجهيز: إنشاء حسابات اختبار، وتهيئة أداة لالتقاط الإيميلات، وترتيب الحالات. التنفيذ: تشغيلها، ومقارنة النتائج، وتسجيل defect إذا كان الرابط لا تنتهي صلاحيته أبدًا.</p></aside>
 
 <section class="gx-lab" data-lab="LAB-1.4.1"><header class="gx-lab-head"><span class="gx-lab-title"><span class="gx-en" lang="en" dir="ltr">Lab · Map One Story Through All Seven Activities</span><span class="gx-ar" lang="ar" dir="rtl">تمرين عملي · مرّر قصة واحدة على الأنشطة السبعة</span></span><span class="gx-lab-meta">LAB-1.4.1 · Practice</span></header><div class="gx-lab-body"><p><span class="gx-en" lang="en" dir="ltr"><strong>Goal:</strong> see the whole test process on a single user story from your work.</span><span class="gx-ar" lang="ar" dir="rtl"><strong>الهدف:</strong> رؤية عملية الاختبار كاملة على قصة مستخدم واحدة من عملك.</span></p><ol class="gx-lab-steps"><li><span class="gx-en" lang="en" dir="ltr">Pick one user story or feature you tested recently.</span><span class="gx-ar" lang="ar" dir="rtl">اختر قصة مستخدم أو ميزة اختبرتها مؤخرًا.</span></li><li><span class="gx-en" lang="en" dir="ltr">For each of the seven activities, write what was actually done and by whom.</span><span class="gx-ar" lang="ar" dir="rtl">لكل نشاط من الأنشطة السبعة، اكتب ما تم فعلًا ومن قام به.</span></li><li><span class="gx-en" lang="en" dir="ltr">Mark activities that were skipped or done informally (often analysis and completion).</span><span class="gx-ar" lang="ar" dir="rtl">علّم الأنشطة التي تم تجاوزها أو نُفّذت بشكل غير رسمي (غالبًا التحليل والإكمال).</span></li><li><span class="gx-en" lang="en" dir="ltr">Note where activities overlapped or repeated instead of following a strict order.</span><span class="gx-ar" lang="ar" dir="rtl">لاحظ أين تداخلت الأنشطة أو تكررت بدل أن تتبع ترتيبًا صارمًا.</span></li></ol><details class="gx-lab-answer"><summary>What good looks like · <span class="gx-ar-inline" lang="ar" dir="rtl">كيف يبدو الحل الجيد</span></summary><p><span class="gx-en" lang="en" dir="ltr">You can place each real task under the right activity (for example, preparing test accounts is implementation, not design), and you can explain why skipping analysis or completion carries a risk.</span><span class="gx-ar" lang="ar" dir="rtl">تستطيع وضع كل مهمة حقيقية تحت النشاط الصحيح (مثلًا: تجهيز حسابات الاختبار تجهيز وليس تصميمًا)، وتستطيع أن تشرح لماذا يحمل تجاوز التحليل أو الإكمال خطرًا.</span></p></details></div></section>
 

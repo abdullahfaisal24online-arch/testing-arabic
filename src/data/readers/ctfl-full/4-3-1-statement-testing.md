@@ -21,8 +21,8 @@ takeaways:
 takeawaysAr:
   - "في اختبار التعليمات، عناصر التغطية هي التعليمات القابلة للتنفيذ."
   - "تغطية التعليمات = التعليمات التي نفّذتها الاختبارات ÷ إجمالي التعليمات القابلة للتنفيذ × 100%."
-  - "تغطية التعليمات 100% تعني أن كل تعليمة قابلة للتنفيذ، ومنها أي تعليمة فيها عيب، نُفّذت مرة واحدة على الأقل."
-  - "قد تفوّت عيوبًا تعتمد على البيانات، مثل القسمة على صفر التي تحدث فقط عندما يكون المقسوم عليه 0."
+  - "تغطية التعليمات 100% تعني أن كل تعليمة قابلة للتنفيذ، ومنها أي تعليمة فيها defect، نُفّذت مرة واحدة على الأقل."
+  - "قد تفوّت defects تعتمد على البيانات، مثل القسمة على صفر التي تحدث فقط عندما يكون المقسوم عليه 0."
   - "لا تضمن اختبار كل منطق القرارات: بعض الفروع قد لا تُسلك أبدًا."
 terms:
   - en: "Statement Testing"
@@ -46,17 +46,17 @@ terms:
 
 ### ماذا تضمن 100%؟ — What 100% Gives You
 
-عند الوصول إلى **تغطية تعليمات 100%**، تضمن أن **كل تعليمة قابلة للتنفيذ في الشيفرة نُفّذت مرة واحدة على الأقل**. هذا يعني أن كل تعليمة فيها عيب نُفّذت أيضًا، وقد تسبب عطلًا يكشف العيب.
+عند الوصول إلى **تغطية تعليمات 100%**، تضمن أن **كل تعليمة قابلة للتنفيذ في الشيفرة نُفّذت مرة واحدة على الأقل**. هذا يعني أن كل تعليمة فيها defect نُفّذت أيضًا، وقد تسبب عطلًا يكشف الـ defect.
 
 ### ماذا لا تضمن؟ — What It Does Not Guarantee
 
-- قد **لا تكتشف عيوبًا تعتمد على البيانات**: مثلًا قسمة على صفر لا تفشل إلا عندما يكون المقسوم عليه 0. تنفيذ التعليمة بقيمة أخرى لن يكشف العيب.
+- قد **لا تكتشف defects تعتمد على البيانات**: مثلًا قسمة على صفر لا تفشل إلا عندما يكون المقسوم عليه 0. تنفيذ التعليمة بقيمة أخرى لن يكشف الـ defect.
 - قد **لا تضمن اختبار كل منطق القرارات**، لأنها لا تضمن سلوك كل الفروع في الشيفرة (القسم التالي).
 
 ### جرّبها — Try It
 
 <figure class="gx-figure gx-widget" data-widget="cov" data-config="{&quot;title&quot;:&quot;Shipping fee&quot;,&quot;spec&quot;:&quot;One decision, no else. Find a single test that reaches 100% statement coverage, then look at the branch meter.&quot;,&quot;inputs&quot;:[{&quot;name&quot;:&quot;total&quot;,&quot;value&quot;:150}],&quot;program&quot;:[{&quot;id&quot;:&quot;s1&quot;,&quot;s&quot;:&quot;fee = 5&quot;},{&quot;id&quot;:&quot;d1&quot;,&quot;if&quot;:&quot;total &gt;= 100&quot;,&quot;then&quot;:[{&quot;id&quot;:&quot;s2&quot;,&quot;s&quot;:&quot;fee = 0&quot;}]},{&quot;id&quot;:&quot;s3&quot;,&quot;s&quot;:&quot;charge(fee)&quot;}],&quot;caption&quot;:&quot;total = 150 runs every statement (100%) but only the true branch of the decision (50% branch coverage).&quot;}" aria-label="Shipping fee"><figcaption>Interactive: Shipping fee</figcaption></figure>
 
-<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">K2: expect "what does 100% statement coverage guarantee?" Correct: every executable statement ran at least once. Wrong: all branches were taken, or no defects remain.</p><p class="gx-ar" lang="ar" dir="rtl">هدف K2: توقّع سؤال «ماذا تضمن تغطية التعليمات 100%؟». الصحيح: كل تعليمة قابلة للتنفيذ نُفّذت مرة واحدة على الأقل. والخطأ: كل الفروع سُلكت، أو لم يتبقَّ أي عيب.</p></aside>
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">K2: expect "what does 100% statement coverage guarantee?" Correct: every executable statement ran at least once. Wrong: all branches were taken, or no defects remain.</p><p class="gx-ar" lang="ar" dir="rtl">هدف K2: توقّع سؤال «ماذا تضمن تغطية التعليمات 100%؟». الصحيح: كل تعليمة قابلة للتنفيذ نُفّذت مرة واحدة على الأقل. والخطأ: كل الفروع سُلكت، أو لم يتبقَّ أي defect.</p></aside>
 
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Common mistake</span><span class="gx-ar" lang="ar" dir="rtl">خطأ شائع</span></p><p class="gx-en" lang="en" dir="ltr">Treating 100% statement coverage as "fully tested". In the example above, one test reaches 100% statements, yet the case where the fee stays 5 (total under 100) is never checked.</p><p class="gx-ar" lang="ar" dir="rtl">اعتبار تغطية التعليمات 100% «اختبارًا كاملًا». في المثال أعلاه، اختبار واحد يصل إلى 100% تعليمات، ومع ذلك لم تُفحص أبدًا الحالة التي تبقى فيها الرسوم 5 (مجموع أقل من 100).</p></aside>

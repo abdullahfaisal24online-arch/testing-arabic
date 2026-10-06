@@ -23,7 +23,7 @@ terms:
   - en: "Test Management Tool"
     ar: "أداة إدارة الاختبار"
     def: "A tool that supports the management of the test process and of test work products, requirements, defects and reporting."
-    defAr: "أداة تدعم إدارة عملية الاختبار ومخرجاته، والمتطلبات، والعيوب، والتقارير."
+    defAr: "أداة تدعم إدارة عملية الاختبار ومخرجاته، والمتطلبات، والـ defects، والتقارير."
   - en: "Test Automation"
     ar: "أتمتة الاختبار"
     def: "The use of software to perform or support test activities, such as test execution and comparing actual with expected results."
@@ -34,7 +34,7 @@ terms:
 
 | Tool type | ماذا تدعم؟ |
 | --- | --- |
-| Test management tools | تزيد كفاءة عملية الاختبار بتسهيل إدارة الـ SDLC، والمتطلبات، والاختبارات، والعيوب، والإعدادات |
+| Test management tools | تزيد كفاءة عملية الاختبار بتسهيل إدارة الـ SDLC، والمتطلبات، والاختبارات، والـ defects، والإعدادات |
 | Static testing tools | تدعم المختبر في المراجعات والتحليل الساكن |
 | Test design and implementation tools | تسهّل توليد حالات الاختبار، وبيانات الاختبار، وإجراءات الاختبار |
 | Test execution and coverage tools | تسهّل التنفيذ المؤتمت للاختبارات وقياس التغطية |
@@ -49,7 +49,7 @@ terms:
 
 <figure class="gx-figure gx-spectrum" aria-label="Example tools by type (examples only; the syllabus names no products)."><div class="gx-spectrum-row"><div class="gx-spectrum-item"><b>Test management</b><span>e.g. a test management plugin for an issue tracker.</span></div><div class="gx-spectrum-item"><b>Static testing</b><span>e.g. linters, static code analysers.</span></div><div class="gx-spectrum-item"><b>Test execution</b><span>e.g. UI or API automation frameworks.</span></div><div class="gx-spectrum-item"><b>Non-functional</b><span>e.g. load and performance testing tools.</span></div><div class="gx-spectrum-item"><b>DevOps</b><span>e.g. CI/CD servers and pipelines.</span></div><div class="gx-spectrum-item gx-spectrum-item--accent"><b>Scalability</b><span>e.g. containers and virtual machines for test environments.</span></div></div><figcaption>Example tools by type (examples only; the syllabus names no products).</figcaption></figure>
 
-<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">A typical web team's toolchain: tests and defects in a test management plugin (test management), a linter on every pull request (static testing), Playwright or Selenium tests run by a CI server (test execution and DevOps), a load testing tool before major releases (non-functional), Docker for test environments (scalability), and a chat channel for status (collaboration).</p><p class="gx-ar" lang="ar" dir="rtl">سلسلة أدوات معتادة لفريق ويب: الاختبارات والعيوب في إضافة لإدارة الاختبار (إدارة الاختبار)، وأداة Linter على كل Pull Request (اختبار ساكن)، واختبارات Playwright أو Selenium يشغّلها خادم CI (تنفيذ الاختبار وDevOps)، وأداة اختبار حِمل قبل الإصدارات الكبيرة (غير وظيفي)، وDocker لبيئات الاختبار (التوسّع)، وقناة شات لحالة الاختبار (التعاون).</p></aside>
+<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">A typical web team's toolchain: tests and defects in a test management plugin (test management), a linter on every pull request (static testing), Playwright or Selenium tests run by a CI server (test execution and DevOps), a load testing tool before major releases (non-functional), Docker for test environments (scalability), and a chat channel for status (collaboration).</p><p class="gx-ar" lang="ar" dir="rtl">سلسلة أدوات معتادة لفريق ويب: الاختبارات والـ defects في إضافة لإدارة الاختبار (إدارة الاختبار)، وأداة Linter على كل Pull Request (اختبار ساكن)، واختبارات Playwright أو Selenium يشغّلها خادم CI (تنفيذ الاختبار وDevOps)، وأداة اختبار حِمل قبل الإصدارات الكبيرة (غير وظيفي)، وDocker لبيئات الاختبار (التوسّع)، وقناة شات لحالة الاختبار (التعاون).</p></aside>
 
 <aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">K2: match the tool type to what it supports. "Generating test data" → test design and implementation tools. "Measuring coverage" → test execution and coverage tools. "Containers" → scalability and deployment standardization.</p><p class="gx-ar" lang="ar" dir="rtl">هدف K2: اربط نوع الأداة بما تدعمه. «توليد بيانات الاختبار» ← أدوات تصميم الاختبار وتجهيزه. «قياس التغطية» ← أدوات تنفيذ الاختبار والتغطية. «الحاويات» ← التوسّع وتوحيد النشر.</p></aside>
 

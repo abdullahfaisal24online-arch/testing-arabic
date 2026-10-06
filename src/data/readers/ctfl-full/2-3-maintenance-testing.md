@@ -32,12 +32,12 @@ terms:
   - en: "Hot Fix"
     ar: "الإصلاح العاجل"
     def: "An urgent, unplanned change to a system in production, usually to fix a critical defect."
-    defAr: "تغيير عاجل غير مخطط على نظام في الإنتاج، غالبًا لإصلاح عيب حرج."
+    defAr: "تغيير عاجل غير مخطط على نظام في الإنتاج، غالبًا لإصلاح defect حرج."
     match: ["Hot Fix", "hot fix", "hot fixes"]
 ---
 بعد إطلاق النظام لا يتوقف العمل عليه. هناك أنواع مختلفة من **الصيانة**:
 
-- **تصحيحية (Corrective):** لإصلاح العيوب.
+- **تصحيحية (Corrective):** لإصلاح الـ defects.
 - **تكيّفية (Adaptive):** للتكيّف مع تغيّرات في البيئة.
 - **لتحسين الأداء أو قابلية الصيانة.**
 

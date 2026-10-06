@@ -71,7 +71,7 @@ terms:
 
 - قد يبدأ الاختبار غير الوظيفي **مبكرًا** في دورة الحياة، مثلًا ضمن المراجعات واختبار المكوّنات أو اختبار النظام.
 - كثير من الاختبارات غير الوظيفية **مشتقة من اختبارات وظيفية**، لأنها تستخدم الاختبارات الوظيفية نفسها لكنها تتحقق من أن قيدًا غير وظيفي تحقق أثناء تنفيذ الوظيفة، مثل التحقق من أن وظيفة تُنفَّذ خلال وقت محدد.
-- **اكتشاف العيوب غير الوظيفية متأخرًا قد يهدد نجاح المشروع بشكل خطير.**
+- **اكتشاف الـ defects غير الوظيفية متأخرًا قد يهدد نجاح المشروع بشكل خطير.**
 - قد يحتاج الاختبار غير الوظيفي **بيئة اختبار خاصة جدًا**، مثل مختبر سهولة الاستخدام.
 
 ### اختبار الصندوق الأسود — Black-box Testing
@@ -90,4 +90,4 @@ terms:
 
 <aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">Watch for "how well" wording: response time, ease of use, recovery after a crash, protection of data → non-functional. "Calculates", "displays", "saves" → functional.</p><p class="gx-ar" lang="ar" dir="rtl">انتبه لصياغة «مدى الجودة»: زمن الاستجابة، وسهولة الاستخدام، والتعافي بعد الانهيار، وحماية البيانات ← غير وظيفي. «يحسب»، «يعرض»، «يحفظ» ← وظيفي.</p></aside>
 
-<aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Common mistake</span><span class="gx-ar" lang="ar" dir="rtl">خطأ شائع</span></p><p class="gx-en" lang="en" dir="ltr">Thinking non-functional testing only happens at the end, in system testing. It can start early, in reviews and component testing, and finding non-functional defects late is a serious risk.</p><p class="gx-ar" lang="ar" dir="rtl">الظن بأن الاختبار غير الوظيفي يحدث في النهاية فقط ضمن اختبار النظام. يمكن أن يبدأ مبكرًا في المراجعات واختبار المكوّنات، واكتشاف العيوب غير الوظيفية متأخرًا خطر جدّي.</p></aside>
+<aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Common mistake</span><span class="gx-ar" lang="ar" dir="rtl">خطأ شائع</span></p><p class="gx-en" lang="en" dir="ltr">Thinking non-functional testing only happens at the end, in system testing. It can start early, in reviews and component testing, and finding non-functional defects late is a serious risk.</p><p class="gx-ar" lang="ar" dir="rtl">الظن بأن الاختبار غير الوظيفي يحدث في النهاية فقط ضمن اختبار النظام. يمكن أن يبدأ مبكرًا في المراجعات واختبار المكوّنات، واكتشاف الـ defects غير الوظيفية متأخرًا خطر جدّي.</p></aside>

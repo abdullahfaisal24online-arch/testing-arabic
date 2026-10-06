@@ -90,7 +90,7 @@ export const CTFL = createGuide({
     '5.2': { en: 'Risk Management', ar: 'إدارة المخاطر' },
     '5.3': { en: 'Test Monitoring, Test Control and Test Completion', ar: 'مراقبة الاختبار والتحكم فيه وإكماله' },
     '5.4': { en: 'Configuration Management', ar: 'إدارة الإعدادات' },
-    '5.5': { en: 'Defect Management', ar: 'إدارة العيوب' },
+    '5.5': { en: 'Defect Management', ar: 'إدارة الـ defects' },
     '6.1': { en: 'Tool Support for Testing', ar: 'دعم الأدوات للاختبار' },
     '6.2': { en: 'Benefits and Risks of Test Automation', ar: 'فوائد أتمتة الاختبار ومخاطرها' },
   },

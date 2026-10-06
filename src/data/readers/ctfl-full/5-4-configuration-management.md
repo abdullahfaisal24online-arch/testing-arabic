@@ -18,7 +18,7 @@ takeaways:
   - "To support testing, all items are uniquely identified, version controlled, tracked for changes and related to each other for traceability, and documentation and software are referenced unambiguously in testware."
   - "Continuous integration, delivery and deployment usually include automated CM in the DevOps pipeline."
 takeawaysAr:
-  - "إدارة الإعدادات (CM) تحدد مخرجات العمل وتتحكم فيها وتتابعها كعناصر إعدادات، مثل خطط الاختبار واستراتيجياته وشروطه وحالاته وسكربتاته ونتائجه وسجلاته وتقاريره."
+  - "إدارة الإعدادات (CM) تحدد مخرجات العمل وتتحكم فيها وتتابعها كعناصر إعدادات، مثل خطط الاختبار واستراتيجياته وشروطه وحالاته والـ test scripts ونتائجه وسجلاته وتقاريره."
   - "للعناصر المعقدة، تسجّل CM ما تتكون منه وعلاقاتها وإصداراتها؛ والعنصر المعتمد يصبح خط أساس، لا يتغير إلا عبر ضبط تغيير رسمي."
   - "CM تحتفظ بسجل للتغييرات، وتتيح العودة لخط أساس سابق لإعادة إنتاج نتائج اختبار سابقة."
   - "لدعم الاختبار: كل العناصر مُعرَّفة بشكل فريد، وتحت ضبط الإصدارات، ومتابَعة التغييرات، ومرتبطة ببعضها للتتبّع، والوثائق والبرمجيات مُشار إليها بوضوح في مخرجات الاختبار."
@@ -38,7 +38,7 @@ terms:
     def: "An approved version of a configuration item that can only be changed through formal change control."
     defAr: "إصدار معتمد من عنصر إعدادات، لا يمكن تغييره إلا عبر ضبط تغيير رسمي."
 ---
-في الاختبار، **إدارة الإعدادات (Configuration Management / CM)** توفّر إطارًا لـ **تحديد** مخرجات العمل و**التحكم** فيها و**متابعتها**، مثل خطط الاختبار، واستراتيجياته، وشروطه، وحالاته، وسكربتاته، ونتائجه، وسجلاته، وتقاريره، باعتبارها **عناصر إعدادات (Configuration Items)**.
+في الاختبار، **إدارة الإعدادات (Configuration Management / CM)** توفّر إطارًا لـ **تحديد** مخرجات العمل و**التحكم** فيها و**متابعتها**، مثل خطط الاختبار، واستراتيجياته، وشروطه، وحالاته، والـ test scripts، ونتائجه، وسجلاته، وتقاريره، باعتبارها **عناصر إعدادات (Configuration Items)**.
 
 ### العناصر المعقدة وخطوط الأساس — Complex Items and Baselines
 
@@ -57,8 +57,8 @@ terms:
 
 **التكامل المستمر، والتسليم المستمر، والنشر المستمر** والاختبار المرتبط بها، تُنفَّذ عادة كجزء من **خط DevOps مؤتمت**، تكون فيه **إدارة الإعدادات المؤتمتة** جزءًا أساسيًا.
 
-<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">A defect report says "Fails on build 4.12.3, test environment ENV-B (Postgres 15.4), test script checkout_v7". Because all three are under configuration management, a developer can recreate exactly the same setup a month later and reproduce the failure.</p><p class="gx-ar" lang="ar" dir="rtl">تقرير عيب يقول: «يفشل على النسخة 4.12.3، بيئة الاختبار ENV-B (Postgres 15.4)، سكربت الاختبار checkout_v7». ولأن الثلاثة تحت إدارة الإعدادات، يستطيع المطوّر إعادة إنشاء الإعداد نفسه بالضبط بعد شهر، وإعادة إنتاج العطل.</p></aside>
+<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">A defect report says "Fails on build 4.12.3, test environment ENV-B (Postgres 15.4), test script checkout_v7". Because all three are under configuration management, a developer can recreate exactly the same setup a month later and reproduce the failure.</p><p class="gx-ar" lang="ar" dir="rtl">تقرير defect يقول: «يفشل على النسخة 4.12.3، بيئة الاختبار ENV-B (Postgres 15.4)، الـ test script checkout_v7». ولأن الثلاثة تحت إدارة الإعدادات، يستطيع المطوّر إعادة إنشاء الإعداد نفسه بالضبط بعد شهر، وإعادة إنتاج العطل.</p></aside>
 
 <aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">Key ideas for K2: unique identification, version control, change tracking, traceability between items, and baselines that change only through formal change control. Reverting to a baseline lets you reproduce earlier results.</p><p class="gx-ar" lang="ar" dir="rtl">أفكار أساسية لهدف K2: التعريف الفريد، وضبط الإصدارات، ومتابعة التغييرات، والتتبّع بين العناصر، وخطوط الأساس التي لا تتغير إلا عبر ضبط تغيير رسمي. والعودة لخط أساس تتيح إعادة إنتاج النتائج السابقة.</p></aside>
 
-<aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Common mistake</span><span class="gx-ar" lang="ar" dir="rtl">خطأ شائع</span></p><p class="gx-en" lang="en" dir="ltr">Thinking configuration management is only for source code. Test plans, test cases, scripts, results, logs, reports and test environments are configuration items too.</p><p class="gx-ar" lang="ar" dir="rtl">الظن بأن إدارة الإعدادات للشيفرة المصدرية فقط. خطط الاختبار وحالاته وسكربتاته ونتائجه وسجلاته وتقاريره وبيئاته عناصر إعدادات أيضًا.</p></aside>
+<aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Common mistake</span><span class="gx-ar" lang="ar" dir="rtl">خطأ شائع</span></p><p class="gx-en" lang="en" dir="ltr">Thinking configuration management is only for source code. Test plans, test cases, scripts, results, logs, reports and test environments are configuration items too.</p><p class="gx-ar" lang="ar" dir="rtl">الظن بأن إدارة الإعدادات للشيفرة المصدرية فقط. خطط الاختبار وحالاته والـ test scripts ونتائجه وسجلاته وتقاريره وبيئاته عناصر إعدادات أيضًا.</p></aside>

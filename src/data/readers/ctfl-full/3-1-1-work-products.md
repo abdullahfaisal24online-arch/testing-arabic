@@ -26,7 +26,7 @@ terms:
   - en: "Review"
     ar: "المراجعة"
     def: "A type of static testing in which people examine a work product to find defects or for other purposes such as reaching consensus."
-    defAr: "نوع من الاختبار الساكن يفحص فيه الأشخاص مُخرَج عمل لاكتشاف العيوب أو لأغراض أخرى مثل الوصول لتوافق."
+    defAr: "نوع من الاختبار الساكن يفحص فيه الأشخاص مُخرَج عمل لاكتشاف الـ defects أو لأغراض أخرى مثل الوصول لتوافق."
     match: ["Review", "review", "reviews"]
 ---
 في **الاختبار الساكن (Static Testing)** لا يحتاج موضوع الاختبار إلى التشغيل. يمكن أن يتم:
@@ -34,7 +34,7 @@ terms:
 - **يدويًا** عبر **المراجعات (Reviews)**.
 - **بالأدوات** عبر **التحليل الساكن (Static Analysis)**.
 
-أهداف الاختبار الساكن تشمل تحسين الجودة، واكتشاف العيوب، وتقييم خصائص مثل سهولة القراءة والاكتمال والصحة وقابلية الاختبار والاتساق. ويمكن استخدامه للتحقق (Verification) وللمصادقة (Validation).
+أهداف الاختبار الساكن تشمل تحسين الجودة، واكتشاف الـ defects، وتقييم خصائص مثل سهولة القراءة والاكتمال والصحة وقابلية الاختبار والاتساق. ويمكن استخدامه للتحقق (Verification) وللمصادقة (Validation).
 
 المختبرون وممثلو العمل والمطوّرون يعملون معًا أثناء جلسات الاختبار بالأمثلة، وكتابة قصص المستخدم بشكل تعاوني، وجلسات تحسين قائمة المنتج، للتأكد من أن قصص المستخدم ومخرجاتها تحقق المعايير المحددة، مثل «تعريف الجاهزية» (Definition of Ready).
 
@@ -52,8 +52,8 @@ terms:
 
 المخرجات التي **يصعب على الإنسان تفسيرها**، والتي **لا يجوز تحليلها بالأدوات**، غير مناسبة للاختبار الساكن. مثال المنهج: **شيفرة تنفيذية لطرف ثالث**، بسبب قيود قانونية.
 
-<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">In one sprint, a team reviews three user stories with the product owner, runs a linter and a security scanner on every pull request, and peer-reviews the new test cases for the payment flow. All three are static testing; none of them runs the application.</p><p class="gx-ar" lang="ar" dir="rtl">في سبرنت واحد، يراجع فريق ثلاث قصص مستخدم مع مالك المنتج، ويشغّل أداة Linter وماسحًا أمنيًا على كل Pull Request، ويراجع الزملاء حالات الاختبار الجديدة لمسار الدفع. الثلاثة اختبار ساكن؛ ولا واحد منها يشغّل التطبيق.</p></aside>
+<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">In one sprint, a team reviews three user stories with the product owner, runs a linter and a security scanner on every pull request, and peer-reviews the new test cases for the payment flow. All three are static testing; none of them runs the application.</p><p class="gx-ar" lang="ar" dir="rtl">في sprint واحد، يراجع فريق ثلاث قصص مستخدم مع مالك المنتج، ويشغّل أداة Linter وماسحًا أمنيًا على كل Pull Request، ويراجع الزملاء حالات الاختبار الجديدة لمسار الدفع. الثلاثة اختبار ساكن؛ ولا واحد منها يشغّل التطبيق.</p></aside>
 
 <aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">K1: if the option is something you can read, it can be statically tested, including test cases and contracts. Watch for the one exception: third-party executable code that cannot be analysed for legal reasons.</p><p class="gx-ar" lang="ar" dir="rtl">هدف K1: إذا كان الخيار شيئًا يمكن قراءته، فيمكن اختباره ساكنًا، بما في ذلك حالات الاختبار والعقود. وانتبه للاستثناء الوحيد: شيفرة تنفيذية لطرف ثالث لا يجوز تحليلها لأسباب قانونية.</p></aside>
 
-<aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Common mistake</span><span class="gx-ar" lang="ar" dir="rtl">خطأ شائع</span></p><p class="gx-en" lang="en" dir="ltr">Thinking static testing is only for code. Requirements, test cases, contracts and models are all valid targets, and often the most valuable ones because defects there are found earliest.</p><p class="gx-ar" lang="ar" dir="rtl">الظن بأن الاختبار الساكن للشيفرة فقط. المتطلبات وحالات الاختبار والعقود والنماذج كلها أهداف صحيحة، وغالبًا الأكثر قيمة، لأن العيوب فيها تُكتشف في أبكر وقت.</p></aside>
+<aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Common mistake</span><span class="gx-ar" lang="ar" dir="rtl">خطأ شائع</span></p><p class="gx-en" lang="en" dir="ltr">Thinking static testing is only for code. Requirements, test cases, contracts and models are all valid targets, and often the most valuable ones because defects there are found earliest.</p><p class="gx-ar" lang="ar" dir="rtl">الظن بأن الاختبار الساكن للشيفرة فقط. المتطلبات وحالات الاختبار والعقود والنماذج كلها أهداف صحيحة، وغالبًا الأكثر قيمة، لأن الـ defects فيها تُكتشف في أبكر وقت.</p></aside>

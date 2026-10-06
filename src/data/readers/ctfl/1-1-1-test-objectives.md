@@ -18,7 +18,7 @@ takeaways:
   - "Static testing examines work products without running them; dynamic testing runs the software."
   - "There are nine typical test objectives, and which ones matter most depends on the context."
 takeawaysAr:
-  - "الاختبار مجموعة أنشطة لاكتشاف العيوب وتقييم جودة مخرجات العمل، وليس مجرد تشغيل اختبارات."
+  - "الاختبار مجموعة أنشطة لاكتشاف الـ defects وتقييم جودة مخرجات العمل، وليس مجرد تشغيل اختبارات."
   - "الاختبار يشمل التحقق (هل بنيناه بشكل صحيح؟) والمصادقة (هل بنينا الشيء الصحيح؟)."
   - "الاختبار الساكن يفحص مخرجات العمل دون تشغيلها؛ والاختبار الديناميكي يشغّل البرمجية."
   - "هناك تسعة أهداف معتادة للاختبار، وأهمّها يختلف حسب السياق."
@@ -26,7 +26,7 @@ terms:
   - en: "Testing"
     ar: "الاختبار"
     def: "A set of activities to discover defects and evaluate the quality of software work products."
-    defAr: "مجموعة أنشطة لاكتشاف العيوب وتقييم جودة مخرجات العمل البرمجية."
+    defAr: "مجموعة أنشطة لاكتشاف الـ defects وتقييم جودة مخرجات العمل البرمجية."
   - en: "Test Object"
     ar: "موضوع الاختبار"
     def: "The work product that is being tested."
@@ -56,7 +56,7 @@ terms:
 ---
 البرمجيات حولنا في كل مكان: تطبيق البنك، ونظام الحجز، وبرنامج المستشفى. وأي برمجية قد لا تعمل كما هو متوقع، وقد تكون العواقب خسارة مال أو وقت أو سمعة، وأحيانًا ما هو أخطر. **الاختبار** يساعدنا على تقييم جودة البرمجية وتقليل خطر حدوث الأعطال أثناء التشغيل.
 
-يعرّف المنهج **الاختبار (Testing)** بأنه مجموعة أنشطة لاكتشاف العيوب وتقييم جودة مخرجات العمل البرمجية. والشيء الذي نختبره، سواء كان شيفرة أو متطلبات أو تصميمًا، يسمّى **موضوع الاختبار (Test Object)**.
+يعرّف المنهج **الاختبار (Testing)** بأنه مجموعة أنشطة لاكتشاف الـ defects وتقييم جودة مخرجات العمل البرمجية. والشيء الذي نختبره، سواء كان شيفرة أو متطلبات أو تصميمًا، يسمّى **موضوع الاختبار (Test Object)**.
 
 ### ما هو الاختبار فعلًا؟ — What Testing Really Is
 
@@ -85,7 +85,7 @@ terms:
 | Test objective | المعنى |
 | --- | --- |
 | Evaluating work products | تقييم مخرجات العمل مثل المتطلبات وقصص المستخدم والتصاميم والشيفرة |
-| Causing failures and finding defects | إحداث الأعطال واكتشاف العيوب |
+| Causing failures and finding defects | إحداث الأعطال واكتشاف الـ defects |
 | Ensuring required coverage | ضمان التغطية المطلوبة لموضوع الاختبار |
 | Reducing risk | خفض مستوى خطر أن تكون جودة البرمجية غير كافية |
 | Verifying specified requirements | التحقق من أن المتطلبات المحددة تحققت |
@@ -104,10 +104,10 @@ terms:
 - دورة حياة التطوير المتّبعة.
 - عوامل سياق العمل، مثل هيكل المؤسسة والمنافسة ووقت الوصول للسوق.
 
-مثلًا، في اختبار المكوّنات قد يكون الهدف الأهم اكتشاف أكبر عدد من العيوب مبكرًا. أما في اختبار القبول فالهدف الأهم غالبًا بناء الثقة والمصادقة على أن النظام جاهز للاستخدام الفعلي، لا البحث عن عيوب كثيرة.
+مثلًا، في اختبار المكوّنات قد يكون الهدف الأهم اكتشاف أكبر عدد من الـ defects مبكرًا. أما في اختبار القبول فالهدف الأهم غالبًا بناء الثقة والمصادقة على أن النظام جاهز للاستخدام الفعلي، لا البحث عن defects كثيرة.
 
 <aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">A banking app must comply with central bank regulations, so verifying compliance becomes a key objective. A startup's prototype may focus on giving the founders quick information about whether the main flow works at all.</p><p class="gx-ar" lang="ar" dir="rtl">تطبيق بنكي يجب أن يلتزم بتعليمات البنك المركزي، فيصبح التحقق من الالتزام هدفًا رئيسيًا. أما النموذج الأولي لشركة ناشئة فقد يركّز على تزويد المؤسسين بمعلومة سريعة عن عمل المسار الرئيسي من الأساس.</p></aside>
 
-<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">This is a K1 objective: you need to recognise the typical objectives in a list. Watch for options that sound plausible but are not test objectives, such as "fixing defects" (that is debugging) or "proving the software has no defects" (testing cannot do that).</p><p class="gx-ar" lang="ar" dir="rtl">هذا هدف K1: المطلوب أن تتعرّف على الأهداف المعتادة ضمن قائمة. انتبه للخيارات التي تبدو منطقية لكنها ليست أهداف اختبار، مثل «إصلاح العيوب» (هذا تنقيح Debugging) أو «إثبات خلو البرمجية من العيوب» (الاختبار لا يستطيع ذلك).</p></aside>
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">This is a K1 objective: you need to recognise the typical objectives in a list. Watch for options that sound plausible but are not test objectives, such as "fixing defects" (that is debugging) or "proving the software has no defects" (testing cannot do that).</p><p class="gx-ar" lang="ar" dir="rtl">هذا هدف K1: المطلوب أن تتعرّف على الأهداف المعتادة ضمن قائمة. انتبه للخيارات التي تبدو منطقية لكنها ليست أهداف اختبار، مثل «إصلاح الـ defects» (هذا تنقيح Debugging) أو «إثبات خلو البرمجية من الـ defects» (الاختبار لا يستطيع ذلك).</p></aside>
 
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Common mistake</span><span class="gx-ar" lang="ar" dir="rtl">خطأ شائع</span></p><p class="gx-en" lang="en" dir="ltr">Thinking validation is the same as verification. Verification compares the product with its specification; validation checks whether it meets the real needs of its users, even if the specification was incomplete.</p><p class="gx-ar" lang="ar" dir="rtl">الظن بأن المصادقة هي نفسها التحقق. التحقق يقارن المنتج بمواصفاته؛ والمصادقة تتأكد من أنه يلبّي الاحتياجات الفعلية لمستخدميه، حتى لو كانت المواصفات ناقصة.</p></aside>

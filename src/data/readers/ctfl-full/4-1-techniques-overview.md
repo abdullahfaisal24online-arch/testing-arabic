@@ -22,7 +22,7 @@ takeawaysAr:
   - "تساعد في تحديد شروط الاختبار وعناصر التغطية وبيانات الاختبار، وتطوير مجموعة صغيرة نسبيًا لكنها كافية من حالات الاختبار بشكل منهجي."
   - "تقنيات الصندوق الأسود مبنية على السلوك المحدد، دون النظر للبنية الداخلية؛ والاختبارات تبقى صالحة إذا تغيّر التنفيذ ولم يتغيّر السلوك."
   - "تقنيات الصندوق الأبيض مبنية على البنية الداخلية؛ ولا يمكن إنشاء الاختبارات إلا بعد وجود التصميم أو التنفيذ."
-  - "التقنيات المبنية على الخبرة تستخدم معرفة المختبر وخبرته، وقد تكتشف عيوبًا تفوتها التقنيات الأخرى."
+  - "التقنيات المبنية على الخبرة تستخدم معرفة المختبر وخبرته، وقد تكتشف defects تفوتها التقنيات الأخرى."
 terms:
   - en: "Test Technique"
     ar: "تقنية الاختبار"
@@ -63,10 +63,10 @@ terms:
 
 تستخدم بفعالية **معرفة المختبرين وخبرتهم** في تصميم الاختبارات وتنفيذها. فعاليتها تعتمد كثيرًا على مهارات المختبر.
 
-يمكنها اكتشاف عيوب قد تفوت تقنيات الصندوق الأسود والأبيض. لذلك هي **مكمّلة** لهما.
+يمكنها اكتشاف defects قد تفوت تقنيات الصندوق الأسود والأبيض. لذلك هي **مكمّلة** لهما.
 
 <aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">For a loan calculator: a black-box test uses the rule "loans of $1,000–$50,000 are allowed" from the specification. A white-box test makes sure the branch that applies a special rate for existing customers is executed. An experience-based test tries a pasted amount with a currency symbol, because the tester has seen that break forms before.</p><p class="gx-ar" lang="ar" dir="rtl">لحاسبة قروض: اختبار الصندوق الأسود يستخدم قاعدة «القروض بين 1000 و50000 دولار مسموحة» من المواصفات. اختبار الصندوق الأبيض يتأكد من تنفيذ الفرع الذي يطبّق سعرًا خاصًا للعملاء الحاليين. والاختبار المبني على الخبرة يجرّب لصق مبلغ مع رمز العملة، لأن المختبر رأى ذلك يعطّل النماذج من قبل.</p></aside>
 
 <aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">"Test cases can only be created after the design is available" → white-box. "Test cases remain useful if the implementation changes" → black-box. "Depends heavily on the tester's skills" → experience-based.</p><p class="gx-ar" lang="ar" dir="rtl">«لا يمكن إنشاء حالات الاختبار إلا بعد توفر التصميم» ← صندوق أبيض. «حالات الاختبار تبقى مفيدة إذا تغيّر التنفيذ» ← صندوق أسود. «يعتمد كثيرًا على مهارات المختبر» ← مبني على الخبرة.</p></aside>
 
-<aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Common mistake</span><span class="gx-ar" lang="ar" dir="rtl">خطأ شائع</span></p><p class="gx-en" lang="en" dir="ltr">Thinking experience-based techniques are "unstructured guessing" to be avoided. They complement the systematic techniques and often find defects the others miss.</p><p class="gx-ar" lang="ar" dir="rtl">الظن بأن التقنيات المبنية على الخبرة «تخمين عشوائي» يجب تجنّبه. هي تكمّل التقنيات المنهجية، وغالبًا تكتشف عيوبًا تفوت غيرها.</p></aside>
+<aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Common mistake</span><span class="gx-ar" lang="ar" dir="rtl">خطأ شائع</span></p><p class="gx-en" lang="en" dir="ltr">Thinking experience-based techniques are "unstructured guessing" to be avoided. They complement the systematic techniques and often find defects the others miss.</p><p class="gx-ar" lang="ar" dir="rtl">الظن بأن التقنيات المبنية على الخبرة «تخمين عشوائي» يجب تجنّبه. هي تكمّل التقنيات المنهجية، وغالبًا تكتشف defects تفوت غيرها.</p></aside>
