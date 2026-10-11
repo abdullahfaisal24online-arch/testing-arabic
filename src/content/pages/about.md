@@ -4,7 +4,7 @@ slug: about
 description: عن Testing بالعربي — منصة عربية مستقلة لتعليم اختبار البرمجيات.
 order: 1
 draft: false
-profilePhoto: /uploads/chatgpt-image-sep-13-2026-11-57-57-pm.png
+profilePhoto: /uploads/profile-centered-3600.png
 profileName: Abdullah Faisal
 profileRole: QA Engineer
 profileText: ''
