@@ -46,17 +46,17 @@ terms:
 
 - **وصف الصورة (Image captioning):** كتابة وصف نصي لما في لقطة الشاشة.
 - **الإجابة عن أسئلة بصرية (Visual question answering):** مثل «هل زر الحفظ ظاهر في هذه الشاشة؟».
-- **تحليل الاتساق بين النص والصورة:** هل ما يقوله تقرير العيب أو قصة المستخدم يطابق ما يظهر فعلًا؟
+- **تحليل الاتساق بين النص والصورة:** هل ما يقوله تقرير الـ defect أو قصة المستخدم يطابق ما يظهر فعلًا؟
 
 <figure class="gx-figure" aria-label="Multimodal flow: text and image inputs become embeddings, the transformer relates them, the model produces a text answer."><div class="gx-flow-row"><span class="gx-flow-node">Text<small>user story</small></span><span class="gx-flow-arrow" aria-hidden="true">+</span><span class="gx-flow-node">Image<small>screenshot</small></span><span class="gx-flow-arrow" aria-hidden="true">→</span><span class="gx-flow-node">Embeddings<small>per modality</small></span><span class="gx-flow-arrow" aria-hidden="true">→</span><span class="gx-flow-node gx-flow-node--accent">Transformer<small>links both</small></span></div><figcaption>Each modality is turned into embeddings first, then processed together.</figcaption></figure>
 
 ### الاستخدام في الاختبار — Use in Testing
 
-يمكن تزويد النموذج بصورة شاشة أو مخطط واجهة **GUI Wireframe**، مع قصة مستخدم أو وصف عيب. يتيح ذلك:
+يمكن تزويد النموذج بصورة شاشة أو مخطط واجهة **GUI Wireframe**، مع قصة مستخدم أو وصف defect. يتيح ذلك:
 
 - مقارنة عنصر مرئي بنتيجة متوقعة مكتوبة، والإشارة إلى اختلاف محتمل.
 - توليد حالات اختبار أغنى وأقرب للواقع تجمع المتطلبات النصية مع عناصر الواجهة المرئية، مما يزيد التغطية.
-- تحليل اتساق وصف العيب مع لقطة الشاشة، وطلب معلومات مفقودة.
+- تحليل اتساق وصف الـ defect مع لقطة الشاشة، وطلب معلومات مفقودة.
 
 مثال عملي: تعطي النموذج قصة مستخدم تقول «يظهر للمستخدم سعر المنتج شاملًا الضريبة» ولقطة شاشة لصفحة الدفع. يستطيع النموذج أن يلاحظ أن السعر المعروض لا يحمل أي إشارة للضريبة، فيقترحه كاختلاف محتمل، ويقترح حالة اختبار تتحقق من حساب الضريبة. لكنه لا يستطيع من الصورة وحدها أن يعرف إذا كان الرقم المعروض يتضمن الضريبة فعلًا.
 

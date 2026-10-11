@@ -21,7 +21,7 @@ takeaways:
   - "Inputs are requirements, user stories, specifications and wireframes; outputs are test conditions and acceptance criteria."
   - "Input quality decides output accuracy. Never accept a threshold or risk level the model invented."
 takeawaysAr:
-  - "يستطيع GenAI كشف عيوب أساس الاختبار، واشتقاق شروط الاختبار، وترتيبها حسب المخاطر، وفحص التغطية، واقتراح تقنيات الاختبار."
+  - "يستطيع GenAI كشف defects أساس الاختبار، واشتقاق شروط الاختبار، وترتيبها حسب المخاطر، وفحص التغطية، واقتراح تقنيات الاختبار."
   - "المدخلات متطلبات وقصص مستخدم ومواصفات ومخططات واجهة؛ والمخرجات شروط اختبار ومعايير قبول."
   - "جودة المدخلات تحدد دقة الناتج. لا تقبل أبدًا حدًا زمنيًا أو مستوى خطر اخترعه النموذج."
 terms:
@@ -39,25 +39,25 @@ terms:
     def: "A test technique that targets the edges of valid and invalid ranges."
     defAr: "تقنية اختبار تستهدف حواف المجالات الصحيحة وغير الصحيحة."
 ---
-تطبيق التوجيه المنظّم على مهام الاختبار يجعل GenAI يدعم التحليل والتصميم والأتمتة وترتيب الحالات وكشف العيوب وتقييم التغطية والمراقبة. والجمع بين Prompt chaining و Few-shot و Meta prompting يسمح للفريق بتكييف الأسلوب مع هدف الاختبار، فتصبح المخرجات أدق وأنفع.
+تطبيق التوجيه المنظّم على مهام الاختبار يجعل GenAI يدعم التحليل والتصميم والأتمتة وترتيب الحالات وكشف الـ defects وتقييم التغطية والمراقبة. والجمع بين Prompt chaining و Few-shot و Meta prompting يسمح للفريق بتكييف الأسلوب مع هدف الاختبار، فتصبح المخرجات أدق وأنفع.
 
 التحليل يجيب أساسًا: **ماذا ينبغي أن نختبر؟** المدخلات قد تكون متطلبات، أو قصص مستخدم، أو مواصفات تقنية، أو مخططات واجهة، وكلها أجزاء محتملة من **Test Basis**. والمخرجات هي نواتج التحليل المعتادة، مثل شروط اختبار منظمة ومعايير قبول.
 
 ### مهام التحليل الخمس — Five Test Analysis Tasks
 
-1. **كشف عيوب أساس الاختبار:** البحث عن التناقض والغموض والنقص، بالمقارنة مع متطلبات مشابهة أو الاستفادة من تاريخ العيوب، ثم اقتراح تحسينات.
+1. **كشف defects أساس الاختبار:** البحث عن التناقض والغموض والنقص، بالمقارنة مع متطلبات مشابهة أو الاستفادة من تاريخ الـ defects، ثم اقتراح تحسينات.
 2. **توليد شروط الاختبار:** تفسير المتطلبات وقصص المستخدم وتفكيكها إلى عبارات قابلة للقياس والاختبار.
-3. **ترتيب الشروط حسب المخاطر:** عند توفر احتمال الخطر وأثره لكل شرط، مع مراعاة الالتزامات التنظيمية والوظائف المواجهة للعميل مثل الدخول والدفع وأنماط العيوب السابقة.
+3. **ترتيب الشروط حسب المخاطر:** عند توفر احتمال الخطر وأثره لكل شرط، مع مراعاة الالتزامات التنظيمية والوظائف المواجهة للعميل مثل الدخول والدفع وأنماط الـ defects السابقة.
 4. **دعم تقييم التغطية:** ربط كل متطلب أو قصة بشروطها لمعرفة ما غُطّي وما لم يُغطَّ، وهذا مهم خصوصًا في المتطلبات المعقّدة.
 5. **اقتراح تقنيات الاختبار:** مثل تقسيم التكافؤ أو تحليل القيم الحدّية بحسب نوع المتطلب.
 
 ### كيف تبدو كل مهمة عمليًا؟ — Each Task in Practice
 
-**كشف عيوب أساس الاختبار:** متطلبان يقولان «كلمة المرور 8 محارف على الأقل» و«كلمة المرور 12 محرفًا على الأقل» في وثيقتين مختلفتين. يستطيع النموذج إظهار هذا التناقض إذا أعطيته الوثيقتين معًا. وقد يلاحظ أيضًا أن المتطلبات لا تذكر ما يحدث عند نسيان كلمة المرور؛ هذا نقص يستحق سؤالًا.
+**كشف defects أساس الاختبار:** متطلبان يقولان «كلمة المرور 8 محارف على الأقل» و«كلمة المرور 12 محرفًا على الأقل» في وثيقتين مختلفتين. يستطيع النموذج إظهار هذا التناقض إذا أعطيته الوثيقتين معًا. وقد يلاحظ أيضًا أن المتطلبات لا تذكر ما يحدث عند نسيان كلمة المرور؛ هذا نقص يستحق سؤالًا.
 
 **توليد شروط الاختبار:** من متطلب «يستطيع المستخدم إلغاء الطلب قبل الشحن»، يشتق النموذج شروطًا مثل: الإلغاء متاح قبل الشحن، الإلغاء غير متاح بعد الشحن، ماذا يحدث للمبلغ المدفوع عند الإلغاء. كل شرط قابل للاختبار ومرتبط بالمتطلب.
 
-**الترتيب حسب المخاطر:** إذا أعطيت النموذج احتمال الخطر وأثره لكل شرط، يستطيع ترتيبها. الدفع والدخول وما تفرضه الأنظمة عادةً أعلى أثرًا. لكنه يعتمد على المعلومات التي تعطيه إياها، ولا يعرف وحده أن مكوّنًا معيّنًا تكررت فيه العيوب الإصدار الماضي.
+**الترتيب حسب المخاطر:** إذا أعطيت النموذج احتمال الخطر وأثره لكل شرط، يستطيع ترتيبها. الدفع والدخول وما تفرضه الأنظمة عادةً أعلى أثرًا. لكنه يعتمد على المعلومات التي تعطيه إياها، ولا يعرف وحده أن مكوّنًا معيّنًا تكررت فيه الـ defects الإصدار الماضي.
 
 **تقييم التغطية:** تطلب مصفوفة تربط كل متطلب بالشروط المشتقة منه، فتظهر المتطلبات التي لا يقابلها أي شرط. هذا مفيد خصوصًا في المتطلبات المعقّدة التي قد يفلت منها جزء دون أن يلاحظه أحد.
 
@@ -81,7 +81,7 @@ terms:
 
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Common mistake</span><span class="gx-ar" lang="ar" dir="rtl">خطأ شائع</span></p><p class="gx-en" lang="en" dir="ltr">Accepting a number the model invented. If it turns “fast” into “under one second” with no approved source, record it as a question for the requirement owner instead. Likewise, a condition is not high risk just because the model says so: give it likelihood and impact data.</p><p class="gx-ar" lang="ar" dir="rtl">قبول رقم اخترعه النموذج. إذا حوّل «سريع» إلى «أقل من ثانية» دون مصدر معتمد، سجّل ذلك سؤالًا لمالك المتطلب. وبالمثل، الشرط ليس عالي الخطورة لأن النموذج قال ذلك: أعطه بيانات الاحتمال والأثر.</p></aside>
 
-<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">GenAI-2.2.1 is K3 (apply). Be ready to pick the right use of GenAI for an analysis scenario: finding test basis defects, generating test conditions, risk-based prioritisation, coverage evaluation, or suggesting a test technique. Also remember the inputs (requirements, user stories, specifications, wireframes) and the outputs (test conditions, acceptance criteria).</p><p class="gx-ar" lang="ar" dir="rtl">الهدف GenAI-2.2.1 من مستوى K3 (تطبيق). كن جاهزًا لاختيار الاستخدام المناسب لـ GenAI في سيناريو تحليل: كشف عيوب أساس الاختبار، أو توليد شروط الاختبار، أو الترتيب حسب المخاطر، أو تقييم التغطية، أو اقتراح تقنية اختبار. وتذكّر المدخلات (متطلبات، قصص مستخدم، مواصفات، مخططات واجهة) والمخرجات (شروط اختبار، معايير قبول).</p></aside>
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">GenAI-2.2.1 is K3 (apply). Be ready to pick the right use of GenAI for an analysis scenario: finding test basis defects, generating test conditions, risk-based prioritisation, coverage evaluation, or suggesting a test technique. Also remember the inputs (requirements, user stories, specifications, wireframes) and the outputs (test conditions, acceptance criteria).</p><p class="gx-ar" lang="ar" dir="rtl">الهدف GenAI-2.2.1 من مستوى K3 (تطبيق). كن جاهزًا لاختيار الاستخدام المناسب لـ GenAI في سيناريو تحليل: كشف defects أساس الاختبار، أو توليد شروط الاختبار، أو الترتيب حسب المخاطر، أو تقييم التغطية، أو اقتراح تقنية اختبار. وتذكّر المدخلات (متطلبات، قصص مستخدم، مواصفات، مخططات واجهة) والمخرجات (شروط اختبار، معايير قبول).</p></aside>
 
 <section class="gx-lab" data-lab="HO-2.2.1a"><header class="gx-lab-head"><span class="gx-lab-title"><span class="gx-en" lang="en" dir="ltr">Lab · Acceptance Criteria from Story + Wireframe</span><span class="gx-ar" lang="ar" dir="rtl">تمرين عملي · معايير قبول من القصة ومخطط الواجهة</span></span><span class="gx-lab-meta">HO-2.2.1a · H2</span></header><div class="gx-lab-body"><p><span class="gx-en" lang="en" dir="ltr"><strong>Goal:</strong> write structured multimodal prompts that turn the sign-up story and the wireframe from section 1.1.4 into clear, testable acceptance criteria. Attach the wireframe image to a tool that accepts images; text alone is not a multimodal run.</span><span class="gx-ar" lang="ar" dir="rtl"><strong>الهدف:</strong> كتابة توجيهات منظّمة متعددة الوسائط تحوّل قصة التسجيل ومخطط الواجهة من القسم 1.1.4 إلى معايير قبول واضحة وقابلة للاختبار. أرفق صورة المخطط بأداة تقبل الصور؛ النص وحده ليس تجربة متعددة الوسائط.</span></p><ol class="gx-lab-steps"><li><span class="gx-en" lang="en" dir="ltr">Run a short prompt with the task only.</span><span class="gx-ar" lang="ar" dir="rtl">شغّل توجيهًا مختصرًا فيه المهمة فقط.</span></li><li><span class="gx-en" lang="en" dir="ltr">Run a structured prompt with all six components (below). Optionally add constraints or business rules.</span><span class="gx-ar" lang="ar" dir="rtl">شغّل توجيهًا منظّمًا بالمكوّنات الستة كلها (أدناه). ويمكنك إضافة قيود أو قواعد أعمال.</span></li><li><span class="gx-en" lang="en" dir="ltr">Compare clarity, completeness and faithfulness to the source between the two outputs.</span><span class="gx-ar" lang="ar" dir="rtl">قارن بين الناتجين من حيث الوضوح والاكتمال والالتزام بالمصدر.</span></li></ol><pre class="gx-lab-prompt"><code>Role: Test analyst.
 Context: Sign-up for the "Taallam" e-learning platform.

@@ -7,7 +7,7 @@ section: "1.1.1"
 title: "Test Objectives"
 titleAr: "أهداف الاختبار"
 objectives: "FL-1.1.1 · K1"
-minutes: 9
+minutes: 8
 lo:
   FL-1.1.1: "Identify the typical objectives of testing."
 loAr:
@@ -17,11 +17,13 @@ takeaways:
   - "Testing covers both verification (did we build it right?) and validation (did we build the right thing?)."
   - "Static testing examines work products without running them; dynamic testing runs the software."
   - "There are nine typical test objectives, and which ones matter most depends on the context."
+  - "Testing is largely an intellectual activity that needs analytical, critical and systems thinking, not only tools."
 takeawaysAr:
   - "الاختبار مجموعة أنشطة لاكتشاف الـ defects وتقييم جودة مخرجات العمل، وليس مجرد تشغيل اختبارات."
   - "الاختبار يشمل التحقق (هل بنيناه بشكل صحيح؟) والمصادقة (هل بنينا الشيء الصحيح؟)."
   - "الاختبار الساكن يفحص مخرجات العمل دون تشغيلها؛ والاختبار الديناميكي يشغّل البرمجية."
   - "هناك تسعة أهداف معتادة للاختبار، وأهمّها يختلف حسب السياق."
+  - "الاختبار نشاط ذهني في جوهره يحتاج تفكيرًا تحليليًا ونقديًا ومنظوميًا، لا أدوات فقط."
 terms:
   - en: "Testing"
     ar: "الاختبار"
@@ -54,57 +56,51 @@ terms:
     defAr: "اختبار يتضمن تشغيل البرمجية."
     match: ["Dynamic Testing", "dynamic testing"]
 ---
-البرمجيات حولنا في كل مكان: تطبيق البنك، ونظام الحجز، وبرنامج المستشفى. وأي برمجية قد لا تعمل كما هو متوقع، وقد تكون العواقب خسارة مال أو وقت أو سمعة، وأحيانًا ما هو أخطر. **الاختبار** يساعدنا على تقييم جودة البرمجية وتقليل خطر حدوث الأعطال أثناء التشغيل.
+البرمجيات جزء من حياتنا اليومية، ومعظمنا جرّب برمجية لم تعمل كما توقّع. والبرمجية التي لا تعمل بشكل صحيح قد تسبب خسارة مال أو وقت أو سمعة تجارية، وفي الحالات القصوى إصابة أو وفاة. هنا يأتي دور **الاختبار**: فهو يقيّم جودة البرمجية ويساعد على **تقليل خطر العطل أثناء التشغيل**. في تطبيق التوصيل الذي نتابعه في هذا الدليل، عطل واحد في الدفع يعني زبائن خُصمت أموالهم ومطاعم لم تستلم طلباتها.
 
-يعرّف المنهج **الاختبار (Testing)** بأنه مجموعة أنشطة لاكتشاف الـ defects وتقييم جودة مخرجات العمل البرمجية. والشيء الذي نختبره، سواء كان شيفرة أو متطلبات أو تصميمًا، يسمّى **موضوع الاختبار (Test Object)**.
+يعرّف المنهج **الاختبار (Testing)** بأنه مجموعة أنشطة لاكتشاف الـ defects وتقييم جودة مخرجات العمل البرمجية. ومُخرَج العمل حين يخضع للاختبار يسمّى **موضوع الاختبار (Test Object)**: قد يكون قصة مستخدم، أو تصميم شاشة، أو واجهة API، أو التطبيق كاملًا.
 
-### ما هو الاختبار فعلًا؟ — What Testing Really Is
+### فكرتان خاطئتان عن الاختبار — Two Misconceptions
 
-هناك فكرتان خاطئتان شائعتان عن الاختبار. الأولى أنه مجرد **تشغيل الاختبارات** والتأكد من النتيجة. الحقيقة أن التشغيل جزء واحد فقط؛ فالاختبار يشمل أيضًا التخطيط والتحليل والتصميم والتجهيز والمتابعة والإغلاق، وكلها مرتبطة بدورة حياة التطوير.
+**الأولى:** أن الاختبار هو **تشغيل الاختبارات** فقط ومقارنة النتائج. الصحيح أن التشغيل نشاط واحد بين أنشطة كثيرة، مثل التخطيط والتحليل والتصميم والتجهيز والمتابعة والإغلاق، ويجب أن تتماشى كلها مع دورة حياة التطوير (الفصل 2).
 
-الفكرة الثانية أن الاختبار يركّز فقط على التأكد من تطابق النظام مع المتطلبات المكتوبة. هذا جزء مهم ويسمّى **التحقق (Verification)**. لكن الاختبار يشمل أيضًا **المصادقة (Validation)**: التأكد من أن النظام يلبّي احتياجات المستخدمين وأصحاب المصلحة الفعلية في بيئة التشغيل.
+**الثانية:** أن الاختبار يقتصر على **التحقق (Verification)**، أي فحص مطابقة النظام للمتطلبات المحددة. الاختبار يشمل أيضًا **المصادقة (Validation)**: فحص ما إذا كان النظام يلبّي احتياجات المستخدمين وأصحاب المصلحة **في بيئة التشغيل الفعلية**. قد تنص المواصفات على أن الزبون يتتبع طلبه على الخريطة، فينجح التحقق؛ لكن إذا كانت الخريطة لا تتحدث إلا كل دقيقتين فالزبون لن يستفيد منها، وهذا ما تكشفه المصادقة.
 
 <figure class="gx-figure gx-spectrum" aria-label="Verification checks against the specification. Validation checks against real needs."><div class="gx-spectrum-row"><div class="gx-spectrum-item"><b>Verification</b><span>Did we build the system right? Compare it with the specified requirements.</span></div><div class="gx-spectrum-item gx-spectrum-item--accent"><b>Validation</b><span>Did we build the right system? Compare it with what users actually need.</span></div></div><figcaption>Verification checks against the specification. Validation checks against real needs.</figcaption></figure>
 
-### الاختبار الساكن والديناميكي — Static and Dynamic Testing
+### الساكن والديناميكي — Static and Dynamic Testing
 
-يمكن أن يكون الاختبار **ديناميكيًا (Dynamic Testing)**، أي يتضمن تشغيل البرمجية ومراقبة سلوكها. ويمكن أن يكون **ساكنًا (Static Testing)**، أي فحص مُخرَج العمل دون تشغيله، مثل مراجعة وثيقة المتطلبات أو تحليل الشيفرة بأداة تحليل ساكن.
-
-هذا يعني أن الاختبار يمكن أن يبدأ قبل وجود أي شيفرة قابلة للتشغيل. مراجعة قصة المستخدم واكتشاف تناقض فيها هي اختبار أيضًا.
+**الاختبار الديناميكي (Dynamic Testing)** يشغّل البرمجية، ويستخدم تقنيات ومناهج اختبار مختلفة لاستخراج حالات الاختبار (الفصل 4). أما **الاختبار الساكن (Static Testing)** فلا يشغّل شيئًا، ويشمل المراجعات والتحليل الساكن (الفصل 3). لذلك يبدأ الاختبار قبل وجود شيفرة: مراجعة قصة «كوبون واحد لكل طلب» واكتشاف أنها لا تذكر ماذا يحدث للكوبون إذا أُلغي الطلب هي اختبار.
 
 ### أكثر من نشاط تقني — More Than a Technical Activity
 
-الاختبار ليس عملًا تقنيًا فقط. يحتاج إلى تخطيط وإدارة وتقدير ومتابعة وتحكم. والمختبرون يستخدمون الأدوات، لكن الاختبار في جوهره **نشاط ذهني** يحتاج معرفة متخصصة، ومهارات تحليلية، وتفكيرًا نقديًا، وتفكيرًا منظوميًا يرى النظام كاملًا لا أجزاءه فقط.
+الاختبار يحتاج أيضًا إلى تخطيط وإدارة وتقدير ومتابعة وتحكم (الفصل 5). والمختبرون يستخدمون الأدوات (الفصل 6)، لكن الاختبار **نشاط ذهني** في جوهره، يتطلب معرفة متخصصة ومهارات تحليلية وتفكيرًا نقديًا و**تفكيرًا منظوميًا** يرى كيف تتفاعل أجزاء النظام.
 
 <aside class="gx-callout" data-kind="key"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Key idea</span><span class="gx-ar" lang="ar" dir="rtl">فكرة أساسية</span></p><p class="gx-en" lang="en" dir="ltr">Testing is not the same as test execution. Planning, analysis, design, implementation, monitoring and completion are all part of testing, and so is reviewing a document without running anything.</p><p class="gx-ar" lang="ar" dir="rtl">الاختبار ليس مرادفًا لتشغيل الاختبارات. التخطيط والتحليل والتصميم والتجهيز والمتابعة والإغلاق كلها جزء من الاختبار، وكذلك مراجعة وثيقة دون تشغيل أي شيء.</p></aside>
 
 ### الأهداف المعتادة للاختبار — Typical Test Objectives
 
-لماذا نختبر؟ يذكر المنهج تسعة أهداف معتادة:
+**هدف الاختبار (Test Objective)** هو سبب الاختبار أو غايته. يذكر المنهج تسعة أهداف معتادة:
 
-| Test objective | المعنى |
-| --- | --- |
-| Evaluating work products | تقييم مخرجات العمل مثل المتطلبات وقصص المستخدم والتصاميم والشيفرة |
-| Causing failures and finding defects | إحداث الأعطال واكتشاف الـ defects |
-| Ensuring required coverage | ضمان التغطية المطلوبة لموضوع الاختبار |
-| Reducing risk | خفض مستوى خطر أن تكون جودة البرمجية غير كافية |
-| Verifying specified requirements | التحقق من أن المتطلبات المحددة تحققت |
-| Verifying compliance | التحقق من الالتزام بالمتطلبات التعاقدية والقانونية والتنظيمية |
-| Providing information to stakeholders | تزويد أصحاب المصلحة بمعلومات تساعدهم على اتخاذ قرارات مدروسة |
-| Building confidence | بناء الثقة في جودة موضوع الاختبار |
-| Validating the test object | المصادقة على أن موضوع الاختبار مكتمل ويعمل كما يتوقع أصحاب المصلحة |
+| # | Test objective | Delivery-app example |
+| --- | --- | --- |
+| 1 | Evaluating work products (requirements, user stories, designs, code) | Reviewing the coupon user story |
+| 2 | Causing failures and finding defects | A 19.99 JOD order wrongly gets free delivery |
+| 3 | Ensuring required coverage of a test object | Every order state transition is exercised |
+| 4 | Reducing the risk level of inadequate software quality | Extra tests on card payments |
+| 5 | Verifying whether specified requirements have been fulfilled | Minimum order of 5.00 JOD is enforced |
+| 6 | Verifying compliance with contractual, legal and regulatory requirements | Card data handling meets payment rules |
+| 7 | Providing information to stakeholders for informed decisions | Test report before the store release |
+| 8 | Building confidence in the quality of the test object | Smooth end-to-end order on iOS and Android |
+| 9 | Validating that the test object is complete and works as stakeholders expect | Restaurants try the dashboard in a real shift |
+
+لاحظ أن بعض الأهداف **تبحث عن المشكلات** (2، 4)، وبعضها **يقيس ويطمئن** (3، 7، 8)، وبعضها **يقارن بمرجع**: المتطلبات (5)، أو القانون والعقود (6)، أو توقعات أصحاب المصلحة (9). والهدف الأول يذكّرك بأن موضوع الاختبار ليس الشيفرة وحدها.
+
+هدفان يحتاجان توضيحًا: **التغطية (Coverage)** تعني أن نقيس كم من عناصر موضوع الاختبار مررنا عليها، فلا نترك حالة طلب أو طريقة دفع دون اختبار. و**خفض المخاطر** يعني أن الاختبار لا يزيل الخطر تمامًا، لكنه يقلل احتمال أن تصل إلى الزبائن برمجية جودتها غير كافية.
 
 ### الأهداف تختلف حسب السياق — Objectives Depend on Context
 
-لا يكون لكل الأهداف الوزن نفسه في كل مشروع. أهداف الاختبار تتغير حسب **السياق**، ومنه:
-
-- مُخرَج العمل الذي نختبره (متطلبات؟ شيفرة؟ نظام كامل؟).
-- مستوى الاختبار (اختبار مكوّن؟ اختبار قبول؟).
-- المخاطر.
-- دورة حياة التطوير المتّبعة.
-- عوامل سياق العمل، مثل هيكل المؤسسة والمنافسة ووقت الوصول للسوق.
-
-مثلًا، في اختبار المكوّنات قد يكون الهدف الأهم اكتشاف أكبر عدد من الـ defects مبكرًا. أما في اختبار القبول فالهدف الأهم غالبًا بناء الثقة والمصادقة على أن النظام جاهز للاستخدام الفعلي، لا البحث عن defects كثيرة.
+لا يكون لكل الأهداف الوزن نفسه دائمًا. يتغير الاختيار حسب **السياق**: مُخرَج العمل الذي نختبره، و**مستوى الاختبار**، والمخاطر، ودورة حياة التطوير المتّبعة، وعوامل سياق العمل مثل هيكل المؤسسة والمنافسة و**وقت الوصول للسوق**. في اختبار المكوّنات يغلب هدف اكتشاف الـ defects مبكرًا، وفي اختبار القبول يغلب بناء الثقة والمصادقة. وإذا كان منافس سيطلق ميزة «الطلب المجدول» قريبًا، قد يركّز الفريق على تزويد مالك المنتج بمعلومات سريعة تدعم قرار الإطلاق.
 
 <aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">A banking app must comply with central bank regulations, so verifying compliance becomes a key objective. A startup's prototype may focus on giving the founders quick information about whether the main flow works at all.</p><p class="gx-ar" lang="ar" dir="rtl">تطبيق بنكي يجب أن يلتزم بتعليمات البنك المركزي، فيصبح التحقق من الالتزام هدفًا رئيسيًا. أما النموذج الأولي لشركة ناشئة فقد يركّز على تزويد المؤسسين بمعلومة سريعة عن عمل المسار الرئيسي من الأساس.</p></aside>
 

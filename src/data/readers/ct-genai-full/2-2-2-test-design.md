@@ -24,10 +24,10 @@ takeaways:
   - "Priority never overrides a hard dependency: a high-priority test still waits for the tests it depends on."
   - "A script that runs without errors can still check the wrong expected result."
 takeawaysAr:
-  - "يساعد GenAI في توليد حالات الاختبار وبيانات الاختبار التركيبية والسكربتات، وفي جدولة التنفيذ وترتيب أولوياته."
+  - "يساعد GenAI في توليد حالات الاختبار وبيانات الاختبار التركيبية والـ scripts، وفي جدولة التنفيذ وترتيب أولوياته."
   - "تجهيز الاختبار يُعدّ ما يحتاجه التنفيذ؛ وهو ليس تنفيذ الاختبار نفسه."
   - "الأولوية لا تتجاوز اعتمادية إلزامية أبدًا: الاختبار عالي الأولوية ينتظر الاختبارات التي يعتمد عليها."
-  - "السكربت الذي يعمل دون أخطاء قد يتحقق رغم ذلك من نتيجة متوقعة خاطئة."
+  - "الـ script الذي يعمل دون أخطاء قد يتحقق رغم ذلك من نتيجة متوقعة خاطئة."
 terms:
   - en: "Test Design"
     ar: "تصميم الاختبار"
@@ -36,7 +36,7 @@ terms:
   - en: "Test Implementation"
     ar: "تجهيز الاختبار"
     def: "Creating or acquiring the testware needed for execution, such as procedures, scripts, data and environments."
-    defAr: "إنشاء مواد الاختبار اللازمة للتنفيذ أو اقتناؤها، مثل الإجراءات والسكربتات والبيانات والبيئات."
+    defAr: "إنشاء مواد الاختبار اللازمة للتنفيذ أو اقتناؤها، مثل الإجراءات والـ scripts والبيانات والبيئات."
   - en: "Synthetic Test Data"
     ar: "بيانات اختبار تركيبية"
     def: "Generated data that resembles production data, including edge cases, without exposing real confidential information."
@@ -46,13 +46,13 @@ terms:
     def: "A Given–When–Then syntax for writing test scenarios in structured natural language."
     defAr: "صيغة Given–When–Then لكتابة سيناريوهات الاختبار بلغة طبيعية منظّمة."
 ---
-**Test Design** يفصّل شروط الاختبار إلى حالات ومواد اختبار. **Test Implementation** يعني تجهيز أو اقتناء ما يلزم لتنفيذ الاختبارات، مثل الإجراءات والسكربتات والبيانات والبيئة؛ لا تخلطه مع **Test Execution** الذي يشغّل الاختبارات فعليًا. يدعم GenAI إعداد السكربتات اليدوية والمؤتمتة وترتيبها وجدولتها، ويساعد في إنشاء مواد الاختبار المختلفة وتقييمها: حالات الاختبار، وبيانات الاختبار، والسكربتات، وحتى بيئات الاختبار.
+**Test Design** يفصّل شروط الاختبار إلى حالات ومواد اختبار. **Test Implementation** يعني تجهيز أو اقتناء ما يلزم لتنفيذ الاختبارات، مثل الإجراءات والـ scripts والبيانات والبيئة؛ لا تخلطه مع **Test Execution** الذي يشغّل الاختبارات فعليًا. يدعم GenAI إعداد الـ scripts اليدوية والمؤتمتة وترتيبها وجدولتها، ويساعد في إنشاء مواد الاختبار المختلفة وتقييمها: حالات الاختبار، وبيانات الاختبار، والـ scripts، وحتى بيئات الاختبار.
 
 ### مهام التصميم والتجهيز — Design and Implementation Tasks
 
 - **توليد حالات الاختبار:** من متطلبات وظيفية وغير وظيفية، مع الشروط المسبقة والمدخلات والنتائج المتوقعة وأهداف التغطية، من التحقق الوظيفي البسيط حتى اختبارات End-to-End.
 - **إنشاء بيانات اختبار تركيبية — Synthetic Test Data:** متنوعة وقريبة من بيانات الإنتاج، تشمل الحالات الحدّية وتخدم الاختبارات الوظيفية وغير الوظيفية، دون كشف معلومات سرية.
-- **توليد السكربتات:** تحويل الحالات المنظمة إلى إجراءات يدوية أو سكربتات تتوافق مع إطار الأتمتة، وتحديثها مع تغيّر المتطلبات.
+- **توليد الـ scripts:** تحويل الحالات المنظمة إلى إجراءات يدوية أو scripts تتوافق مع إطار الأتمتة، وتحديثها مع تغيّر المتطلبات.
 - **جدولة التنفيذ وترتيبه:** بحسب الأولوية والمخاطر والاعتماديات وتوفر الموارد وأهداف الاختبار.
 
 ### أمثلة لكل مهمة — Examples
@@ -61,13 +61,13 @@ terms:
 
 **البيانات التركيبية:** تحتاج 500 عميل لاختبار تقرير؟ يولّد النموذج أسماء وعناوين وأرقامًا واقعية الشكل لكنها غير حقيقية، مع حالات حدّية مثل أسماء طويلة جدًا، وأحرف عربية وإنجليزية مختلطة، وتواريخ ميلاد على الحدود. هذا يخدم الاختبار دون كشف بيانات عملاء فعلية.
 
-**السكربتات:** من حالة منظمة بخطوات واضحة، يولّد النموذج سكربتًا للإطار الذي يستخدمه الفريق، وعند تغيّر المتطلب يحدّث السكربت المتأثر.
+**الـ scripts:** من حالة منظمة بخطوات واضحة، يولّد النموذج script للإطار الذي يستخدمه الفريق، وعند تغيّر المتطلب يحدّث الـ script المتأثر.
 
 **الجدولة:** يقرأ النموذج الحالات واعتمادياتها ويقترح ترتيب تنفيذ يراعي الأولوية والمخاطر والموارد المتاحة وأهداف الاختبار.
 
-<aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Common mistake</span><span class="gx-ar" lang="ar" dir="rtl">خطأ شائع</span></p><p class="gx-en" lang="en" dir="ltr">Treating generated data as safe by default, or treating a script that runs as a correct test. Check data for sensitivity and validity, and check every script's expected result and coverage before approving it.</p><p class="gx-ar" lang="ar" dir="rtl">اعتبار البيانات المولّدة آمنة تلقائيًا، أو اعتبار السكربت الذي يعمل اختبارًا صحيحًا. افحص البيانات من حيث الحساسية والصلاحية، وافحص النتيجة المتوقعة والتغطية لكل سكربت قبل اعتماده.</p></aside>
+<aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Common mistake</span><span class="gx-ar" lang="ar" dir="rtl">خطأ شائع</span></p><p class="gx-en" lang="en" dir="ltr">Treating generated data as safe by default, or treating a script that runs as a correct test. Check data for sensitivity and validity, and check every script's expected result and coverage before approving it.</p><p class="gx-ar" lang="ar" dir="rtl">اعتبار البيانات المولّدة آمنة تلقائيًا، أو اعتبار الـ script الذي يعمل اختبارًا صحيحًا. افحص البيانات من حيث الحساسية والصلاحية، وافحص النتيجة المتوقعة والتغطية لكل script قبل اعتماده.</p></aside>
 
-<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">Know the four design and implementation tasks: test case generation, synthetic test data, test script generation, and execution scheduling and prioritisation. Remember that test implementation prepares testware for execution; it is not execution itself.</p><p class="gx-ar" lang="ar" dir="rtl">اعرف مهام التصميم والتجهيز الأربع: توليد حالات الاختبار، وبيانات الاختبار التركيبية، وتوليد السكربتات، وجدولة التنفيذ وترتيب أولوياته. وتذكّر أن التجهيز يُعدّ مواد الاختبار للتنفيذ، وليس هو التنفيذ.</p></aside>
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">Know the four design and implementation tasks: test case generation, synthetic test data, test script generation, and execution scheduling and prioritisation. Remember that test implementation prepares testware for execution; it is not execution itself.</p><p class="gx-ar" lang="ar" dir="rtl">اعرف مهام التصميم والتجهيز الأربع: توليد حالات الاختبار، وبيانات الاختبار التركيبية، وتوليد الـ scripts، وجدولة التنفيذ وترتيب أولوياته. وتذكّر أن التجهيز يُعدّ مواد الاختبار للتنفيذ، وليس هو التنفيذ.</p></aside>
 
 <section class="gx-lab" data-lab="HO-2.2.2a"><header class="gx-lab-head"><span class="gx-lab-title"><span class="gx-en" lang="en" dir="ltr">Lab · Generate, Check Coverage, Then Meta-Prompt</span><span class="gx-ar" lang="ar" dir="rtl">تمرين عملي · ولّد، افحص التغطية، ثم استخدم التوجيه الفوقي</span></span><span class="gx-lab-meta">HO-2.2.2a · H2</span></header><div class="gx-lab-body"><p><span class="gx-en" lang="en" dir="ltr"><strong>Goal:</strong> generate functional test cases for the rule “password length is 12–64 characters”, assuming all other fields are valid.</span><span class="gx-ar" lang="ar" dir="rtl"><strong>الهدف:</strong> توليد حالات اختبار وظيفية لقاعدة «طول كلمة المرور من 12 إلى 64 محرفًا»، بافتراض أن بقية الحقول صحيحة.</span></p><ol class="gx-lab-steps"><li><span class="gx-en" lang="en" dir="ltr">Ask for test cases in the format ID / Preconditions / Input / Steps / Expected / Requirement.</span><span class="gx-ar" lang="ar" dir="rtl">اطلب حالات اختبار بالصيغة: المعرّف / الشروط المسبقة / المدخل / الخطوات / المتوقع / المتطلب.</span></li><li><span class="gx-en" lang="en" dir="ltr">Ask for a coverage table per acceptance criterion and review it.</span><span class="gx-ar" lang="ar" dir="rtl">اطلب جدول تغطية لكل معيار قبول وراجعه.</span></li><li><span class="gx-en" lang="en" dir="ltr">Use a meta prompt to design a prompt for an end-to-end procedure: sign up, then reach the allowed feature. Fix the prompt when you find a gap and regenerate only the affected part.</span><span class="gx-ar" lang="ar" dir="rtl">استخدم توجيهًا فوقيًا لتصميم توجيه لإجراء End-to-End: التسجيل ثم الوصول إلى الميزة المسموحة. صحّح التوجيه عند اكتشاف فجوة، وأعد توليد الجزء المتأثر فقط.</span></li></ol><table><thead><tr><th><span class="gx-en" lang="en" dir="ltr">Case</span><span class="gx-ar" lang="ar" dir="rtl">الحالة</span></th><th><span class="gx-en" lang="en" dir="ltr">Input</span><span class="gx-ar" lang="ar" dir="rtl">المدخل</span></th><th><span class="gx-en" lang="en" dir="ltr">Expected</span><span class="gx-ar" lang="ar" dir="rtl">المتوقع</span></th><th><span class="gx-en" lang="en" dir="ltr">Source</span><span class="gx-ar" lang="ar" dir="rtl">المصدر</span></th></tr></thead><tbody><tr><td>TC-01</td><td><span class="gx-en" lang="en" dir="ltr">11 characters</span><span class="gx-ar" lang="ar" dir="rtl">11 محرفًا</span></td><td><span class="gx-en" lang="en" dir="ltr">Sign-up rejected for length</span><span class="gx-ar" lang="ar" dir="rtl">رفض التسجيل بسبب الطول</span></td><td><span class="gx-en" lang="en" dir="ltr">Lower boundary</span><span class="gx-ar" lang="ar" dir="rtl">الحد الأدنى</span></td></tr><tr><td>TC-02</td><td><span class="gx-en" lang="en" dir="ltr">12 characters</span><span class="gx-ar" lang="ar" dir="rtl">12 محرفًا</span></td><td><span class="gx-en" lang="en" dir="ltr">Length rule accepted</span><span class="gx-ar" lang="ar" dir="rtl">قبول شرط الطول</span></td><td><span class="gx-en" lang="en" dir="ltr">Lower boundary</span><span class="gx-ar" lang="ar" dir="rtl">الحد الأدنى</span></td></tr><tr><td>TC-03</td><td><span class="gx-en" lang="en" dir="ltr">64 characters</span><span class="gx-ar" lang="ar" dir="rtl">64 محرفًا</span></td><td><span class="gx-en" lang="en" dir="ltr">Length rule accepted</span><span class="gx-ar" lang="ar" dir="rtl">قبول شرط الطول</span></td><td><span class="gx-en" lang="en" dir="ltr">Upper boundary</span><span class="gx-ar" lang="ar" dir="rtl">الحد الأعلى</span></td></tr><tr><td>TC-04</td><td><span class="gx-en" lang="en" dir="ltr">65 characters</span><span class="gx-ar" lang="ar" dir="rtl">65 محرفًا</span></td><td><span class="gx-en" lang="en" dir="ltr">Sign-up rejected for length</span><span class="gx-ar" lang="ar" dir="rtl">رفض التسجيل بسبب الطول</span></td><td><span class="gx-en" lang="en" dir="ltr">Upper boundary</span><span class="gx-ar" lang="ar" dir="rtl">الحد الأعلى</span></td></tr></tbody></table><pre class="gx-lab-prompt"><code>Design a prompt that generates an end-to-end procedure from the approved
 acceptance criteria and test cases. Ask for missing data first, define the

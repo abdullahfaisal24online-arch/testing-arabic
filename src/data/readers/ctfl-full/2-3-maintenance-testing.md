@@ -6,7 +6,7 @@ section: "2.3"
 title: "Maintenance Testing"
 titleAr: "اختبار الصيانة"
 objectives: "FL-2.3.1 · K2"
-minutes: 7
+minutes: 12
 lo:
   FL-2.3.1: "Summarise maintenance testing and what triggers it."
 loAr:
@@ -35,40 +35,60 @@ terms:
     defAr: "تغيير عاجل غير مخطط على نظام في الإنتاج، غالبًا لإصلاح defect حرج."
     match: ["Hot Fix", "hot fix", "hot fixes"]
 ---
-بعد إطلاق النظام لا يتوقف العمل عليه. هناك أنواع مختلفة من **الصيانة**:
+إطلاق تطبيق التوصيل في المتاجر ليس نهاية القصة، بل بدايتها. بعد الإطلاق تأتي بلاغات الزبائن عن defects، وتطلب المطاعم ميزات جديدة، وتصدر نسخ جديدة من iOS وAndroid، وتغيّر بوابة الدفع واجهتها. كل تغيير على **نظام قيد التشغيل** يحتاج اختبارًا، وهذا هو **اختبار الصيانة (maintenance testing)**. الفرق المهم عن الاختبار قبل الإطلاق أن هناك الآن زبائن حقيقيين وبيانات حقيقية، وأي خطأ يظهر لهم مباشرة.
 
-- **تصحيحية (Corrective):** لإصلاح الـ defects.
-- **تكيّفية (Adaptive):** للتكيّف مع تغيّرات في البيئة.
-- **لتحسين الأداء أو قابلية الصيانة.**
+### فئات الصيانة — Categories of Maintenance
 
-يمكن أن تكون الصيانة جزءًا من **إصدارات ونشر مخطط**، أو **غير مخططة** مثل **الإصلاحات العاجلة (Hot Fixes)**.
+يذكر المنهج أن للصيانة فئات مختلفة (التفاصيل في معيار **ISO/IEC 14764**):
 
-### تحليل الأثر — Impact Analysis
+- **تصحيحية (corrective)**: لإصلاح الـ defects، مثل تصحيح رسوم توصيل تُحسب خطأً.
+- **تكيّفية (adaptive)** مع التغيّرات في البيئة: مثل تعديل التطبيق ليعمل على إصدار جديد من Android، أو مع نسخة جديدة من واجهة بوابة الدفع.
+- **لتحسين الأداء أو قابلية الصيانة**: مثل تسريع البحث عن المطاعم، أو إعادة هيكلة شيفرة الكوبونات لتسهيل تعديلها لاحقًا.
 
-قد يُجرى **تحليل الأثر** قبل إجراء التغيير، للمساعدة في تقرير ما إذا كان يجب إجراؤه، بناءً على عواقبه المحتملة على مناطق أخرى من النظام.
+لذلك قد تتضمن الصيانة **إصدارات ونشرًا مخططًا (planned releases/deployments)**، أو **غير مخطط** مثل **الإصلاحات العاجلة (hot fixes)**. الإصدار المخطط يأتي ضمن جدول الفريق كل 2 sprints، فيتسع له وقت الاختبار المعتاد؛ أما الإصلاح العاجل، كعطل يمنع الدفع بالبطاقة مساء الجمعة، فيُنشر خلال ساعات، والاختبار يجب أن يكون سريعًا ومركّزًا، وهنا تظهر قيمة مجموعة الانحدار المؤتمتة.
+
+### تحليل الأثر قبل التغيير — Impact Analysis Before the Change
+
+**قد يُجرى تحليل الأثر (impact analysis) قبل إجراء التغيير**، **للمساعدة في تقرير ما إذا كان يجب إجراؤه أصلًا**، **بناءً على عواقبه المحتملة في مناطق أخرى من النظام**. لاحظ الفرق عن القسم 2.2.3: هناك استُخدم تحليل الأثر لتحديد **نطاق اختبار الانحدار**؛ وهنا يُستخدم أيضًا **كأداة قرار**. مثال: طلب مطعم تغيير الحد الأدنى للطلب لديه وحده إلى 7 دنانير. يكشف تحليل الأثر أن القاعدة الحالية عامة ومستخدمة في السلة والكوبونات والتقارير، فيقرر مالك المنتج تأجيل التغيير إلى إصدار مخطط بدل تنفيذه كإصلاح عاجل.
 
 ### ماذا يشمل اختبار الصيانة؟ — What Maintenance Testing Covers
 
-اختبار التغييرات على نظام قيد التشغيل يشمل:
+اختبار التغييرات على نظام قيد التشغيل يشمل أمرين:
 
-- **تقييم نجاح تنفيذ التغيير** نفسه.
-- **التحقق من الانحدار المحتمل** في أجزاء النظام التي **لم تتغير**، وهي عادة **معظم النظام**.
+1. **تقييم نجاح تنفيذ التغيير** نفسه: هل الميزة الجديدة تعمل؟ هل الـ defect أُصلح؟
+2. **التحقق من الانحدار المحتمل في أجزاء النظام التي لم تتغير**، وهي **عادة معظم النظام**. التغيير قد يكون سطرًا واحدًا، لكن ما يعتمد عليه قد يكون كثيرًا. ولهذا يجمع اختبار الصيانة بين ما تعلمناه في القسم 2.2.3: اختبار تأكيد أو اختبار للميزة الجديدة من جهة، واختبار انحدار واسع تختاره نتائج تحليل الأثر من جهة أخرى.
 
 ### ما الذي يحدد نطاقه؟ — What Determines the Scope
 
-- **درجة خطورة التغيير.**
-- **حجم النظام الحالي.**
-- **حجم التغيير.**
+**يعتمد نطاق اختبار الصيانة عادة على**:
+
+- **درجة خطورة التغيير**: تعديل في حساب المبلغ المدفوع أخطر من تغيير لون زر.
+- **حجم النظام الحالي**: كلما كبر النظام كثرت الأجزاء التي قد تتأثر واتسعت مجموعة الانحدار.
+- **حجم التغيير**: إضافة طريقة دفع جديدة تحتاج اختبارًا أوسع من تصحيح نص رسالة.
 
 ### ما الذي يستدعي الصيانة واختبارها؟ — Triggers
 
+يصنّف المنهج محفّزات الصيانة واختبار الصيانة في ثلاث مجموعات:
+
 <figure class="gx-figure gx-spectrum" aria-label="The three groups of maintenance triggers."><div class="gx-spectrum-row"><div class="gx-spectrum-item"><b>Modifications</b><span>Planned enhancements (releases), corrective changes, hot fixes.</span></div><div class="gx-spectrum-item"><b>Upgrades or migrations</b><span>Platform changes, which need tests of the new environment and the changed software; data conversion when data moves from another application.</span></div><div class="gx-spectrum-item gx-spectrum-item--accent"><b>Retirement</b><span>End of life: test data archiving and, if needed, restore and retrieval procedures.</span></div></div><figcaption>The three groups of maintenance triggers.</figcaption></figure>
 
-1. **التعديلات (Modifications):** مثل التحسينات المخططة (ضمن الإصدارات)، والتغييرات التصحيحية، والإصلاحات العاجلة.
-2. **الترقيات أو الترحيل (Upgrades or Migrations):** للبيئة التشغيلية، مثل الانتقال من منصة لأخرى. هذا قد يتطلب اختبارات مرتبطة بالبيئة الجديدة وبالبرمجية المتغيرة، أو اختبارات **تحويل البيانات** عند ترحيل بيانات من تطبيق آخر إلى النظام الذي تتم صيانته.
-3. **الإحالة للتقاعد (Retirement):** عندما يصل التطبيق لنهاية عمره. قد يتطلب ذلك اختبار **أرشفة البيانات** إذا كانت هناك حاجة للاحتفاظ بها لفترات طويلة. وقد يلزم أيضًا اختبار **إجراءات الاستعادة والاسترجاع** بعد الأرشفة، إذا كانت بعض البيانات ستُطلب خلال فترة الأرشفة.
+**1. التعديلات (modifications)**: مثل **التحسينات المخططة** (المبنية على الإصدارات)، و**التغييرات التصحيحية**، و**الإصلاحات العاجلة**. في تطبيقنا: إضافة ميزة «إعادة الطلب» في الإصدار القادم، أو إصلاح عاجل لعطل الدفع.
 
-<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">A bank moves its customer portal from on-premise servers to the cloud (migration). Testing covers the portal on the new platform, the conversion of ten years of customer data, and a regression suite for the unchanged features. Two years later, the old reporting module is retired: the team tests that its data is archived and can still be retrieved for audits.</p><p class="gx-ar" lang="ar" dir="rtl">بنك ينقل بوابة عملائه من خوادم داخلية إلى السحابة (ترحيل). يشمل الاختبار البوابة على المنصة الجديدة، وتحويل بيانات عملاء عشر سنوات، ومجموعة انحدار للميزات التي لم تتغير. بعد سنتين تُحال وحدة التقارير القديمة للتقاعد: يختبر الفريق أرشفة بياناتها، وإمكانية استرجاعها لأغراض التدقيق.</p></aside>
+**2. الترقيات أو الترحيل في البيئة التشغيلية (upgrades or migrations)**، **مثل الانتقال من منصة إلى أخرى**. هذا **قد يتطلب اختبارات مرتبطة بالبيئة الجديدة وبالبرمجية المتغيرة معًا**. أو قد يتطلب **اختبار تحويل البيانات (data conversion)** **عند ترحيل بيانات من تطبيق آخر إلى النظام الذي تتم صيانته**. مثال: نقل الخوادم إلى مزوّد سحابي جديد، أو استيراد قوائم الطعام وحسابات المطاعم من نظام قديم كانت تستخدمه سلسلة مطاعم انضمت حديثًا؛ يجب التحقق من أن الأسعار والوجبات انتقلت كاملة وبالتنسيق الصحيح.
+
+**3. الإحالة للتقاعد (retirement)**، **عندما يصل التطبيق إلى نهاية عمره**. عند إحالة نظام للتقاعد **قد يلزم اختبار أرشفة البيانات (data archiving)** **إذا كانت فترات الاحتفاظ بالبيانات طويلة**. و**قد يلزم أيضًا اختبار إجراءات الاستعادة والاسترجاع (restore and retrieval) بعد الأرشفة**، **إذا احتجنا بعض البيانات خلال فترة الأرشفة**. مثال: إيقاف لوحة المطاعم القديمة بعد إطلاق لوحة جديدة؛ يجب التأكد من أرشفة سجل الطلبات والفواتير للسنوات المطلوبة، ومن إمكانية استرجاع فاتورة قديمة عند تدقيق أو شكوى.
+
+<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">Friday evening, card payments fail in the delivery app after the payment gateway changed a field name. Hot fix: the team tests the corrected card payment (the change), then runs the automated regression suite for cash, wallet, coupons and order states (the unchanged parts). The risk is high but the change is small, so the scope is focused; the full exploratory round waits for the next planned release.</p><p class="gx-ar" lang="ar" dir="rtl">مساء الجمعة، يفشل الدفع بالبطاقة في تطبيق التوصيل بعد أن غيّرت بوابة الدفع اسم أحد الحقول. إصلاح عاجل: يختبر الفريق الدفع بالبطاقة بعد التصحيح (التغيير)، ثم يشغّل مجموعة الانحدار المؤتمتة للدفع النقدي والمحفظة والكوبونات وحالات الطلب (الأجزاء التي لم تتغير). الخطورة عالية لكن التغيير صغير، فيبقى النطاق مركّزًا؛ وتنتظر الجولة الاستكشافية الكاملة الإصدار المخطط القادم.</p></aside>
+
+### لا تخلط بين — Don't Confuse
+
+| Situation | Trigger group | Special testing |
+| --- | --- | --- |
+| New feature in the next release | Modification (planned) | The change + regression |
+| Urgent fix in production | Modification (hot fix) | Focused, fast; regression suite |
+| Move to a new cloud platform | Upgrade / migration | New environment + changed software |
+| Import restaurant data from an old system | Migration | Data conversion |
+| Old dashboard switched off | Retirement | Data archiving, restore and retrieval |
 
 <aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">Learn the three trigger groups and their examples. "Data conversion" belongs to migration; "archiving" and "restore after archiving" belong to retirement.</p><p class="gx-ar" lang="ar" dir="rtl">احفظ مجموعات المحفّزات الثلاث وأمثلتها. «تحويل البيانات» ينتمي للترحيل؛ و«الأرشفة» و«الاستعادة بعد الأرشفة» تنتميان للإحالة للتقاعد.</p></aside>
 

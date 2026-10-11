@@ -7,7 +7,7 @@ section: "2.1.2"
 title: "Software Development Lifecycle and Good Testing Practices"
 titleAr: "دورة حياة التطوير وممارسات الاختبار الجيدة"
 objectives: "FL-2.1.2 · K1"
-minutes: 5
+minutes: 8
 lo:
   FL-2.1.2: "Recall good testing practices that apply to all software development lifecycles."
 loAr:
@@ -29,21 +29,38 @@ terms:
     defAr: "تجسيد محدد لعملية الاختبار، مثل اختبار المكوّنات أو اختبار النظام."
     match: ["Test Level", "test level", "test levels"]
 ---
-مهما كانت دورة حياة التطوير التي يتّبعها فريقك، هناك **ممارسات اختبار جيدة** تنطبق عليها جميعًا. يذكر المنهج أربعًا منها.
-
-### الممارسات الأربع — The Four Practices
+بعض ممارسات الاختبار مرتبطة بنموذج تطوير معيّن، لكن هناك ممارسات **مستقلة عن نموذج الـ SDLC المختار**: تصلح لمشروع شلال، ولفريق Scrum، ولخط DevOps. يذكر المنهج أربعًا منها. وكلها تخدم فكرة واحدة: أن يرافق الاختبار التطوير من أوله إلى آخره، بدل أن يكون مرحلة منفصلة في النهاية.
 
 <figure class="gx-figure gx-spectrum" aria-label="Good testing practices, independent of the chosen SDLC."><div class="gx-spectrum-row"><div class="gx-spectrum-item"><b>1 · A test activity for every development activity</b><span>All development activities are subject to quality control.</span></div><div class="gx-spectrum-item"><b>2 · Distinct objectives per test level</b><span>Comprehensive testing without redundancy.</span></div><div class="gx-spectrum-item"><b>3 · Early test analysis and design</b><span>Start during the matching development phase.</span></div><div class="gx-spectrum-item gx-spectrum-item--accent"><b>4 · Review drafts early</b><span>Testers join as soon as drafts exist.</span></div></div><figcaption>Good testing practices, independent of the chosen SDLC.</figcaption></figure>
 
-**1. لكل نشاط تطوير نشاط اختبار مقابل.** بهذا يخضع كل نشاط تطوير لضبط الجودة. كتابة المتطلبات يقابلها مراجعتها، وكتابة الشيفرة يقابلها اختبار المكوّنات، وهكذا.
+### 1. لكل نشاط تطوير نشاط اختبار مقابل — A Test Activity for Every Development Activity
 
-**2. لكل مستوى اختبار أهداف خاصة ومختلفة.** هذا يجعل الاختبار شاملًا مع **تجنّب التكرار**. اختبار المكوّنات لا يعيد ما يفعله اختبار النظام، والعكس.
+لكل نشاط تطوير يجب أن يوجد **نشاط اختبار مقابل**، حتى **يخضع كل نشاط تطوير لضبط الجودة (quality control)**. السبب: أي نشاط بلا اختبار مقابل هو مكان يمكن أن تتسرب منه الـ defects دون أن يلاحظها أحد. في تطبيق التوصيل: كتابة قصة «إلغاء الطلب» يقابلها مراجعة القصة ومعايير قبولها، وتصميم واجهة الـ API يقابله مراجعة التصميم واختبار تكامل المكوّنات، وكتابة الشيفرة يقابلها اختبار المكوّنات والتحليل الساكن.
 
-**3. تحليل الاختبار وتصميمه لمستوى معيّن يبدآن خلال مرحلة التطوير المقابلة.** مثلًا: تصميم اختبارات النظام يبدأ عندما تُكتب مواصفات النظام، لا عندما يكتمل النظام. هذا تطبيق لمبدأ **الاختبار المبكر**.
+### 2. أهداف مختلفة لكل مستوى — Distinct Objectives per Test Level
 
-**4. المختبرون يشاركون في مراجعة مخرجات العمل فور توفر مسوداتها.** بهذا يدعم الاختبار المبكر واكتشاف الـ defects نهج **النقل لليسار (Shift Left)**.
+لكل **مستوى اختبار (test level)** (القسم 2.2.1) **أهداف اختبار محددة ومختلفة**. هذا يجعل الاختبار **شاملًا بالقدر المناسب** وفي الوقت نفسه **يتجنّب التكرار (redundancy)**. لو اختبر كل مستوى الأشياء نفسها لضاع الوقت في تكرار الفحوص، وبقيت جوانب أخرى بلا فحص. مثال: اختبار المكوّنات يتحقق من أن دالة حساب رسوم التوصيل تعيد 1.50 للطلب الأقل من 20 دينارًا؛ أما اختبار النظام فلا يعيد هذا الفحص بكل قيمه، بل يتحقق من أن الرسوم تظهر صحيحة في رحلة الطلب كاملة من السلة حتى الإيصال.
 
-<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">As soon as the product owner shares a draft story for "export invoices to PDF", the tester comments: "What happens with 1,000+ invoices? Which date format?" Two defects are prevented before a single line of code is written.</p><p class="gx-ar" lang="ar" dir="rtl">بمجرد أن يشارك مالك المنتج مسودة قصة «تصدير الفواتير إلى PDF»، يعلّق المختبر: «ماذا يحدث مع أكثر من 1000 فاتورة؟ وأي صيغة للتاريخ؟». اثنان من الـ defects تم منعهما قبل كتابة سطر شيفرة واحد.</p></aside>
+### 3. التحليل والتصميم يبدآن مع مرحلة التطوير المقابلة — Early Test Analysis and Design
+
+**تحليل الاختبار وتصميمه لمستوى معيّن يبدآن خلال مرحلة التطوير المقابلة له** في دورة الحياة، لا بعد انتهائها. بهذا يلتزم الاختبار بمبدأ **الاختبار المبكر** (القسم 1.3). مثلًا: حين يكتب مالك المنتج معايير قبول ميزة الكوبونات، يبدأ المختبر فورًا في استخراج شروط الاختبار منها، مثل الكوبون المنتهي وكوبونين في طلب واحد، قبل أن تُكتب الشيفرة. وغالبًا يكشف هذا التحليل نفسه أسئلة لم يجب عنها أحد.
+
+### 4. مراجعة المسودات فور توفرها — Review Drafts Early
+
+**يشارك المختبرون في مراجعة مخرجات العمل بمجرد توفر مسوداتها**، ولا ينتظرون النسخة النهائية. هذا الاختبار والاكتشاف المبكر للـ defects يدعم نهج **النقل لليسار (shift left)** (القسم 2.1.5). الـ defect الذي يُكتشف في مسودة يُصلح بتعديل جملة؛ أما بعد البرمجة فيحتاج تعديل الشيفرة وإعادة الاختبار.
+
+<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">The product owner shares a draft story: "A customer can cancel an order." The tester comments within an hour: "Until which state? The order states say cancellation is possible only before Out for delivery. Is the payment refunded for card and wallet?" Two defects are prevented before any code is written.</p><p class="gx-ar" lang="ar" dir="rtl">يشارك مالك المنتج مسودة قصة: «يمكن للزبون إلغاء الطلب». يعلّق المختبر خلال ساعة: «حتى أي حالة؟ حالات الطلب تقول إن الإلغاء ممكن فقط قبل Out for delivery. وهل يُسترد المبلغ في الدفع بالبطاقة والمحفظة؟». اثنان من الـ defects تم منعهما قبل كتابة أي شيفرة.</p></aside>
+
+### كيف تعمل الممارسات الأربع معًا؟ — How They Fit Together
+
+الممارسة الأولى تضمن ألا يبقى نشاط تطوير بلا رقابة، والثانية توزّع هذه الرقابة على المستويات دون تكرار، والثالثة والرابعة تحددان **التوقيت**: ابدأ مبكرًا، ولا تنتظر اكتمال الوثائق. لذلك تجد في الامتحان أن هذه الممارسات ترتبط بمفاهيم أخرى من المنهج: الأولى بضبط الجودة، والثانية بمستويات الاختبار، والثالثة بمبدأ الاختبار المبكر، والرابعة بالنقل لليسار. وتذكّر أنها **لا تعتمد على النموذج**: فريق الشلال يطبّقها بمراجعة وثيقة المتطلبات، وفريق Scrum يطبّقها بمراجعة قصة المستخدم في جلسة التحضير (refinement).
+
+| Practice | Linked concept |
+| --- | --- |
+| Test activity for every development activity | Quality control |
+| Specific, different objectives per level | Test levels, no redundancy |
+| Analysis and design start in the matching phase | Early testing principle |
+| Review drafts as soon as available | Shift left |
 
 <aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">This is K1: recognise the four practices. A distractor might say "each test level should cover the same objectives to be safe"; the syllabus says the opposite: different, specific objectives to avoid redundancy.</p><p class="gx-ar" lang="ar" dir="rtl">هذا هدف K1: تعرّف على الممارسات الأربع. قد يقول خيار مضلل «يجب أن يغطي كل مستوى اختبار الأهداف نفسها للاحتياط»؛ والمنهج يقول العكس: أهداف محددة ومختلفة لتجنّب التكرار.</p></aside>
 

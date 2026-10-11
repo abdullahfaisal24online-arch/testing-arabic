@@ -43,11 +43,11 @@ terms:
 - **تقارير الإكمال والتعلّم المستمر:** إعداد تقرير الإكمال بما أُنجز والدروس المستفادة لتحسين العمليات القادمة.
 - **عرض المقاييس:** لوحات مؤشرات وملخصات مكتوبة تعطي كل صاحب مصلحة المقاييس المناسبة لقرارات أسرع وأوضح.
 
-### مثال من سبرنت — A Sprint Example
+### مثال من sprint — A Sprint Example
 
-في منتصف السبرنت، يقرأ النموذج بيانات أداة إدارة الاختبار: نسبة التنفيذ أقل من المخطط بـ15%، والعيوب المفتوحة في مكوّن الدفع تزداد منذ ثلاثة أيام. يقترح النموذج تنبيهًا للفريق، ويقترح للتحكم: نقل مختبِر من مكوّن مستقر إلى الدفع، وتأجيل حالات منخفضة الأولوية، وتقديم حالات الدفع الحرجة. مدير الاختبار يقرر، لأن النموذج لا يعرف مثلًا أن المختبِر المقترح نقله في إجازة.
+في منتصف الـ sprint، يقرأ النموذج بيانات أداة إدارة الاختبار: نسبة التنفيذ أقل من المخطط بـ15%، والـ defects المفتوحة في مكوّن الدفع تزداد منذ ثلاثة أيام. يقترح النموذج تنبيهًا للفريق، ويقترح للتحكم: نقل مختبِر من مكوّن مستقر إلى الدفع، وتأجيل حالات منخفضة الأولوية، وتقديم حالات الدفع الحرجة. مدير الاختبار يقرر، لأن النموذج لا يعرف مثلًا أن المختبِر المقترح نقله في إجازة.
 
-وفي نهاية الإصدار، يجهّز النموذج مسودة تقرير إكمال: ما الذي أُنجز، والعيوب المتبقية، والمخاطر، والدروس المستفادة للإصدار القادم. ثم يحوّل المقاييس إلى لوحة لمدير المنتج، وملخص مكتوب للإدارة، ومستوى تفصيل أعلى للفريق التقني.
+وفي نهاية الإصدار، يجهّز النموذج مسودة تقرير إكمال: ما الذي أُنجز، والـ defects المتبقية، والمخاطر، والدروس المستفادة للإصدار القادم. ثم يحوّل المقاييس إلى لوحة لمدير المنتج، وملخص مكتوب للإدارة، ومستوى تفصيل أعلى للفريق التقني.
 
 <aside class="gx-callout" data-kind="key"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Key idea</span><span class="gx-ar" lang="ar" dir="rtl">فكرة أساسية</span></p><p class="gx-en" lang="en" dir="ltr">Define every metric and review the calculations. Do not turn a forecast about a future risk into a stated fact.</p><p class="gx-ar" lang="ar" dir="rtl">عرّف كل مقياس وراجع الحسابات. لا تحوّل توقّعًا بخطر مستقبلي إلى حقيقة مؤكدة.</p></aside>
 
@@ -58,4 +58,4 @@ Define the numerator and denominator for every ratio.
 Do not count blocked cases as executed or passed.
 Output: metric, calculation, value, data source,
 then suggested actions with reasons.
-Separate proven observations from forecasts and control recommendations.</code></pre><details class="gx-lab-answer"><summary>Reading the result · <span class="gx-ar-inline" lang="ar" dir="rtl">قراءة النتيجة</span></summary><p><span class="gx-en" lang="en" dir="ltr">If the plan required 90 executed cases today, there is a gap of 15. The numbers alone do not show that a person underperformed or that the release is safe. Rescheduling also needs the importance of the remaining cases, time and dependencies. A completion report adds remaining defects, risks and lessons, not ratios alone.</span><span class="gx-ar" lang="ar" dir="rtl">إذا كانت الخطة تتطلب تنفيذ 90 حالة اليوم، فهناك فجوة 15 حالة. الأرقام وحدها لا تثبت أن شخصًا قصّر أو أن الإصدار آمن. وإعادة الجدولة تحتاج أيضًا أهمية الحالات المتبقية والوقت والاعتماديات. وتقرير الإكمال يضيف العيوب المتبقية والمخاطر والدروس، لا النسب وحدها.</span></p></details></div></section>
+Separate proven observations from forecasts and control recommendations.</code></pre><details class="gx-lab-answer"><summary>Reading the result · <span class="gx-ar-inline" lang="ar" dir="rtl">قراءة النتيجة</span></summary><p><span class="gx-en" lang="en" dir="ltr">If the plan required 90 executed cases today, there is a gap of 15. The numbers alone do not show that a person underperformed or that the release is safe. Rescheduling also needs the importance of the remaining cases, time and dependencies. A completion report adds remaining defects, risks and lessons, not ratios alone.</span><span class="gx-ar" lang="ar" dir="rtl">إذا كانت الخطة تتطلب تنفيذ 90 حالة اليوم، فهناك فجوة 15 حالة. الأرقام وحدها لا تثبت أن شخصًا قصّر أو أن الإصدار آمن. وإعادة الجدولة تحتاج أيضًا أهمية الحالات المتبقية والوقت والاعتماديات. وتقرير الإكمال يضيف الـ defects المتبقية والمخاطر والدروس، لا النسب وحدها.</span></p></details></div></section>

@@ -53,7 +53,7 @@ terms:
 
 **Data Poisoning:** التلاعب بالبيانات التي يتعلم منها النموذج. مثال: أداة تحسّن نفسها بناءً على تقييمات المستخدمين لتقارير الاختبار المولّدة؛ تقييمات مزيفة متعمدة قد تدفعها لتفضيل تقارير سيئة.
 
-**Malicious Code Generation:** دفع النموذج لتوليد شيفرة تحتوي باب خلفي أو استدعاء أوامر غير مقصود. سكربت اختبار يفتح اتصالًا بخادم خارجي، أو يرسل بيانات البيئة، يجب أن يُرفض قبل أي تشغيل.
+**Malicious Code Generation:** دفع النموذج لتوليد شيفرة تحتوي باب خلفي أو استدعاء أوامر غير مقصود. test script يفتح اتصالًا بخادم خارجي، أو يرسل بيانات البيئة، يجب أن يُرفض قبل أي تشغيل.
 
 <aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip · v1.1</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان · v1.1</span></p><p class="gx-en" lang="en" dir="ltr">Syllabus v1.1 renamed the first vector from “Data exfiltration” to <strong>Context Manipulation</strong>. Expect the new name in questions.</p><p class="gx-ar" lang="ar" dir="rtl">غيّرت نسخة المنهج v1.1 اسم المتجه الأول من «Data exfiltration» إلى <strong>Context Manipulation</strong>. توقّع الاسم الجديد في الأسئلة.</p></aside>
 

@@ -13,12 +13,12 @@ lo:
 loAr:
   GenAI-4.1.1: "شرح المكوّنات والمفاهيم الرئيسية لبنية الاختبار التحتية المعتمدة على النماذج اللغوية الكبيرة."
 takeaways:
-  - "Six building blocks: front-end, back-end, LLM, relational database, vector database and post-processing."
+  - "Main components: front-end, back-end, the LLM and external data sources (relational and vector databases); the back-end also post-processes the LLM output."
   - "The LLM can be a third-party service via API or a model hosted inside the organisation."
   - "Authentication and permissions stay the application's job, not the model's."
   - "Post-processing can reject malformed output, but well-formed text can still be wrong."
 takeawaysAr:
-  - "ستة مكوّنات أساسية: الواجهة الأمامية، والواجهة الخلفية، والنموذج اللغوي، وقاعدة البيانات العلائقية، وقاعدة البيانات المتجهية، والمعالجة اللاحقة."
+  - "المكوّنات الأساسية: الواجهة الأمامية، والواجهة الخلفية، والنموذج اللغوي، ومصادر البيانات الخارجية (قواعد البيانات العلائقية والمتجهية)؛ والواجهة الخلفية تتولى أيضًا المعالجة اللاحقة لمخرجات النموذج."
   - "يمكن أن يكون النموذج اللغوي خدمة خارجية عبر API أو نموذجًا مستضافًا داخل المؤسسة."
   - "المصادقة والصلاحيات تبقى من مسؤولية التطبيق، لا النموذج."
   - "المعالجة اللاحقة ترفض المخرجات المشوّهة البنية، لكن النص السليم البنية قد يبقى خاطئًا."
@@ -41,9 +41,9 @@ terms:
 | Front-end | استقبال طلب المختبِر وعرض النتائج | اختيار قصة وطلب حالات اختبار |
 | Back-end | المصادقة والاسترجاع وتجهيز التوجيه واستدعاء النموذج | جمع معايير القبول المسموح بها |
 | LLM | توليد استجابة من التوجيه والسياق | مسودة الحالات والنتائج |
-| Relational database | البيانات المنظمة | حالات ومعرّفات وعلاقاتها |
-| Vector database | استرجاع دلالي بواسطة Embeddings | مقاطع توثيق ذات صلة بالسؤال |
-| Post-processing | فحص وتحويل الناتج قبل العرض | التحقق من البنية وربط الحالات بالمصادر |
+| External data: relational database | البيانات المنظمة، تدمجها الواجهة الخلفية | حالات ومعرّفات وعلاقاتها |
+| External data: vector database | استرجاع دلالي بواسطة Embeddings، تدمجه الواجهة الخلفية | مقاطع توثيق ذات صلة بالسؤال |
+| Post-processing (back-end function) | فحص وتحويل الناتج قبل العرض | التحقق من البنية وربط الحالات بالمصادر |
 
 ### لماذا نوعان من قواعد البيانات؟ — Two Kinds of Database
 
@@ -57,6 +57,6 @@ terms:
 
 <aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice · Tracing one request</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي · تتبّع طلب واحد</span></p><p class="gx-en" lang="en" dir="ltr">The tester picks the “sign-up” story. The back-end checks the user's permissions, retrieves the approved version and builds the prompt. The model returns a draft, and the tool checks the fields and requirement IDs before showing it for review.</p><p class="gx-ar" lang="ar" dir="rtl">يختار المختبِر قصة «التسجيل». تتحقق الواجهة الخلفية من صلاحيات المستخدم، وتسترجع النسخة المعتمدة، وتبني الـ prompt. يعيد النموذج مسودة، وتتحقق الأداة من الحقول ومعرّفات المتطلبات قبل عرضها للمراجعة.</p></aside>
 
-<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">Know the six components and the job of each: front-end (user interaction), back-end (orchestration: auth, retrieval, prompt building, model calls), LLM (generation), relational database (structured data), vector database (semantic retrieval) and post-processing (checking and transforming output).</p><p class="gx-ar" lang="ar" dir="rtl">اعرف المكوّنات الستة ووظيفة كلٍّ منها: الواجهة الأمامية (تفاعل المستخدم)، والواجهة الخلفية (التنسيق: المصادقة، والاسترجاع، وبناء الـ prompt، واستدعاء النموذج)، والنموذج اللغوي (التوليد)، وقاعدة البيانات العلائقية (البيانات المهيكلة)، وقاعدة البيانات المتجهية (الاسترجاع الدلالي)، والمعالجة اللاحقة (فحص المخرجات وتحويلها).</p></aside>
+<aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">Know the components and the job of each: front-end (user interaction), back-end (auth, data retrieval, prompt preparation, LLM interaction, and post-processing of the output), the LLM (generation), and external data sources the back-end integrates: relational databases (structured data) and vector databases (semantic retrieval).</p><p class="gx-ar" lang="ar" dir="rtl">اعرف المكوّنات ووظيفة كلٍّ منها: الواجهة الأمامية (تفاعل المستخدم)، والواجهة الخلفية (المصادقة، واسترجاع البيانات، وتجهيز الـ prompt، والتعامل مع النموذج، والمعالجة اللاحقة لمخرجاته)، والنموذج اللغوي (التوليد)، ومصادر البيانات الخارجية التي تدمجها الواجهة الخلفية: قواعد البيانات العلائقية (البيانات المهيكلة) والمتجهية (الاسترجاع الدلالي).</p></aside>
 
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Common mistake</span><span class="gx-ar" lang="ar" dir="rtl">خطأ شائع</span></p><p class="gx-en" lang="en" dir="ltr">Trusting structurally valid output. Post-processing can reject missing fields, but it cannot fix every reasoning error. And authentication and permissions remain the application's responsibility; the model does not replace them.</p><p class="gx-ar" lang="ar" dir="rtl">الثقة بمخرجات سليمة البنية. المعالجة اللاحقة ترفض الحقول الناقصة، لكنها لا تصلح كل أخطاء الاستدلال. كما تبقى المصادقة والصلاحيات من مسؤولية التطبيق، والنموذج لا يحلّ محلّها.</p></aside>

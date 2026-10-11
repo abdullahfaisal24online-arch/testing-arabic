@@ -7,7 +7,7 @@ section: "5.1.7"
 title: "Testing Quadrants"
 titleAr: "أرباع الاختبار"
 objectives: "FL-5.1.7 · K2"
-minutes: 7
+minutes: 11
 lo:
   FL-5.1.7: "Summarise the testing quadrants and their relationship with test levels and test types."
 loAr:
@@ -35,22 +35,43 @@ terms:
     defAr: "نموذج يجمع الاختبارات حسب كونها موجّهة للعمل أو للتقنية، وكونها تدعم الفريق أو تنقد المنتج."
     match: ["Testing Quadrants", "testing quadrants"]
 ---
-**أرباع الاختبار (Testing Quadrants)**، التي عرّفها Brian Marick، تجمع **مستويات الاختبار** مع **أنواع الاختبار** والأنشطة والتقنيات ومخرجات العمل المناسبة في تطوير Agile.
+فريق **تطبيق التوصيل** يكتب اختبارات وحدات في خط CI، ويختبر معايير قبول القصص، ويجري اختبارًا استكشافيًا قبل كل نشر، ويقيس أداء الـ API. كيف يتأكد أنه لم ينسَ نوعًا مهمًا من الاختبار، كاختبار سهولة الاستخدام أو الأمان؟ وكيف يشرح لمالك المنتج لماذا يحتاج كل هذه الأنواع؟ هنا يفيد نموذج **أرباع الاختبار (Testing Quadrants)**.
 
-يدعم النموذج إدارة الاختبار في:
+عرّف النموذج **Brian Marick** (Marick 2003, Crispin 2008)، وهو **يجمع مستويات الاختبار** مع **أنواع الاختبار** والأنشطة **وتقنيات الاختبار ومخرجات العمل** المناسبة لها في **تطوير Agile**.
 
-- **ضمان تضمين** كل أنواع الاختبار ومستوياته المطلوبة في دورة التطوير.
-- **فهم** أن بعض أنواع الاختبار مرتبطة بمستويات اختبار معيّنة أكثر من غيرها.
-- **التمييز بين أنواع الاختبارات وشرحها** لكل أصحاب المصلحة، بمن فيهم المطوّرون والمختبرون وممثلو العمل.
+### لماذا هذا النموذج؟ — Why the Quadrants?
+
+يذكر السيليبس ثلاث فوائد:
+
+- **إظهار الصورة كاملة لضمان تضمين كل أنواع الاختبار ومستوياته المناسبة** في دورة حياة التطوير. عندما يضع الفريق اختباراته في الأرباع الأربعة، يظهر الربع الفارغ فورًا. فلو كانت كل اختبارات تطبيق التوصيل في الربعين 1 و2، فالفريق لا ينقد المنتج من منظور المستخدم ولا يقيس أداءه.
+- **فهم أن بعض أنواع الاختبار أكثر ارتباطًا بمستويات اختبار معيّنة** من غيرها. اختبار المكوّنات مثلًا مرتبط بمستوى المكوّنات وبالأتمتة في CI، واختبار قبول المستخدم مرتبط بمستوى القبول.
+- **التمييز بين أنواع الاختبارات ووصفها لكل أصحاب المصلحة**، بمن فيهم المطوّرون والمختبرون وممثلو العمل. النموذج يعطي الجميع لغة مشتركة بسيطة: «هذا اختبار من الربع 3» يفهمه المطوّر ومالك المنتج بالمعنى نفسه.
 
 ### البُعدان — The Two Dimensions
 
-- **موجّه للعمل (Business facing)** مقابل **موجّه للتقنية (Technology facing)**.
-- **يدعم الفريق (Support the team):** يوجّه التطوير. مقابل **ينقد المنتج (Critique the product):** يقيس سلوكه مقارنة بالتوقعات.
+**البُعد الأول: لمن يتجه الاختبار؟**
+
+- **موجّه للعمل (Business facing):** يُكتب بلغة العمل ويفهمه ممثلو العمل، مثل «زبون يطبّق كوبون 10% على طلب 30.00 دينارًا».
+- **موجّه للتقنية (Technology facing):** يُكتب بلغة تقنية ويهم الفريق التقني، مثل «دالة الخصم تُرجع 3.00 للمدخلات 30.00 و10%»، أو «الـ API يستجيب خلال 300 ميلي ثانية».
+
+**البُعد الثاني: ما الغرض منه؟**
+
+- **يدعم الفريق (Support the team):** أي **يوجّه التطوير**؛ اختبارات تُكتب قبل الشيفرة أو معها لتساعد الفريق على بناء الشيء الصحيح بالطريقة الصحيحة.
+- **ينقد المنتج (Critique the product):** أي **يقيس سلوك المنتج مقارنة بالتوقعات**؛ اختبارات تنظر إلى المنتج المبني وتسأل: هل هو جيد بما يكفي للمستخدم ومن الناحية التقنية؟
+
+**تركيب هذين المنظورين** يعطي الأرباع الأربعة:
 
 <figure class="gx-figure" aria-label="The four testing quadrants. Top: business facing; bottom: technology facing. Left: support the team; right: critique the product."><div class="gx-quad"><div><small>Q2 · Business facing · Support the team</small><b>Functional tests, examples, story tests, UX prototypes, API testing, simulations</b><span>Check acceptance criteria. Manual or automated.</span></div><div><small>Q3 · Business facing · Critique the product</small><b>Exploratory testing, usability testing, user acceptance testing</b><span>User-oriented, often manual.</span></div><div><small>Q1 · Technology facing · Support the team</small><b>Component tests, component integration tests</b><span>Automated, part of CI.</span></div><div><small>Q4 · Technology facing · Critique the product</small><b>Smoke tests, non-functional tests (except usability)</b><span>Often automated.</span></div></div><figcaption>The four testing quadrants. Top: business facing; bottom: technology facing. Left: support the team; right: critique the product.</figcaption></figure>
 
 ### الأرباع الأربعة — The Four Quadrants
+
+**الربع Q1 (موجّه للتقنية، يدعم الفريق):** يضم **اختبارات المكوّنات** و**اختبارات تكامل المكوّنات**. هذه الاختبارات **يجب أن تكون مؤتمتة ومضمّنة في عملية CI**، لأنها تعطي المطوّرين تغذية راجعة فورية مع كل commit. مثال: اختبار وحدة لدالة رسوم التوصيل، واختبار تكامل بين خدمة الطلبات وخدمة الكوبونات.
+
+**الربع Q2 (موجّه للعمل، يدعم الفريق):** يضم **الاختبارات الوظيفية، والأمثلة، واختبارات قصص المستخدم، ونماذج تجربة المستخدم الأولية (UX prototypes)، واختبار الـ API، والمحاكاة**. هذه الاختبارات **تتحقق من معايير القبول**، ويمكن أن تكون **يدوية أو مؤتمتة**. مثال: اختبار معيار القبول «الكوبون المنتهي يُرفض برسالة واضحة»، ومحاكاة رحلة السائق بدل خدمة الخرائط الحقيقية.
+
+**الربع Q3 (موجّه للعمل، ينقد المنتج):** يضم **الاختبار الاستكشافي، واختبار سهولة الاستخدام، واختبار قبول المستخدم**. هذه الاختبارات **موجّهة للمستخدم**، و**غالبًا يدوية**، لأنها تحتاج حكمًا بشريًا. مثال: جلسة استكشافية على شاشة الدفع بالواجهة العربية، أو مراقبة زبائن حقيقيين يحاولون تطبيق كوبون.
+
+**الربع Q4 (موجّه للتقنية، ينقد المنتج):** يضم **اختبارات الدخان** و**الاختبارات غير الوظيفية (عدا اختبارات سهولة الاستخدام)**، مثل الأداء والأمان والتحمل. هذه الاختبارات **غالبًا مؤتمتة**. مثال: اختبار حمل لـ 2,000 طلب متزامن وقت الغداء، واختبار دخان بعد كل نشر على بيئة staging.
 
 | Quadrant | Facing | Purpose | Examples | Execution |
 | --- | --- | --- | --- | --- |
@@ -58,6 +79,20 @@ terms:
 | Q2 | Business | Support the team | Functional tests, examples, user story tests, UX prototypes, API testing, simulations | Manual or automated; check acceptance criteria |
 | Q3 | Business | Critique the product | Exploratory testing, usability testing, user acceptance testing | User-oriented, often manual |
 | Q4 | Technology | Critique the product | Smoke tests, non-functional tests (except usability) | Often automated |
+
+### العلاقة بالمستويات والأنواع — Relation to Test Levels and Test Types
+
+هدف التعلم يطلب تلخيص علاقة الأرباع **بمستويات الاختبار وأنواعه**. القراءة المختصرة: Q1 يرتبط بمستويي **المكوّنات وتكامل المكوّنات**؛ وQ2 يرتبط أساسًا **بالاختبار الوظيفي** لقصص المستخدم ومعايير قبولها؛ وQ3 يضم **اختبار قبول المستخدم** (مستوى القبول) و**سهولة الاستخدام**؛ وQ4 هو موطن **الاختبار غير الوظيفي**. ولاحظ أن سهولة الاستخدام نوع غير وظيفي، لكنها في Q3 لأنها تُقيَّم من منظور المستخدم.
+
+ولاحظ نمط التنفيذ: اختبارات «دعم الفريق» يجب أن تعمل باستمرار ومع كل تغيير، لذلك تميل إلى الأتمتة. واختبارات «نقد المنتج» الموجّهة للعمل تحتاج حكمًا بشريًا فتميل إلى اليدوي، بينما الموجّهة للتقنية (كالأداء) تحتاج أدوات وحِملًا لا يولّده الإنسان، فتميل إلى الأتمتة. والأرباع ليست مراحل متتابعة، فتطبيق التوصيل قد ينفذ اختبارات من الأرباع الأربعة في الـ sprint نفسه.
+
+### لا تخلط بين — Don't Confuse
+
+| | Test pyramid | Testing quadrants |
+| --- | --- | --- |
+| Main question | How many tests of each granularity? | Which test types and levels do we need, and why? |
+| Organized by | Granularity, isolation, execution time | Business vs technology facing; support vs critique |
+| Typical use | Test automation and effort allocation | Making sure no test type is missing; explaining tests to stakeholders |
 
 <aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">Two quick rules: usability is in Q3 (business facing, critique), while all other non-functional tests are in Q4. Component tests are always Q1.</p><p class="gx-ar" lang="ar" dir="rtl">قاعدتان سريعتان: سهولة الاستخدام في الربع 3 (موجّه للعمل، نقد)، بينما بقية الاختبارات غير الوظيفية في الربع 4. واختبارات المكوّنات دائمًا في الربع 1.</p></aside>
 

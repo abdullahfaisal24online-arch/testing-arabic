@@ -6,7 +6,7 @@ section: "1.3"
 title: "Testing Principles"
 titleAr: "مبادئ الاختبار"
 objectives: "FL-1.3.1 · K2"
-minutes: 12
+minutes: 14
 lo:
   FL-1.3.1: "Explain the seven testing principles."
 loAr:
@@ -20,6 +20,7 @@ takeaways:
   - "Repeating the same tests finds fewer new defects over time, so tests need updating."
   - "There is no single right way to test: it depends on the context."
   - "A product with no known defects can still fail to meet users' needs."
+  - "Predicted and actual defect clusters are an important input for risk-based testing."
 takeawaysAr:
   - "الاختبار يُظهر وجود الـ defects، لكنه لا يثبت عدم وجودها."
   - "اختبار كل شيء مستحيل، فاستخدم التقنيات والأولويات والمخاطر لتركيز الجهد."
@@ -28,6 +29,7 @@ takeawaysAr:
   - "تكرار الاختبارات نفسها يجد defects جديدة أقل مع الوقت، فتحتاج الاختبارات إلى تحديث."
   - "لا توجد طريقة واحدة صحيحة للاختبار: الأمر يعتمد على السياق."
   - "منتج بلا defects معروفة قد يفشل مع ذلك في تلبية احتياجات المستخدمين."
+  - "تجمّعات الـ defects المتوقعة والفعلية مدخل مهم للاختبار المبني على المخاطر."
 terms:
   - en: "Exhaustive Testing"
     ar: "الاختبار الشامل"
@@ -47,50 +49,67 @@ terms:
     def: "An approach where testing activities are performed earlier in the software development lifecycle."
     defAr: "نهج تُنفّذ فيه أنشطة الاختبار في وقت أبكر من دورة حياة تطوير البرمجيات."
     match: ["Shift Left", "shift left", "shift-left"]
+  - en: "Absence-of-Defects Fallacy"
+    ar: "مغالطة غياب الـ defects"
+    def: "The misconception that software verification alone, testing all specified requirements and fixing all defects found, will ensure the success of a system."
+    defAr: "الاعتقاد الخاطئ بأن التحقق من البرمجية وحده، باختبار كل المتطلبات المحددة وإصلاح كل الـ defects المكتشفة، يضمن نجاح النظام."
+    match: ["Absence-of-Defects Fallacy", "Absence-of-defects fallacy", "absence-of-defects fallacy"]
 ---
-على مدى عقود، لاحظ العاملون في الاختبار مجموعة من القواعد العامة التي تنطبق على معظم المشاريع. يجمعها المنهج في **سبعة مبادئ**. هي ليست قوانين صارمة، لكنها إرشادات تساعدك على اتخاذ قرارات اختبار أفضل.
+على مدى سنوات طويلة، اقترح العاملون في الاختبار عددًا من **المبادئ** التي تقدّم **إرشادات عامة تنطبق على كل اختبار**. يصف المنهج **سبعة** منها. هي ليست قوانين رياضية، بل خلاصة خبرة متراكمة تساعدك على اتخاذ قرارات أفضل: أين تركّز، ومتى تبدأ، ومتى تغيّر اختباراتك، وماذا تقول لمالك المنتج حين يسأل «هل التطبيق خالٍ من الـ defects؟». سنشرح كل مبدأ: ماذا يقول، ولماذا هو صحيح، وكيف يظهر في تطبيق التوصيل.
 
 <figure class="gx-figure gx-spectrum" aria-label="The seven testing principles."><div class="gx-spectrum-row"><div class="gx-spectrum-item"><b>1 · Presence, not absence</b><span>Testing shows defects exist, not that none remain.</span></div><div class="gx-spectrum-item"><b>2 · Exhaustive is impossible</b><span>Focus with techniques, priorities and risk.</span></div><div class="gx-spectrum-item"><b>3 · Early testing saves</b><span>Find defects before they spread.</span></div><div class="gx-spectrum-item"><b>4 · Defects cluster</b><span>A few components hold most defects.</span></div><div class="gx-spectrum-item"><b>5 · Tests wear out</b><span>Same tests, fewer new defects.</span></div><div class="gx-spectrum-item"><b>6 · Context dependent</b><span>No single approach fits all.</span></div><div class="gx-spectrum-item gx-spectrum-item--accent"><b>7 · Absence-of-defects fallacy</b><span>Correct is not the same as useful.</span></div></div><figcaption>The seven testing principles.</figcaption></figure>
 
 ### المبدأ 1: الاختبار يُظهر الوجود لا الغياب — Principle 1: Testing Shows the Presence, Not the Absence of Defects
 
-الاختبار يستطيع أن يُظهر أن في موضوع الاختبار defects، لكنه **لا يستطيع إثبات خلوّه من الـ defects**. الاختبار يقلل احتمال بقاء defects غير مكتشفة، لكن حتى لو لم نجد أي defect، فهذا لا يثبت أن البرمجية صحيحة تمامًا.
+الاختبار يستطيع أن **يُظهر وجود defects** في موضوع الاختبار، لكنه **لا يستطيع إثبات عدم وجودها**. لماذا؟ لأن كل اختبار يفحص حالة واحدة من حالات لا حصر لها؛ اختبار فاشل دليل قاطع على مشكلة، أما مئة اختبار ناجح فلا تقول شيئًا عن الحالة رقم مئة وواحد. الاختبار **يقلل احتمال** بقاء defects غير مكتشفة، لكن حتى لو لم نجد أي defect، فهذا **لا يثبت صحة** موضوع الاختبار.
+
+في تطبيق التوصيل: نجحت 300 حالة اختبار لميزة الكوبونات. التقرير الصحيح: «لم نجد defects في الحالات التي اختبرناها، والمخاطر في هذه المناطق منخفضة»، لا «الكوبونات خالية من الـ defects».
 
 ### المبدأ 2: الاختبار الشامل مستحيل — Principle 2: Exhaustive Testing Is Impossible
 
-اختبار كل شيء، أي كل تركيبات المدخلات والشروط، غير ممكن إلا في حالات بسيطة جدًا. حقل واحد يقبل نصًا من 20 حرفًا له عدد احتمالات يفوق ما يمكن تشغيله في عمر كامل.
+اختبار كل شيء، أي كل تركيبات المدخلات والشروط المسبقة، **غير ممكن إلا في الحالات البسيطة جدًا**. خذ شاشة الدفع وحدها: قيم الطلب من 5.00 إلى 500.00 دينار بدقة القرش (49,501 قيمة)، × 20 عددًا للوجبات، × 3 طرق دفع، × 3 حالات كوبون (بلا، نسبة، مبلغ ثابت)، × لغتين، × نظامي تشغيل = **أكثر من 35 مليون تركيبة**، قبل أن نحسب حالات الطلب والأجهزة وسرعة الشبكة.
 
-لذلك، بدل محاولة اختبار كل شيء، نركّز الجهد باستخدام **تقنيات الاختبار**، و**ترتيب أولويات حالات الاختبار**، و**الاختبار المبني على المخاطر**.
+لذلك، بدل محاولة الاختبار الشامل، نركّز الجهد باستخدام **تقنيات الاختبار** (الفصل 4)، مثل تقسيم التكافؤ وتحليل القيم الحدّية، و**ترتيب أولويات حالات الاختبار** (5.1.5)، و**الاختبار المبني على المخاطر** (5.2). بضع عشرات من الحالات المختارة جيدًا تكشف أكثر مما تكشفه آلاف الحالات العشوائية.
 
 ### المبدأ 3: الاختبار المبكر يوفّر الوقت والمال — Principle 3: Early Testing Saves Time and Money
 
-الـ defect الذي يُكتشف ويُزال مبكرًا لا ينتقل إلى مخرجات العمل اللاحقة. متطلب خاطئ يُصحَّح في المراجعة أرخص بكثير من شيفرة مبنية عليه ثم عطل في الإنتاج.
+الـ defects التي **تُزال مبكرًا** في العملية **لا تسبب defects لاحقة في مخرجات العمل المشتقة** منها. تذكّر سلسلة القسم 1.2.3: عبارة «أكثر من 20 دينارًا» في قصة المستخدم أنتجت شيفرة خاطئة واختبارًا خاطئًا ثم عطلًا عند الزبون. لو اكتُشفت في مراجعة القصة لكلّف إصلاحها دقيقة واحدة. ولأن **عددًا أقل من الأعطال سيحدث لاحقًا** في دورة الحياة، **تنخفض تكلفة الجودة**.
 
-تكلفة الجودة تنخفض لأن الأعطال المتأخرة تقل. لذلك يجب أن يبدأ الاختبار، **الساكن والديناميكي**، في أبكر وقت ممكن. هذه الفكرة هي أساس نهج **النقل لليسار (Shift Left)** الذي ستراه في الفصل الثاني.
+ولاكتشاف الـ defects مبكرًا يجب أن يبدأ **الاختبار الساكن** (الفصل 3) **والاختبار الديناميكي** (الفصل 4) **في أبكر وقت ممكن**: مراجعة القصص في جلسات التنقيح قبل الـSprint، واختبارات مكوّنات تعمل في خط CI مع كل commit. هذه الفكرة هي أساس نهج **النقل لليسار (Shift Left)** الذي ستراه في الفصل الثاني.
 
 ### المبدأ 4: الـ defects تتجمّع — Principle 4: Defects Cluster Together
 
-عادة يكون معظم الـ defects المكتشفة، ومعظم الأعطال في التشغيل، في **عدد قليل من مكوّنات النظام**. هذا مثال على **مبدأ باريتو (Pareto Principle)**.
+**عدد قليل من مكوّنات النظام** يحتوي عادة **معظم الـ defects المكتشفة**، أو يكون مسؤولًا عن **معظم الأعطال التشغيلية**. هذه الظاهرة مثال على **مبدأ باريتو (Pareto Principle)**. السبب أن الـ defects لا تتوزع عشوائيًا: المكوّنات المعقدة، وكثيرة التغيير، والمتكاملة مع أطراف خارجية، أكثر عرضة للأخطاء.
 
-تجمّعات الـ defects المتوقعة، أو التي لوحظت فعلًا أثناء الاختبار أو التشغيل، مدخل مهم للاختبار المبني على المخاطر: نركّز الجهد حيث يُرجّح وجود الـ defects.
+في تطبيق التوصيل، قد يُظهر سجل الـ defects أن معظمها في التسعير والكوبونات والتكامل مع بوابة الدفع، بينما شاشة «من نحن» نظيفة منذ سنة. **التجمّعات المتوقعة** (مثل التكامل الجديد مع خدمة الخرائط) و**التجمّعات الفعلية** التي لوحظت في الاختبار أو التشغيل **مدخل مهم للاختبار المبني على المخاطر**: نضع جهدًا أكبر حيث يُرجّح وجود الـ defects.
 
 ### المبدأ 5: الاختبارات تستهلك نفسها — Principle 5: Tests Wear Out
 
-إذا كررت الاختبارات نفسها مرات كثيرة، تقل فعاليتها في اكتشاف defects جديدة. الحل: تعديل الاختبارات الحالية وبيانات الاختبار، أو كتابة اختبارات جديدة.
+إذا **تكررت الاختبارات نفسها مرات كثيرة**، تصبح **أقل فعالية في اكتشاف defects جديدة**. لماذا؟ لأن الاختبار يمر على المسارات والبيانات نفسها، والـ defects التي في هذه المسارات اكتُشفت وأُصلحت، بينما الـ defects الجديدة تختبئ في مسارات لم يلمسها أحد.
 
-لكن في بعض الحالات يكون تكرار الاختبارات نفسها مفيدًا، كما في **اختبار الانحدار المؤتمت**، لأن هدفه التأكد من أن ما كان يعمل ما زال يعمل، لا اكتشاف defects جديدة.
+للتغلب على ذلك قد نحتاج إلى **تعديل الاختبارات الحالية وبيانات الاختبار**، و**كتابة اختبارات جديدة**: مثلًا إضافة كوبون منتهي الصلاحية، أو اسم زبون عربي طويل، أو طلب يُلغى لحظة تحوّله إلى «Out for delivery».
+
+لكن **التكرار مفيد أحيانًا**، كما في **اختبار الانحدار المؤتمت**. مجموعة اختبارات الدفع في خط CI لا تهدف إلى اكتشاف defects جديدة في الشيفرة القديمة، بل إلى التأكد من أن التغييرات الجديدة لم تكسر ما كان يعمل، ولهذا نريدها أن تتكرر كما هي.
 
 ### المبدأ 6: الاختبار يعتمد على السياق — Principle 6: Testing Is Context Dependent
 
-لا يوجد نهج اختبار واحد يصلح لكل الحالات. اختبار نظام تحكم في جهاز طبي يختلف جذريًا عن اختبار لعبة على الموبايل أو موقع تسويقي. الاختبار يُنفَّذ بطرق مختلفة حسب السياق.
+**لا يوجد نهج واحد للاختبار يصلح لكل الحالات**؛ الاختبار يُنفَّذ **بطرق مختلفة في سياقات مختلفة**. نظام تحكم في جهاز طبي يحتاج توثيقًا رسميًا وتغطية صارمة والتزامًا بمعايير تنظيمية. أما تطبيق التوصيل، بفريق Scrum وSprints من أسبوعين وإصدار كل Sprintين، فيعتمد على أتمتة في CI واختبار استكشافي وتغذية راجعة سريعة. وحتى داخل التطبيق نفسه، لا يُختبر الدفع بالعمق نفسه الذي تُختبر به صفحة العروض الترويجية، لأن المخاطر مختلفة.
 
 ### المبدأ 7: مغالطة غياب الـ defects — Principle 7: Absence-of-Defects Fallacy
 
-من الخطأ توقع أن التحقق من البرمجية وحده يضمن نجاح النظام. يمكنك اختبار كل المتطلبات المحددة بدقة، وإصلاح كل الـ defects المكتشفة، ومع ذلك تنتج نظامًا **لا يلبّي احتياجات المستخدمين أو أهداف العمل**، أو أضعف من المنافسين.
+**المغالطة** هنا هي توقّع أن **التحقق من البرمجية (Verification)** وحده **يضمن نجاح النظام**. يمكنك أن تختبر **كل المتطلبات المحددة** بدقة، وأن **تصلح كل الـ defects المكتشفة**، ومع ذلك تنتج نظامًا: **لا يلبّي احتياجات المستخدمين وتوقعاتهم**، أو **لا يساعد العميل على تحقيق أهداف عمله**، أو **أضعف من الأنظمة المنافسة**. لذلك، **إلى جانب التحقق، يجب إجراء المصادقة (Validation)**.
 
-لذلك، إلى جانب **التحقق (Verification)**، يجب إجراء **المصادقة (Validation)**.
+تخيّل أن تطبيق التوصيل اجتاز كل الاختبارات، لكن تتبّع السائق على الخريطة يتحدّث كل دقيقتين بينما المنافس يتحدّث كل ثانيتين، فيعود الزبائن إلى المنافس. المتطلب «يعرض موقع السائق» تحقق، والنجاح لم يتحقق.
 
 <aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">A team ran 600 automated tests on a new expense app, all green, no open defects. After launch, employees kept using spreadsheets because submitting a receipt took nine taps. The app was correct (verification passed) but not useful (validation was missing): principle 7.</p><p class="gx-ar" lang="ar" dir="rtl">فريق شغّل 600 اختبار مؤتمت على تطبيق مصاريف جديد، كلها ناجحة، ولا defects مفتوحة. بعد الإطلاق استمر الموظفون باستخدام جداول البيانات، لأن رفع إيصال واحد يحتاج تسع نقرات. التطبيق كان صحيحًا (التحقق نجح) لكنه غير مفيد (المصادقة غابت): هذا المبدأ السابع.</p></aside>
+
+### لا تخلط بين — Don't Confuse
+
+| Pair | The difference |
+| --- | --- |
+| Principle 1 vs 7 | 1: you cannot prove there are no defects. 7: even with no defects, the system can still fail its users |
+| Principle 2 vs 4 | 2: you cannot test everything. 4: where to focus, because defects are not spread evenly |
+| Principle 5 vs regression | Wear-out reduces finding *new* defects; automated regression repeats tests on purpose |
 
 <section class="gx-lab" data-lab="LAB-1.3"><header class="gx-lab-head"><span class="gx-lab-title"><span class="gx-en" lang="en" dir="ltr">Lab · Spot the Principles in Your Project</span><span class="gx-ar" lang="ar" dir="rtl">تمرين عملي · ابحث عن المبادئ في مشروعك</span></span><span class="gx-lab-meta">LAB-1.3 · Practice</span></header><div class="gx-lab-body"><p><span class="gx-en" lang="en" dir="ltr"><strong>Goal:</strong> connect each principle to something you have seen at work.</span><span class="gx-ar" lang="ar" dir="rtl"><strong>الهدف:</strong> ربط كل مبدأ بشيء رأيته فعلًا في العمل.</span></p><ol class="gx-lab-steps"><li><span class="gx-en" lang="en" dir="ltr">Open your defect tracker and count defects per module for the last release. Do a few modules hold most of them? (principle 4)</span><span class="gx-ar" lang="ar" dir="rtl">افتح أداة متابعة الـ defects واحسب الـ defects لكل وحدة في آخر إصدار. هل تحتوي وحدات قليلة على معظمها؟ (المبدأ 4)</span></li><li><span class="gx-en" lang="en" dir="ltr">Find a regression suite that has not found a new defect in months. Decide what to change or add. (principle 5)</span><span class="gx-ar" lang="ar" dir="rtl">ابحث عن مجموعة اختبارات انحدار لم تكتشف defect جديدًا منذ أشهر. قرر ماذا تعدّل أو تضيف. (المبدأ 5)</span></li><li><span class="gx-en" lang="en" dir="ltr">Find one defect that started in requirements and was found late. Estimate what it would have cost to catch it in a review. (principle 3)</span><span class="gx-ar" lang="ar" dir="rtl">ابحث عن defect بدأ في المتطلبات واكتُشف متأخرًا. قدّر كم كانت ستكون تكلفته لو اكتُشف في مراجعة. (المبدأ 3)</span></li><li><span class="gx-en" lang="en" dir="ltr">Write one sentence on how testing in your project differs from another project you know. (principle 6)</span><span class="gx-ar" lang="ar" dir="rtl">اكتب جملة واحدة عن اختلاف الاختبار في مشروعك عن مشروع آخر تعرفه. (المبدأ 6)</span></li></ol><details class="gx-lab-answer"><summary>What good looks like · <span class="gx-ar-inline" lang="ar" dir="rtl">كيف يبدو الحل الجيد</span></summary><p><span class="gx-en" lang="en" dir="ltr">You can name a real example for at least four principles and say what you would do differently because of each one, such as focusing more testing on the defect-heavy module or refreshing a stale suite.</span><span class="gx-ar" lang="ar" dir="rtl">تستطيع ذكر مثال حقيقي لأربعة مبادئ على الأقل، وتقول ماذا ستغيّر بسبب كل منها، مثل تركيز اختبار أكثر على الوحدة كثيرة الـ defects، أو تجديد مجموعة اختبارات قديمة.</span></p></details></div></section>
 
