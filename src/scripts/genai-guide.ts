@@ -88,6 +88,13 @@ if (root) {
       el.classList.toggle('is-last', s === state.last && !isRead(s));
       for (const c of ['ok', 'unsure', 'again']) el.classList.toggle(`conf-${c}`, state.conf[s] === c);
     });
+    // زر «كمّل من وين وقفت» بصفحة الفصل: بيروح لآخر عنوان مفتوح بهالفصل
+    const chapterContinue = document.querySelector<HTMLAnchorElement>('[data-guide-chapter-continue]');
+    if (chapterContinue) {
+      const last = document.querySelector<HTMLAnchorElement>('.gx-contents-row.is-last');
+      chapterContinue.hidden = !last;
+      if (last) chapterContinue.href = last.href;
+    }
     document.querySelectorAll<HTMLElement>('[data-guide-dot]').forEach((el) => {
       el.classList.toggle('is-read', isRead(el.dataset.guideDot!));
     });
@@ -143,6 +150,25 @@ if (root) {
     btn.textContent = flip ? 'رجّع الكل' : 'اقلب الكل';
     flashCards.forEach((c) => c.setAttribute('aria-pressed', String(flip)));
   });
+
+  /* ---------- كاروسيل المصطلحات بصفحة الفصل ---------- */
+  const track = document.querySelector<HTMLElement>('[data-guide-flash-track]');
+  if (track) {
+    const prev = document.querySelector<HTMLButtonElement>('[data-guide-flash-prev]');
+    const next = document.querySelector<HTMLButtonElement>('[data-guide-flash-next]');
+    const count = document.querySelector<HTMLElement>('[data-guide-flash-count]');
+    const step = () => (flashCards[0]?.getBoundingClientRect().width || track.clientWidth) + 12;
+    const update = () => {
+      const i = Math.min(flashCards.length - 1, Math.round(track.scrollLeft / step()));
+      if (count) count.textContent = `${i + 1} / ${flashCards.length}`;
+      if (prev) prev.disabled = track.scrollLeft <= 2;
+      if (next) next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+    };
+    prev?.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+    next?.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
+    track.addEventListener('scroll', () => requestAnimationFrame(update), { passive: true });
+    update();
+  }
 
   /* ---------- الفهرس والبحث ---------- */
   if (toc) {

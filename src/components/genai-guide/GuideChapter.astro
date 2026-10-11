@@ -1,4 +1,11 @@
 ---
+/**
+ * صفحة الفصل (لكل الأدلة: CT-GenAI و CTFL وأي دليل جاي).
+ * الترتيب معتمد من صاحب الموقع (أكتوبر 2026) — اقرأ docs/GUIDE-STANDARDS.md قبل أي تعديل:
+ *   1) رأس الفصل  2) العناوين أولاً + زر «كمّل من وين وقفت» + شارة المستوى (K/H) و Lab على كل سطر
+ *   3) بطاقات المصطلحات ككاروسيل (بطاقة وحدة بالمرة، أسهم + عدّاد)  4) الجانب: المصطلحات (كمبيوتر فقط) والمستويات.
+ * لا ترجّع قائمة «أهداف التعلّم» المنفصلة ولا شبكة البطاقات الطويلة: كانت تخلّي الصفحة ~15,000px على الموبايل.
+ */
 import { LEVELS, sectionLabel, termId, type Guide, type GuidePage, type GuideView } from '../../lib/guide';
 
 interface Props { g: Guide; view: GuideView; chapter: number }
@@ -18,9 +25,6 @@ for (const p of pages) {
   else blocks.push({ key, group: p.group ? GROUPS[p.group] : undefined, pages: [p] });
 }
 
-const objectives = pages.flatMap((p) =>
-  p.objectives.filter((o) => o.code.startsWith(g.loPrefix)).map((o) => ({ ...o, page: p })),
-);
 const levelsUsed = Object.keys(LEVELS).filter((lvl) => pages.some((p) => p.objectives.some((o) => o.level === lvl)));
 const termMap = new Map<string, { en: string; ar: string; def: string; defAr?: string }>();
 for (const p of pages) for (const t of p.terms) if (!termMap.has(t.en)) termMap.set(t.en, t);
@@ -40,31 +44,46 @@ const pad = (n: number) => String(n).padStart(2, '0');
       </div>
     </header>
 
-    {objectives.length > 0 && (
-      <section class="gx-card gx-objectives-list" aria-labelledby="gx-lo-title">
-        <h2 id="gx-lo-title" class="gx-bi-label"><span lang="en">Learning Objectives</span><span>أهداف التعلّم</span></h2>
-        <ul>
-          {objectives.map((o) => (
-            <li>
-              <span class:list={['gx-level', `gx-level--${o.level.charAt(0).toLowerCase()}`]}>{o.code.replace(g.loPrefix, '')} · {o.level}</span>
-              <a href={pageUrl(view, o.page)}>
-                <span class="gx-en" lang="en" dir="ltr">{o.text || o.page.title}</span>
-                {o.textAr && <span class="gx-ar" lang="ar" dir="rtl">{o.textAr}</span>}
-              </a>
-            </li>
+    <section class="gx-contents" aria-labelledby="gx-contents-title">
+      <div class="gx-contents-head">
+        <h2 id="gx-contents-title" class="gx-bi-label"><span lang="en">Contents</span><span>العناوين</span></h2>
+        <a class="gx-continue-chip" href="#" data-guide-chapter-continue hidden>كمّل من وين وقفت ←</a>
+      </div>
+      {blocks.map((b) => (
+        <div class="gx-contents-block">
+          {b.group && (
+            <div class="gx-contents-group" dir="ltr">
+              <span class="gx-mono gx-cyan">{b.pages[0].group}</span>
+              <span><b lang="en">{b.group.en}</b><span dir="rtl">{b.group.ar}</span></span>
+            </div>
+          )}
+          {b.pages.map((p) => (
+            <a href={pageUrl(view, p)} class:list={['gx-contents-row', { 'is-nested': Boolean(b.group) }]} dir="ltr" data-guide-row={p.slug}>
+              <span class="gx-mono gx-contents-num">{sectionLabel(p)}</span>
+              <span class="gx-contents-title">
+                <b lang="en">{p.title}</b>
+                <span dir="rtl">{p.titleAr}</span>
+              </span>
+              <span class="gx-contents-tags">
+                {p.objectives.filter((o) => o.code.startsWith(g.loPrefix)).map((o) => (
+                  <span class:list={['gx-level', `gx-level--${o.level.charAt(0).toLowerCase()}`]} title={o.text}>{o.level}</span>
+                ))}
+                {p.labs.length > 0 && <span class="gx-lab-chip">Lab</span>}
+                <span class="gx-contents-min">{p.minutes} min</span>
+              </span>
+              <span class="gx-state" data-guide-state aria-hidden="true"></span>
+            </a>
           ))}
-        </ul>
-      </section>
-    )}
-
+        </div>
+      ))}
+    </section>
     {terms.length > 0 && (
       <section class="gx-flash" id="flash" aria-labelledby="gx-flash-title">
         <div class="gx-flash-head">
           <h2 id="gx-flash-title" class="gx-bi-label"><span lang="en">Term Cards</span><span>بطاقات المصطلحات</span></h2>
-          <p class="gx-muted">اكبس على البطاقة عشان تقلبها وتشوف التعريف. للحفظ والمراجعة، مش امتحان.</p>
-          <button type="button" class="gx-flash-all" data-guide-flash-all aria-pressed="false">اقلب الكل</button>
+          <p class="gx-muted">اسحب يمين ويسار، واكبس على البطاقة عشان تقلبها وتشوف التعريف.</p>
         </div>
-        <div class="gx-flash-grid" dir="ltr">
+        <div class="gx-flash-grid gx-flash-track" dir="ltr" data-guide-flash-track>
           {terms.map((t) => (
             <button type="button" class="gx-flash-card" data-guide-flash aria-pressed="false">
               <span class="gx-flash-inner">
@@ -82,38 +101,19 @@ const pad = (n: number) => String(n).padStart(2, '0');
             </button>
           ))}
         </div>
+        <div class="gx-flash-nav" dir="ltr">
+          <button type="button" class="gx-flash-btn" data-guide-flash-prev aria-label="Previous card">‹</button>
+          <span class="gx-flash-count" data-guide-flash-count>1 / {terms.length}</span>
+          <button type="button" class="gx-flash-btn" data-guide-flash-next aria-label="Next card">›</button>
+        </div>
       </section>
     )}
 
-    <section class="gx-contents" aria-labelledby="gx-contents-title">
-      <h2 id="gx-contents-title" dir="ltr" lang="en">Contents</h2>
-      {blocks.map((b) => (
-        <div class="gx-contents-block">
-          {b.group && (
-            <div class="gx-contents-group" dir="ltr">
-              <span class="gx-mono gx-cyan">{b.pages[0].group}</span>
-              <span><b lang="en">{b.group.en}</b><span dir="rtl">{b.group.ar}</span></span>
-            </div>
-          )}
-          {b.pages.map((p) => (
-            <a href={pageUrl(view, p)} class:list={['gx-contents-row', { 'is-nested': Boolean(b.group) }]} dir="ltr" data-guide-row={p.slug}>
-              <span class="gx-mono gx-contents-num">{sectionLabel(p)}</span>
-              <span class="gx-contents-title">
-                <b lang="en">{p.title}</b>
-                <span dir="rtl">{p.titleAr}{p.labs.length > 0 && ' · فيه Lab'}</span>
-              </span>
-              <span class="gx-contents-min">{p.minutes} min</span>
-              <span class="gx-state" data-guide-state aria-hidden="true"></span>
-            </a>
-          ))}
-        </div>
-      ))}
-    </section>
   </div>
 
   <aside class="gx-chapter-side">
     {terms.length > 0 && (
-      <section class="gx-card">
+      <section class="gx-card gx-side-terms">
         <h2 class="gx-bi-label"><span lang="en">Key Terms</span><span>المصطلحات</span></h2>
         <div class="gx-term-chips" dir="ltr">
           {terms.map((t) => <a href={`${glossaryUrl(view)}#${termId(t.en)}`} title={t.ar}>{t.en}</a>)}

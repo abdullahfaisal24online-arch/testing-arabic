@@ -1,5 +1,7 @@
 # دليل CTFL التفاعلي — خطة الدفعات
 
+> المعايير المعتمدة للكتابة وصفحة الفصل: `docs/GUIDE-STANDARDS.md` (اقرأها قبل أي تعديل).
+
 المرجع: ISTQB® Certified Tester Foundation Level Syllabus v4.0.1 (15 سبتمبر 2024).
 6 فصول، 64 عنوان. الشغل كله على staging لحد الإطلاق.
 

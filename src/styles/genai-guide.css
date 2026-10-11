@@ -1076,3 +1076,22 @@ a.gx-chapter-card:hover { border-color: var(--line-strong); color: var(--ink); }
 @media (max-width: 560px) {
   .gx-buy-full { display: none; }
 }
+
+/* ---------- صفحة الفصل: العناوين أولاً، شارات المستوى، وكاروسيل المصطلحات ---------- */
+.gx-contents-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.gx-contents-head h2 { font-size: 18px; }
+.gx-continue-chip { display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: 999px; background: var(--orange-soft); border: 1px solid var(--orange-line); color: var(--orange); font-size: 13px; font-weight: 600; }
+.gx-contents-tags { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.gx-contents-tags .gx-level { font-size: 11px; padding: 1px 7px; }
+.gx-lab-chip { font: 500 11px/1.6 'IBM Plex Mono', monospace; padding: 1px 7px; border-radius: 6px; border: 1px solid var(--line-strong); color: var(--cyan); }
+.gx-flash-track { display: flex; grid-template-columns: none; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 2px; padding: 2px 2px 6px; scrollbar-width: none; }
+.gx-flash-track::-webkit-scrollbar { display: none; }
+.gx-flash-track .gx-flash-card { flex: 0 0 calc((100% - 24px) / 3); scroll-snap-align: start; }
+.gx-flash-nav { display: flex; align-items: center; justify-content: center; gap: 16px; }
+.gx-flash-btn { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-strong); background: transparent; color: var(--ink-2); font-size: 22px; line-height: 1; cursor: pointer; }
+.gx-flash-btn:disabled { opacity: 0.35; cursor: default; }
+.gx-flash-count { font: 500 13px 'IBM Plex Mono', monospace; color: var(--muted); min-width: 64px; text-align: center; }
+@media (max-width: 860px) {
+  .gx-flash-track .gx-flash-card { flex-basis: 86%; }
+  .gx-side-terms { display: none; }
+}

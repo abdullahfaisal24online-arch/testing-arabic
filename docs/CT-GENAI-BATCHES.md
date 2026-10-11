@@ -1,5 +1,7 @@
 # CT-GenAI staged delivery checkpoint
 
+> المعايير المعتمدة للكتابة وصفحة الفصل: `docs/GUIDE-STANDARDS.md` (اقرأها قبل أي تعديل).
+
 ## Batch 1 — reader shell
 
 - Calm, compact reading header; existing global site shell unchanged.
