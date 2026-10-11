@@ -7,7 +7,7 @@ section: "1.1.4"
 title: "Multimodal LLMs and Vision-Language Models"
 titleAr: "النماذج متعددة الوسائط ونماذج الرؤية واللغة"
 objectives: "GenAI-1.1.4 · K2 / HO-1.1.4 · H1"
-minutes: 9
+minutes: 18
 lo:
   GenAI-1.1.4: "Write and run a given prompt for a test task on a multimodal LLM, understanding how it handles text and images."
   HO-1.1.4: "Write and run a prompt that gives a multimodal LLM both text and an image for a test task."
@@ -18,10 +18,14 @@ takeaways:
   - "Multimodal input widens the context available to the tester and the model."
   - "The value comes from linking visual evidence with the written description."
   - "Keep what the image shows separate from what needs execution to verify."
+  - "Each modality is tokenized in its own way; images become embeddings through a vision-language model before the transformer processes them."
+  - "Running a multimodal prompt has two steps: review the inputs, then execute and verify the actual result."
 takeawaysAr:
   - "المدخلات متعددة الوسائط توسّع السياق المتاح للمختبِر وللنموذج."
   - "القيمة تأتي من الربط بين الدليل المرئي والوصف المكتوب."
   - "افصل ما تُظهره الصورة عمّا يحتاج تنفيذًا للتحقق منه."
+  - "لكل وسيط طريقته في التقطيع؛ فالصور تتحول إلى تضمينات عبر نموذج رؤية ولغة قبل أن يعالجها الـ Transformer."
+  - "تنفيذ توجيه متعدد الوسائط خطوتان: مراجعة المدخلات، ثم التنفيذ والتحقق من النتيجة الفعلية."
 terms:
   - en: "Multimodal LLM"
     ar: "النموذج متعدد الوسائط"
@@ -37,30 +41,90 @@ terms:
     ar: "مخطط الواجهة"
     def: "A simple layout sketch of a screen that shows its elements without final visual design."
     defAr: "رسم مبسّط لتخطيط الشاشة يُظهر عناصرها دون التصميم البصري النهائي."
+  - en: "Image Captioning"
+    ar: "وصف الصورة"
+    def: "A vision-language task: producing a text description of what an image shows."
+    defAr: "مهمة من مهام نماذج الرؤية واللغة: إنتاج وصف نصي لما تُظهره الصورة."
+    match: ["image captioning"]
+  - en: "Visual Question Answering"
+    ar: "الإجابة عن الأسئلة البصرية"
+    def: "A vision-language task: answering a question in text about the content of an image."
+    defAr: "مهمة من مهام نماذج الرؤية واللغة: الإجابة نصيًا عن سؤال حول محتوى صورة."
+    match: ["visual question answering"]
 ---
-تتعامل **النماذج متعددة الوسائط (Multimodal LLMs)** مع أكثر من نوع من البيانات، مثل النص والصورة والصوت والفيديو. إمكانات الإدخال والإخراج تختلف من نموذج لآخر؛ دعم الصور لا يعني تلقائيًا دعم الفيديو أو توليد الصوت.
+جزء كبير من عمل المختبِر بصري: لقطات شاشة مرفقة بتقارير الـ defects، ومخططات واجهة من فريق التصميم، وشاشات يجب أن تظهر صحيحة بالعربية والإنجليزية وعلى iOS وAndroid. النموذج الذي يقرأ النص فقط يرى نصف الصورة، حرفيًا. أما النموذج متعدد الوسائط فيستطيع أن يقرأ قصة المستخدم **وينظر** إلى الشاشة في الوقت نفسه، ثم يخبرك أين لا يتطابقان. هذا القسم يشرح كيف يحدث ذلك، وكيف تكتب توجيهًا لمهمة اختبار تجمع النص والصورة، ولماذا يبقى التحقق في يدك.
 
-تمدّ هذه النماذج بنية Transformer لتشمل وسائط متعددة، وتُدرَّب على بيانات متنوعة لتتعلّم العلاقات بين هذه الوسائط. ويتكيّف التقطيع مع نوع الوسيط: لا تُعامل الصورة حرفيًا كجملة نصية، بل تُحوّل أولًا إلى Embeddings، ثم يعالجها الـ Transformer ويربطها بالنص.
+### ما النموذج متعدد الوسائط؟ — Multimodal LLMs
 
-**نماذج الرؤية واللغة (Vision-Language Models / VLMs)** مجموعة فرعية من النماذج متعددة الوسائط تجمع المعلومات المرئية والنصية تحديدًا. أبرز مهامها:
+**النماذج متعددة الوسائط (Multimodal LLMs)** **توسّع نموذج المحوّل التقليدي** الذي عرفته في القسم 1.1.2 ليعالج **وسائط بيانات متعددة**، منها النص والصور والصوت والفيديو. وتُدرَّب على **مجموعات بيانات كبيرة ومتنوعة** تمكّنها من **تعلّم العلاقات بين أنواع البيانات المختلفة**: أن عبارة «زر سلة المشتريات» تقابل شكلًا معينًا في الصورة، وأن «رسالة خطأ حمراء تحت الحقل» تصف نمطًا بصريًا محددًا.
 
-- **وصف الصورة (Image captioning):** كتابة وصف نصي لما في لقطة الشاشة.
-- **الإجابة عن أسئلة بصرية (Visual question answering):** مثل «هل زر الحفظ ظاهر في هذه الشاشة؟».
-- **تحليل الاتساق بين النص والصورة:** هل ما يقوله تقرير الـ defect أو قصة المستخدم يطابق ما يظهر فعلًا؟
+عمليًا، إمكانات الإدخال والإخراج تختلف من نموذج لآخر؛ دعم الصور لا يعني تلقائيًا دعم الفيديو أو توليد الصوت. لذلك تحقق مما يقبله النموذج الذي تستخدمه قبل أن تبني مهمة اختبار عليه.
+
+### كيف يُقطَّع ما ليس نصًا؟ — Tokenization Across Modalities
+
+تعلّمت أن النموذج اللغوي يحوّل النص إلى رموز ثم إلى Embeddings. لكن الصورة ليست جملة. لذلك يقول المنهج إن **التقطيع يُكيَّف لكل نوع من البيانات**: فـ**الصور تُحوَّل إلى Embeddings باستخدام نماذج الرؤية واللغة، قبل أن يعالجها نموذج المحوّل**. بعد هذه الخطوة يصبح النص والصورة كلاهما متجهات يستطيع الـ Transformer أن يربط بينها، فيفهم أن عبارة «رسوم التوصيل» في قصة المستخدم مرتبطة بالسطر الذي يحمل «1.50 JOD» في لقطة الشاشة.
 
 <figure class="gx-figure" aria-label="Multimodal flow: text and image inputs become embeddings, the transformer relates them, the model produces a text answer."><div class="gx-flow-row"><span class="gx-flow-node">Text<small>user story</small></span><span class="gx-flow-arrow" aria-hidden="true">+</span><span class="gx-flow-node">Image<small>screenshot</small></span><span class="gx-flow-arrow" aria-hidden="true">→</span><span class="gx-flow-node">Embeddings<small>per modality</small></span><span class="gx-flow-arrow" aria-hidden="true">→</span><span class="gx-flow-node gx-flow-node--accent">Transformer<small>links both</small></span></div><figcaption>Each modality is turned into embeddings first, then processed together.</figcaption></figure>
 
+### نماذج الرؤية واللغة — Vision-Language Models
+
+**نماذج الرؤية واللغة (Vision-Language Models / VLMs)** **مجموعة فرعية من النماذج متعددة الوسائط**، تختص بـ**دمج المعلومات المرئية والنصية**. يذكر المنهج لها ثلاث مهام:
+
+- **وصف الصورة (Image captioning):** كتابة وصف نصي لما في الصورة. تعطي النموذج لقطة شاشة تتبّع الطلب، فيكتب: «شاشة تُظهر الطلب في حالة Out for delivery، مع خريطة واسم السائق وزر اتصال». مفيد عمليًا لتوثيق خطوات إعادة إنتاج defect، أو لفهم شاشة سريعًا قبل مراجعتها.
+- **الإجابة عن أسئلة بصرية (Visual question answering):** تسأل عن محتوى الصورة وتحصل على جواب نصي: «هل تظهر رسوم التوصيل في شاشة الدفع؟ وما قيمتها؟»، أو «هل زر الإلغاء ظاهر في هذه الشاشة؟».
+- **تحليل الاتساق بين المدخل النصي والمرئي:** هل يطابق ما يقوله النص ما يظهر في الصورة؟ تقرير defect يقول «زر الإلغاء مفقود في حالة Preparing»، بينما تُظهر اللقطة المرفقة الزر موجودًا لكن باهتًا وغير قابل للنقر. هذا تناقض يستحق سؤال المبلّغ قبل إصلاح شيء.
+
 ### الاستخدام في الاختبار — Use in Testing
 
-يمكن تزويد النموذج بصورة شاشة أو مخطط واجهة **GUI Wireframe**، مع قصة مستخدم أو وصف defect. يتيح ذلك:
+يرى المنهج أن النماذج متعددة الوسائط، **وخاصة النماذج اللغوية المعزّزة بنماذج الرؤية واللغة**، تقدّم **فرصًا كبيرة** للاختبار. ويفصّلها في ثلاث نقاط:
 
-- مقارنة عنصر مرئي بنتيجة متوقعة مكتوبة، والإشارة إلى اختلاف محتمل.
-- توليد حالات اختبار أغنى وأقرب للواقع تجمع المتطلبات النصية مع عناصر الواجهة المرئية، مما يزيد التغطية.
-- تحليل اتساق وصف الـ defect مع لقطة الشاشة، وطلب معلومات مفقودة.
+**1. تحليل العناصر المرئية مع الوصف النصي المرافق.** يستطيع النموذج تحليل **لقطات الشاشة** و**مخططات الواجهة (GUI Wireframes)**، **مع** نصوص مرتبطة بها مثل **تقارير الـ defects** و**قصص المستخدم**. القيمة في كلمة «مع»: الصورة وحدها لا تقول ما هو المتوقع، والنص وحده لا يقول ما الذي ظهر فعلًا.
 
-مثال عملي: تعطي النموذج قصة مستخدم تقول «يظهر للمستخدم سعر المنتج شاملًا الضريبة» ولقطة شاشة لصفحة الدفع. يستطيع النموذج أن يلاحظ أن السعر المعروض لا يحمل أي إشارة للضريبة، فيقترحه كاختلاف محتمل، ويقترح حالة اختبار تتحقق من حساب الضريبة. لكنه لا يستطيع من الصورة وحدها أن يعرف إذا كان الرقم المعروض يتضمن الضريبة فعلًا.
+**2. كشف الاختلاف بين النتيجة المتوقعة والعناصر المرئية الفعلية.** مثال: قصة المستخدم تقول إن التوصيل مجاني للطلبات من 20.00 دينارًا فأكثر، مقيسةً **قبل** الخصم. تعطي النموذج هذا النص ولقطة شاشة دفع تُظهر: سلة بقيمة 22.00، وكوبون 10%، والمجموع بعد الخصم 19.80، ثم «رسوم التوصيل 1.50». يستطيع النموذج أن يربط بين الاثنين ويقترح هذا كاختلاف محتمل، لأن القيمة قبل الخصم تتجاوز الحد. لكنه لا يستطيع من الصورة وحدها أن يعرف إن كان الخادم قد حسب الرسوم فعلًا، أو أن الواجهة فقط تعرض قيمة قديمة؛ هذا يحتاج تنفيذًا.
+
+**3. توليد حالات اختبار أغنى وأقرب للواقع تزيد التغطية.** يستطيع النموذج توليد حالات تجمع **البيانات النصية** و**الإشارات البصرية** معًا. من مخطط بطاقة الطلب في تطبيق السائق مع قصتها، قد يقترح حالات لم تكن لتخطر من النص وحده: عنوان عربي طويل جدًا، هل يُقطع أم يلتف؟ رقم هاتف داخل نص عربي، هل يظهر باتجاه صحيح؟ زر «فتح الخريطة» على شاشة صغيرة، هل يبقى ظاهرًا؟ هذا ما يقصده المنهج بزيادة التغطية الكلية.
 
 <aside class="gx-callout" data-kind="key"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Key idea</span><span class="gx-ar" lang="ar" dir="rtl">فكرة أساسية</span></p><p class="gx-en" lang="en" dir="ltr">An image does not reveal server behaviour or every application state. Keep <strong>what the evidence shows</strong> separate from <strong>what needs execution to verify</strong>.</p><p class="gx-ar" lang="ar" dir="rtl">الصورة لا تكشف سلوك الخادم ولا كل حالات التطبيق. افصل <strong>ما يُظهره الدليل</strong> عن <strong>ما يحتاج تنفيذًا للتحقق منه</strong>.</p></aside>
+
+### كتابة توجيه متعدد الوسائط وتنفيذه — Step by Step
+
+يصف المنهج التمرين العملي في خطوتين: **مراجعة المدخلات**، ثم **تنفيذ التوجيه والتحقق من النتيجة الفعلية**. عمليًا يمكن تفصيلهما هكذا:
+
+1. **راجع التوجيه:** هل يحدد المهمة بوضوح؟ هل يربط الصورة بالنص صراحةً («قارن اللقطة المرفقة بمعايير القبول التالية»)؟ هل يطلب فصل الملاحظة المرئية عن الاستنتاج، وذكر ما لا يمكن تأكيده؟
+2. **راجع المدخلات:** هل الصورة مقروءة وبدقة كافية؟ هل هي من الإصدار والشاشة الصحيحين؟ هل النص كامل؟ وهل في اللقطة **بيانات شخصية**؟ لقطات تطبيق التوصيل قد تحمل أسماء العملاء وأرقام هواتفهم وعناوينهم؛ استخدم بيانات اختبار أو أخفِ هذه الحقول قبل الإرسال، وسنفصّل ذلك في الفصل الثالث.
+3. **نفّذ** على نموذج يقبل الصور، وأرسل النص والصورة معًا في الطلب نفسه.
+4. **تحقق من كل ملاحظة:** هل تستند إلى شيء ظاهر فعلًا في الصورة، وإلى متطلب موجود فعلًا في النص؟ صنّف كل ملاحظة: مدعومة، أو غير مثبتة من الصورة، أو مختلقة. وسجّل ما فات النموذج.
+
+مثال على توجيه لشاشة الدفع:
+
+```text
+Attached: a checkout screenshot from the delivery app (Arabic UI) and the
+acceptance criteria below. Compare them. For each discrepancy, quote the
+visual evidence and the related criterion. List what you cannot confirm
+from the image alone. Do not invent requirements.
+```
+
+### الفوائد والتحديات — Benefits and Challenges
+
+يهدف التمرين أيضًا إلى أن **تدرك الفوائد والتحديات المحتملة**. هذا ملخص عملي لها:
+
+| Benefits | Challenges |
+| --- | --- |
+| Links visual evidence with the written test basis | Low image quality or cropped screens |
+| Faster review of many screens and languages | Behaviour behind the screen is invisible |
+| Spots expected-vs-actual visual discrepancies | Hallucinated elements or invented requirements |
+| Richer test cases from text plus visual cues | Personal data visible in screenshots |
+| Helps check defect reports against their screenshots | Supported modalities differ per model |
+
+### لا تخلط بين — Don't Confuse
+
+| | Multimodal LLM | Vision-language model (VLM) |
+| --- | --- | --- |
+| Scope | Several modalities: text, images, sound, video | Visual + textual information specifically |
+| Relation | The wider family | A subset of multimodal LLMs |
+| Typical tasks | Any mix the model supports | Captioning, visual QA, text–image consistency |
+
+<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">Before each store release, the delivery app testers send the Arabic and English checkout screenshots together with the acceptance criteria to a multimodal model. In one sprint it flagged that the Arabic screen showed the delivery fee on a 22.00 JOD order with a coupon. The testers then placed a real test order to confirm the backend charged the fee too, and only then logged the defect with both the screenshot and the execution evidence.</p><p class="gx-ar" lang="ar" dir="rtl">قبل كل إصدار إلى المتاجر، يرسل مختبرو تطبيق التوصيل لقطات شاشة الدفع بالعربية والإنجليزية مع معايير القبول إلى نموذج متعدد الوسائط. في أحد الـ sprints نبّه النموذج إلى أن الشاشة العربية تعرض رسوم توصيل على طلب بقيمة 22.00 دينارًا مع كوبون. نفّذ المختبرون بعدها طلبًا تجريبيًا فعليًا ليتأكدوا أن الخادم احتسب الرسوم أيضًا، ثم سجّلوا الـ defect مع اللقطة ودليل التنفيذ معًا.</p></aside>
 
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Common mistake</span><span class="gx-ar" lang="ar" dir="rtl">خطأ شائع</span></p><p class="gx-en" lang="en" dir="ltr">Assuming that a model that accepts images also accepts video or produces audio. Supported inputs and outputs differ per model; check before you design a test task around them.</p><p class="gx-ar" lang="ar" dir="rtl">افتراض أن النموذج الذي يقبل الصور يقبل الفيديو أيضًا أو يولّد صوتًا. المدخلات والمخرجات المدعومة تختلف من نموذج لآخر؛ تحقق قبل أن تبني مهمة اختبار عليها.</p></aside>
 

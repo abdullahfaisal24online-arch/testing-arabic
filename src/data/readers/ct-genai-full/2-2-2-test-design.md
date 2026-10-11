@@ -7,7 +7,7 @@ section: "2.2.2"
 title: "Test Design and Test Implementation with Generative AI"
 titleAr: "تصميم الاختبار وتجهيزه باستخدام الذكاء التوليدي"
 objectives: "GenAI-2.2.2 · K3 / HO-2.2.2a · H2 / HO-2.2.2b · H2 / HO-2.2.2c · H2"
-minutes: 13
+minutes: 22
 lo:
   GenAI-2.2.2: "Use GenAI to support test design and test implementation tasks."
   HO-2.2.2a: "Generate functional test cases from user stories with chaining, structured prompts and meta prompting."
@@ -23,11 +23,13 @@ takeaways:
   - "Test implementation prepares what execution needs; it is not test execution itself."
   - "Priority never overrides a hard dependency: a high-priority test still waits for the tests it depends on."
   - "A script that runs without errors can still check the wrong expected result."
+  - "Generated test cases are drafts: recalculate the expected results of critical cases yourself from the approved rules."
 takeawaysAr:
   - "يساعد GenAI في توليد حالات الاختبار وبيانات الاختبار التركيبية والـ scripts، وفي جدولة التنفيذ وترتيب أولوياته."
   - "تجهيز الاختبار يُعدّ ما يحتاجه التنفيذ؛ وهو ليس تنفيذ الاختبار نفسه."
   - "الأولوية لا تتجاوز اعتمادية إلزامية أبدًا: الاختبار عالي الأولوية ينتظر الاختبارات التي يعتمد عليها."
   - "الـ script الذي يعمل دون أخطاء قد يتحقق رغم ذلك من نتيجة متوقعة خاطئة."
+  - "حالات الاختبار المولّدة مسودات: أعد حساب النتائج المتوقعة للحالات الحرجة بنفسك من القواعد المعتمدة."
 terms:
   - en: "Test Design"
     ar: "تصميم الاختبار"
@@ -45,29 +47,116 @@ terms:
     ar: "صيغة Gherkin"
     def: "A Given–When–Then syntax for writing test scenarios in structured natural language."
     defAr: "صيغة Given–When–Then لكتابة سيناريوهات الاختبار بلغة طبيعية منظّمة."
+  - en: "Test Execution Schedule"
+    ar: "جدول تنفيذ الاختبار"
+    def: "The planned order and timing of test execution, based on priority, risks, dependencies, resource availability and test objectives."
+    defAr: "الترتيب والتوقيت المخطط لتنفيذ الاختبارات، بناءً على الأولوية والمخاطر والاعتماديات وتوفر الموارد وأهداف الاختبار."
 ---
-**Test Design** يفصّل شروط الاختبار إلى حالات ومواد اختبار. **Test Implementation** يعني تجهيز أو اقتناء ما يلزم لتنفيذ الاختبارات، مثل الإجراءات والـ scripts والبيانات والبيئة؛ لا تخلطه مع **Test Execution** الذي يشغّل الاختبارات فعليًا. يدعم GenAI إعداد الـ scripts اليدوية والمؤتمتة وترتيبها وجدولتها، ويساعد في إنشاء مواد الاختبار المختلفة وتقييمها: حالات الاختبار، وبيانات الاختبار، والـ scripts، وحتى بيئات الاختبار.
+بعد أن يجيب التحليل عن «ماذا نختبر؟»، يأتي سؤالان: **كيف نختبره بالضبط؟** و**ماذا نحتاج لننفّذ الاختبار؟** يعتمد المنهج هنا تعريفات منهج الأساس [ISTQB_CTFL_SYL]:
 
-### مهام التصميم والتجهيز — Design and Implementation Tasks
+- **تصميم الاختبار (Test Design)** هو **تفصيل شروط الاختبار وتنقيحها**، ثم **ترجمتها إلى حالات اختبار ومواد اختبار (testware) أخرى**.
+- **تجهيز الاختبار (Test Implementation)** هو **إنشاء مواد الاختبار اللازمة لتنفيذ الاختبارات أو اقتناؤها**، مثل الإجراءات والـ scripts والبيانات والبيئة.
 
-- **توليد حالات الاختبار:** من متطلبات وظيفية وغير وظيفية، مع الشروط المسبقة والمدخلات والنتائج المتوقعة وأهداف التغطية، من التحقق الوظيفي البسيط حتى اختبارات End-to-End.
-- **إنشاء بيانات اختبار تركيبية — Synthetic Test Data:** متنوعة وقريبة من بيانات الإنتاج، تشمل الحالات الحدّية وتخدم الاختبارات الوظيفية وغير الوظيفية، دون كشف معلومات سرية.
-- **توليد الـ scripts:** تحويل الحالات المنظمة إلى إجراءات يدوية أو scripts تتوافق مع إطار الأتمتة، وتحديثها مع تغيّر المتطلبات.
-- **جدولة التنفيذ وترتيبه:** بحسب الأولوية والمخاطر والاعتماديات وتوفر الموارد وأهداف الاختبار.
+لا تخلط التجهيز مع **تنفيذ الاختبار (Test Execution)** الذي يشغّل الاختبارات فعليًا: التجهيز يُعدّ كل شيء، والتنفيذ يستخدمه.
 
-### أمثلة لكل مهمة — Examples
+يقول المنهج إن **الاختبارات اليدوية والـ test scripts المؤتمتة** يمكن **إنشاؤها، وترتيب أولوياتها، وتنظيمها في جدول تنفيذ الاختبار** بدعم من GenAI. ويصف هذه المجموعة من الأنشطة بأنها **كبيرة**، وأن GenAI يستطيع دعمها **بشكل كبير** بالمساعدة في **إنشاء** مواد الاختبار المختلفة **وتقييمها**: حالات الاختبار، وبيانات الاختبار، والـ test scripts، وبيئات الاختبار. لاحظ كلمة «تقييم»: النموذج لا يكتب فقط، بل يمكن أن يُطلب منه مراجعة حالات موجودة، مثل البحث عن حالات مكررة أو نتائج متوقعة ناقصة. ولهذا الهدف مستوى **K3**: ستُعطى مهمة تصميم أو تجهيز، وعليك أن تطبّق GenAI عليها وتعرف ما الذي تتحقق منه.
 
-**توليد الحالات:** من متطلب وظيفي مثل «يحصل العميل على خصم 10% عند شراء أكثر من 3 قطع»، يقترح النموذج حالات بشروط مسبقة (سلة فيها 3 قطع، 4 قطع)، ومدخلات، ونتائج متوقعة. ومن متطلب غير وظيفي مثل «تُحمَّل الصفحة خلال ثانيتين»، يقترح شروط القياس والحمل والبيئة.
+### 1. توليد حالات الاختبار — Test Case Generation
 
-**البيانات التركيبية:** تحتاج 500 عميل لاختبار تقرير؟ يولّد النموذج أسماء وعناوين وأرقامًا واقعية الشكل لكنها غير حقيقية، مع حالات حدّية مثل أسماء طويلة جدًا، وأحرف عربية وإنجليزية مختلطة، وتواريخ ميلاد على الحدود. هذا يخدم الاختبار دون كشف بيانات عملاء فعلية.
+**ماذا يفعل النموذج؟** باستخدام **معالجة اللغة الطبيعية**، يُنشئ **مسودات** حالات اختبار من **المتطلبات الوظيفية وغير الوظيفية**. وعندما يُعطى **معلومات مناسبة**، يقترح **الشروط المسبقة، والمدخلات، والنتائج المتوقعة، ومعايير التغطية**، فينتج حالات تخدم **أهداف اختبار مختلفة**: من **التحقق الوظيفي البسيط** حتى **اختبارات End-to-End المعقّدة**.
 
-**الـ scripts:** من حالة منظمة بخطوات واضحة، يولّد النموذج script للإطار الذي يستخدمه الفريق، وعند تغيّر المتطلب يحدّث الـ script المتأثر.
+كلمتان مهمتان هنا: **«مسودات»** تعني أن الناتج يحتاج مراجعة قبل اعتماده، و**«معلومات مناسبة»** تعني أن جودة الحالات تتبع جودة ما أعطيته. **مثال من تطبيق التوصيل:** من قاعدة رسوم التوصيل، يقترح النموذج حالات بقيم حدّية (19.99 و20.00) مع شرط مسبق «سلة فيها وجبات بهذه القيمة» ونتيجة متوقعة واضحة للرسوم والإجمالي. وعلى مستوى End-to-End: عميل يطلب، والمطعم يقبل، والسائق يوصل، ويظهر Delivered في التطبيقات الثلاثة. ومن متطلب غير وظيفي، كأن يعتمد الفريق حدًا لزمن تحميل قائمة المطعم، يقترح شروط القياس والحمل والبيئة.
 
-**الجدولة:** يقرأ النموذج الحالات واعتمادياتها ويقترح ترتيب تنفيذ يراعي الأولوية والمخاطر والموارد المتاحة وأهداف الاختبار.
+### 2. توليد بيانات الاختبار التركيبية — Test Data Synthesis
+
+**ماذا يفعل النموذج؟** يُنشئ **بيانات اختبار تركيبية (synthetic test data)** **تمثيلية** و**تحافظ على خصوصية البيانات**، **تشبه بيانات الإنتاج**، وتغطي **الحالات القصوى** و**شروط اختبار متنوعة**. ويقول المنهج إنها تُستخدم في **الاختبار الوظيفي وغير الوظيفي**، وإنها يمكن أن **تُكيَّف مع متطلبات التطبيق**، فتحاكي سيناريوهات واقعية **دون كشف معلومات حساسة**.
+
+**لماذا يهم في تطبيقنا؟** بيانات العملاء تتضمن أسماء وأرقام هواتف وعناوين، وهي بيانات شخصية. نسخ بيانات الإنتاج إلى بيئة الاختبار يعرّضها للخطر. البديل: عملاء وهميون بأسماء عربية وإنجليزية، وأرقام هواتف بصيغة صحيحة لكنها غير حقيقية، وعناوين طويلة جدًا، وطلبات على الحدود.
+
+### 3. توليد الـ test scripts المؤتمتة — Automated Test Script Generation
+
+**ماذا يفعل النموذج؟** يولّد **إجراءات اختبار يدوية** و**test scripts مؤتمتة** من **حالات اختبار منظّمة**، فيفسّر خطوات الاختبار ويترجمها إلى شيفرة **متوافقة مع أطر أتمتة مختلفة**. ويمكن **تحديث** هذه الـ scripts أو **توسيعها** بناءً على متطلبات جديدة.
+
+**مثال:** من حالة منظّمة «اطلب وجبتين بقيمة 20.00، ادفع نقدًا، تحقّق أن رسوم التوصيل صفر»، يولّد النموذج script بإطار الأتمتة الذي يستخدمه الفريق. وعندما يضيف الفريق المحفظة الرقمية كطريقة دفع، يطلب المختبِر من النموذج توسيع الـ scripts المتأثرة بدل كتابتها من الصفر. لاحظ أن المدخل حالة **منظّمة**: الخطوات الغامضة تعطي script غامضًا.
+
+### 4. جدولة التنفيذ وترتيب أولوياته — Test Execution Scheduling and Prioritization
+
+**ماذا يفعل النموذج؟** يحلل حالات الاختبار و**الاعتماديات بينها**، ويحسّن جدول التنفيذ بناءً على **الأولوية، والمخاطر المرتبطة، وتوفر الموارد، وأهداف الاختبار**.
+
+**لماذا يحتاج مراجعة؟** لأنها مهمة **استدلال متعدد المعايير**: يجب أن يوازن النموذج بين الأولوية والاعتمادية والموارد في وقت واحد، وهنا قد يخطئ في استدلاله. القاعدة الثابتة: **الأولوية لا تتجاوز اعتمادية إلزامية**.
 
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Common mistake</span><span class="gx-ar" lang="ar" dir="rtl">خطأ شائع</span></p><p class="gx-en" lang="en" dir="ltr">Treating generated data as safe by default, or treating a script that runs as a correct test. Check data for sensitivity and validity, and check every script's expected result and coverage before approving it.</p><p class="gx-ar" lang="ar" dir="rtl">اعتبار البيانات المولّدة آمنة تلقائيًا، أو اعتبار الـ script الذي يعمل اختبارًا صحيحًا. افحص البيانات من حيث الحساسية والصلاحية، وافحص النتيجة المتوقعة والتغطية لكل script قبل اعتماده.</p></aside>
 
+### خطوات التطبيق — Step by Step
+
+1. **ابدأ من شروط اختبار معتمدة** (ناتج القسم 2.2.1)، لا من القصة الخام.
+2. **أعطِ النموذج القواعد الدقيقة**: الحدود، والعملة، وترتيب الحساب (مثل: حد التوصيل المجاني يُحسب قبل الخصم).
+3. **حدّد صيغة الحالة**: المعرّف، الشروط المسبقة، المدخلات، الخطوات، النتيجة المتوقعة، المصدر. ولصيغة متكررة مثل Gherkin، أضف أمثلة (Few-shot).
+4. **اطلب جدول تغطية** يربط كل شرط بحالاته، وابحث عن الشروط بلا حالات.
+5. **احسب النتائج المتوقعة بنفسك** للحالات الحرجة؛ لا تعتمد على حساب النموذج.
+6. **للبيانات والـ scripts والجدولة**: افحص الخصوصية، وشغّل الـ script وتحقق مما يفحصه، وراجع الاعتماديات قبل اعتماد الترتيب.
+
+### أمثلة محلولة — Worked Examples
+
+**المثال 1 (حالة خادعة): رسوم التوصيل مع الكوبون.** القواعد: الحد الأدنى 5.00 دينار؛ التوصيل مجاني من 20.00 فأكثر، **محسوبًا على قيمة الطلب قبل الخصم**؛ وإلا فالرسوم 1.50. طلب المختبِر حالات من النموذج، ثم راجع النتائج المتوقعة بنفسه:
+
+| Case | Order value | Coupon | Expected delivery fee | Expected total |
+|---|---|---|---|---|
+| TC-01 | 4.99 | None | Order rejected (below minimum) | — |
+| TC-02 | 5.00 | None | 1.50 | 6.50 |
+| TC-03 | 19.99 | None | 1.50 | 21.49 |
+| TC-04 | 20.00 | None | 0.00 | 20.00 |
+| TC-05 | 22.00 | Fixed 3.00 | 0.00 | 19.00 |
+| TC-06 | 25.00 | 20% | 0.00 | 20.00 |
+
+في المسودة الأولى أعطى النموذج TC-05 رسومًا قدرها 1.50، لأنه حسب الحد بعد الخصم (19.00). هذا الخطأ لا يظهر إلا إذا حسبت النتيجة المتوقعة بنفسك من القاعدة. وظهر سؤال لم تجب عنه القواعد: طلب بقيمة 6.00 مع كوبون 2.00 يصبح 4.00؛ هل الحد الأدنى يُحسب قبل الخصم أم بعده؟ القاعدة لا تقول، فهو **سؤال لمالك المنتج**، لا قرار يتخذه النموذج.
+
+**المثال 2: بيانات تركيبية لاختبار الطلبات.**
+
+| Field | Synthetic values | Why |
+|---|---|---|
+| Customer name | Short Latin name; 60-character Arabic name | Arabic and English UI, long text |
+| Phone number | Valid format, not a real subscriber | Personal data must not be exposed |
+| Address | Very long Arabic address with digits | Layout and right-to-left display |
+| Meals | 1, 20, and 21 (invalid) | Boundaries of 1–20 meals |
+| Payment | Cash, card, digital wallet | One value per partition |
+| Coupon expiry | Yesterday, today, next month | Expired vs valid coupon |
+
+وللاختبار غير الوظيفي، يمكن أن يولّد النموذج آلاف الطلبات الوهمية بالتوزيع نفسه لاختبار الحمل. وقبل الاستخدام، تحقّق أن لا قيمة منها تطابق بيانات حقيقية.
+
+**المثال 3 (حالة خادعة): ترتيب التنفيذ مع اعتماديات.**
+
+| Test | Priority | Depends on |
+|---|---|---|
+| T1 Place a cash order | High | — |
+| T2 Restaurant accepts the order | Medium | T1 |
+| T3 Customer cancels while Preparing | High | T2 |
+| T4 Driver marks the order Delivered | High | T2 |
+| T5 Arabic labels in order history | Low | — |
+
+الترتيب الصحيح: T1 ثم T2، ثم T3 وT4، وT5 في أي وقت أو بالتوازي على جهاز ثانٍ. أولوية T3 عالية، لكنها لا تسبق T2. وهناك فخ آخر: T3 وT4 **لا تستطيعان استخدام الطلب نفسه**، لأن الطلب الملغى لا يمكن توصيله. الجدول الصحيح يجهّز طلبين منفصلين. هذا النوع من الاعتمادية الخفية هو ما يجب أن تبحث عنه عند مراجعة استدلال النموذج.
+
+### لا تخلط بين — Don't Confuse
+
+| | Test design | Test implementation | Test execution |
+|---|---|---|---|
+| Main question | How do we test it? | What do we need to run it? | Run it and compare results |
+| Typical output | Test cases | Procedures, scripts, data, environment, schedule | Test results, defect reports |
+| GenAI support (this section) | Test case generation | Data synthesis, script generation, scheduling | Not covered here |
+
 <aside class="gx-callout" data-kind="tip"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Exam tip</span><span class="gx-ar" lang="ar" dir="rtl">تلميح امتحان</span></p><p class="gx-en" lang="en" dir="ltr">Know the four design and implementation tasks: test case generation, synthetic test data, test script generation, and execution scheduling and prioritisation. Remember that test implementation prepares testware for execution; it is not execution itself.</p><p class="gx-ar" lang="ar" dir="rtl">اعرف مهام التصميم والتجهيز الأربع: توليد حالات الاختبار، وبيانات الاختبار التركيبية، وتوليد الـ scripts، وجدولة التنفيذ وترتيب أولوياته. وتذكّر أن التجهيز يُعدّ مواد الاختبار للتنفيذ، وليس هو التنفيذ.</p></aside>
+
+<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">The delivery app testers generated 30 checkout test cases in minutes, but before approving them they recalculated the expected totals for the boundary and coupon cases. Two expected results were wrong because the model applied the free-delivery limit after the discount. Fixing the prompt with the exact rule and regenerating only those cases took less time than writing them all by hand.</p><p class="gx-ar" lang="ar" dir="rtl">ولّد مختبرو تطبيق التوصيل 30 حالة اختبار لشاشة الدفع في دقائق، لكنهم قبل اعتمادها أعادوا حساب الإجماليات المتوقعة لحالات الحدود والكوبونات. كانت نتيجتان متوقعتان خاطئتين لأن النموذج طبّق حد التوصيل المجاني بعد الخصم. وتصحيح التوجيه بالقاعدة الدقيقة وإعادة توليد هاتين الحالتين فقط استغرق وقتًا أقل من كتابة الحالات كلها يدويًا.</p></aside>
+
+### التمارين العملية — The Labs
+
+**HO-2.2.2a** (مستوى H2): توليد حالات اختبار وظيفية من قصص المستخدم بثلاث أدوات معًا: **تسلسل التوجيهات، والتوجيه المنظّم، والتوجيه الفوقي**، لضمان تغطية شاملة. الخطوة الأولى توجيه يولّد الحالات من معايير القبول **بصيغة مخرجات محددة**. والثانية **التحقق من الاكتمال**: يولّد النموذج **جدولًا يلخّص التغطية** لكل معيار قبول. والثالثة **توجيه فوقي** يساعد في إنشاء **إجراءات End-to-End**، ويُحسَّن تكراريًا.
+
+**HO-2.2.2b** (مستوى H2): بعد مراجعة أمثلة جاهزة وصيغة Gherkin، **تختار n مثالًا** تضعها في التوجيه، **كل مثال فيه قصة مستخدم وشروط اختبار وحالات Given-When-Then المتوقعة**. ثم تطبّق التوجيه على قصة جديدة. وإذا كانت النتائج غير دقيقة، **تحسّن التوجيه أو الأمثلة**.
+
+**HO-2.2.2c** (مستوى H2): ترتيب حالات مجموعة اختبار حسب **المخاطر والاعتماديات** باستخدام تسلسل التوجيهات. يبدأ بنظرة على مناهج مختلفة: **القائم على المخاطر، والقائم على التغطية، والقائم على المتطلبات**، ثم مراجعة مجموعة الاختبار، ثم كتابة توجيهات تولّد **خطط ترتيب قابلة للتنفيذ**. ويجب **التحقق يدويًا** من النتائج لاكتشاف أخطاء استدلال النموذج. الهدف تجربة GenAI في مهام تحتاج **استدلالًا متعدد المعايير**.
+
+تستخدم التمارين أدناه مثال التسجيل في منصة «تعلّم».
 
 <section class="gx-lab" data-lab="HO-2.2.2a"><header class="gx-lab-head"><span class="gx-lab-title"><span class="gx-en" lang="en" dir="ltr">Lab · Generate, Check Coverage, Then Meta-Prompt</span><span class="gx-ar" lang="ar" dir="rtl">تمرين عملي · ولّد، افحص التغطية، ثم استخدم التوجيه الفوقي</span></span><span class="gx-lab-meta">HO-2.2.2a · H2</span></header><div class="gx-lab-body"><p><span class="gx-en" lang="en" dir="ltr"><strong>Goal:</strong> generate functional test cases for the rule “password length is 12–64 characters”, assuming all other fields are valid.</span><span class="gx-ar" lang="ar" dir="rtl"><strong>الهدف:</strong> توليد حالات اختبار وظيفية لقاعدة «طول كلمة المرور من 12 إلى 64 محرفًا»، بافتراض أن بقية الحقول صحيحة.</span></p><ol class="gx-lab-steps"><li><span class="gx-en" lang="en" dir="ltr">Ask for test cases in the format ID / Preconditions / Input / Steps / Expected / Requirement.</span><span class="gx-ar" lang="ar" dir="rtl">اطلب حالات اختبار بالصيغة: المعرّف / الشروط المسبقة / المدخل / الخطوات / المتوقع / المتطلب.</span></li><li><span class="gx-en" lang="en" dir="ltr">Ask for a coverage table per acceptance criterion and review it.</span><span class="gx-ar" lang="ar" dir="rtl">اطلب جدول تغطية لكل معيار قبول وراجعه.</span></li><li><span class="gx-en" lang="en" dir="ltr">Use a meta prompt to design a prompt for an end-to-end procedure: sign up, then reach the allowed feature. Fix the prompt when you find a gap and regenerate only the affected part.</span><span class="gx-ar" lang="ar" dir="rtl">استخدم توجيهًا فوقيًا لتصميم توجيه لإجراء End-to-End: التسجيل ثم الوصول إلى الميزة المسموحة. صحّح التوجيه عند اكتشاف فجوة، وأعد توليد الجزء المتأثر فقط.</span></li></ol><table><thead><tr><th><span class="gx-en" lang="en" dir="ltr">Case</span><span class="gx-ar" lang="ar" dir="rtl">الحالة</span></th><th><span class="gx-en" lang="en" dir="ltr">Input</span><span class="gx-ar" lang="ar" dir="rtl">المدخل</span></th><th><span class="gx-en" lang="en" dir="ltr">Expected</span><span class="gx-ar" lang="ar" dir="rtl">المتوقع</span></th><th><span class="gx-en" lang="en" dir="ltr">Source</span><span class="gx-ar" lang="ar" dir="rtl">المصدر</span></th></tr></thead><tbody><tr><td>TC-01</td><td><span class="gx-en" lang="en" dir="ltr">11 characters</span><span class="gx-ar" lang="ar" dir="rtl">11 محرفًا</span></td><td><span class="gx-en" lang="en" dir="ltr">Sign-up rejected for length</span><span class="gx-ar" lang="ar" dir="rtl">رفض التسجيل بسبب الطول</span></td><td><span class="gx-en" lang="en" dir="ltr">Lower boundary</span><span class="gx-ar" lang="ar" dir="rtl">الحد الأدنى</span></td></tr><tr><td>TC-02</td><td><span class="gx-en" lang="en" dir="ltr">12 characters</span><span class="gx-ar" lang="ar" dir="rtl">12 محرفًا</span></td><td><span class="gx-en" lang="en" dir="ltr">Length rule accepted</span><span class="gx-ar" lang="ar" dir="rtl">قبول شرط الطول</span></td><td><span class="gx-en" lang="en" dir="ltr">Lower boundary</span><span class="gx-ar" lang="ar" dir="rtl">الحد الأدنى</span></td></tr><tr><td>TC-03</td><td><span class="gx-en" lang="en" dir="ltr">64 characters</span><span class="gx-ar" lang="ar" dir="rtl">64 محرفًا</span></td><td><span class="gx-en" lang="en" dir="ltr">Length rule accepted</span><span class="gx-ar" lang="ar" dir="rtl">قبول شرط الطول</span></td><td><span class="gx-en" lang="en" dir="ltr">Upper boundary</span><span class="gx-ar" lang="ar" dir="rtl">الحد الأعلى</span></td></tr><tr><td>TC-04</td><td><span class="gx-en" lang="en" dir="ltr">65 characters</span><span class="gx-ar" lang="ar" dir="rtl">65 محرفًا</span></td><td><span class="gx-en" lang="en" dir="ltr">Sign-up rejected for length</span><span class="gx-ar" lang="ar" dir="rtl">رفض التسجيل بسبب الطول</span></td><td><span class="gx-en" lang="en" dir="ltr">Upper boundary</span><span class="gx-ar" lang="ar" dir="rtl">الحد الأعلى</span></td></tr></tbody></table><pre class="gx-lab-prompt"><code>Design a prompt that generates an end-to-end procedure from the approved
 acceptance criteria and test cases. Ask for missing data first, define the

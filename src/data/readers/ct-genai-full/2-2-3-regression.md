@@ -7,7 +7,7 @@ section: "2.2.3"
 title: "Automated Regression Testing with Generative AI"
 titleAr: "اختبار الانحدار المؤتمت باستخدام الذكاء التوليدي"
 objectives: "GenAI-2.2.3 · K3 / HO-2.2.3a · H2 / HO-2.2.3b · H2"
-minutes: 12
+minutes: 22
 lo:
   GenAI-2.2.3: "Use GenAI to support automated regression testing."
   HO-2.2.3a: "Use few-shot prompting to create, maintain and debug keyword-driven test scripts."
@@ -21,11 +21,13 @@ takeaways:
   - "Five uses: keyword-driven scripts, impact analysis, self-healing tests, reporting, and defect reporting with root-cause support."
   - "GUI tests suffer from changing locators; API tests from changing endpoints, payloads and authentication."
   - "Review generated outputs in proportion to the risk."
+  - "Self-healing suits only minor, intended changes; check the approved specification before accepting a fix."
 takeawaysAr:
   - "مجموعات الانحدار تكبر مع كل إصدار، فتصبح أتمتتها في CI/CD مجدية، ويساعد GenAI في إنشائها وصيانتها وتحسينها."
   - "خمسة استخدامات: scripts الكلمات المفتاحية، وتحليل الأثر، والاختبارات ذاتية الإصلاح، والتقارير، وتقارير الـ defects مع دعم تحليل السبب الجذري."
   - "اختبارات الواجهة تعاني من تغيّر المحددات؛ واختبارات API من تغيّر المسارات وبنية البيانات والمصادقة."
   - "راجع المخرجات المولّدة بقدر الخطر."
+  - "الإصلاح الذاتي يناسب التغييرات البسيطة المقصودة فقط؛ راجع المواصفات المعتمدة قبل قبول أي إصلاح."
 terms:
   - en: "Regression Testing"
     ar: "اختبار الانحدار"
@@ -46,35 +48,104 @@ terms:
     def: "Automatically adapting test scripts to small UI or API changes to avoid needless failures."
     defAr: "تكييف الـ test scripts تلقائيًا مع تغييرات بسيطة في الواجهة أو API لتجنّب فشل غير ضروري."
 ---
-مع الإصدارات المتكررة يزيد حجم اختبارات **Regression**، وتكرار تشغيلها في CI/CD يجعل أتمتتها مفيدة. يدعم GenAI إنشاء مجموعات الانحدار المؤتمتة وصيانتها وتحسينها. ومن خلال التكيّف مع تغييرات الشيفرة وتحليل الأثر، يحدد الأجزاء الأكثر تأثرًا بالتغيير الأخير، فيتوجه جهد الانحدار إلى حيث القيمة الأكبر.
+مع كل iteration أو إصدار جديد يكتمل، تُضاف ميزات جديدة، ويجب أن نتأكد أن ما كان يعمل قبلها ما زال يعمل. لذلك يزداد عدد حالات **اختبار الانحدار (Regression Testing)** مع الوقت ولا ينقص. في تطبيق التوصيل مثلًا، بدأت مجموعة الانحدار بحالات الطلب والدفع فقط، ثم أُضيفت الكوبونات، ثم إلغاء الطلب، ثم واجهة المطعم، فصارت المجموعة تكبر في كل sprint. وهذا القسم من مستوى **K3**: المطلوب أن تعرف كيف **تطبّق** GenAI على أنشطة الانحدار المؤتمت، وأين تتوقف ثقتك بناتجه.
 
-### استخدامات GenAI في الانحدار — Typical Activities
+### لماذا الانحدار مرشّح مثالي للأتمتة؟ — Why Regression Suits Automation
 
-| Activity | كيف يساعد؟ | ما الذي نتحقق منه؟ |
+يربط المنهج بين أمرين: **العدد المتزايد** لحالات الانحدار، و**التكرار العالي** لتشغيلها، خصوصًا في خطوط **التكامل والتسليم المستمرين (CI/CD)**. في فريق التوصيل يعمل خط CI مع كل commit، أي عشرات المرات في اليوم الواحد. تنفيذ مئات الحالات يدويًا بهذا التكرار مستحيل عمليًا، أما الأتمتة فتنفّذها في كل مرة بالتكلفة نفسها تقريبًا.
+
+لكن الأتمتة نفسها تحتاج جهدًا: كتابة الـ test scripts، وصيانتها كلما تغيّر التطبيق، وتقليل الحالات المكررة أو غير المفيدة. هنا يأتي دور GenAI، فالمنهج يذكر ثلاثة أفعال: **الإنشاء (creation)**، و**الصيانة (maintenance)**، و**التحسين (optimization)** لمجموعات الانحدار المؤتمتة.
+
+ويضيف المنهج قدرتين: **التكيّف الديناميكي مع تغييرات الشيفرة**، و**تحليل الأثر (Impact Analysis)**. معناهما أن GenAI يستطيع أن يحدد **أي أجزاء البرنامج يُرجَّح أن تتأثر** بالتعديلات الأخيرة، فيتركّز جهد الانحدار **حيث الحاجة إليه أكبر**، بدل توزيعه بالتساوي على كل شيء.
+
+### الأنشطة الخمسة — Five Typical Activities
+
+يسرد المنهج خمسة أنشطة نموذجية في الانحدار المؤتمت وتقارير الاختبار يمكن دعمها بالتوجيه:
+
+| Activity | What GenAI does | What the tester checks |
 |---|---|---|
-| Keyword-driven scripts | ربط الكلمات المفتاحية بالحالات وتوليد الـ scripts | وجود الكلمات وتواقيعها وترتيبها |
-| Impact analysis | تحديد المناطق عالية الخطر في تعديلات الشيفرة | اعتماديات لم تظهر في المدخلات |
-| Self-healing tests | تعديل الـ scripts تلقائيًا مع تغييرات بسيطة في الواجهة أو API | أن الإصلاح لا يخفي defect فعليًا |
-| Reporting and insights | تقارير ولوحات فيها نسب النجاح والمشكلات والاتجاهات وتوقعات الفشل | الحسابات ومصدر كل نتيجة |
-| Defect reporting / RCA | تقارير defects شاملة بالسجلات وصور الشاشة وبيانات البيئة | فصل السبب المثبت عن الفرضية |
+| Keyword-driven script implementation | Maps keywords to test cases and generates scripts | Every keyword exists; arguments and order are right |
+| Impact analysis and test optimization | Analyses code changes to find high-risk areas | Dependencies missing from the input |
+| Self-healing and adaptive tests | Adjusts scripts to minor UI or API changes | The fix does not hide a real defect |
+| Automated test reporting and insights | Detailed, timely reports and dashboards with trends and predictions | Calculations and the source of each claim |
+| Enhanced defect reporting and root cause analysis | Compiles defect reports with logs, screenshots, environment data | Proven facts separated from hypotheses |
 
-تنطبق هذه الاستخدامات على الانحدار الوظيفي وغير الوظيفي، لكن مخرجات GenAI تحتاج مراجعة تتناسب مع مستوى الخطر (انظر الفصل الثالث).
+### الـ scripts بالكلمات المفتاحية — Keyword-driven Automation
 
-### كل استخدام بالتفصيل — Each Activity
+في إطار **الاختبار المعتمد على الكلمات المفتاحية (Keyword-driven Testing)**، كل خطوة اختبار شائعة لها **كلمة مفتاحية محددة مسبقًا** وموثّقة، مثل OpenMenu أو AddMeal أو ApplyCoupon (أسماء افتراضية للتوضيح). يقول المنهج إن النماذج اللغوية تستطيع **ربط هذه الكلمات بحالات اختبار محددة**، و**توليد الـ test scripts**، و**مساعدة المختبرين ومهندسي الأتمتة** في عملهم. السبب أن هذه المهمة متكررة وصيغتها مقيّدة: يجب استخدام كلمات المكتبة فقط، بوسائطها وترتيبها. ولهذا يربطها الهدف العملي HO-2.2.3a بتقنية **التوجيه بالأمثلة (Few-shot Prompting)**: مثالان صحيحان من scripts الفريق يُظهران للنموذج النمط المطلوب بالضبط.
 
-**الـ scripts بالكلمات المفتاحية:** في إطار Keyword-driven، كل خطوة متكررة لها كلمة مفتاحية موثقة (مثل OpenLogin أو FillEmail). يربط النموذج خطوات الحالة بالكلمات المناسبة ويولّد الـ script، فيدعم المختبرين ومهندسي الأتمتة دون الحاجة لكتابة الشيفرة من الصفر.
+### تحليل الأثر وتحسين الاختبارات — Impact Analysis and Test Optimization
 
-**تحليل الأثر:** يقرأ النموذج تغييرات الشيفرة (مثل Diff في طلب الدمج) ويقترح المكوّنات والاختبارات الأكثر تأثرًا. بدل تشغيل مجموعة الانحدار كاملة لكل تغيير صغير، يُوجَّه الجهد إلى المناطق عالية الخطر.
+يحلل GenAI **تغييرات الشيفرة** لتحديد **المناطق عالية الخطر**، فيصبح الانحدار **موجّهًا (targeted)**. مثال: مطوّر عدّل دالة حساب رسوم التوصيل. يقرأ النموذج الـ diff ويقترح تشغيل حالات السلة والدفع والكوبونات أولًا، لأنها تعتمد على المبلغ الإجمالي. لماذا لا نكتفي بهذا دائمًا؟ لأن النموذج لا يرى إلا ما أعطيته: إن كانت لوحة المطعم تعرض الإجمالي نفسه عبر API آخر لم يظهر في الـ diff، فقد يفوته. عمليًا، تبقى المجموعة الكاملة تعمل دوريًا (ليلًا مثلًا)، والمجموعة الموجّهة تعمل مع كل commit.
 
-**الإصلاح الذاتي:** عندما يتغيّر معرّف زر أو مسار API تغييرًا بسيطًا، يكيّف النموذج الـ script تلقائيًا، فلا تفشل الاختبارات فشلًا لا علاقة له بالجودة الفعلية، وتبقى المجموعة مستقرة.
+### الاختبارات ذاتية الإصلاح والتكيفية — Self-healing and Adaptive Tests
 
-**التقارير والرؤى:** ينتج تقارير ولوحات في الوقت المناسب، تتضمن نسب النجاح والمشكلات والاتجاهات، وقد يقدّم توقعات عن مناطق الفشل المحتملة.
+يكيّف GenAI الـ test scripts تلقائيًا مع **تغييرات بسيطة في الواجهة أو API**، فيمنع **الفشل غير الضروري** الناتج عن تعديلات صغيرة، ويُبقي مجموعة الاختبارات **مستقرة مع الوقت**. مثال: تغيّر معرّف زر «إتمام الطلب» من btn-checkout إلى checkout-button دون أي تغيير في السلوك. بدون **الإصلاح الذاتي (Self-healing)** تفشل عشرات الحالات، ويضيع وقت الفريق في التحقيق في فشل لا علاقة له بالجودة. الكلمة المهمة في المنهج هي **بسيطة (minor)**: إذا تغيّر السلوك نفسه، فالمطلوب تحقيق، لا إصلاح تلقائي.
 
-**تقارير الـ defects وتحليل السبب الجذري:** يجمع السجلات ولقطات الشاشة ومعلومات البيئة في تقرير defect كامل، ويقترح أسبابًا محتملة يتحقق منها المختبِر.
+### التقارير والرؤى المؤتمتة — Automated Test Reporting and Insights
 
-### واجهة المستخدم مقابل API — GUI vs API
+يولّد GenAI تقارير **مفصّلة ومتاحة في وقتها**، فيها **مقاييس النجاح، والإخفاقات، والرؤى الأساسية**، ويقدّم لأصحاب المصلحة **لوحات مؤشرات (dashboards)** تُبرز **اتجاهات الاختبار** وتقدّم **رؤى تنبؤية** عن نقاط الفشل المحتملة. مثال: بعد كل تشغيل ليلي، يلخص النموذج أن حالات الدفع بالمحفظة الرقمية فشلت في ثلاث ليالٍ من آخر خمس، ويتوقع أنها منطقة خطر في الإصدار القادم. التوقع هنا **فرضية** يتحقق منها الفريق، لا حقيقة.
 
-اختبارات GUI غير مستقرة غالبًا بسبب تغيّر الواجهة: محددات ديناميكية وتغيرات بصرية وتفاعلات. يعدّل GenAI الـ scripts مع تغيّر المحددات والتفاعلات فيقلّ التدخل اليدوي. أما اختبارات API فتتأثر بتغيّر بنية الطلب والاستجابة والمسارات والمصادقة؛ يعدّل GenAI الـ scripts مع تغيّر المواصفات ويولّد بيانات متنوعة، فتبقى التغطية جيدة بجهد أقل.
+### تقارير الـ defects المحسّنة وتحليل السبب الجذري — Enhanced Defect Reporting and Root Cause Analysis
+
+يسهّل GenAI **التجميع التلقائي** لتقارير defects **شاملة** تحتوي **سجلات الاختبار (test logs)، ولقطات الشاشة، وبيانات بيئة الاختبار**. فائدة ذلك أن المطوّر يحصل على كل ما يحتاجه لإعادة إنتاج المشكلة دون أن يسأل. وعنوان النشاط في المنهج يذكر **تحليل السبب الجذري**؛ عمليًا، يقترح النموذج أسبابًا محتملة من السجلات، ويبقى على المختبِر والمطوّر إثباتها قبل كتابتها كسبب.
+
+### وظيفي وغير وظيفي، والمراجعة بقدر الخطر — Functional, Non-functional and Risk
+
+يؤكد المنهج أن هذه الأنشطة تنطبق على أنواع مختلفة من الانحدار، **الوظيفي وغير الوظيفي**. مثال غير وظيفي: مقارنة زمن استجابة API إنشاء الطلب بين الإصدارات، وتلخيص النموذج لاتجاهه.
+
+لكنه يحذّر: **GenAI قد يخطئ**، لذلك يجب **فحص الناتج بعناية بحسب الخطر المرتبط به** (انظر الفصل الثالث). إصلاح ذاتي في خطوة الدفع يستحق مراجعة بشرية كاملة، أما صياغة جملة في تقرير يومي داخلي فتكفيها مراجعة سريعة.
+
+### واجهة المستخدم مقابل API — GUI vs API Regression
+
+يدعم GenAI اختبارات الانحدار **الشاملة (end-to-end) عبر الواجهة الرسومية** والاختبارات **المبنية على API**، ولكل منهما تحدياته وحلوله:
+
+| Test type | Typical challenge | How GenAI helps | What to check |
+|---|---|---|---|
+| GUI end-to-end | Frequent UI changes: dynamic locators, modified interactions | Adapts scripts automatically, less manual intervention | The healed step still does what the test intended |
+| API-based | Changing request/response formats, endpoints, authentication | Adapts scripts to evolving API specifications; generates diverse test data | The change is in the approved specification |
+
+اختبارات الواجهة **تفقد استقرارها كثيرًا** لأن الواجهة تتغير باستمرار: **محددات ديناميكية (dynamic locators)** يولّدها الإطار عند كل بناء، أو **تفاعلات معدّلة**، مثل تحويل قائمة منسدلة إلى أزرار. يكيّف GenAI الـ scripts فيقلّ **التدخل اليدوي**. أما اختبارات API فتواجه تغيّر **صيغ الطلب والاستجابة**، و**المسارات (endpoints)**، و**المصادقة**. يكيّف GenAI الـ scripts مع **تطوّر مواصفات API**، ويولّد **بيانات اختبار متنوعة**، فتبقى **التغطية شاملة** ويقلّ التحديث اليدوي.
+
+### خطوات التطبيق — Step by Step
+
+1. **حدّد النشاط**: أي الأنشطة الخمسة تحتاج؟ إنشاء scripts، أم تحليل أثر، أم إصلاح، أم تقرير؟
+2. **أعطِ السياق الصحيح**: مكتبة الكلمات الموثّقة، أو الـ diff، أو مواصفات API المعتمدة، أو السجلات.
+3. **اختر التقنية**: أمثلة (Few-shot) للـ scripts ذات الصيغة الثابتة (HO-2.2.3a). ولتحليل تقارير الانحدار، توجيهات منظّمة في محادثة واحدة، كل خطوة تبني على السابقة: مقارنة النتائج بمواصفات الاختبار، ثم تجميع الـ defects المتشابهة، ثم تحديث قائمة الحالات الشاذة المعروفة، ثم التحقق المتقاطع (HO-2.2.3b).
+4. **قيّد الناتج**: «استخدم الكلمات الموثّقة فقط»، «افصل الحقائق عن الفرضيات».
+5. **راجع بقدر الخطر**، ثم شغّل في بيئة اختبار، وسجّل ما قبلته وما رفضته.
+
+### أمثلة محلولة — Worked Examples
+
+**المثال 1: توليد script بالأمثلة، ومراجعة تكشف خطأ.** أعطى المختبِر النموذج مثالين، ثم طلب حالة: طلب بقيمة 22.00 دينار مع كوبون خصم 10%. القاعدة أن التوصيل المجاني يُفحص على قيمة الطلب **قبل** الخصم.
+
+| Step | Generated script | Review result |
+|---|---|---|
+| 1 | AddMeal "Shawarma" 2 (total 22.00) | OK |
+| 2 | ApplyDiscount 10% | Rejected: undocumented keyword; the library has ApplyCoupon |
+| 3 | ExpectTotal 19.80 | OK: 22.00 − 2.20 = 19.80 |
+| 4 | ExpectDeliveryFee 1.50 | Wrong: 22.00 ≥ 20.00 before the coupon, so the fee is 0.00 |
+
+استنتج النموذج أن 19.80 أقل من 20.00 فأضاف الرسوم، وهذا خطأ استدلال لا يظهر إلا لمن يعرف القاعدة. تصحيح التوجيه: إضافة القاعدة صراحة ومثال ثالث عليها.
+
+**المثال 2: تحليل الأثر.** الـ diff يعدّل ملف حساب الرسوم وملف ترجمة نصوص الواجهة العربية.
+
+| Change | Model suggestion | Tester decision |
+|---|---|---|
+| Delivery fee calculation | Cart, checkout, coupon tests | Accept, and add restaurant dashboard totals (not in the diff) |
+| Arabic UI strings file | All Arabic UI tests | Narrow to changed screens; layout check on iOS and Android |
+
+**المثال 3 (حالة خادعة): إصلاح ذاتي يجب رفضه.** فشل اختبار API لأن حقل الاستجابة تغيّر اسمه من deliveryFee إلى delivery_fee، فاقترح الإصلاح الذاتي تعديل الـ assertion. يبدو التغيير «بسيطًا»، لكن المختبِر راجع مواصفات API المعتمدة فوجد الاسم القديم ما زال فيها. إذن التغيير غير مقصود، وسيكسر نسخ التطبيق القديمة على الهواتف. القرار: رفض الإصلاح، وتسجيل defect. الإصلاح الذاتي مناسب فقط عندما يكون التغيير مقصودًا وموثّقًا ولا يغيّر السلوك.
+
+### لا تخلط بين — Don't Confuse
+
+| | Self-healing | Impact analysis | Defect reporting / RCA |
+|---|---|---|---|
+| Input | Failing script + changed UI or API | Code changes | Logs, screenshots, environment data |
+| Output | Adjusted script | List of high-risk areas and tests | Complete defect report, likely causes |
+| Main risk | Masks a real defect | Misses hidden dependencies | Hypothesis reported as proven cause |
+
+<aside class="gx-callout" data-kind="practice"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">In practice</span><span class="gx-ar" lang="ar" dir="rtl">من الواقع العملي</span></p><p class="gx-en" lang="en" dir="ltr">The delivery app team lets self-healing propose fixes in CI, but never merge them automatically. Each proposed fix appears in the pipeline report with the old and new locator or field; a tester approves it only after checking the approved specification. Fixes on payment and checkout steps always get a full review.</p><p class="gx-ar" lang="ar" dir="rtl">يسمح فريق تطبيق التوصيل للإصلاح الذاتي باقتراح التعديلات في CI، لكنه لا يدمجها تلقائيًا أبدًا. يظهر كل إصلاح مقترح في تقرير خط CI مع المحدد أو الحقل القديم والجديد، ولا يعتمده المختبِر إلا بعد مراجعة المواصفات المعتمدة. وإصلاحات خطوات الدفع وإتمام الطلب تخضع دائمًا لمراجعة كاملة.</p></aside>
 
 <aside class="gx-callout" data-kind="warn"><p class="gx-callout-label"><span class="gx-en" lang="en" dir="ltr">Common mistake</span><span class="gx-ar" lang="ar" dir="rtl">خطأ شائع</span></p><p class="gx-en" lang="en" dir="ltr">Accepting any self-heal that makes the test pass. If the “Submit” button changed and self-healing picked “Delete”, the run passes but the test is wrong. Check the intent of the step and the expected result; reject the fix if needed. For APIs, give the model the approved specification so it does not “fix” a test to tolerate an unintended contract change.</p><p class="gx-ar" lang="ar" dir="rtl">قبول أي إصلاح ذاتي يجعل الاختبار ينجح. إذا تغيّر زر «إرسال» واختار الإصلاح الذاتي زر «حذف»، ينجح التشغيل لكن الاختبار خاطئ. افحص نية الخطوة والنتيجة المتوقعة، وارفض الإصلاح إن لزم. وفي API، أعطِ النموذج المواصفات المعتمدة حتى لا «يصلح» اختبارًا ليتسامح مع تغيير غير مقصود في العقد.</p></aside>
 
