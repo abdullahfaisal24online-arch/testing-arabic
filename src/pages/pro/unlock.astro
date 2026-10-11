@@ -2,9 +2,12 @@
 // تفعيل كود الشراء على هاد الجهاز (+ «نسيت الكود؟»). الرابط بالإيميل بيعبّي الكود لحاله: /pro/unlock/?code=TA-XXXX-XXXX
 import Base from '../../layouts/Base.astro';
 import { STORE_OPEN, getStoreSettings, tpl } from '../../lib/store';
+import { GUIDES } from '../../lib/guides';
 
 if (!STORE_OPEN) return Astro.redirect('/store/');
 const t = await getStoreSettings();
+// الدليل بينفتح بصفحاته (/store/<منتج>/full/)، والبنك بصفحة /pro/<منتج>/
+const hrefs = Object.fromEntries(Object.entries(GUIDES).map(([slug, g]) => [slug, g.guideBase('full')]));
 const L = {
   invalid: t.unlockErrInvalid, blocked: t.unlockErrBlocked, devices: t.unlockErrDevices, too_many: t.unlockErrTooMany,
   ok: t.unlockOk, forgotDone: t.forgotDone, bad_email: 'الإيميل مش مكتوب صح.', network: 'صار خطأ بالاتصال. جرّب كمان مرة.',
@@ -17,7 +20,9 @@ const L = {
       <h1>{t.unlockTitle}</h1>
       <p class="lead">{tpl(t.unlockText, { devices: t.maxDevices })}</p>
 
-      <form id="uform" novalidate data-labels={JSON.stringify(L)}>
+      <p class="locked" id="ulocked" hidden>هاد المحتوى للي اشترى الدليل. فعّل كود الشراء على هاد الجهاز، أو <a id="ubuy" href="/store/">اشتري الدليل من هون</a>.</p>
+
+      <form id="uform" novalidate data-labels={JSON.stringify(L)} data-hrefs={JSON.stringify(hrefs)}>
         <label>
           <span>{t.unlockField}</span>
           <input name="code" id="code" required maxlength="20" dir="ltr" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="TA-XXXX-XXXX" />
@@ -52,8 +57,18 @@ const L = {
   const form = $('uform') as HTMLFormElement;
   const L = JSON.parse(form.dataset.labels!);
   const input = $('code') as HTMLInputElement;
-  const q = new URLSearchParams(location.search).get('code');
+  const params = new URLSearchParams(location.search);
+  const q = params.get('code');
   if (q) input.value = q.toUpperCase();
+  const hrefs = JSON.parse(form.dataset.hrefs || '{}') as Record<string, string>;
+  // جاي من دليل مقفول: /pro/unlock/?p=<منتج>&next=/store/<منتج>/full/...
+  const fromSlug = (params.get('p') || '').replace(/[^a-z0-9-]/g, '');
+  const next = params.get('next') || '';
+  const safeNext = fromSlug && next.startsWith(`/store/${fromSlug}/full`) && !next.includes('//') ? next : '';
+  if (fromSlug) {
+    ($('ubuy') as HTMLAnchorElement).href = `/store/${fromSlug}/`;
+    $('ulocked').hidden = false;
+  }
 
   const say = (el: HTMLElement, text: string, ok = false) => { el.textContent = text; el.className = 'msg ' + (ok ? 'ok' : 'bad'); el.hidden = false; };
 
@@ -72,7 +87,7 @@ const L = {
       ul.replaceChildren(...d.products.map((p: { slug: string; title: string }) => {
         const li = document.createElement('li');
         const a = document.createElement('a');
-        a.href = `/pro/${p.slug}/`;
+        a.href = hrefs[p.slug] || `/pro/${p.slug}/`;
         a.textContent = p.title;
         li.append(a);
         return li;
@@ -82,6 +97,8 @@ const L = {
       $('udone').hidden = false;
       history.replaceState(null, '', location.pathname);
       window.taTrack?.('pro_unlock', {});
+      // رجّعه للصفحة اللي كان بدّه يفتحها إذا الكود بيفتح هالدليل
+      if (safeNext && d.products.some((p: { slug: string }) => p.slug === fromSlug)) location.assign(safeNext);
     } catch (x) {
       const err = x as Error & { devices?: number };
       say(msg, (L[err.message] || L.network).replace('{devices}', String(err.devices ?? '')));
@@ -109,6 +126,8 @@ const L = {
 </script>
 
 <style>
+  .locked { margin: 0 0 14px; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--orange-line, #f97316); background: var(--orange-soft, rgba(249,115,22,.08)); font-size: 14px; line-height: 1.7; }
+  .locked a { color: var(--orange, #f97316); font-weight: 600; }
   .upage { max-width: 560px; padding-block: 40px 80px; }
   .ucard { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 26px 22px; }
   .ucard h1 { font-size: clamp(24px, 3vw, 30px); margin: 0 0 6px; }

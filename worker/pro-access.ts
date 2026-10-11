@@ -98,6 +98,38 @@ async function tooMany(env: StoreEnv, ipHash: string, kind: string, limit: numbe
 const logAttempt = (env: StoreEnv, ipHash: string, kind: string) =>
   env.DB.prepare(`INSERT INTO pro_attempts (ip_hash, kind, at) VALUES (?1, ?2, ?3)`).bind(ipHash, kind, Date.now()).run();
 
+/**
+ * حماية الدليل الكامل: كل طلب لـ /store/<منتج>/full/... بيمر من هون قبل الملفات الثابتة
+ * (لازم المسار يكون بـ run_worker_first بـ wrangler.jsonc — شوف docs/GUIDE-STANDARDS.md).
+ * الصفحة بتنعرض بس لجهاز مفعّل على المنتج (أو حزمة فيها المنتج)، وإلا بنحوّله لصفحة التفعيل.
+ * المعاينة المجانية (/store/<منتج>/preview/) ما بتمر من هون وبتضل مفتوحة.
+ */
+export async function guideGate(req: Request, env: StoreEnv, url: URL): Promise<Response | null> {
+  const m = url.pathname.match(/^\/store\/([a-z0-9-]+)\/full(?:\/|$)/);
+  if (!m) return null;
+  const slug = m[1];
+  if (req.method !== 'GET' && req.method !== 'HEAD') return new Response('Method Not Allowed', { status: 405 });
+  const cat = await catalog(req, env);
+  const known = cat.products.some((p) => p.slug === slug);
+  if (!cat.open || !known) return Response.redirect(new URL('/store/', req.url).toString(), 302);
+
+  await ensureTables(env);
+  const dev = await device(req, env);
+  const codes = dev.fresh ? [] : await deviceCodes(env, dev.hash);
+  if (!productsOf(codes, cat).has(slug)) {
+    const to = new URL('/pro/unlock/', req.url);
+    to.searchParams.set('p', slug);
+    to.searchParams.set('next', url.pathname);
+    return new Response(null, { status: 302, headers: { location: to.toString(), 'cache-control': 'no-store', 'set-cookie': devCookie(dev.id) } });
+  }
+  const res = await env.ASSETS.fetch(req);
+  const out = new Response(res.body, res);
+  out.headers.set('cache-control', 'private, no-store');
+  out.headers.set('x-robots-tag', 'noindex');
+  out.headers.append('set-cookie', devCookie(dev.id));
+  return out;
+}
+
 export async function handleProAccess(req: Request, env: StoreEnv, url: URL): Promise<Response> {
   const path = url.pathname.replace(/\/+$/, '');
   const cat = await catalog(req, env);

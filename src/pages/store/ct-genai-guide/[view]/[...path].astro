@@ -1,12 +1,12 @@
 ---
 /**
- * دليل CT-GenAI — مسارات المراجعة (staging فقط).
+ * دليل CT-GenAI — مسارات الدليل.
  *   /store/ct-genai-guide/{preview|full}/              الرئيسية
  *   /store/ct-genai-guide/{preview|full}/chapter-N/    افتتاح الفصل
  *   /store/ct-genai-guide/{preview|full}/<slug>/       عنوان فرعي (مثل 1-1-2)
  *   /store/ct-genai-guide/{preview|full}/glossary/     مصطلحات الدليل
- * preview = الفصل الأول (المعاينة المجانية)، full = المسودة الكاملة.
- * ما بينبنوا أبداً بدون CMS_BRANCH=staging. الصفحة نفسها بـ GuideView.
+ * preview = الفصل الأول (المعاينة المجانية، مفتوحة)، full = الدليل الكامل (محمي بالـ Worker: جهاز مفعّل بس).
+ * بينبنوا على staging أو لما المتجر مفتوح (STORE_OPEN=1). الصفحة نفسها بـ GuideView.
  */
 import GuideView from '../../../../components/genai-guide/GuideView.astro';
 import { CT_GENAI } from '../../../../lib/guides';

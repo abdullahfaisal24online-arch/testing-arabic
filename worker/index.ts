@@ -21,7 +21,7 @@
 import { EmailMessage } from 'cloudflare:email';
 import { handleStore } from './store';
 import { handleStoreAdmin } from './store-admin';
-import { handleProAccess } from './pro-access';
+import { handleProAccess, guideGate } from './pro-access';
 
 interface Env {
   DB: D1Database;
@@ -994,6 +994,11 @@ async function router(req: Request, env: Env): Promise<Response> {
   // ---------- المتجر (مسار الشراء) ----------
   if (path.startsWith('/api/store/')) return handleStore(req, env, url);
   if (path.startsWith('/api/pro/')) return handleProAccess(req, env, url);
+  // الدليل الكامل المدفوع: بس لجهاز مفعّل (المعاينة المجانية مش مشمولة)
+  if (path.startsWith('/store/') && path.includes('/full')) {
+    const gated = await guideGate(req, env, url);
+    if (gated) return gated;
+  }
   if (path === '/admin/store' || path.startsWith('/admin/store/')) return handleStoreAdmin(req, env, url);
 
   // ---------- واجهة التعليقات ----------

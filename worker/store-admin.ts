@@ -18,7 +18,8 @@ const newCode = () => {
   return `TA-${pick(4)}-${pick(4)}`;
 };
 const esc = (s: unknown) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-const jod = (n: number) => `$${Number.isInteger(n) ? n : n.toFixed(2)}`;
+// الأسعار بالمتجر بالدولار (usd)، والمبلغ المحوّل فعلياً بالدينار (jd)
+const usd = (n: number) => `$${Number.isInteger(n) ? n : n.toFixed(2)}`;
 const jd = (n: number | null | undefined) => (n != null ? `${n} د.أ` : '');
 const when = (ms: number | null) =>
   ms ? new Date(ms).toLocaleString('ar-JO-u-nu-latn', { timeZone: 'Asia/Amman', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) : '—';
@@ -90,8 +91,8 @@ async function listPage(env: StoreEnv, url: URL) {
   const counts = await env.DB.prepare(`SELECT status, COUNT(*) AS n FROM store_orders GROUP BY status`).all<{ status: string; n: number }>();
   const c = Object.fromEntries((counts.results ?? []).map((r) => [r.status, r.n]));
   const monthStart = new Date(); monthStart.setUTCDate(1); monthStart.setUTCHours(0, 0, 0, 0);
-  const rev = await env.DB.prepare(`SELECT COALESCE(SUM(amount),0) AS s, COUNT(*) AS n FROM store_orders WHERE status='approved' AND reviewed_at >= ?1`)
-    .bind(monthStart.getTime()).first<{ s: number; n: number }>();
+  const rev = await env.DB.prepare(`SELECT COALESCE(SUM(amount),0) AS s, COALESCE(SUM(amount_jod),0) AS j, COUNT(*) AS n FROM store_orders WHERE status='approved' AND reviewed_at >= ?1`)
+    .bind(monthStart.getTime()).first<{ s: number; j: number; n: number }>();
   const rows = (view[2]
     ? await env.DB.prepare(`SELECT * FROM store_orders WHERE status = ?1 ORDER BY created_at DESC LIMIT 200`).bind(view[2]).all<Order & { ref: string | null }>()
     : await env.DB.prepare(`SELECT * FROM store_orders ORDER BY created_at DESC LIMIT 200`).all<Order & { ref: string | null }>()).results ?? [];
@@ -100,11 +101,11 @@ async function listPage(env: StoreEnv, url: URL) {
     const st = o.status === 'awaiting_payment' && now > o.expires_at ? 'expired' : o.status;
     const [label, cls] = STATUS[st] ?? [st, 'p'];
     return `<tr><td><a class="mono" href="/admin/store/order/${esc(o.id)}">${esc(o.id)}</a></td><td>${esc(o.name)}<br><small class="mono muted">${esc(o.email)}</small></td>
-<td>${esc(o.product_title ?? o.product)}</td><td>${jod(o.amount)}${o.amount_jod != null ? `<br><small class="muted">${jd(o.amount_jod)}</small>` : ''}${o.discount_code ? `<br><small class="muted">${esc(o.discount_code)}</small>` : ''}</td>
+<td>${esc(o.product_title ?? o.product)}</td><td>${usd(o.amount)}${o.amount_jod != null ? `<br><small class="muted">${jd(o.amount_jod)}</small>` : ''}${o.discount_code ? `<br><small class="muted">${esc(o.discount_code)}</small>` : ''}</td>
 <td>${when(o.created_at)}</td><td><span class="st ${cls}">${label}</span></td><td><a class="btn g" href="/admin/store/order/${esc(o.id)}">فتح</a></td></tr>`;
   }).join('');
   return `<div class="kpis"><div><b>${c.review ?? 0}</b>قيد المراجعة</div><div><b>${c.awaiting_payment ?? 0}</b>بانتظار الدفع</div>
-<div><b>${c.approved ?? 0}</b>مفعّلة (الكل)</div><div><b>${jod(Math.round((rev?.s ?? 0) * 100) / 100)}</b>مبيعات هالشهر (${rev?.n ?? 0})</div></div>
+<div><b>${c.approved ?? 0}</b>مفعّلة (الكل)</div><div><b>${jd(Math.round((rev?.j ?? 0) * 100) / 100) || '0 د.أ'}</b>مبيعات هالشهر بالدينار (${rev?.n ?? 0}) · ${usd(Math.round((rev?.s ?? 0) * 100) / 100)}</div></div>
 <div class="tabs">${VIEWS.map((v) => `<a class="${v === view ? 'on' : ''}" href="/admin/store?view=${v[0]}">${v[1]}${v[2] ? ` (${c[v[2]] ?? 0})` : ''}</a>`).join('')}</div>
 <div class="card">${rows.length ? `<table><tr><th>الطلب</th><th>المشتري</th><th>المنتج</th><th>المبلغ</th><th>التاريخ</th><th>الحالة</th><th></th></tr>${tr}</table>` : '<p class="muted">ما في طلبات هون.</p>'}</div>`;
 }
@@ -129,7 +130,7 @@ async function orderPage(env: StoreEnv, id: string, origin: string) {
 
   const actions =
     o.status === 'review' || o.status === 'awaiting_payment' || o.status === 'expired'
-      ? `<div class="warn">قبل ما توافق: افتح تطبيق البنك وتأكد إنه وصل تحويل بمبلغ <b>${o.amount_jod != null ? jd(o.amount_jod) : jod(o.amount)}</b> ومعه <b class="mono">${esc(o.id)}</b>.</div>
+      ? `<div class="warn">قبل ما توافق: افتح تطبيق البنك وتأكد إنه وصل تحويل بمبلغ <b>${o.amount_jod != null ? jd(o.amount_jod) : usd(o.amount)}</b> ومعه <b class="mono">${esc(o.id)}</b>.</div>
 <form method="post" action="/admin/store/action" class="acts"><input type="hidden" name="id" value="${esc(o.id)}"><input type="hidden" name="do" value="approve">
 <button class="btn y">✓ قبول وتوليد الكود</button></form>
 <form method="post" action="/admin/store/action" class="inline" style="margin-top:12px"><input type="hidden" name="id" value="${esc(o.id)}"><input type="hidden" name="do" value="reject">
@@ -147,8 +148,8 @@ async function orderPage(env: StoreEnv, id: string, origin: string) {
 <div class="card"><h2 style="margin-top:0" class="mono">${esc(o.id)} <span class="st ${cls}">${label}</span></h2>
 <div class="kv"><span>المنتج</span><b>${esc(o.product_title ?? o.product)}</b><span>المشتري</span><b>${esc(o.name)}</b>
 <span>الإيميل</span><b class="mono">${esc(o.email)}</b><span>واتساب</span><b class="mono">${esc(o.phone ?? '—')}</b>
-<span>السعر</span><b>${jod(o.price)}</b><span>كود الخصم</span><b>${o.discount_code ? `${esc(o.discount_code)} (− ${jod(o.discount)})` : '—'}</b>
-<span>المطلوب</span><b style="color:var(--or)">${jod(o.amount)}${o.amount_jod != null ? ` · ${jd(o.amount_jod)}` : ''}</b><span>مرجع التحويل</span><b class="mono">${esc(o.ref ?? '—')}</b>
+<span>السعر</span><b>${usd(o.price)}</b><span>كود الخصم</span><b>${o.discount_code ? `${esc(o.discount_code)} (− ${usd(o.discount)})` : '—'}</b>
+<span>المطلوب</span><b style="color:var(--or)">${usd(o.amount)}${o.amount_jod != null ? ` · ${jd(o.amount_jod)}` : ''}</b><span>مرجع التحويل</span><b class="mono">${esc(o.ref ?? '—')}</b>
 <span>تاريخ الطلب</span><b>${when(o.created_at)}</b><span>وصل الإثبات</span><b>${when(o.proof_at)}</b><span>آخر حجز</span><b>${when(o.expires_at)}</b></div>
 <div style="margin-top:14px">${actions}</div>
 <div class="acts">${phone ? `<a class="btn g" target="_blank" href="https://wa.me/${phone}?text=${encodeURIComponent(waText)}">واتساب للمشتري ↗</a>` : ''}
@@ -158,7 +159,7 @@ async function orderPage(env: StoreEnv, id: string, origin: string) {
 
 async function discountsPage(env: StoreEnv, products: { slug: string; title: string }[]) {
   const rows = (await env.DB.prepare(`SELECT d.*, (SELECT COUNT(*) FROM store_orders o WHERE o.discount_code = d.code AND o.status IN ('awaiting_payment','review','approved')) AS used FROM store_discounts d ORDER BY created_at DESC`).all<any>()).results ?? [];
-  const tr = rows.map((d) => `<tr><td class="mono"><b>${esc(d.code)}</b></td><td>${d.kind === 'fixed' ? jod(d.value) : `${d.value}%`}</td>
+  const tr = rows.map((d) => `<tr><td class="mono"><b>${esc(d.code)}</b></td><td>${d.kind === 'fixed' ? usd(d.value) : `${d.value}%`}</td>
 <td>${d.products ? esc(d.products) : 'كل المنتجات'}</td><td>${d.used}${d.max_uses ? ` / ${d.max_uses}` : ''}</td><td>${d.expires_at ? when(d.expires_at) : '—'}</td>
 <td>${d.active ? '<span class="st o">فعّال</span>' : '<span class="st x">موقوف</span>'}</td><td>${esc(d.note ?? '')}</td>
 <td><form method="post" action="/admin/store/action" style="display:inline"><input type="hidden" name="do" value="disc_toggle"><input type="hidden" name="code" value="${esc(d.code)}"><button class="btn g">${d.active ? 'إيقاف' : 'تفعيل'}</button></form>

@@ -1,10 +1,11 @@
 /**
- * محرّك أدلة الدراسة التفاعلية (staging فقط).
+ * محرّك أدلة الدراسة التفاعلية.
  *
  * كل دليل (CT-GenAI، CTFL…) بيتعرّف بملف إعدادات بـ src/lib/guides.ts:
  * الاسم، الفصول، المجموعات، مجلدات المحتوى، ومنتج المتجر.
  * هون الأنواع والمنطق المشترك: تحميل الصفحات، تحويل العناوين، الروابط، مفتاح الحفظ.
  */
+import { STORE_OPEN } from './store';
 import type { MarkdownInstance } from 'astro';
 
 export type GuideView = 'preview' | 'full';
@@ -101,7 +102,7 @@ export interface GuideDef {
   syllabus: string;
   /** فقرة «عن هذا الدليل» بالرئيسية */
   about: string;
-  /** ملاحظة الرئيسية بالمسودة الكاملة */
+  /** ملاحظة الرئيسية بالدليل الكامل */
   fullNote: string;
   /** مثال بخانة البحث بالفهرس */
   searchHint: string;
@@ -231,9 +232,13 @@ export function createGuide(def: GuideDef) {
   const glossaryUrl = (view: GuideView) => `${guideBase(view)}glossary/`;
   const storageKey = (view: GuideView) => `ta:${def.id}:guide:${view}:v2`;
 
-  /** مسارات getStaticPaths للدليل. ما بينبنوا أبداً بدون CMS_BRANCH=staging أو بدون محتوى. */
+  /**
+   * مسارات getStaticPaths للدليل: بينبنوا على staging، وعلى الموقع الحقيقي لما المتجر يكون مفتوح (STORE_OPEN=1).
+   * المعاينة (preview) مفتوحة للكل. الكامل (full) بينبني كملفات، بس الـ Worker بيحميه:
+   * ما بينعرض إلا لجهاز مفعّل على المنتج (guideGate بـ worker/pro-access.ts + run_worker_first بـ wrangler.jsonc).
+   */
   const staticPaths = () => {
-    if (process.env.CMS_BRANCH !== 'staging') return [];
+    if (process.env.CMS_BRANCH !== 'staging' && !STORE_OPEN) return [];
     const views: GuideView[] = ['preview', 'full'];
     return views.flatMap((view) => {
       const pages = pagesFor(view);

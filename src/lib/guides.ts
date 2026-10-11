@@ -15,7 +15,7 @@ export const CT_GENAI = createGuide({
   syllabus: 'ISTQB® CT-GenAI Syllabus v1.1',
   about:
     'شرح دراسي مستقل من Testing بالعربي، مبني على ISTQB® CT-GenAI Syllabus v1.1 (27 أبريل 2026). حقوق السيليبس لـISTQB® ومؤلفيه Abbas Ahmad وGualtiero Bazzana وAlessandro Collino وOlivier Denoo وBruno Legeard. هذا الدليل مش مادة تدريب معتمدة ولا ضمان لنتيجة الامتحان.',
-  fullNote: 'مسودة مراجعة داخلية: الفصل الأول مقسّم حسب السيليبس، والفصول 2–5 لسا بشكلها القديم لحد ما تنراجع بدفعاتها.',
+  fullNote: 'الدليل الكامل: الفصول الخمسة بترتيب السيليبس، مع التمارين العملية وبطاقات المصطلحات. تقدّمك بينحفظ على هاد الجهاز.',
   searchHint: 'مثل: Tokens أو Hallucination',
   loPrefix: 'GenAI-',
   labPrefix: 'HO-',
@@ -59,7 +59,7 @@ export const CTFL = createGuide({
   syllabus: 'ISTQB® CTFL Syllabus v4.0.1',
   about:
     'شرح دراسي مستقل من Testing بالعربي، مبني على ISTQB® Certified Tester Foundation Level Syllabus v4.0.1 (15 سبتمبر 2024). حقوق السيليبس لـISTQB®. هذا الدليل مش مادة تدريب معتمدة ولا ضمان لنتيجة الامتحان.',
-  fullNote: 'نسخة مراجعة داخلية: الفصول الستة كاملة حسب السيليبس، مع الأدوات التفاعلية.',
+  fullNote: 'الدليل الكامل: الفصول الستة بترتيب السيليبس، مع الأدوات التفاعلية والتمارين. تقدّمك بينحفظ على هاد الجهاز.',
   searchHint: 'مثل: Boundary Value أو Regression',
   loPrefix: 'FL-',
   chapters: [

@@ -164,7 +164,7 @@ async function loadOrder(env: StoreEnv, token: string): Promise<Order | null> {
 }
 
 async function notifyOwner(env: StoreEnv, o: Order, ref: string, origin: string) {
-  const subject = `طلب جديد بانتظار المراجعة — ${o.id} (${o.amount_jod ?? o.amount} JOD)`;
+  const subject = `طلب جديد بانتظار المراجعة — ${o.id} (${o.amount_jod != null ? `${o.amount_jod} JOD` : `$${o.amount}`})`;
   const raw = [
     `From: Testing بالعربي <${MAIL_FROM}>`,
     `To: ${OWNER_TO}`,

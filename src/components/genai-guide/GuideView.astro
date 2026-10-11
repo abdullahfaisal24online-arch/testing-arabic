@@ -44,10 +44,10 @@ const title =
   kind === 'section' && page ? `${page.section} ${page.title} — دليل ${g.name}`
   : kind === 'chapter' && chapterMeta ? `Chapter ${chapterMeta.number}: ${chapterMeta.en} — دليل ${g.name}`
   : kind === 'glossary' ? `Glossary — دليل ${g.name}`
-  : view === 'full' ? `مسودة دليل ${g.name} الكامل`
+  : view === 'full' ? `دليل ${g.name} الكامل`
   : `معاينة دليل ${g.name}`;
 ---
-<Base title={title} description={`دليل Testing بالعربي لدراسة ${g.name} — مراجعة تحريرية.`} noindex hideChat>
+<Base title={title} description={`دليل Testing بالعربي لدراسة ${g.name}: شرح عربي مفصّل للسيليبس مع أمثلة وتمارين.`} noindex hideChat>
   <div class="gx" data-guide-view={view} data-guide-kind={kind} data-guide-slug={page?.slug} data-guide-key={g.storageKey(view)}>
     <GuideBar g={g} view={view} kind={kind} chapter={chapterNumber} page={page} buy={buy} />
     {kind === 'home' && <GuideHome g={g} view={view} buy={buy} />}
