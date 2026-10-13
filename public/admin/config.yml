@@ -171,7 +171,7 @@ collections:
         label: "صندوق «باختصار» — النص"
         widget: text
         required: false
-        hint: "جملتين أو ثلاثة بتجاوب مباشرة: شو الدورة، لمين، مجانية؟ كم مدتها؟ اكتب {lessons} لعدد الدروس و {duration} للمدة وبيتعبّوا تلقائياً. أدوات الذكاء الاصطناعي بتقتبس من هون."
+        hint: "جملتين أو ثلاثة بتجاوب مباشرة: شو الدورة، لمين، مجانية؟ كم مدتها؟ اكتب {lessons} لعدد الدروس و {duration} للمدة و {lessonList} لأسماء الدروس، وبيتعبّوا تلقائياً لما تضيف درس. أدوات الذكاء الاصطناعي بتقتبس من هون."
       - name: faqTitle
         label: "الأسئلة الشائعة — العنوان"
         widget: string
@@ -183,7 +183,7 @@ collections:
         widget: list
         required: false
         summary: "{{fields.q}}"
-        hint: "أسئلة بصيغة الناس. بالجواب بتقدر تكتب {lessons} و {duration}، ورابط بالشكل [النص](/start/)"
+        hint: "أسئلة بصيغة الناس. بالجواب بتقدر تكتب {lessons} و {duration} و {lessonList}، ورابط بالشكل [النص](/start/)"
         fields:
           - name: q
             label: "السؤال"
@@ -199,7 +199,17 @@ collections:
         date_format: "YYYY-MM-DD"
         time_format: false
         picker_utc: true
-        hint: "حدّثه لما تراجع الدورة أو تضيف درس — بيظهر بالصفحة وبيشوفه Google وأدوات الذكاء الاصطناعي"
+        hint: "حدّثه لما تراجع نصوص الدورة. لما تضيف درس جديد التاريخ بيتحدّث لحاله من تاريخ نشر الدرس — بيظهر بالصفحة وبيشوفه Google وأدوات الذكاء الاصطناعي"
+      - name: inProgress
+        label: "الدورة لسا عم تنضاف إلها دروس"
+        widget: boolean
+        default: false
+        hint: "شغّلها للدورات اللي لسا ما خلصت — بتظهر ملاحظة بصندوق «باختصار». طفّيها لما تخلص الدورة"
+      - name: inProgressNote
+        label: "نص ملاحظة «عم تنضاف دروس»"
+        widget: string
+        required: false
+        hint: "إذا فاضي بيطلع «الدورة لسا عم تنضاف إلها دروس جديدة»"
       - name: tags
         label: "الوسوم"
         widget: list

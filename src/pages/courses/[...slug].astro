@@ -32,12 +32,16 @@ const totalSeconds = sumSeconds(lessons.map((l) => l.data.duration));
 const totalLabel = durationLabel(totalSeconds);
 
 // GEO: صندوق «باختصار» + أسئلة شائعة + تاريخ آخر تحديث (كلها من لوحة التحكم)
-const facts = { lessons: lessons.length, seconds: totalSeconds };
+const facts = { lessons: lessons.length, seconds: totalSeconds, titles: lessons.map((l) => l.data.title) };
 const quickAnswer = data.quickAnswer ? fillFacts(data.quickAnswer, facts) : '';
 const faq = data.faq
   .filter((f) => f.q.trim() && f.a.trim())
   .map((f) => ({ q: fillFacts(f.q, facts), a: fillFacts(f.a, facts) }));
-const updated = data.updatedDate;
+// آخر تحديث = الأحدث بين تاريخ مراجعة الدورة (CMS) وتاريخ نشر/تحديث آخر درس — بيتحدّث لحاله لما ينضاف درس
+const lessonDates = lessons.map((l) => l.data.updatedDate ?? l.data.publishDate).filter(Boolean) as Date[];
+const updated = [data.updatedDate, ...lessonDates]
+  .filter((d): d is Date => d instanceof Date && !Number.isNaN(d.valueOf()))
+  .sort((x, y) => y.valueOf() - x.valueOf())[0];
 const updatedIso = updated ? updated.toISOString().slice(0, 10) : undefined;
 const updatedText = updated
   ? new Intl.DateTimeFormat('ar', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC', numberingSystem: 'latn' }).format(updated)
@@ -142,6 +146,7 @@ const jsonLd = [
       <div class="quick" id="quick-answer">
         <h2 class="quick-ttl">{data.quickAnswerTitle || 'باختصار'}</h2>
         <p class="quick-txt" set:html={inlineLinks(quickAnswer)} />
+        {data.inProgress && <p class="in-progress">{data.inProgressNote || 'الدورة لسا عم تنضاف إلها دروس جديدة'}</p>}
         {updatedIso && <p class="updated">آخر تحديث: <time datetime={updatedIso}>{updatedText}</time></p>}
       </div>
     </section>
@@ -309,6 +314,11 @@ const jsonLd = [
   .quick-txt { margin: 0; font-size: 17px; line-height: 1.9; color: var(--ink); }
   .quick-txt :global(a), .faq-a :global(a) { color: var(--cyan); }
   .updated { margin: 10px 0 0; font-size: 13px; color: var(--muted); }
+  .in-progress {
+    margin: 12px 0 0; display: inline-flex; align-items: center; gap: 8px;
+    font-size: 14px; color: var(--orange);
+  }
+  .in-progress::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--orange); flex: none; }
 
   /* الأسئلة الشائعة */
   .faq { margin-top: 36px; }

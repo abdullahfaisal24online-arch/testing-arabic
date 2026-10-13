@@ -114,6 +114,9 @@ const courses = defineCollection({
     ),
     // تاريخ آخر مراجعة لمحتوى الدورة — بيظهر بالصفحة وكـ dateModified
     updatedDate: optDate,
+    // الدورة لسا عم تنضاف إلها دروس — بتظهر ملاحظة بصندوق «باختصار»
+    inProgress: bool(false),
+    inProgressNote: optString,
     tags: strList,
     draft: bool(false),
   }),

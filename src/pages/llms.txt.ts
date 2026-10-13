@@ -57,7 +57,7 @@ export const GET: APIRoute = async ({ site: astroSite }) => {
   for (const c of [...courses].sort((a, b) => a.data.order - b.data.order)) {
     // إذا للدورة صندوق «باختصار» بنستعمله (جواب مباشر وفيه العدد والمدة)، وإلا الوصف
     const ls = lessons.filter((l) => (l.data.course ?? l.data.track) === c.id);
-    const facts = { lessons: ls.length, seconds: totalSeconds(ls.map((l) => l.data.duration)) };
+    const facts = { lessons: ls.length, seconds: totalSeconds(ls.map((l) => l.data.duration)), titles: [...ls].sort((x, y) => x.data.order - y.data.order).map((l) => l.data.title) };
     const desc = c.data.quickAnswer ? plainLinks(fillFacts(c.data.quickAnswer, facts)) : c.data.description;
     out.push(link(c.data.title, `/courses/${c.id}/`, desc, 420));
   }

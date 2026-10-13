@@ -15,8 +15,9 @@ export function durationLabel(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
   const mins = Math.round((seconds % 3600) / 60);
   const h = hours === 1 ? 'ساعة' : hours === 2 ? 'ساعتين' : hours <= 10 ? `${hours} ساعات` : `${hours} ساعة`;
-  if (hours === 0) return `${mins} دقيقة`;
-  return mins > 0 ? `${h} و${mins} دقيقة` : h;
+  if (hours === 0) return mins === 1 ? 'دقيقة' : mins === 2 ? 'دقيقتين' : mins <= 10 ? `${mins} دقائق` : `${mins} دقيقة`;
+  const m = mins === 1 ? 'دقيقة' : mins === 2 ? 'دقيقتين' : mins <= 10 ? `${mins} دقائق` : `${mins} دقيقة`;
+  return mins > 0 ? `${h} و${m}` : h;
 }
 
 /** عدد الدروس بصيغة عربية سليمة: درس واحد، درسين، 3 دروس، 11 درس */
@@ -27,10 +28,18 @@ export function lessonsLabel(n: number): string {
   return `${n} درس`;
 }
 
-export function fillFacts(text: string, facts: { lessons: number; seconds: number }): string {
+/** عناوين الدروس بقائمة عربية: «أ، ب، وج» — بدون الرموز التزيينية */
+export function lessonListLabel(titles: string[]): string {
+  const t = titles.map((x) => x.replace(/🔻/g, '').replace(/\s+/g, ' ').trim()).filter(Boolean);
+  if (t.length <= 1) return t.join('');
+  return `${t.slice(0, -1).join('، ')}، و${t[t.length - 1]}`;
+}
+
+export function fillFacts(text: string, facts: { lessons: number; seconds: number; titles?: string[] }): string {
   return (text || '')
     .replaceAll('{lessons}', lessonsLabel(facts.lessons))
-    .replaceAll('{duration}', durationLabel(facts.seconds));
+    .replaceAll('{duration}', durationLabel(facts.seconds))
+    .replaceAll('{lessonList}', lessonListLabel(facts.titles ?? []));
 }
 
 const esc = (s: string) =>

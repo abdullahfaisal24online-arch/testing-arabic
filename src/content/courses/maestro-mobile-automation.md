@@ -14,6 +14,20 @@ outcomes:
 prerequisites:
   - معرفة أساسية بمبادئ مفاهيم اختبار البرمجيات (QA & Software Testing)
   - أساسيات التعامل مع نظام التشغيل وسطر الأوامر (Terminal / Command Line)
+quickAnswer: 'دورة مجانية بالعربي لأتمتة اختبار تطبيقات الموبايل (Android و iOS) بأداة Maestro: بتكتب الاختبارات بملفات YAML بسيطة بدل كود معقّد، وبتشغّلها على الـ Emulator أو جهاز حقيقي. فيها هلأ {lessons} بالفيديو (حوالي {duration})، بدون تسجيل.'
+faq:
+- q: هل الدورة مجانية؟
+  a: آه، مجانية بالكامل وبدون تسجيل. كل الدروس مفتوحة للكل.
+- q: ليش Maestro مش Appium؟
+  a: 'Maestro أسهل بكثير للبداية: الاختبار بيتكتب بـ YAML بخطوات واضحة زي tapOn و inputText و assertVisible، وما بتحتاج تبني framework كامل. وهاد بيخليه مناسب للـ QA اللي بادئ بالأتمتة.'
+- q: بحتاج أعرف برمجة؟
+  a: مش لازم. الاختبارات بـ YAML وقريبة من خطوات الـ Test Case. بس بتحتاج فهم أساسي لاختبار البرمجيات، وتكون مرتاح شوي مع الـ Terminal للتثبيت.
+- q: شو بتغطي الدورة لحد هلأ؟
+  a: '{lessons} لحد هلأ (حوالي {duration}): {lessonList}. وعم تنضاف دروس جديدة.'
+- q: بشتغل على iOS ولا Android؟
+  a: الاثنين. للـ Android بتشغّل الاختبارات على Emulator أو جهاز حقيقي، وللـ iOS بتحتاج جهاز Mac عليه Xcode عشان الـ Simulator.
+inProgress: true
+updatedDate: 2026-10-13
 tags:
   - Maestro
   - Mobile Automation
