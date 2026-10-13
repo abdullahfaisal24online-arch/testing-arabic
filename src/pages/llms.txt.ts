@@ -6,6 +6,7 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { getSite } from '../lib/site';
+import { totalSeconds, fillFacts, plainLinks } from '../lib/courseFacts';
 
 const clean = (s = '') => s.replace(/\s+/g, ' ').replace(/[\[\]]/g, '').trim();
 const cut = (s = '', n = 170) => {
@@ -27,8 +28,8 @@ export const GET: APIRoute = async ({ site: astroSite }) => {
     getCollection('resources').then(live),
   ]);
 
-  const link = (title: string, path: string, desc?: string) =>
-    `- [${clean(title)}](${base}${path})${desc ? `: ${cut(desc)}` : ''}`;
+  const link = (title: string, path: string, desc?: string, max = 170) =>
+    `- [${clean(title)}](${base}${path})${desc ? `: ${cut(desc, max)}` : ''}`;
 
   const out: string[] = [];
   out.push(`# ${site.name} (Testing Arabic)`);
@@ -42,7 +43,7 @@ export const GET: APIRoute = async ({ site: astroSite }) => {
   );
   out.push('');
   out.push('- اللغة: العربية (مع مصطلحات إنجليزية)');
-  out.push('- المحتوى: مجاني، بدون تسجيل');
+  out.push('- المحتوى: كل الدورات والدروس والمقالات وأسئلة المقابلات والأدوات مجانية بالكامل، بدون تسجيل وبدون اشتراك');
   out.push(`- الموقع: ${base}`);
   if (site.linkedin) out.push(`- المؤسس على LinkedIn: ${site.linkedin}`);
   out.push('');
@@ -54,7 +55,11 @@ export const GET: APIRoute = async ({ site: astroSite }) => {
 
   out.push('## الدورات');
   for (const c of [...courses].sort((a, b) => a.data.order - b.data.order)) {
-    out.push(link(c.data.title, `/courses/${c.id}/`, c.data.description));
+    // إذا للدورة صندوق «باختصار» بنستعمله (جواب مباشر وفيه العدد والمدة)، وإلا الوصف
+    const ls = lessons.filter((l) => (l.data.course ?? l.data.track) === c.id);
+    const facts = { lessons: ls.length, seconds: totalSeconds(ls.map((l) => l.data.duration)) };
+    const desc = c.data.quickAnswer ? plainLinks(fillFacts(c.data.quickAnswer, facts)) : c.data.description;
+    out.push(link(c.data.title, `/courses/${c.id}/`, desc, 420));
   }
   out.push('');
 

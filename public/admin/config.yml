@@ -162,6 +162,44 @@ collections:
         label: "متطلبات سابقة"
         widget: list
         required: false
+      - name: quickAnswerTitle
+        label: "صندوق «باختصار» — العنوان"
+        widget: string
+        required: false
+        hint: "إذا فاضي بيطلع «باختصار»"
+      - name: quickAnswer
+        label: "صندوق «باختصار» — النص"
+        widget: text
+        required: false
+        hint: "جملتين أو ثلاثة بتجاوب مباشرة: شو الدورة، لمين، مجانية؟ كم مدتها؟ اكتب {lessons} لعدد الدروس و {duration} للمدة وبيتعبّوا تلقائياً. أدوات الذكاء الاصطناعي بتقتبس من هون."
+      - name: faqTitle
+        label: "الأسئلة الشائعة — العنوان"
+        widget: string
+        required: false
+        hint: "إذا فاضي بيطلع «أسئلة شائعة عن الدورة»"
+      - name: faq
+        label: "الأسئلة الشائعة"
+        label_singular: "سؤال"
+        widget: list
+        required: false
+        summary: "{{fields.q}}"
+        hint: "أسئلة بصيغة الناس. بالجواب بتقدر تكتب {lessons} و {duration}، ورابط بالشكل [النص](/start/)"
+        fields:
+          - name: q
+            label: "السؤال"
+            widget: string
+          - name: a
+            label: "الجواب"
+            widget: text
+      - name: updatedDate
+        label: "آخر تحديث لمحتوى الدورة"
+        widget: datetime
+        required: false
+        format: "YYYY-MM-DD"
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        picker_utc: true
+        hint: "حدّثه لما تراجع الدورة أو تضيف درس — بيظهر بالصفحة وبيشوفه Google وأدوات الذكاء الاصطناعي"
       - name: tags
         label: "الوسوم"
         widget: list

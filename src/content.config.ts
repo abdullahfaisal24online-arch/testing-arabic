@@ -102,6 +102,18 @@ const courses = defineCollection({
     outcomes: strList,
     // متطلبات سابقة قبل البدء
     prerequisites: strList,
+    // صندوق «باختصار» بأول الصفحة — جواب مباشر لأدوات الذكاء الاصطناعي ومحركات البحث (GEO)
+    // بيقبل {lessons} و {duration} وبيتعبّوا تلقائياً من دروس الدورة
+    quickAnswerTitle: optString,
+    quickAnswer: optString,
+    // أسئلة شائعة عن الدورة — بتظهر بالصفحة وكـ FAQPage بالـ JSON-LD
+    faqTitle: optString,
+    faq: z.preprocess(
+      fallback([]),
+      z.array(z.object({ q: str(''), a: str('') })),
+    ),
+    // تاريخ آخر مراجعة لمحتوى الدورة — بيظهر بالصفحة وكـ dateModified
+    updatedDate: optDate,
     tags: strList,
     draft: bool(false),
   }),
