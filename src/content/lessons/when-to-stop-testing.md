@@ -11,7 +11,7 @@ videoId: 65e1c5ef-09de-4cfe-9ff2-3fac65ffc03f
 youtubeUrl: ''
 thumbnail: /uploads/stop-testing.png
 course: qa-fundamentals-and-practical-skills
-order: 9
+order: 10
 lessonType: شرح
 tags:
   - Software Testing

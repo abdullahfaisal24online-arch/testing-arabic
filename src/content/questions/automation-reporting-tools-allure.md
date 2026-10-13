@@ -1,5 +1,5 @@
 ---
-title: شو أدوات التقرير (Reporting Tools) اللي بتربطها مع سكريبتات الأتمتة بالـ Selenium أو Playwright؟
+title: شو أدوات التقرير (Reporting Tools) اللي بتربطها مع الـ automation scripts بالـ Selenium أو Playwright؟
 slug: automation-reporting-tools-allure
 level: متوسط
 domain: أدوات

@@ -2,7 +2,7 @@
 title: Appium
 slug: appium
 termEn: Appium
-description: "أداة مفتوحة المصدر لأتمتة تطبيقات الموبايل على Android و iOS بنفس السكربت."
+description: "أداة مفتوحة المصدر لأتمتة تطبيقات الموبايل على Android و iOS بنفس الـ script."
 category: أتمتة
 aliases:
   - Appium

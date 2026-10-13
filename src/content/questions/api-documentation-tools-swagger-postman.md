@@ -3,7 +3,7 @@ title: شو الأداة اللي بتستخدمها لفحص وتجربة ال�
 slug: api-documentation-tools-swagger-postman
 level: مبتدئ
 domain: أدوات
-shortAnswer: بنستخدم Swagger UI (OpenAPI) لقراءة وثائق الـ API وتجربة الطلبات المباشرة، إضافة لـ Postman أو Insomnia لتنفيذ اختبارات متقدمة وأتمتة السكريبتات.
+shortAnswer: بنستخدم Swagger UI (OpenAPI) لقراءة وثائق الـ API وتجربة الطلبات المباشرة، إضافة لـ Postman أو Insomnia لتنفيذ اختبارات متقدمة وأتمتة الـ scripts.
 tags:
   - API Tools
   - Postman
@@ -16,5 +16,5 @@ draft: false
 - **ليش بينسأل؟** لمعرفة كيفية استلامك لمتطلبات الـ Backend والتأكد من إلمامك بأدوات الـ API Documentation.
 - **الجواب النموذجي:**
     - **Swagger UI:** توثيق تفاعلي يتيح للـ QA معرفة الـ Endpoints، المجموعات المتاحة، والـ Request/Response Schemas مباشرة.
-    - **Postman / Insomnia:** تتيح إنشاء البيئات (Environments)، تنظيم الـ Collections، وكتابة سكريبتات التأكيد التلقائية (Assertions).
+    - **Postman / Insomnia:** تتيح إنشاء البيئات (Environments)، تنظيم الـ Collections، وكتابة scripts التأكيد التلقائية (Assertions).
 - **الفخ الشائع:** اعتماد السلوك دون مراجعة الـ Schema الواردة بالـ Swagger.

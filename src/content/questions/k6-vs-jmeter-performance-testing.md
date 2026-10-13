@@ -3,7 +3,7 @@ title: شو هي أداة k6، وكيف بتفرق عن JMeter لاختبار ا
 slug: k6-vs-jmeter-performance-testing
 level: متقدّم
 domain: أدوات
-shortAnswer: k6 أداة حديثة لاختبار الأداء مكتوبة بـ Go وتُكتب السكريبتات فيها بـ JavaScript، تتميز بكونها خفيفة جداً، أسرع بالـ CI/CD، وتعتمد على الكود (Code-based) بدلاً من الـ GUI.
+shortAnswer: k6 أداة حديثة لاختبار الأداء مكتوبة بـ Go وتُكتب الـ scripts فيها بـ JavaScript، تتميز بكونها خفيفة جداً، أسرع بالـ CI/CD، وتعتمد على الكود (Code-based) بدلاً من الـ GUI.
 tags:
   - Developer-centric
   - Performance Testing

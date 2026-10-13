@@ -1,7 +1,7 @@
 ---
 title: إدارة الطلبات المتقدمة باستخدام Collections و كتابة الاختبارات بـ Scripts
 slug: postman-collections-tests-and-scripts
-description: تعلم كيفية تنظيم طلبات API داخل مجموعات (Collections)، وكتابة السكريبتات الآلية (Tests Scripts) في Postman لاختبار استجابة السيرفر وتأكيد الـ Status Code والـ Response Body تلقائياً.
+description: تعلم كيفية تنظيم طلبات API داخل مجموعات (Collections)، وكتابة الـ scripts الآلية (Tests Scripts) في Postman لاختبار استجابة السيرفر وتأكيد الـ Status Code والـ Response Body تلقائياً.
 publishDate: 2026-09-12
 updatedDate: ''
 category: أدوات
@@ -34,13 +34,13 @@ appUsed: Postman Desktop App
 exerciseTitle: أنشئ Collection متكاملة واكتب اختبارات آلية للتحقق من استجابات السيرفر
 exercise:
   - أنشئ Collection جديدة باسم "JSON Server Automated Tests".
-  - أضف طلب GET لجلب كافة التدوينات، واكتب سكريبت اختبار للتأكد من أن رمز الاستجابة هو 200 OK وأن زمن الاستجابة أقل من 500ms.
+  - أضف طلب GET لجلب كافة التدوينات، واكتب test script للتأكد من أن رمز الاستجابة هو 200 OK وأن زمن الاستجابة أقل من 500ms.
   - أضف طلب POST لإضافة عنصر جديد واكتب اختباراً للتأكد من رجوع رمز الاستجابة 201 Created وأن العنصر يحتوي على ID.
   - استخدم الـ Collection Runner لتشغيل كل الاختبارات دفعة واحدة ومراجعة التقرير المجمع.
-exerciseNote: يمكنك اختيار النماذج الجاهزة لسكريبتات الاختبار (Snippets) الموجودة على الجانب الأيمن من تبويب Tests في برنامج Postman للتسهيل عليك.
+exerciseNote: يمكنك اختيار النماذج الجاهزة لـ test scripts (Snippets) الموجودة على الجانب الأيمن من تبويب Tests في برنامج Postman للتسهيل عليك.
 solution:
-  - افتح تبويب Tests في طلب GET وأضف السكريبت التلقائي للتحقق من Status Code 200 وزمن Response Time.
-  - افتح تبويب Tests في طلب POST وأضف السكريبت الخاص بالتحقق من الحقول في الـ Response Body.
+  - افتح تبويب Tests في طلب GET وأضف الـ script التلقائي للتحقق من Status Code 200 وزمن Response Time.
+  - افتح تبويب Tests في طلب POST وأضف الـ script الخاص بالتحقق من الحقول في الـ Response Body.
   - اضغط على الخيارات الخاصة بـ Collection واختر Run Collection لمشاهدة النتائج (Pass / Fail).
 solutionCode: |-
   // Test 1: Check Status Code is 200 OK
@@ -89,13 +89,13 @@ draft: false
 
 #### أ. Pre-request Script
 
-\* يُنفذ هذا السكريبت \*\*قبل\*\* إرسال طلب الـ HTTP للسيرفر.
+\* يُنفذ هذا الـ script \*\*قبل\*\* إرسال طلب الـ HTTP للسيرفر.
 
 \* يُستخدم عادة في تجهيز البيانات، أو توليد تواريخ عشوائية، أو حساب توقيعات أمان (Signatures/Tokens).
 
 #### ب. Tests Script
 
-\* يُنفذ هذا السكريبت \*\*بعد\*\* وصول الاستجابة (Response) من السيرفر.
+\* يُنفذ هذا الـ script \*\*بعد\*\* وصول الاستجابة (Response) من السيرفر.
 
 \* يُستخدم بكثرة للتحقق من:
 

@@ -3,7 +3,7 @@ title: كيف بتتصرف لو اتهم المطورون أو الإدارة ف
 slug: qa-as-a-bottleneck-resolution
 level: متقدّم
 domain: سلوكي
-shortAnswer: بحلل أسباب التراكم (مثل وصول المهام بآخر أيام السبرنت)، وبقترح حلول عملية مثل Shift-Left، تحسين الـ Automation، أو أتمتة الـ Sanity Tests لتحسين الـ Velocity.
+shortAnswer: بحلل أسباب التراكم (مثل وصول المهام بآخر أيام الـ sprint)، وبقترح حلول عملية مثل Shift-Left، تحسين الـ Automation، أو أتمتة الـ Sanity Tests لتحسين الـ Velocity.
 tags:
   - Communication
   - Agile

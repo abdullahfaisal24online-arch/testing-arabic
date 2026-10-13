@@ -3,7 +3,7 @@ title: شو يعني JQL (Jira Query Language) وكيف بتستخدمها كـ 
 slug: jira-query-language-jql-for-qa
 level: متوسط
 domain: أدوات
-shortAnswer: JQL هي لغة استعلام مخصصة في Jira تُستخدم للبحث المتقدم وتصفية التيكتس حسب شروط معينة مثل حالة الـ Bugs المفتوحة، الأولوية، أو الـ Sprint الحالي.
+shortAnswer: JQL هي لغة استعلام مخصصة في Jira تُستخدم للبحث المتقدم وتصفية الـ tickets حسب شروط معينة مثل حالة الـ Bugs المفتوحة، الأولوية، أو الـ Sprint الحالي.
 tags:
   - Tools
   - Reporting
