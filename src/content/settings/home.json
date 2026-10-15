@@ -5,8 +5,8 @@
   "heroSubtitle": "مسارك المتكامل للبدء من الصفر حتى مرحلة الممارسة العملية والتطبيق.",
   "primaryCtaLabel": "استكشف الدورات",
   "primaryCtaHref": "/courses/",
-  "secondaryCtaLabel": "تصفّح الدروس",
-  "secondaryCtaHref": "/lessons/",
+  "secondaryCtaLabel": "تصفّح الدورات",
+  "secondaryCtaHref": "/courses/",
   "showStats": true,
   "statsStyle": "قيم",
   "values": [
