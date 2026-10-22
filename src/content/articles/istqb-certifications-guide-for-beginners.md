@@ -40,15 +40,7 @@ draft: false
 
 تنقسم شهادات ISTQB إلى **ثلاثة مستويات رئيسية**:
 
-```plain
-                 [ Core Stream ]       [ Agile Stream ]       [ Specialist Stream ]
-                        |                     |                        |
-Advanced Level  --->  (TA / TTA / TM)     (Agile Technical)    (Security / Automation / Mobile...)
-                        ^                     ^                        ^
-                        |                     |                        |
-Foundation Level --->  ==================== CTFL ====================
-
-```
+<figure class="dg" role="img" aria-label="مسارات شهادات ISTQB: المستوى التأسيسي CTFL ثم مسارات Advanced Level الثلاثة"><div class="dg-box dg-root o"><b class="en">Foundation Level · CTFL</b><span>المستوى التأسيسي</span></div><div class="dg-split" style="--n:3" aria-hidden="true"><i></i><i></i><i></i></div><div class="dg-cols" style="--n:3;--nm:1"><div class="dg-box dg-card"><b class="en">Core Stream</b><span>المسار الأساسي</span><ul><li>TA</li><li>TTA</li><li>TM</li></ul></div><div class="dg-box dg-card"><b class="en">Agile Stream</b><span>مسار Agile</span><ul><li>Agile Technical</li></ul></div><div class="dg-box dg-card"><b class="en">Specialist Stream</b><span>المسار التخصصي</span><ul><li>Security</li><li>Automation</li><li><span class="en">Mobile…</span></li></ul></div></div><p class="dg-cap"><span class="en">Advanced Level</span> · المستوى المتقدم</p></figure>
 
 ## 1. المستوى الأساسي (Foundation Level) — المحطة الأولى لكل مبتدئ
 
@@ -103,10 +95,7 @@ Foundation Level --->  ==================== CTFL ====================
 
 إذا كنت تبدأ من الصفر، اتبع هذه الخطوات بالترتيب لتضمن أقصى استفادة:
 
-```plain
-[الخطوة 1: دراسة مفاهيم CTFL] ➔ [الخطوة 2: تطبيق عملي على مشاريع حقيقية] ➔ [الخطوة 3: تقديم امتحان CTFL] ➔ [الخطوة 4: تحديد التخصص (Agile / Automation / Manual)]
-
-```
+<figure class="dg" role="img" aria-label="خطوات الحصول على شهادة ISTQB"><div class="dg-flow"><div class="dg-box dg-step"><em>1</em><div><b>دراسة مفاهيم CTFL</b></div></div><div class="dg-box dg-step"><em>2</em><div><b>تطبيق عملي على مشاريع حقيقية</b></div></div><div class="dg-box dg-step"><em>3</em><div><b>تقديم امتحان CTFL</b></div></div><div class="dg-box dg-step"><em>4</em><div><b>تحديد التخصص</b><span class="en">Agile / Automation / Manual</span></div></div></div></figure>
 
 1. **ابدأ بدراسة منهج CTFL (الإصدار الأخير CTFL v4.0):** اقرأ كتاب المنهج الرسمي (Syllabus) أو تابع دورات تشرحه باللغة العربية.
 2. **اربط النظري بالعملي:** لا تكتفِ بالحفظ! طبق تقنيات كتابة حالات الاختبار (Boundary Value Analysis, Equivalence Partitioning) على تطبيقات حقيقية.

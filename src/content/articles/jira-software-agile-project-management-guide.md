@@ -62,14 +62,7 @@ draft: false
 
 تدعم جيرا تطبيق منهجيتين رئيسيتين للأجايل:
 
-```plain
-[إدارة المشاريع في Jira]
-       │
-       ├──► [لوحة Scrum] ───► تعتمد على الـ Sprints والزمن المحدد (2-4 أسابيع)
-       │
-       └──► [لوحة Kanban] ──► تعتمد على التدفق المستمر والحد من المهام الحالية (WIP Limits)
-
-```
+<figure class="dg" role="img" aria-label="إدارة المشاريع في Jira: لوحة Scrum ولوحة Kanban"><div class="dg-box dg-root"><b>إدارة المشاريع في Jira</b></div><div class="dg-split" style="--n:2" aria-hidden="true"><i></i><i></i></div><div class="dg-cols" style="--n:2;--nm:1"><div class="dg-box dg-card"><b class="en">Scrum Board</b><span>لوحة Scrum</span><ul><li>تعتمد على الـ Sprints والزمن المحدد (2-4 أسابيع)</li></ul></div><div class="dg-box dg-card o"><b class="en">Kanban Board</b><span>لوحة Kanban</span><ul><li>تعتمد على التدفق المستمر والحد من المهام الحالية (WIP Limits)</li></ul></div></div></figure>
 
 ### أولاً: نظام Scrum
 

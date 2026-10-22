@@ -72,16 +72,7 @@ test('user can log in with valid credentials', async ({ page }) => {
 
 أكبر غلط بيقع فيه الفريق: يفكر إنه «أتمتة» = «UI scripts». الواقع إنه في ثلاث طبقات، وكل طبقة إلها تكلفة وسرعة مختلفة.
 
-```plain
-        /\
-       /  \      UI Tests        ← بطيئة، غالية، هشّة   (10%)
-      /----\
-     /      \    API Tests       ← سريعة، مستقرة        (20-30%)
-    /--------\
-   /          \  Unit Tests      ← أسرع شي، أرخص شي     (60-70%)
-  /____________\
-
-```
+<figure class="dg" role="img" aria-label="هرم الاختبارات: Unit Tests في القاعدة ثم API Tests ثم UI Tests في القمة"><div class="dg-pyr"><div class="dg-box o" style="--w:44%"><b class="en">UI Tests</b><span>بطيئة، غالية، هشّة</span><em>10%</em></div><div class="dg-box" style="--w:72%;--c:var(--cyan-bright,#7dd3fc)"><b class="en">API Tests</b><span>سريعة، مستقرة</span><em>20–30%</em></div><div class="dg-box" style="--w:100%"><b class="en">Unit Tests</b><span>أسرع شي، أرخص شي</span><em>60–70%</em></div></div></figure>
 
 **القاعدة العملية:** أي شي بتقدر تختبره على مستوى أدنى، لا تختبره على مستوى أعلى.
 

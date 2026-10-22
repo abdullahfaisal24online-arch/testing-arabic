@@ -35,15 +35,7 @@ draft: false
 
 لا يقتصر اختبار الأداء على إرسال طلبات مكثفة فقط، بل ينقسم إلى عدة أنواع متخصصة يجيب كل منها عن سؤال تقني محدد:
 
-```plain
-[أنواع اختبارات الأداء]
-  │
-  ├──► Load Testing ──────► هل يتحمل النظام العدد المتوقع من المستخدمين؟
-  ├──► Stress Testing ────► أين تقع نقطة الانهيار (Break Point) وكيف يتصرف بعدها؟
-  ├──► Spike Testing ─────► كيف يتعامل النظام مع الارتفاع المفاجئ والسريع في الترافيك؟
-  └──► Endurance Testing ─► هل يستطيع النظام الصمود تحت حمل ثابت لفترات طويلة؟
-
-```
+<figure class="dg" role="img" aria-label="أنواع اختبارات الأداء: Load وStress وSpike وEndurance والسؤال الذي يجيب عنه كل نوع"><div class="dg-box dg-root"><b>أنواع اختبارات الأداء</b></div><div class="dg-stem" aria-hidden="true"></div><div class="dg-cols" style="--n:2;--nm:1"><div class="dg-box dg-card"><b class="en">Load Testing</b><p class="dg-q">هل يتحمل النظام العدد المتوقع من المستخدمين؟</p></div><div class="dg-box dg-card"><b class="en">Stress Testing</b><p class="dg-q">أين تقع نقطة الانهيار (Break Point) وكيف يتصرف بعدها؟</p></div><div class="dg-box dg-card"><b class="en">Spike Testing</b><p class="dg-q">كيف يتعامل النظام مع الارتفاع المفاجئ والسريع في الترافيك؟</p></div><div class="dg-box dg-card"><b class="en">Endurance Testing</b><p class="dg-q">هل يستطيع النظام الصمود تحت حمل ثابت لفترات طويلة؟</p></div></div></figure>
 
 ### أ. اختبار الحمل (Load Testing)
 
@@ -75,10 +67,7 @@ draft: false
 
 ## 3. خطة عمل تنفيذ اختبار الأداء (Step-by-Step Roadmap)
 
-```plain
-[1. تحديد البيئة والمعايير] ➔ [2. تحديد السيناريوهات الحرج] ➔ [3. كتابة الـ scripts] ➔ [4. التنفيذ والقياس] ➔ [5. التحليل والتقرير]
-
-```
+<figure class="dg" role="img" aria-label="خطوات تنفيذ اختبار الأداء"><div class="dg-flow"><div class="dg-box dg-step"><em>1</em><div><b>تحديد البيئة والمعايير</b></div></div><div class="dg-box dg-step"><em>2</em><div><b>تحديد السيناريوهات الحرجة</b></div></div><div class="dg-box dg-step"><em>3</em><div><b>كتابة الـ scripts</b></div></div><div class="dg-box dg-step"><em>4</em><div><b>التنفيذ والقياس</b></div></div><div class="dg-box dg-step"><em>5</em><div><b>التحليل والتقرير</b></div></div></div></figure>
 
 1. **تحديد البيئة والمعايير (NFRs):** تحديد زمن الاستجابة المقبول (مثلاً ألا يتجاوز Response Time نسبة 200ms لـ 95% من الطلبات).
 2. **تحديد السيناريوهات الحرجة:** عدم فحص كل الأجزاء، بل التركيز على العمليات الأكثر استهلاكاً للموارد (مثل البحث، إنشاء حساب جديد، وإتمام الدفع).

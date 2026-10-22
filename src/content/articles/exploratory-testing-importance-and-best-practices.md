@@ -45,10 +45,7 @@ draft: false
 
 لكي لا تتحول جلسة الاختبار إلى إهدار للوقت، يجب اتباع ممارسات هيكلية ذكية:
 
-```plain
-[1. تحديد هدف الجلسة Charter] ➔ [2. تحديد النطاق والوقت Time-box] ➔ [3. الاستكشاف والتسجيل] ➔ [4. المراجعة والتقرير]
-
-```
+<figure class="dg" role="img" aria-label="خطوات جلسة الاختبار الاستكشافي"><div class="dg-flow"><div class="dg-box dg-step"><em>1</em><div><b>تحديد هدف الجلسة</b><span class="en">Charter</span></div></div><div class="dg-box dg-step"><em>2</em><div><b>تحديد النطاق والوقت</b><span class="en">Time-box</span></div></div><div class="dg-box dg-step"><em>3</em><div><b>الاستكشاف والتسجيل</b></div></div><div class="dg-box dg-step"><em>4</em><div><b>المراجعة والتقرير</b></div></div></div></figure>
 
 ### 1. استخدم M charters (وثائق التوجيه)
 
