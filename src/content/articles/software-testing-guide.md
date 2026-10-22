@@ -68,49 +68,7 @@ draft: false
 
 لفهم عملية الاختبار، يمكن تصورها كسلسلة من الخطوات تبدأ بفهم ما يجب أن يفعله النظام، وتنتهي بتقييم النتائج وتوثيق المخاطر.
 
-```plain
-+--------------------------------------+
-|       Software Requirements          |
-|          متطلبات البرمجيات           |
-+--------------------------------------+
-                  |
-                  v
-+--------------------------------------+
-|        Test Planning & Design        |
-|       تخطيط وتصميم الاختبارات        |
-+--------------------------------------+
-                  |
-                  v
-+--------------------------------------+
-|          Test Execution              |
-|           تنفيذ الاختبارات            |
-+--------------------------------------+
-                  |
-                  v
-+--------------------------------------+
-|       Compare Expected vs Actual     |
-|     مقارنة النتائج المتوقعة والفعلية  |
-+--------------------------------------+
-                  |
-                  v
-+--------------------------------------+
-|       Defect Reporting & Analysis    |
-|        تسجيل الـ defects وتحليلها          |
-+--------------------------------------+
-                  |
-                  v
-+--------------------------------------+
-|       Retesting & Regression         |
-|      إعادة الاختبار واختبار التراجع   |
-+--------------------------------------+
-                  |
-                  v
-+--------------------------------------+
-|       Test Summary & Quality Info    |
-|      ملخص الاختبار ومعلومات الجودة    |
-+--------------------------------------+
-
-```
+<figure class="dg" role="img" aria-label="مراحل عملية اختبار البرمجيات من المتطلبات إلى ملخص الجودة"><div class="dg-flow"><div class="dg-box dg-step"><em>1</em><div><b class="en">Software Requirements</b><span>متطلبات البرمجيات</span></div></div><div class="dg-box dg-step"><em>2</em><div><b class="en">Test Planning & Design</b><span>تخطيط وتصميم الاختبارات</span></div></div><div class="dg-box dg-step"><em>3</em><div><b class="en">Test Execution</b><span>تنفيذ الاختبارات</span></div></div><div class="dg-box dg-step"><em>4</em><div><b class="en">Compare Expected vs Actual</b><span>مقارنة النتائج المتوقعة والفعلية</span></div></div><div class="dg-box dg-step"><em>5</em><div><b class="en">Defect Reporting & Analysis</b><span>تسجيل الـ defects وتحليلها</span></div></div><div class="dg-box dg-step"><em>6</em><div><b class="en">Retesting & Regression</b><span>إعادة الاختبار واختبار التراجع</span></div></div><div class="dg-box dg-step"><em>7</em><div><b class="en">Test Summary & Quality Info</b><span>ملخص الاختبار ومعلومات الجودة</span></div></div></div></figure>
 
 ### شرح مراحل عملية الاختبار
 
@@ -213,28 +171,7 @@ draft: false
 
 ### مخطط يوضح الفرق بين Verification وValidation
 
-```plain
-                  +----------------------+
-                  |   Software Quality   |
-                  |       جودة المنتج    |
-                  +----------------------+
-                             |
-             +---------------+---------------+
-             |                               |
-             v                               v
-+--------------------------+    +--------------------------+
-|       Verification       |    |        Validation        |
-|          التحقق          |    |       إثبات الصلاحية     |
-+--------------------------+    +--------------------------+
-| هل نبني المنتج بطريقة    |    | هل نبني المنتج الصحيح    |
-| صحيحة؟                   |    | الذي يحتاجه المستخدم؟   |
-+--------------------------+    +--------------------------+
-| مراجعة المتطلبات         |    | اختبار الاستخدام         |
-| مراجعة التصميم والكود    |    | اختبار القبول            |
-| فحص المواصفات            |    | تقييم ملاءمة المنتج      |
-+--------------------------+    +--------------------------+
-
-```
+<figure class="dg" role="img" aria-label="جودة المنتج تتفرع إلى Verification وValidation"><div class="dg-box dg-root"><b class="en">Software Quality</b><span>جودة المنتج</span></div><div class="dg-split" style="--n:2" aria-hidden="true"><i></i><i></i></div><div class="dg-cols" style="--n:2;--nm:1"><div class="dg-box dg-card"><b class="en">Verification</b><span>التحقق</span><p class="dg-q">هل نبني المنتج بطريقة صحيحة؟</p><ul><li>مراجعة المتطلبات</li><li>مراجعة التصميم والكود</li><li>فحص المواصفات</li></ul></div><div class="dg-box dg-card o"><b class="en">Validation</b><span>إثبات الصلاحية</span><p class="dg-q">هل نبني المنتج الصحيح الذي يحتاجه المستخدم؟</p><ul><li>اختبار الاستخدام</li><li>اختبار القبول</li><li>تقييم ملاءمة المنتج</li></ul></div></div></figure>
 
 ### مقارنة مختصرة
 
@@ -291,31 +228,7 @@ draft: false
 
 تُقسم مستويات الاختبار عادةً إلى أربع فئات رئيسية، تبدأ من اختبار المكونات الصغيرة، وتصل إلى تقييم النظام من منظور المستخدم والأعمال.
 
-```plain
-+------------------------------------------+
-|          Levels of Software Testing      |
-|            مستويات اختبار البرمجيات      |
-+------------------------------------------+
-                     |
-                     v
-+------------------+-----------------------+
-|                  |                       |
-v                  v                       v
-+------------+ +-------------+ +----------------+
-| Unit       | | Integration | | System         |
-| Testing    | | Testing     | | Testing        |
-| اختبار     | | اختبار      | | اختبار         |
-| الوحدة     | | التكامل     | | النظام         |
-+------------+ +-------------+ +----------------+
-                                      |
-                                      v
-                              +----------------+
-                              | Acceptance     |
-                              | Testing        |
-                              | اختبار القبول  |
-                              +----------------+
-
-```
+<figure class="dg" role="img" aria-label="مستويات اختبار البرمجيات الأربعة بالترتيب"><div class="dg-box dg-root"><b class="en">Levels of Software Testing</b><span>مستويات اختبار البرمجيات</span></div><div class="dg-split" style="--n:4" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="dg-cols" style="--n:4;--nm:2"><div class="dg-box dg-card"><em>1</em><b class="en">Unit Testing</b><span>اختبار الوحدة</span></div><div class="dg-box dg-card"><em>2</em><b class="en">Integration Testing</b><span>اختبار التكامل</span></div><div class="dg-box dg-card"><em>3</em><b class="en">System Testing</b><span>اختبار النظام</span></div><div class="dg-box dg-card o"><em>4</em><b class="en">Acceptance Testing</b><span>اختبار القبول</span></div></div></figure>
 
 ### 1. اختبار الوحدة (Unit Testing)
 
@@ -361,43 +274,7 @@ v                  v                       v
 
 عند الضغط على زر الدفع، قد تحدث الخطوات التالية:
 
-```plain
-+----------------------+
-| User clicks Pay      |
-| المستخدم يضغط دفع    |
-+----------------------+
-           |
-           v
-+----------------------+
-| Validate Cart        |
-| التحقق من السلة      |
-+----------------------+
-           |
-           v
-+----------------------+
-| Create Payment       |
-| إنشاء عملية الدفع    |
-+----------------------+
-           |
-           v
-+----------------------+
-| Payment Gateway      |
-| بوابة الدفع          |
-+----------------------+
-           |
-           v
-+----------------------+
-| Update Order Status  |
-| تحديث حالة الطلب     |
-+----------------------+
-           |
-           v
-+----------------------+
-| Send Confirmation    |
-| إرسال التأكيد        |
-+----------------------+
-
-```
+<figure class="dg" role="img" aria-label="مسار عملية الدفع من ضغط زر الدفع حتى إرسال التأكيد"><div class="dg-flow"><div class="dg-box dg-step"><em>1</em><div><b class="en">User clicks Pay</b><span>المستخدم يضغط دفع</span></div></div><div class="dg-box dg-step"><em>2</em><div><b class="en">Validate Cart</b><span>التحقق من السلة</span></div></div><div class="dg-box dg-step"><em>3</em><div><b class="en">Create Payment</b><span>إنشاء عملية الدفع</span></div></div><div class="dg-box dg-step o"><em>4</em><div><b class="en">Payment Gateway</b><span>بوابة الدفع</span></div></div><div class="dg-box dg-step"><em>5</em><div><b class="en">Update Order Status</b><span>تحديث حالة الطلب</span></div></div><div class="dg-box dg-step"><em>6</em><div><b class="en">Send Confirmation</b><span>إرسال التأكيد</span></div></div></div></figure>
 
 قد تعمل كل خدمة بصورة صحيحة منفردة، لكن المشكلة تظهر عند الربط بينها. فمثلاً، قد تنجح عملية الدفع لدى المزود الخارجي، بينما لا يتم تحديث حالة الطلب داخل المتجر.
 
@@ -449,24 +326,7 @@ v                  v                       v
 
 من التصنيفات المهمة في Software Testing تقسيم الاختبارات بناءً على مقدار المعرفة التي يمتلكها المختبر عن البنية الداخلية للنظام.
 
-```plain
-                 +---------------------------+
-                 |     Software Testing     |
-                 |      أنواع الاختبار       |
-                 +---------------------------+
-                              |
-          +-------------------+-------------------+
-          |                   |                   |
-          v                   v                   v
-+----------------+  +----------------+  +----------------+
-| Black Box      |  | Gray Box       |  | White Box      |
-| الصندوق الأسود |  | الصندوق الرمادي|  | الصندوق الأبيض |
-+----------------+  +----------------+  +----------------+
-| دون معرفة      |  | معرفة جزئية    |  | معرفة كاملة    |
-| بالكود الداخلي |  | بالبنية        |  | بالكود والبنية |
-+----------------+  +----------------+  +----------------+
-
-```
+<figure class="dg" role="img" aria-label="أنواع الاختبار حسب معرفة المختبر بالكود: Black Box وGray Box وWhite Box"><div class="dg-box dg-root"><b class="en">Software Testing</b><span>أنواع الاختبار</span></div><div class="dg-split" style="--n:3" aria-hidden="true"><i></i><i></i><i></i></div><div class="dg-cols" style="--n:3;--nm:1"><div class="dg-box dg-card" style="--c:var(--cyan,#38bdf8)"><b class="en">Black Box</b><span>الصندوق الأسود</span><ul><li>دون معرفة بالكود الداخلي</li></ul></div><div class="dg-box dg-card" style="--c:var(--muted,#93a4c0)"><b class="en">Gray Box</b><span>الصندوق الرمادي</span><ul><li>معرفة جزئية بالبنية</li></ul></div><div class="dg-box dg-card" style="--c:var(--orange,#f6823b)"><b class="en">White Box</b><span>الصندوق الأبيض</span><ul><li>معرفة كاملة بالكود والبنية</li></ul></div></div></figure>
 
 ### 1. اختبار الصندوق الأسود (Black Box Testing)
 
@@ -581,31 +441,7 @@ ELSE
 
 بعد إضافة ميزة الكوبون، لا يكفي اختبار أن الكوبون يعمل فقط، بل يجب التحقق أيضاً من الوظائف المرتبطة:
 
-```plain
-+--------------------------+
-| New Feature: Coupon      |
-| ميزة جديدة: كوبون خصم    |
-+--------------------------+
-             |
-             v
-+--------------------------+
-| Test Coupon Calculation  |
-| اختبار احتساب الخصم      |
-+--------------------------+
-             |
-             v
-+--------------------------+
-| Regression Test          |
-| اختبار الوظائف المتأثرة  |
-+--------------------------+
-             |
-      +------+------+------+
-      |      |      |      |
-      v      v      v      v
-   Cart   Tax    Payment  Invoice
-   السلة  الضريبة الدفع   الفاتورة
-
-```
+<figure class="dg" role="img" aria-label="بعد إضافة كوبون الخصم يتم اختبار الميزة ثم Regression على السلة والضريبة والدفع والفاتورة"><div class="dg-flow"><div class="dg-box dg-step"><em>1</em><div><b class="en">New Feature: Coupon</b><span>ميزة جديدة: كوبون خصم</span></div></div><div class="dg-box dg-step"><em>2</em><div><b class="en">Test Coupon Calculation</b><span>اختبار احتساب الخصم</span></div></div><div class="dg-box dg-step o"><em>3</em><div><b class="en">Regression Test</b><span>اختبار الوظائف المتأثرة</span></div></div></div><div class="dg-split" style="--n:4" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="dg-cols" style="--n:4;--nm:2"><div class="dg-box dg-chip"><b class="en">Cart</b><span>السلة</span></div><div class="dg-box dg-chip"><b class="en">Tax</b><span>الضريبة</span></div><div class="dg-box dg-chip"><b class="en">Payment</b><span>الدفع</span></div><div class="dg-box dg-chip"><b class="en">Invoice</b><span>الفاتورة</span></div></div></figure>
 
 قد يؤدي تعديل بسيط في منطق الحساب إلى التأثير في الضريبة أو الشحن أو الدفع أو الفاتورة.
 
@@ -729,29 +565,7 @@ ELSE
 
 ### مخطط مبسط
 
-```plain
-             +------------------------+
-             |   Test Automation     |
-             |    أتمتة الاختبار      |
-             +------------------------+
-                         |
-             +-----------+-----------+
-             |                       |
-             v                       v
-+---------------------+  +---------------------+
-| Repetitive Tests    |  | Stable Test Cases   |
-| اختبارات متكررة     |  | حالات مستقرة       |
-+---------------------+  +---------------------+
-             |                       |
-             +-----------+-----------+
-                         |
-                         v
-             +------------------------+
-             | Faster Feedback        |
-             | تغذية راجعة أسرع       |
-             +------------------------+
-
-```
+<figure class="dg" role="img" aria-label="أتمتة الاختبار تناسب الاختبارات المتكررة والحالات المستقرة وتعطي تغذية راجعة أسرع"><div class="dg-box dg-root"><b class="en">Test Automation</b><span>أتمتة الاختبار</span></div><div class="dg-split" style="--n:2" aria-hidden="true"><i></i><i></i></div><div class="dg-cols" style="--n:2;--nm:1"><div class="dg-box dg-card"><b class="en">Repetitive Tests</b><span>اختبارات متكررة</span></div><div class="dg-box dg-card"><b class="en">Stable Test Cases</b><span>حالات مستقرة</span></div></div><div class="dg-split dg-merge" style="--n:2" aria-hidden="true"><i></i><i></i></div><div class="dg-box dg-root o"><b class="en">Faster Feedback</b><span>تغذية راجعة أسرع</span></div></figure>
 
 **ملاحظة مهمة:** الأتمتة ليست بديلاً كاملاً عن الاختبار اليدوي. فالاختبار اليدوي مناسب لمهام تتطلب الاستكشاف والحكم البشري، بينما الأتمتة مفيدة في الحالات المتكررة والمستقرة.
 
@@ -870,43 +684,7 @@ ELSE
 
 يمكن أن تساهم أنشطة الاختبار في مراحل متعددة:
 
-```plain
-+-----------------------+
-| Requirements          |
-| تحليل المتطلبات       |
-+-----------------------+
-           |
-           v
-+-----------------------+
-| Design                |
-| التصميم               |
-+-----------------------+
-           |
-           v
-+-----------------------+
-| Development           |
-| التطوير               |
-+-----------------------+
-           |
-           v
-+-----------------------+
-| Testing               |
-| الاختبار              |
-+-----------------------+
-           |
-           v
-+-----------------------+
-| Release               |
-| الإطلاق               |
-+-----------------------+
-           |
-           v
-+-----------------------+
-| Maintenance           |
-| الصيانة والتحسين      |
-+-----------------------+
-
-```
+<figure class="dg" role="img" aria-label="مراحل دورة حياة تطوير البرمجيات SDLC ودور الاختبار فيها"><div class="dg-flow"><div class="dg-box dg-step"><em>1</em><div><b class="en">Requirements</b><span>تحليل المتطلبات</span></div></div><div class="dg-box dg-step"><em>2</em><div><b class="en">Design</b><span>التصميم</span></div></div><div class="dg-box dg-step"><em>3</em><div><b class="en">Development</b><span>التطوير</span></div></div><div class="dg-box dg-step o"><em>4</em><div><b class="en">Testing</b><span>الاختبار</span></div></div><div class="dg-box dg-step"><em>5</em><div><b class="en">Release</b><span>الإطلاق</span></div></div><div class="dg-box dg-step"><em>6</em><div><b class="en">Maintenance</b><span>الصيانة والتحسين</span></div></div></div></figure>
 
 ### مرحلة تحليل المتطلبات
 
