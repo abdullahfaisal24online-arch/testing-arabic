@@ -448,3 +448,13 @@ html:not([data-theme='light']) .mobile-nav a.m-link[href="/store/"] {
 .dg-split>i{display:none}
 .dg-split::before{height:26px}
 }
+/* .dg additions: stem, captions, Arabic-first steps, pyramid */
+.dg-stem{width:2px;height:24px;margin-inline:auto;background:var(--dg-ln)}
+.dg-cap{text-align:center;color:var(--muted,#93a4c0);font-size:.88rem;margin-top:.6rem}
+.dg-cap .en{font-weight:600;color:var(--ink-2,#c3d0e4)}
+.dg-step>div>*{text-align:right}
+.dg-step>div>span.en{color:var(--muted,#93a4c0);font-size:.85rem}
+.dg-pyr{display:flex;flex-direction:column;align-items:center;gap:.5rem;max-width:560px;margin-inline:auto}
+.dg-pyr>.dg-box{width:var(--w,100%);min-width:160px;border-top:3px solid var(--c)}
+.dg-pyr>.dg-box>b{color:var(--c)}
+.dg-pyr>.dg-box>em{display:inline-block;margin-top:.35rem;font-style:normal;font-size:.8rem;font-weight:700;color:var(--c);padding:.1rem .55rem;border-radius:999px;background:color-mix(in srgb,var(--c) 14%,transparent);direction:ltr}
