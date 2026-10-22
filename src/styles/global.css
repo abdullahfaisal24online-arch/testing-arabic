@@ -400,3 +400,51 @@ html:not([data-theme='light']) .mobile-nav a.m-link[href="/store/"] {
     text-shadow: 0 0 14px rgba(246, 130, 59, 0.55);
   }
 }
+
+/* ===== Article diagrams (.dg) — RTL-safe replacements for ASCII diagrams ===== */
+.dg{--dg-c:var(--cyan,#38bdf8);--dg-o:var(--orange,#f6823b);--dg-ln:var(--line-strong,#38bdf852);--dg-g:1rem;direction:rtl;margin:1.5rem 0 2rem}
+.dg *{box-sizing:border-box}
+.dg .en{direction:ltr;unicode-bidi:isolate}
+.dg-box{--c:var(--dg-c);background:var(--surface,#12213d);border:1px solid var(--line,#38bdf829);border-radius:var(--r-md,12px);padding:.7rem 1rem;text-align:center}
+.dg-box.o{--c:var(--dg-o)}
+.dg-box>b{display:block;color:var(--ink,#e8eef9);font-size:1rem;line-height:1.5}
+.dg-box>span{display:block;color:var(--ink-2,#c3d0e4);font-size:.9rem;line-height:1.6;margin-top:.1rem}
+.dg-root{width:fit-content;min-width:220px;max-width:100%;margin-inline:auto;border-color:var(--line-strong,#38bdf852)}
+.dg-root.o{border-color:var(--c);background:color-mix(in srgb,var(--c) 10%,var(--surface,#12213d))}
+.dg-root>span{color:var(--muted,#93a4c0)}
+.dg-cols{display:grid;grid-template-columns:repeat(var(--n,2),minmax(0,1fr));gap:var(--dg-g)}
+.dg-card{border-top:3px solid var(--c);display:flex;flex-direction:column;gap:.7rem;padding:1rem 1rem 1.1rem}
+.dg-card>b{color:var(--c);font-size:1.1rem}
+.dg-card>span{margin-top:-.55rem}
+.dg-card>em{font-style:normal;align-self:center;width:1.7rem;height:1.7rem;border-radius:50%;display:grid;place-items:center;font-size:.85rem;font-weight:700;color:var(--c);border:1.5px solid var(--c)}
+.dg-q{margin:0;padding:.6rem .75rem;border-radius:var(--r-sm,8px);background:color-mix(in srgb,var(--c) 12%,transparent);color:var(--ink,#e8eef9);font-weight:600;line-height:1.7}
+.dg-card ul{list-style:none;margin:0;padding:0;display:grid;gap:.4rem;text-align:start}
+.dg-card li{position:relative;margin:0;padding-inline-start:1.1rem;color:var(--ink-2,#c3d0e4);line-height:1.6}
+.dg-card li::before{content:"";position:absolute;inset-inline-start:0;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--c)}
+.dg-chip{padding:.55rem .5rem}
+.dg-chip>b{font-size:.95rem}
+.dg-split{display:grid;grid-template-columns:repeat(var(--n,2),minmax(0,1fr));column-gap:var(--dg-g);height:40px;position:relative}
+.dg-split::before{content:"";position:absolute;top:0;height:20px;width:2px;inset-inline-start:calc(50% - 1px);background:var(--dg-ln)}
+.dg-split>i{position:relative}
+.dg-split>i::before{content:"";position:absolute;top:19px;height:2px;inset-inline:calc(var(--dg-g)/-2);background:var(--dg-ln)}
+.dg-split>i:first-child::before{inset-inline-start:calc(50% - 1px)}
+.dg-split>i:last-child::before{inset-inline-end:calc(50% - 1px)}
+.dg-split>i::after{content:"";position:absolute;top:19px;bottom:0;width:2px;inset-inline-start:calc(50% - 1px);background:var(--dg-ln)}
+.dg-merge{transform:scaleY(-1)}
+.dg-flow{display:flex;flex-direction:column;max-width:460px;margin-inline:auto;counter-reset:dg}
+.dg-step{display:flex;align-items:center;gap:.8rem;text-align:start;position:relative}
+.dg-step+.dg-step{margin-top:30px}
+.dg-step+.dg-step::before{content:"";position:absolute;top:-29px;height:20px;width:2px;inset-inline-start:calc(50% - 1px);background:var(--dg-ln)}
+.dg-step+.dg-step::after{content:"";position:absolute;top:-10px;inset-inline-start:calc(50% - 5px);border:5px solid transparent;border-top:6px solid var(--dg-ln);border-bottom:0}
+.dg-step>em{flex:none;font-style:normal;width:1.9rem;height:1.9rem;border-radius:50%;display:grid;place-items:center;font-size:.85rem;font-weight:700;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.dg-step.o{border-color:var(--c)}
+.dg-step>div>b{text-align:right;display:block;color:var(--ink,#e8eef9);font-size:1rem;line-height:1.5}
+.dg-step>div>span{display:block;color:var(--ink-2,#c3d0e4);font-size:.9rem;line-height:1.6}
+.dg-step.o>div>b{color:var(--c)}
+.dg-flow+.dg-split{margin-top:0}
+@media (max-width:560px){
+.dg-cols{grid-template-columns:repeat(var(--nm,1),minmax(0,1fr))}
+.dg-split{height:26px}
+.dg-split>i{display:none}
+.dg-split::before{height:26px}
+}
